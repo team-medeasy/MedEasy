@@ -82,4 +82,3 @@ link-assets-manifest.json
 # iOS Xcode workspace & build artifacts
 ios/Podfile.lock
 ios/MedEasy.xcworkspace/
-ios/MedEasy.xcodeproj/
