@@ -72,3 +72,14 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Fonts (Android에서 번들된 경우)
+/android/app/src/main/assets/fonts/
+
+# Link assets manifest (자동 생성됨)
+link-assets-manifest.json
+
+# iOS Xcode workspace & build artifacts
+ios/Podfile.lock
+ios/MedEasy.xcworkspace/
+ios/MedEasy.xcodeproj/
