@@ -10,9 +10,19 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-navigation/bottom-tabs": "^7.2.0",
+    "@react-navigation/native": "^7.0.14",
+    "@react-navigation/native-stack": "^7.2.0",
+    "@react-navigation/stack": "^7.1.1",
     "react": "18.3.1",
     "react-dom": "^18.3.1",
     "react-native": "^0.77.1",
+    "react-native-gesture-handler": "^2.23.1",
+    "react-native-safe-area-context": "^5.2.0",
+    "react-native-screens": "^4.6.0",
+    "react-native-styled-components": "^2.1.0",
+    "react-native-vector-icons": "^10.2.0",
+    "react-native-vision-camera": "^4.6.3",
     "styled-components": "^6.1.15"
   },
   "devDependencies": {
