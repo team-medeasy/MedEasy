@@ -29,7 +29,7 @@ const Container3 = styled.View`
 
 const WelcomeText = styled.Text`
   font-family: ${fonts.title.fontFamily};
-  font-size: ${fonts.title.fontSize}
+  font-size: ${fonts.title.fontSize};  
 `;
 
 const LogoImage = styled(Image)`
@@ -43,7 +43,13 @@ const EmailBtn = styled(TouchableOpacity)`
   border-radius: 10px;
 `;
 
-const SignUpStartScreen = ( { navigation } ) => {
+const EmailBtnText = styled.Text`
+  font-size: 12px;
+  font-family: 'Pretendard-SemiBold';
+  color: #0005;
+`;
+
+const SignUpStartScreen = ({ navigation }) => {
   return (
     <Container>
       <Container1>
@@ -53,10 +59,10 @@ const SignUpStartScreen = ( { navigation } ) => {
         <LogoImage source={require('./../../assets/images/logo.png')} />
       </Container2>
       <Container3>
-        <Button title="카카오톡으로 시작하기"/>
-        <Button title="Google로 시작하기"/>
+        <Button title="카카오톡으로 시작하기" onPress={() => navigation.navigate('HomePage')} />
+        <Button title="Google로 시작하기" onPress={() => console.log('Google 로그인')} />
         <EmailBtn onPress={() => navigation.navigate('')}>
-          <Text style={{ fontSize: 12, fontFamily: 'Pretendard-SemiBold', color: '#0005' }}>이메일로 시작하기</Text>
+          <EmailBtnText>이메일로 시작하기</EmailBtnText>
         </EmailBtn>
       </Container3>
     </Container>
