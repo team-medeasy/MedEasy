@@ -1,8 +1,9 @@
 import React from 'react';
 import { SafeAreaView, Image, TouchableOpacity, Text } from 'react-native';
 import styled from 'styled-components/native';
-import { themes, pointColor, fonts } from './../../styles';
-import { Button } from './../../components';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { themes, fonts } from './../../styles';
 
 const currentTheme = themes.light;
 
@@ -12,7 +13,6 @@ const Container = styled(SafeAreaView)`
 `;
 
 const Container1 = styled.View`
-  background-color: #fff;
   margin-top: 70px;
   margin-left: 40px;
 `;
@@ -24,17 +24,31 @@ const Container2 = styled.View`
 `;
 
 const Container3 = styled.View`
-  align-items: center;    
-`;
-
-const WelcomeText = styled.Text`
-  font-family: ${fonts.title.fontFamily};
-  font-size: ${fonts.title.fontSize};  
+  align-items: center;
+  height: 152px;
 `;
 
 const LogoImage = styled(Image)`
   width: 250px;  
   height: 250px;  
+`;
+
+const SignUpBtn = styled(TouchableOpacity)`
+  width: 90%;
+  height: 53px;
+  background-color: ${themes.light.boxColor.buttonPrimary};
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  flex-direction: row;
+  gap: 20px;
+`;
+
+const BtnText = styled(Text)`
+  color: ${themes.light.textColor.buttonText};
+  font-size: 15px;
+  font-family: 'Pretendard-SemiBold';
 `;
 
 const EmailBtn = styled(TouchableOpacity)`
@@ -46,22 +60,29 @@ const EmailBtn = styled(TouchableOpacity)`
 const EmailBtnText = styled.Text`
   font-size: 12px;
   font-family: 'Pretendard-SemiBold';
-  color: #0005;
+  color: #0006;
 `;
 
 const SignUpStartScreen = ({ navigation }) => {
   return (
     <Container>
       <Container1>
-        <WelcomeText>메디지와 함께{"\n"}규칙적인 복약 습관{"\n"}만들어 가요!</WelcomeText>
+      <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
+        메디지와 함께{"\n"}규칙적인 복약 습관{"\n"}만들어 가요!
+      </Text>
       </Container1> 
       <Container2>
         <LogoImage source={require('./../../assets/images/logo.png')} />
       </Container2>
       <Container3>
-        <Button title="카카오톡으로 시작하기" onPress={() => navigation.navigate('HomePage')} />
-        <Button title="Google로 시작하기" onPress={() => console.log('Google 로그인')} />
-        <EmailBtn onPress={() => navigation.navigate('')}>
+        <SignUpBtn onPress={() => navigation.navigate('HomePage')}>
+          <BtnText>카카오톡으로 시작하기</BtnText>
+        </SignUpBtn>
+        <SignUpBtn onPress={() => console.log('Google 로그인')}>
+          <FontAwesome name="google" size={20} color="#ffffff" />
+          <BtnText>Google로 시작하기</BtnText>
+        </SignUpBtn > 
+        <EmailBtn onPress={() => navigation.navigate('SignUpName')}>
           <EmailBtnText>이메일로 시작하기</EmailBtnText>
         </EmailBtn>
       </Container3>
