@@ -5,10 +5,13 @@ export const lightTheme = {
     },
     boxColor: {
         buttonPrimary: '#000000',
+        inputPrimary: '#0000000A',
     },
     bgColor: {
     },
     borderColor: {
+        borderPrimary: '#0000001A',
+        borderSecondary: '#00000012',
     },
   };
   
