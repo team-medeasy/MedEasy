@@ -5,9 +5,8 @@ import { themes } from '../styles';
 
 const ButtonContainer = styled(TouchableOpacity)`
   width: 90%;
-  height: 53px;
+  height: 60px;
   background-color: ${(props) => props.bgColor || themes.light.boxColor.buttonPrimary};
-  margin-bottom: 15px;
   justify-content: center;
   align-items: center;
   border-radius: 10px;
@@ -15,8 +14,8 @@ const ButtonContainer = styled(TouchableOpacity)`
 
 const ButtonText = styled(Text)`
   color: ${(props) => props.color || '#fff'};
-  font-size: 14px;
-  font-family: 'Pretendard-SemiBold';
+  font-size: 18px;
+  font-family: 'KimjungchulGothic-Bold';
 `;
 
 const Button = ({ title, onPress, bgColor, textColor }) => {
