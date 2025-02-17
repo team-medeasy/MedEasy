@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components/native';
+import Logo from './../../assets/icons/logo/logo.svg';
+import Logo_kr from './../../assets/icons/logo/logo_kr.svg';
 
 const Splash = ({ navigation }) => {
   useEffect(() => {
@@ -19,7 +21,11 @@ const Splash = ({ navigation }) => {
         <BigLine>의학 도우미</BigLine>
       </TextContainer>
       <LogoContainer>
-        <Logo>logo</Logo>
+        <Logo width={500} height={500} style={{ 
+            opacity: 0.5, 
+            transform: [{ rotate: '10deg' }] ,
+          }}  />
+          <Logo_kr width={82}/>
       </LogoContainer>
     </Container>
   );
@@ -27,11 +33,12 @@ const Splash = ({ navigation }) => {
 
 const Container = styled.View`
   flex: 1;
-  background-color: black;
+  background-color: #18337B;
 `;
 
 const TextContainer = styled.View`
   flex: 1;
+  justify-content: center;
 `;
 
 const SmallLine = styled.Text`
@@ -52,10 +59,10 @@ const BigLine = styled.Text`
 
 const LogoContainer = styled.View`
   flex: 2;
-`;
-
-const Logo = styled.Text`
-  color: white;
+  justify-content: center;
+  align-items: flex-end;
+  margin-right: -100;
+  overflow: hidden;
 `;
 
 export default Splash;
