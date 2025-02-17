@@ -21,8 +21,8 @@ const App = () => {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="HomePage"
-          component={HomePage}
+          name="NavigationBar"
+          component={NavigationBar}
           options={{headerShown: false}}
         />
         {/* 회원가입 관련 화면 */}
