@@ -1565,6 +1565,8 @@ PODS:
     - React-logger (= 0.77.1)
     - React-perflogger (= 0.77.1)
     - React-utils (= 0.77.1)
+  - RNCMaskedView (0.1.11):
+    - React
   - RNGestureHandler (2.23.1):
     - DoubleConversion
     - glog
@@ -1625,6 +1627,49 @@ PODS:
     - React-NativeModulesApple
     - React-RCTFabric
     - React-RCTImage
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - RNSVG (15.11.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - RNSVG/common (= 15.11.1)
+    - Yoga
+  - RNSVG/common (15.11.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
     - React-rendererdebug
     - React-utils
     - ReactCodegen
@@ -1730,8 +1775,10 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -1874,10 +1921,14 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCMaskedView:
+    :path: "../node_modules/@react-native-community/masked-view"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   VisionCamera:
@@ -1952,8 +2003,10 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 41e9fb63606c32cce924653d2d410cb01ec81286
   ReactCodegen: d9a09a7f7eee93f54d0b4135d5ca66b31b0c42a5
   ReactCommon: 08f4808f02ff115884e870e5cfea689703ff759a
+  RNCMaskedView: 4c5ee1c8667d56077246cc6d1977f77393923560
   RNGestureHandler: 63273d6c9936df3da2461766615eade82284adac
   RNScreens: 5a1573ceb1a13b2d0663cbfb42cb4aa8803554eb
+  RNSVG: 2089e8b3a145acb2f392017279790f007f934567
   RNVectorIcons: bd818296a51dc2bb8c3bd97a3ca399df1afe216d
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   VisionCamera: 030bcbf22791d698926e7c0e3b804126165e62e3

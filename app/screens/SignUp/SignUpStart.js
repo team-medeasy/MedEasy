@@ -1,9 +1,9 @@
 import React from 'react';
-import { SafeAreaView, Image, TouchableOpacity, Text } from 'react-native';
+import {SafeAreaView, Image, TouchableOpacity, Text} from 'react-native';
 import styled from 'styled-components/native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { themes, fonts } from './../../styles';
+import {themes, fonts} from './../../styles';
+import LogoSvg from './../../assets/images/logo.svg';
 
 const currentTheme = themes.light;
 
@@ -18,7 +18,7 @@ const Container1 = styled.View`
 `;
 
 const Container2 = styled.View`
-  align-items: center;    
+  align-items: center;
   margin-top: 100px;
   margin-bottom: 100px;
 `;
@@ -29,8 +29,8 @@ const Container3 = styled.View`
 `;
 
 const LogoImage = styled(Image)`
-  width: 250px;  
-  height: 250px;  
+  width: 250px;
+  height: 250px;
 `;
 
 const SignUpBtn = styled(TouchableOpacity)`
@@ -52,8 +52,8 @@ const BtnText = styled(Text)`
 `;
 
 const EmailBtn = styled(TouchableOpacity)`
-  justify-content: center; 
-  align-items: center;  
+  justify-content: center;
+  align-items: center;
   border-radius: 10px;
 `;
 
@@ -63,16 +63,20 @@ const EmailBtnText = styled.Text`
   color: #0006;
 `;
 
-const SignUpStartScreen = ({ navigation }) => {
+const SignUpStartScreen = ({navigation}) => {
   return (
     <Container>
       <Container1>
-      <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
-        메디지와 함께{"\n"}규칙적인 복약 습관{"\n"}만들어 가요!
-      </Text>
-      </Container1> 
+        <Text
+          style={{
+            fontFamily: fonts.title.fontFamily,
+            fontSize: fonts.title.fontSize,
+          }}>
+          메디지와 함께{'\n'}규칙적인 복약 습관{'\n'}만들어 가요!
+        </Text>
+      </Container1>
       <Container2>
-        <LogoImage source={require('./../../assets/images/logo.png')} />
+        <LogoSvg width={250} height={250} />
       </Container2>
       <Container3>
         <SignUpBtn onPress={() => navigation.navigate('HomePage')}>
@@ -81,7 +85,7 @@ const SignUpStartScreen = ({ navigation }) => {
         <SignUpBtn onPress={() => console.log('Google 로그인')}>
           <FontAwesome name="google" size={20} color="#ffffff" />
           <BtnText>Google로 시작하기</BtnText>
-        </SignUpBtn > 
+        </SignUpBtn>
         <EmailBtn onPress={() => navigation.navigate('SignUpName')}>
           <EmailBtnText>이메일로 시작하기</EmailBtnText>
         </EmailBtn>
