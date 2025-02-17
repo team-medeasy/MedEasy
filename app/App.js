@@ -7,7 +7,7 @@ import SignUpNameScreen from './screens/SignUp/SignUpName';
 import SignUpEmailScreen from './screens/SignUp/SignUpEmail';
 import SignUpPasswordScreen from './screens/SignUp/SignUpPassword';
 import SignUpDOBGenderScreen from './screens/SignUp/SignUpDOBGender';
-import HomePage from './screens/Navigation/HomePage';
+import NavigationBar from './components/NavigationBar';
 
 const Stack = createStackNavigator();
 

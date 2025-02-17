@@ -79,7 +79,7 @@ const SignUpStartScreen = ({navigation}) => {
         <LogoSvg width={250} height={250} />
       </Container2>
       <Container3>
-        <SignUpBtn onPress={() => navigation.navigate('HomePage')}>
+        <SignUpBtn onPress={() => navigation.navigate('NavigationBar')}>
           <BtnText>카카오톡으로 시작하기</BtnText>
         </SignUpBtn>
         <SignUpBtn onPress={() => console.log('Google 로그인')}>
