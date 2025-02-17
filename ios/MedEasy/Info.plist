@@ -49,14 +49,14 @@
 	<false/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>KimjungchulGothic-Bold.otf</string>
-		<string>KimjungchulGothic-Light.otf</string>
-		<string>KimjungchulGothic-Regular.otf</string>
-		<string>Pretendard-ExtraBold.otf</string>
 		<string>Pretendard-Regular.otf</string>
+		<string>Pretendard-ExtraBold.otf</string>
 		<string>Pretendard-SemiBold.otf</string>
+		<string>KimjungchulGothic-Regular.otf</string>
+		<string>KimjungchulGothic-Light.otf</string>
+		<string>KimjungchulGothic-Bold.otf</string>
 		<string>MaterialCommunityIcons.ttf</string>
-		<string>FontAwesome.ttf</string>
+  		<string>FontAwesome.ttf</string>
 	</array>
 </dict>
 </plist>
