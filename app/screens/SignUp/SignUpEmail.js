@@ -9,6 +9,16 @@ const Container = styled(SafeAreaView)`
   background-color: #fff;
 `;
 
+const BackButtonContainer = styled.View`
+  width: 100%;
+  align-items: flex-start;
+  padding: 20px 25px 10px;
+`;
+
+const BackButton = styled.TouchableOpacity`
+  padding: 10px;
+`;
+
 const Container1 = styled.View`
   justify-content: center; 
   margin-top: 78px;
@@ -53,48 +63,54 @@ const TxtLabel = styled.Text`
 `;
 
 const SignUpEmailScreen = ({ navigation, route }) => {
-    const { lastName, firstName } = route.params;
-    const [email, setEmail] = useState('');
-    const progress = '50%';
-  
-    const handleNext = () => {
-      if (email) {
-        console.log('이메일:', email);
-        // 다음 페이지로 이동
-        navigation.navigate('SignUpPassword', { lastName, firstName, email }); 
-      } else {
-        alert('이메일을 입력하세요.');
-      }
-    };
+  const { lastName, firstName } = route.params;
+  const [email, setEmail] = useState('');
+  const progress = '50%';
 
-    return (
-      <Container>
-          <ProgressBar progress={progress}/>
-        <Container1>
-          <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
-            {firstName}님, 반가워요!
-          </Text>
-          <Text style={{ fontFamily: 'Pretendart-Regular', fontSize: 16, marginTop: 7, color: 'grey' }}>
-              이메일 주소를 입력해주세요.
-          </Text>
-        </Container1>
-        <Container2>
-            <InputContainer marginBottom="5px">
-                <TextInput
-                placeholder="예: abcd@efg.com"
-                value={email}
-                onChangeText={setEmail}
-                />
-            </InputContainer>
-            <InputContainer marginTop="5px">
-                <TxtLabel>{lastName + firstName}</TxtLabel>
-            </InputContainer>
-        </Container2>
-        <BtnContainer>
-            <Button title="다음" onPress={handleNext}/>
-        </BtnContainer>
-      </Container>
-    );
+  const handleNext = () => {
+    if (email) {
+      console.log('이메일:', email);
+      // 다음 페이지로 이동
+      navigation.navigate('SignUpPassword', { lastName, firstName, email });
+    } else {
+      alert('이메일을 입력하세요.');
+    }
+  };
+
+  return (
+    <Container>
+      <ProgressBar progress={progress} />
+
+      <BackButtonContainer>
+        <BackButton onPress={() => navigation.goBack()}>
+          <Text style={{ fontSize: 18, color: 'black' }}>←</Text>
+        </BackButton>
+      </BackButtonContainer>
+      <Container1>
+        <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
+          {firstName}님, 반가워요!
+        </Text>
+        <Text style={{ fontFamily: 'Pretendart-Regular', fontSize: 16, marginTop: 7, color: 'grey' }}>
+          이메일 주소를 입력해주세요.
+        </Text>
+      </Container1>
+      <Container2>
+        <InputContainer marginBottom="5px">
+          <TextInput
+            placeholder="예: abcd@efg.com"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </InputContainer>
+        <InputContainer marginTop="5px">
+          <TxtLabel>{lastName + firstName}</TxtLabel>
+        </InputContainer>
+      </Container2>
+      <BtnContainer>
+        <Button title="다음" onPress={handleNext} />
+      </BtnContainer>
+    </Container>
+  );
 };
 
 export default SignUpEmailScreen;

@@ -9,9 +9,19 @@ const Container = styled(SafeAreaView)`
   background-color: #fff;
 `;
 
+const BackButtonContainer = styled.View`
+  width: 100%;
+  align-items: flex-start;
+  padding: 20px 25px 10px;
+`;
+
+const BackButton = styled.TouchableOpacity`
+  padding: 10px;
+`;
+
 const Container1 = styled.View`
   justify-content: center; 
-  margin-top: 78px;
+  margin-top: 20px;
   margin-left: 30px;
 `;
 
@@ -50,13 +60,6 @@ const GenderContainer = styled.View`
   margin-right: ${(props) => props.marginRight || '0px'}; 
 `;
 
-const DescriptionText = styled.Text`
-  font-family: 'KimjungchulGothic-Bold';
-  font-size: 20px;
-  font-weight: bold;
-  color: #000;
-`;
-
 const TextInput = styled.TextInput`
   height: 60px;
   border-radius: 10px;
@@ -81,44 +84,42 @@ const GenderText = styled.Text`
 const SignUpDOBGenderScreen = ({ navigation, route }) => {
     const { firstName } = route.params;
     const [birthDate, setBirthDate] = useState('');
-    const [gender, setGender] = useState(''); // 성별 상태 추가
+    const [gender, setGender] = useState('');
     const progress = '100%';
 
     const handleNext = () => {
       if (birthDate && gender) {
-        console.log('생년월일:', birthDate);
-        console.log('성별:', gender);
-        // 다음 페이지로 이동
-        navigation.navigate('', {  }); 
+        navigation.navigate('HomePage');
       } else {
         alert('생년월일과 성별을 입력하세요.');
       }
     };
 
     const handleBirthDateChange = (text) => {
-      // 숫자만 필터링
       let formattedText = text.replace(/[^0-9]/g, '');
-
-      // 날짜 형식에 맞게 자동 포맷팅
       if (formattedText.length <= 4) {
-        formattedText = formattedText.slice(0, 4); // 연도 4자리
+        formattedText = formattedText.slice(0, 4);
       } else if (formattedText.length <= 6) {
-        formattedText = formattedText.slice(0, 4) + '.' + formattedText.slice(4, 6); // 연도-월
+        formattedText = formattedText.slice(0, 4) + '-' + formattedText.slice(4, 6);
       } else if (formattedText.length <= 8) {
-        formattedText = formattedText.slice(0, 4) + '.' + formattedText.slice(4, 6) + '.' + formattedText.slice(6, 8); // 연도-월-일
+        formattedText = formattedText.slice(0, 4) + '-' + formattedText.slice(4, 6) + '-' + formattedText.slice(6, 8);
       }
-
-      // 생년월일이 8자리 이상 입력되면 더 이상 입력을 받지 않음
       if (formattedText.length > 10) {
         formattedText = formattedText.slice(0, 10);
       }
-
       setBirthDate(formattedText);
     };
 
     return (
       <Container>
-        <ProgressBar progress={progress}/>
+        <ProgressBar progress={progress} />
+
+        <BackButtonContainer>
+          <BackButton onPress={() => navigation.goBack()}>
+            <Text style={{ fontSize: 18, color: 'black' }}>←</Text>
+          </BackButton>
+        </BackButtonContainer>
+
         <Container1>
           <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
             {firstName}님, 반가워요!
@@ -127,6 +128,7 @@ const SignUpDOBGenderScreen = ({ navigation, route }) => {
             생년월일과 성별을 입력해주세요.
           </Text>        
         </Container1>
+
         <Container2>
           <InputContainer marginBottom="5px">
               <TextInput
@@ -134,27 +136,24 @@ const SignUpDOBGenderScreen = ({ navigation, route }) => {
               value={birthDate}
               onChangeText={handleBirthDateChange}
               keyboardType="numeric"
-              maxLength={10} // 최대 10자 (YYYY-MM-DD)
-              editable={true} // 언제든지 수정할 수 있도록 함
+              maxLength={10}
               />
           </InputContainer>
         </Container2>
+
         <Container3>
           <GenderContainer marginRight="10px">
-            <GenderBtn
-              selected={gender === 'male'}
-              onPress={() => setGender('male')}>
+            <GenderBtn selected={gender === 'male'} onPress={() => setGender('male')}>
               <GenderText selected={gender === 'male'}>남자</GenderText>
             </GenderBtn>
           </GenderContainer>
           <GenderContainer marginLeft="10px">
-            <GenderBtn
-              selected={gender === 'female'}
-              onPress={() => setGender('female')}>
+            <GenderBtn selected={gender === 'female'} onPress={() => setGender('female')}>
               <GenderText selected={gender === 'female'}>여자</GenderText>
             </GenderBtn>
           </GenderContainer>
         </Container3>
+
         <BtnContainer>
           <Button title="메디지 시작하기" onPress={handleNext}/>
         </BtnContainer>
