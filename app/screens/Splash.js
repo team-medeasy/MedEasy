@@ -36,15 +36,17 @@ const TextContainer = styled.View`
 
 const SmallLine = styled.Text`
   color: white;
-  font-size: 18;
+  font-family: 'KimjungchulGothic-Regular';
+  font-size: 15;
   margin-bottom: 10;
   margin-top: 100;
   margin-left: 50;
 `;
 const BigLine = styled.Text`
   color: white;
+  font-family: 'KimjungchulGothic-Bold';
   font-weight: bold;
-  font-size: 40;
+  font-size: 32;
   margin-left: 50;
 `;
 
