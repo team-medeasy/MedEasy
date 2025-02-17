@@ -9,6 +9,16 @@ const Container = styled(SafeAreaView)`
   background-color: #fff;
 `;
 
+const BackButtonContainer = styled.View`
+  width: 100%;
+  align-items: flex-start;
+  padding: 20px 25px 10px;
+`;
+
+const BackButton = styled.TouchableOpacity`
+  padding: 10px;
+`;
+
 const Container1 = styled.View`
   justify-content: center; 
   margin-top: 78px;
@@ -70,6 +80,12 @@ const SignUpPasswordScreen = ({ navigation, route }) => {
     return (
       <Container>
           <ProgressBar progress={progress}/>
+
+          <BackButtonContainer>
+            <BackButton onPress={() => navigation.goBack()}>
+              <Text style={{ fontSize: 18, color: 'black' }}>←</Text>
+            </BackButton>
+          </BackButtonContainer>
         <Container1>
           <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
             {firstName}님, 반가워요!

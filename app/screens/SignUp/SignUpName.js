@@ -9,6 +9,16 @@ const Container = styled(SafeAreaView)`
   background-color: #fff;
 `;
 
+const BackButtonContainer = styled.View`
+  width: 100%;
+  align-items: flex-start;
+  padding: 20px 25px 10px;
+`;
+
+const BackButton = styled.TouchableOpacity`
+  padding: 10px;
+`;
+
 const Container1 = styled.View`
   justify-content: center; 
   margin-top: 78px;
@@ -48,51 +58,57 @@ const TextInput = styled.TextInput`
 `;
 
 const SignUpNameScreen = ({ navigation }) => {
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const progress = '25%';
-  
-    const handleNext = () => {
-      if (firstName && lastName) {
-        console.log('이름:', firstName, '성:', lastName);
-        // 다음 페이지로 이동
-        navigation.navigate('SignUpEmail', { lastName, firstName } ); 
-      } else {
-        alert('성을 포함한 이름을 모두 입력하세요.');
-      }
-    };
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const progress = '25%';
 
-    return (
-      <Container>
-        <ProgressBar progress={progress}/>
-        <Container1>
-            <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
-                안녕하세요, 메디지입니다 👋
-            </Text>
-            <Text style={{ fontFamily: 'Pretendart-Regular', fontSize: 16, marginTop: 7, color: 'grey' }}>
-                이름을 입력해주세요.
-            </Text>
-        </Container1>
-        <Container2>
-            <InputContainer marginRight="5px">
-            <TextInput
+  const handleNext = () => {
+    if (firstName && lastName) {
+      console.log('이름:', firstName, '성:', lastName);
+      // 다음 페이지로 이동
+      navigation.navigate('SignUpEmail', { lastName, firstName });
+    } else {
+      alert('성을 포함한 이름을 모두 입력하세요.');
+    }
+  };
+
+  return (
+    <Container>
+      <ProgressBar progress={progress} />
+
+      <BackButtonContainer>
+        <BackButton onPress={() => navigation.goBack()}>
+          <Text style={{ fontSize: 18, color: 'black' }}>←</Text>
+        </BackButton>
+      </BackButtonContainer>
+      <Container1>
+        <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
+          안녕하세요, 메디지입니다 👋
+        </Text>
+        <Text style={{ fontFamily: 'Pretendart-Regular', fontSize: 16, marginTop: 7, color: 'grey' }}>
+          이름을 입력해주세요.
+        </Text>
+      </Container1>
+      <Container2>
+        <InputContainer marginRight="5px">
+          <TextInput
             placeholder="성"
             value={lastName}
             onChangeText={setLastName}
-            />
-            </InputContainer>
-            <InputContainer marginLeft="5px">
-                <TextInput
-                placeholder="이름"
-                value={firstName}
-                onChangeText={setFirstName}
-                />
-            </InputContainer>
-        </Container2>
-        <BtnContainer>
-            <Button title="다음" onPress={handleNext}/>
-        </BtnContainer>
-      </Container>
-    );
+          />
+        </InputContainer>
+        <InputContainer marginLeft="5px">
+          <TextInput
+            placeholder="이름"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+        </InputContainer>
+      </Container2>
+      <BtnContainer>
+        <Button title="다음" onPress={handleNext} />
+      </BtnContainer>
+    </Container>
+  );
 }
 export default SignUpNameScreen;
