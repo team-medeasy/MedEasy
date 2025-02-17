@@ -3,7 +3,7 @@ import {SafeAreaView, Image, TouchableOpacity, Text} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {themes, fonts} from './../../styles';
-import LogoSvg from './../../assets/images/logo.svg';
+import LogoSvg from './../../../assets/images/logo.svg';
 
 const currentTheme = themes.light;
 
