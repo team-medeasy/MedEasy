@@ -8,17 +8,10 @@ import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
 
-import Search from './Search';
-import Routine from './Routine';
-import MyPage from './MyPage';
-
-export const Home = () => {
-  return (
-    <Container>
-      <StyledText>홈</StyledText>
-    </Container>
-  );
-};
+import Home from '../screens/Navigation/Home';
+import Search from '../screens/Navigation/Search';
+import Routine from '../screens/Navigation/Routine';
+import MyPage from '../screens/Navigation/MyPage';
 
 // 카메라 스크린 컴포넌트
 const CameraScreen = () => {
@@ -152,7 +145,7 @@ const HomePage = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen 
-        name="MainTabs" 
+        name="Main" 
         component={TabNavigator}
         options={{ headerShown: false }}
       />

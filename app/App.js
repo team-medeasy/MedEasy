@@ -7,7 +7,7 @@ import SignUpNameScreen from './screens/SignUp/SignUpName';
 import SignUpEmailScreen from './screens/SignUp/SignUpEmail';
 import SignUpPasswordScreen from './screens/SignUp/SignUpPassword';
 import SignUpDOBGenderScreen from './screens/SignUp/SignUpDOBGender';
-import HomePage from './screens/Navigation/HomePage';
+import NavigationBar from './components/NavigationBar';
 
 const Stack = createStackNavigator();
 
@@ -16,7 +16,7 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
       <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }}/>
-        <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }}/>
+        <Stack.Screen name="NavigationBar" component={NavigationBar} options={{ headerShown: false }}/>
         {/* 회원가입 관련 화면 */}
         <Stack.Screen name="SignUpStart" component={SignUpStartScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="SignUpName" component={SignUpNameScreen} options={{ headerShown: false }}/>
