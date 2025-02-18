@@ -167,32 +167,41 @@ const SignUpDOBGenderScreen = ({ navigation, route }) => {
   };
 
   const handleBirthDateChange = (text) => {
-      let formattedText = text.replace(/[^0-9]/g, '');
-      
-      // 이전 값의 숫자만 추출
-      const prevNumbers = birthDate.replace(/[^0-9]/g, '');
-      
-      // 길이가 증가하는 경우에만 유효성 검사 실행
-      // 이전 단계에서 에러가 있는 상태에서 새로운 숫자 입력을 막음
-      if (formattedText.length > prevNumbers.length && !validatePartialDate(formattedText)) {
-          formattedText = prevNumbers;
-      }
-      
-      // 형식 지정 (하이픈 추가)
-      if (formattedText.length <= 4) {
-          formattedText = formattedText.slice(0, 4);
-      } else if (formattedText.length <= 6) {
-          formattedText = formattedText.slice(0, 4) + '-' + formattedText.slice(4, 6);
-      } else if (formattedText.length <= 8) {
-          formattedText = formattedText.slice(0, 4) + '-' + formattedText.slice(4, 6) + '-' + formattedText.slice(6, 8);
-      }
-      
-      // 최대 길이 제한
-      if (formattedText.length > 10) {
-          formattedText = formattedText.slice(0, 10);
-      }
-      
-      setBirthDate(formattedText);
+    // 현재 입력된 모든 문자(하이픈 포함)의 길이가 이전보다 짧으면 삭제 중
+    const isDeleting = text.length < birthDate.length;
+    
+    // 숫자만 추출
+    let numbers = text.replace(/[^0-9]/g, '');
+    
+    // 삭제 중이 아닐 때만 유효성 검사
+    if (!isDeleting && !validatePartialDate(numbers)) {
+        return;
+    }
+    
+    let formattedText = '';
+    
+    // 삭제 중일 때는 이전 값에서 마지막 숫자 하나만 제거
+    if (isDeleting) {
+        const prevNumbers = birthDate.replace(/[^0-9]/g, '');
+        numbers = prevNumbers.slice(0, -1);
+    }
+    
+    // 숫자 개수에 따른 포맷팅
+    if (numbers.length <= 4) {
+        formattedText = numbers;
+        if (numbers.length === 4 && !isDeleting) {
+            formattedText += '-';
+        }
+    } else if (numbers.length <= 6) {
+        formattedText = `${numbers.slice(0, 4)}-${numbers.slice(4)}`;
+        if (numbers.length === 6 && !isDeleting) {
+            formattedText += '-';
+        }
+    } else {
+        formattedText = `${numbers.slice(0, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6)}`;
+    }
+    
+    setBirthDate(formattedText);
   };
 
     const handleNext = () => {
@@ -264,7 +273,6 @@ const SignUpDOBGenderScreen = ({ navigation, route }) => {
                   </GenderBtn>
               </GenderContainer>
           </Container3>
-
           <BtnContainer>
               <Button title="메디지 시작하기" onPress={handleNext}/>
           </BtnContainer>
