@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components/native';
 import Logo from './../../assets/icons/logo/logo.svg';
 import Logo_kr from './../../assets/icons/logo/logo_kr.svg';
+import {pointColor} from './../styles';
 
 const Splash = ({ navigation }) => {
   useEffect(() => {
@@ -33,7 +34,7 @@ const Splash = ({ navigation }) => {
 
 const Container = styled.View`
   flex: 1;
-  background-color: #18337B;
+  background-color:${pointColor.pointPrimary};
 `;
 
 const TextContainer = styled.View`

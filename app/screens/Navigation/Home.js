@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import { Calendar } from 'react-native-calendars';
-import { View, SafeAreaView } from 'react-native';
+import { SafeAreaView, TouchableOpacity } from 'react-native';
 import Logo from './../../../assets/icons/logo/logo.svg';
 import Logo_kr from './../../../assets/icons/logo/logo_kr.svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { TouchableOpacity } from 'react-native';
 
 const Home = () => {
   return (
@@ -28,20 +27,7 @@ const Home = () => {
 
         {/* 달력 */}
         <CalendarContainer>
-          <Calendar
-            theme={{
-              backgroundColor: '#ffffff',
-              calendarBackground: '#ffffff',
-              textSectionTitleColor: '#18337B',
-              selectedDayBackgroundColor: '#18337B',
-              selectedDayTextColor: '#ffffff',
-              todayTextColor: '#FF5733',
-              dayTextColor: '#2d4150',
-              textDisabledColor: '#d9e1e8',
-              dotColor: 'red',
-              arrowColor: '#18337B',
-            }}
-          />
+          <StyledCalendar />
         </CalendarContainer>
       </ScrollContainer>
     </SafeAreaView>
@@ -84,5 +70,27 @@ const CalendarContainer = styled.View`
   padding: 20px;
   margin-top: 20px;
 `;
+
+const StyledCalendar = styled(Calendar).attrs({
+  theme: {
+    backgroundColor: '#ffffff',
+    calendarBackground: '#ffffff',
+    textSectionTitleColor: '#000000',
+    selectedDayBackgroundColor: '#000000',
+    selectedDayTextColor: '#ffffff',
+    todayTextColor: '#FF6565',
+    dayTextColor: '#000000',
+    textDisabledColor: '#d9e1e8',
+    arrowColor: '#000000',
+    fontFamily: 'KimjungchulGothic-Regular',
+    textDayFontSize: 15, // 날짜 폰트 크기
+    textMonthFontSize: 20, // 월 폰트 크기
+    textDayHeaderFontSize: 13, // 요일(월,화,수 등) 폰트 크기
+    textDayFontWeight: '600', // 날짜 굵기
+    textMonthFontWeight: '800', // 월 굵기
+    textDayHeaderFontWeight: '600', // 요일 굵기
+  },
+  monthFormat: 'yyyy.MM', 
+})``;
 
 export default Home;
