@@ -42,8 +42,7 @@ const BtnContainer = styled.View`
   height: 8.5%;
   justify-content: center; 
   align-items: center;    
-  background-color: #fff;
-  margin-top: 20px;
+  margin-top: auto;
 `;
 
 const TextInput = styled.TextInput`
