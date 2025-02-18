@@ -141,7 +141,7 @@ const TabNavigator = () => {
   );
 };
 
-const HomePage = () => {
+const NavigationBar = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen 
@@ -233,4 +233,4 @@ const StyledText = styled.Text`
   color: #333;
 `;
 
-export default HomePage;
+export default NavigationBar;

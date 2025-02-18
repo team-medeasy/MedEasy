@@ -213,7 +213,7 @@ const SignUpDOBGenderScreen = ({ navigation, route }) => {
             return;
         }
 
-        navigation.navigate('HomePage');
+        navigation.navigate('NavigationBar');
     };
 
   return (
