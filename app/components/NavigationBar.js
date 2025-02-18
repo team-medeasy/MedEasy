@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Camera } from 'react-native-vision-camera';
@@ -8,7 +9,8 @@ import { useNavigation } from '@react-navigation/native';
 import {pointColor} from './../styles';
 
 import Home from '../screens/Navigation/Home';
-import Search from '../screens/Navigation/Search';
+import SearchMedicineScreen from '../screens/Search/SearchMedicine';
+import SearchMedicineResultsScreen from '../screens/Search/SearchMedicineResults';
 import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
 
@@ -16,6 +18,17 @@ import HomeIcon from '../../assets/icons/nav/home.svg';
 import SearchIcon from '../../assets/icons/nav/search.svg';
 import RoutineIcon from '../../assets/icons/nav/routine.svg';
 import MyIcon from '../../assets/icons/nav/my.svg';
+
+const SearchStack = createStackNavigator();
+
+const SearchStackNavigator = () => {
+  return (
+    <SearchStack.Navigator screenOptions={{ headerShown: false }}>
+      <SearchStack.Screen name="SearchMedicine" component={SearchMedicineScreen} />
+      <SearchStack.Screen name="SearchMedicineResults" component={SearchMedicineResultsScreen} />
+    </SearchStack.Navigator>
+  );
+};
 
 // 카메라 버튼
 const CameraButton = ({ onPress }) => {
@@ -62,7 +75,7 @@ const TabNavigator = () => {
         />
         <Tab.Screen
           name="약 검색"
-          component={Search}
+          component={SearchStackNavigator}
           options={{
             headerShown: false,
             tabBarIcon: ({ color, size }) => (
