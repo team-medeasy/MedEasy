@@ -1,6 +1,7 @@
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
 import Splash from './screens/Splash';
 import SignUpStartScreen from './screens/SignUp/SignUpStart';
 import SignUpNameScreen from './screens/SignUp/SignUpName';
@@ -9,49 +10,45 @@ import SignUpPasswordScreen from './screens/SignUp/SignUpPassword';
 import SignUpDOBGenderScreen from './screens/SignUp/SignUpDOBGender';
 import NavigationBar from './components/NavigationBar';
 
-const Stack = createStackNavigator();
+const RootStack = createStackNavigator();
+const AuthStack = createStackNavigator();
+
+const AuthNavigator = () => {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="SignUpStart" component={SignUpStartScreen} />
+      <AuthStack.Screen name="SignUpName" component={SignUpNameScreen} />
+      <AuthStack.Screen name="SignUpEmail" component={SignUpEmailScreen} />
+      <AuthStack.Screen name="SignUpPassword" component={SignUpPasswordScreen} />
+      <AuthStack.Screen name="SignUpDOBGender" component={SignUpDOBGenderScreen} />
+    </AuthStack.Navigator>
+  );
+};
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // 2초 후에 Splash 화면을 종료하고 메인 화면으로 이동
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash">
-        <Stack.Screen
-          name="Splash"
-          component={Splash}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="NavigationBar"
-          component={NavigationBar}
-          options={{headerShown: false}}
-        />
-        {/* 회원가입 관련 화면 */}
-        <Stack.Screen
-          name="SignUpStart"
-          component={SignUpStartScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="SignUpName"
-          component={SignUpNameScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="SignUpEmail"
-          component={SignUpEmailScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="SignUpPassword"
-          component={SignUpPasswordScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="SignUpDOBGender"
-          component={SignUpDOBGenderScreen}
-          options={{headerShown: false}}
-        />
-      </Stack.Navigator>
+      {isLoading ? (
+        <Splash />
+      ) : (
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          {/* ✅ 회원가입 네비게이터 */}
+          <RootStack.Screen name="Auth" component={AuthNavigator} />
+          {/* ✅ 메인 네비게이션 */}
+          <RootStack.Screen name="NavigationBar" component={NavigationBar} />
+        </RootStack.Navigator>
+      )}
     </NavigationContainer>
   );
 };

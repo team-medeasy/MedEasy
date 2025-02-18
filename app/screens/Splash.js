@@ -6,9 +6,10 @@ import {pointColor} from './../styles';
 
 const Splash = ({ navigation }) => {
   useEffect(() => {
-    // 2초 후에 Login 화면으로 이동
     const timer = setTimeout(() => {
-      navigation.navigate('SignUpStart');
+      if (navigation) {
+        navigation.navigate('SignUpStart');
+      }
     }, 2000);
 
     return () => clearTimeout(timer);
@@ -23,10 +24,10 @@ const Splash = ({ navigation }) => {
       </TextContainer>
       <LogoContainer>
         <Logo width={500} height={500} style={{ 
-            opacity: 0.5, 
-            transform: [{ rotate: '10deg' }] ,
-          }}  />
-          <Logo_kr width={82}/>
+          opacity: 0.5, 
+          transform: [{ rotate: '10deg' }]
+        }} />
+        <Logo_kr width={82} />
       </LogoContainer>
     </Container>
   );
@@ -45,24 +46,25 @@ const TextContainer = styled.View`
 const SmallLine = styled.Text`
   color: white;
   font-family: 'KimjungchulGothic-Regular';
-  font-size: 15;
-  margin-bottom: 10;
-  margin-top: 100;
-  margin-left: 50;
+  font-size: ${15}px;
+  margin-bottom: 10px;
+  margin-top: 100px;
+  margin-left: 50px;
 `;
+
 const BigLine = styled.Text`
   color: white;
   font-family: 'KimjungchulGothic-Bold';
   font-weight: bold;
-  font-size: 32;
-  margin-left: 50;
+  font-size: ${32}px;
+  margin-left: 50px;
 `;
 
 const LogoContainer = styled.View`
   flex: 2;
   justify-content: center;
   align-items: flex-end;
-  margin-right: -100;
+  transform: translateX(-100px);
   overflow: hidden;
 `;
 
