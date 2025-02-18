@@ -8,6 +8,7 @@ export const lightTheme = {
         buttonPrimary: '#000000',
         buttonSecondary: '#ffffff',
         inputPrimary: '#0000000A',
+        inputSecondary: '#0000000F'
     },
     bgColor: {
         bgPrimary: '#ffffff',
