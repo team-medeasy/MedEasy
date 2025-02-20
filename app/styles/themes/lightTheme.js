@@ -2,6 +2,9 @@ export const lightTheme = {
     textColor: {
         textPrimary: '#000000',
         Primary20: '#00000033',
+        Primary30: '#0000004D',
+        Primary50: '#00000080',
+        Primary70: '#000000B3',
         buttonText: '#ffffff',
     },
     boxColor: {
