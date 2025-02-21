@@ -1,33 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, FlatList, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import styled from 'styled-components/native';
+import {themes, pointColor} from './../../styles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import {Footer} from './../../components';
+import {LogoIcons, HeaderIcons, OtherIcons} from '../../../assets/icons';
+
+const {
+  logo: LogoIcon,
+} = LogoIcons;
+const {search: SearchGeneralIcon} = OtherIcons;
+const {chevron: ChevronIcon} = HeaderIcons;
 
 const Container = styled(SafeAreaView)`
   flex: 1;
   background-color: #fff;
 `;
 
+const ChevronAndSearchContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  padding-right: 15px;
+  padding-left: 12px;
+`;
+
+const SearchBarTouchable = styled(TouchableOpacity)`
+  height: 44px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  background-color: ${({theme}) => themes.light.boxColor.inputSecondary};
+  flex: 1;
+  padding: 13px 20px 13px 15px;
+`;
+
+const SearchQueryText = styled.Text`
+  font-size: 15px;
+  font-family: 'Pretendard-SemiBold';
+  color: ${themes.light.textColor.textPrimary};
+`;
+
+const SearchIconContainer = styled.View`
+  justify-content: center;
+  align-items: center;
+`;
+
+const ChevronIconButton = styled(TouchableOpacity)`
+  margin-right: 12px;
+`;
+
 const SearchResultContainer = styled.View`
   flex: 1;
   margin-top: 20px;
-  margin-left: 15px;
-  margin-right: 15px;
 `;
 
 const SearchResultItem = styled.View`
-  width: 100%;
-  height: 90px;
+  height: 74.67px;
   flex-direction: row;
-  padding-top: 10px;
-  padding-bottom: 10px;
   align-items: center;
-  margin-bottom: 10px;
+  margin: 0 15px 25px 15px;
 `;
 
 const ImageContainer = styled.View`
   width: 140px;
-  height: 75px;
+  height: 74.67px;
   margin-right: 15px;
   border-radius: 10px;
 `;
@@ -39,65 +77,35 @@ const MedicineImage = styled.Image`
 `;
 
 const InfoContainer = styled.View`
-  flex: 1;
   height: 100%;
+  gap: 7px;
   justify-content: center;
 `;
 
 const ManufacturerText = styled.Text`
-  font-size: 12px;
-  font-weight: 600;
-  color: #0006;
-  margin-bottom: 6px;
+  font-size: 13px;
+  font-family: 'Pretendard-SemiBold';
+  color: ${themes.light.textColor.Primary50};
 `;
 
 const MedicineNameText = styled.Text`
-  font-weight: bold;
-  font-size: 16px;
-  color: #000;
-  margin-bottom: 6px;
+  font-size: 17px;
+  font-family: 'Pretendard-SemiBold';
+  color: ${themes.light.textColor.textPrimary};
 `;
 
 const TypeContainer = styled.View`
   flex-direction: row;
+  gap: 11px;
 `;
 
 const TypeText = styled.Text`
-  font-size: 12px;
-  font-weight: bold;
-  color: #777;
-  background-color: ${(props) => props.bgColor || "lightgoldenrodyellow"};
-  color: ${(props) => props.color || "yellowgreen"};
-  margin-right: 10px;
+  font-size: 13px;
+  font-family: 'Pretendard-SemiBold';
+  background-color: ${(props) => props.bgColor || themes.light.boxColor.tagPrimary};
+  color: ${(props) => props.color || pointColor.pointPrimary};
   border-radius: 5px;
-  padding: 6px;
-`;
-
-const BackAndSearchContainer = styled.View`
-  height: 60px;
-  flex-direction: row;
-  align-items: center;
-  margin-left: 20px;
-  margin-right: 20px;
-`;
-
-const SearchInputContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  border-radius: 8px;
-  background-color: #0001;
-  flex: 1;
-`;
-
-const SearchInput = styled.TextInput`
-  height: 100%;
-  flex: 1;
-  padding: 10px;
-  font-size: 14px;
-`;
-
-const SearchButton = styled(TouchableOpacity)`
-  padding: 10px;
+  padding: 4px 7px;
 `;
 
 const NoResultsContainer = styled.View`
@@ -106,35 +114,32 @@ const NoResultsContainer = styled.View`
   align-items: center;
 `;
 
-const NoResultsImage = styled.Image`
-  margin-bottom: 30px;
-`;
-
 const NoResultsText = styled.Text`
-  font-size: 20px;
-  font-weight: 600;
-  color: #000;
-  margin-bottom: 15px;
+  font-size: 18px;
+  font-family: 'Pretendard-SemiBold';
+  color: ${themes.light.textColor.textPrimary};
+  margin-top: 34px;
 `;
 
 const NoResultsSubText = styled.Text`
   font-size: 14px;
-  font-weight: 600;
-  color: #0005;
+  font-family: 'Pretendard-SemiBold';
+  color: ${themes.light.textColor.Primary30};
+  margin-top: 18px;
   text-align: center;
 `;
 
 const FeatureSearchContainer = styled.View`
-  margin-left: 20px;
-  margin-top: 20px;
+  margin-top: 15px;
+  padding-left: 20px;
   flex-direction: row;
   align-items: center; 
 `;
 
 const FeatureSearchText = styled.Text`
-  font-size: 16px;
-  font-weight: 600;
-  margin-right: 15px;
+  font-size: 15px;
+  font-family: 'Pretendard-SemiBold';
+  margin-right: 11px;
 `;
 
 const ScrollableFilterContainer = styled.ScrollView`
@@ -142,18 +147,19 @@ const ScrollableFilterContainer = styled.ScrollView`
 `;
 
 const FilterButton = styled(TouchableOpacity)`
-  border-color: #0001;
+  border-color: ${themes.light.boxColor.inputSecondary};
   flex-direction: row;
   border-width: 1.5px;
-  padding: 7px 11px;
+  padding: 6px 9px 6px 11px;
   border-radius: 40px;
   margin-right: 10px;
 `;
 
 const FilterButtonText = styled.Text`
-  font-weight: 600;
+  font-size: 13px;
   margin-right: 5px;
-  color: ${props => props.selected ? '#1C51FF' : '#000'};
+  font-family: 'Pretendard-SemiBold';
+  color: ${props => props.selected ? pointColor.pointPrimary : themes.light.textColor.textPrimary};
 `;
 
 const ModalContainer = styled.View`
@@ -278,6 +284,11 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
         }
     };
 
+    // SearchBar 터치 핸들러
+    const handleSearchBarPress = () => {
+      navigation.navigate('SearchMedicine');
+    };
+
     const renderFilterModal = (title, options, selected, setSelected, modalVisible, setModalVisible) => (
       <Modal
           animationType="slide"
@@ -311,21 +322,17 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
 
     return (
       <Container>
-        <BackAndSearchContainer>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="chevron-back" size={20} color="#000" style={{ marginRight: 10 }}/>
-            </TouchableOpacity>
-            <SearchInputContainer>
-              <SearchInput
-                  placeholder="약 이름, 증상을 입력하세요"
-                  value={newSearchQuery}
-                  onChangeText={setNewSearchQuery}
-              />
-              <SearchButton onPress={handleSearch}>
-                  <Ionicons name="search" size={20} color="#0005" />
-              </SearchButton>
-            </SearchInputContainer>
-        </BackAndSearchContainer>
+        <ChevronAndSearchContainer>
+          <ChevronIconButton onPress={() => navigation.goBack()}>
+            <ChevronIcon height={17} width={17} />
+          </ChevronIconButton>
+          <SearchBarTouchable onPress={handleSearchBarPress}>
+            <SearchQueryText>{searchQuery}</SearchQueryText>
+            <SearchIconContainer>
+              <SearchGeneralIcon width={17.5} height={17.5} />
+            </SearchIconContainer>
+          </SearchBarTouchable>
+        </ChevronAndSearchContainer>
         {searchResults.length > 0 && (
           <FeatureSearchContainer>
               <FeatureSearchText>특징 검색</FeatureSearchText>
@@ -375,16 +382,19 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
                                 <ManufacturerText>{item.manufacturer}</ManufacturerText>
                                 <MedicineNameText>{item.name}</MedicineNameText>
                                 <TypeContainer>
-                                    <TypeText color="rgb(28, 81, 255)" bgColor="rgba(28, 81, 255, 0.1)">{item.medicineType}</TypeText>
-                                    <TypeText color="rgb(0, 0, 0)" bgColor="rgba(0, 0, 0, 0.1)">{item.functionalType}</TypeText>
+                                    <TypeText>{item.medicineType}</TypeText>
+                                    <TypeText color={themes.light.textColor.textPrimary} bgColor={themes.light.boxColor.tagSecondary}>{item.functionalType}</TypeText>
                                 </TypeContainer>
                             </InfoContainer>
                         </SearchResultItem>
                     )}
+                    ListFooterComponent={() => (
+                      <Footer/>
+                    )}
                 />
             ) : (
-              <NoResultsContainer>
-              {/* <NoResultsImage source={require("./../assets/images/logo/logo_noResult.png")} /> */}
+            <NoResultsContainer>
+              <LogoIcon></LogoIcon>
               <NoResultsText>검색 결과가 없습니다.</NoResultsText>
               <NoResultsSubText>검색어를 다시 한 번{'\n'}확인해 주세요.</NoResultsSubText>
             </NoResultsContainer>

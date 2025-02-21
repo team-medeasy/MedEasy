@@ -58,7 +58,7 @@ const ClearAllButton = styled(TouchableOpacity)``;
 const ClearAllText = styled.Text`
   font-size: 14px;
   font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.textPrimary};
+  color: ${themes.light.textColor.Primary30};
 `;
 
 const NoRecentSearchesText = styled.Text`
@@ -160,42 +160,26 @@ const SearchMedicineScreen = ({navigation, route}) => {
     {rank: 5, term: '제산제', rankChange: 'stay'},
   ];
 
-  const handleSearch = () => {
-    if (searchQuery.trim() !== '') {
+  const handleSearch = (query) => {
+    if (query.trim() !== '') {
       const updatedSearches = [
-        searchQuery,
-        ...recentSearches.filter(item => item !== searchQuery),
+        query,
+        ...recentSearches.filter(item => item !== query),
       ];
       setRecentSearches(updatedSearches);
-      navigation.navigate('SearchMedicineResults', {
-        searchQuery,
+      navigation.replace('SearchMedicineResults', {
+        searchQuery: query,
         recentSearches: updatedSearches,
       });
     }
   };
 
-  const handleRecentSearchClick = query => {
-    const updatedSearches = [
-      query,
-      ...recentSearches.filter(item => item !== query),
-    ];
-    setRecentSearches(updatedSearches);
-    navigation.navigate('SearchMedicineResults', {
-      searchQuery: query,
-      recentSearches: updatedSearches,
-    });
+  const handleRecentSearchClick = (query) => {
+    handleSearch(query);
   };
 
-  const handlePopularSearchClick = term => {
-    const updatedSearches = [
-      term,
-      ...recentSearches.filter(item => item !== term),
-    ];
-    setRecentSearches(updatedSearches);
-    navigation.navigate('SearchMedicineResults', {
-      searchQuery: term,
-      recentSearches: updatedSearches,
-    });
+  const handlePopularSearchClick = (term) => {
+    handleSearch(term);
   };
 
   const handleDeleteSearch = query => {
@@ -222,13 +206,13 @@ const SearchMedicineScreen = ({navigation, route}) => {
   return (
     <Container>
       <ChevronAndSearchContainer>
-        <ChevronIconButton>
+        <ChevronIconButton onPress={() => navigation.goBack()}>
           <ChevronIcon height={17} width={17} />
         </ChevronIconButton>
         <SearchBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          onSearch={handleSearch}
+          onSearch={() => handleSearch(searchQuery)}
         />
       </ChevronAndSearchContainer>
       <SearchesContainer>
