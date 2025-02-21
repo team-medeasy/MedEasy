@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import React, {useEffect, useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 
 import Splash from './screens/Splash';
 import SignUpStartScreen from './screens/SignUp/SignUpStart';
@@ -15,12 +15,18 @@ const AuthStack = createStackNavigator();
 
 const AuthNavigator = () => {
   return (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+    <AuthStack.Navigator screenOptions={{headerShown: false}}>
       <AuthStack.Screen name="SignUpStart" component={SignUpStartScreen} />
       <AuthStack.Screen name="SignUpName" component={SignUpNameScreen} />
       <AuthStack.Screen name="SignUpEmail" component={SignUpEmailScreen} />
-      <AuthStack.Screen name="SignUpPassword" component={SignUpPasswordScreen} />
-      <AuthStack.Screen name="SignUpDOBGender" component={SignUpDOBGenderScreen} />
+      <AuthStack.Screen
+        name="SignUpPassword"
+        component={SignUpPasswordScreen}
+      />
+      <AuthStack.Screen
+        name="SignUpDOBGender"
+        component={SignUpDOBGenderScreen}
+      />
     </AuthStack.Navigator>
   );
 };
@@ -42,7 +48,7 @@ const App = () => {
       {isLoading ? (
         <Splash />
       ) : (
-        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        <RootStack.Navigator screenOptions={{headerShown: false}}>
           {/* ✅ 회원가입 네비게이터 */}
           <RootStack.Screen name="Auth" component={AuthNavigator} />
           {/* ✅ 메인 네비게이션 */}

@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
-import { SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView, TouchableOpacity, ScrollView} from 'react-native';
 import styled from 'styled-components/native';
-import { themes, pointColor } from './../../styles';
+import {themes, pointColor} from './../../styles';
 
-import Delete from './../../../assets/icons/delete.svg';
-import Chevron from './../../../assets/icons/header/chevron.svg';
-import RankUp from './../../../assets/icons/ranking_up.svg';
-import RankDown from './../../../assets/icons/ranking_down.svg';
 import SearchBar from './../../components/SearchBar';
+import {OtherIcons, HeaderIcons} from '../../../assets/icons';
+
+const {
+  delete: DeleteIcon,
+  rankingDown: RankingDownIcon,
+  rankingUp: RankingUpIcon,
+} = OtherIcons;
+
+const {chevron: ChevronIcon} = HeaderIcons;
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -30,11 +35,9 @@ const SearchesContainer = styled.View`
   margin-top: 25px;
 `;
 
-const RecentSearchesContainer = styled.View`
-`;
+const RecentSearchesContainer = styled.View``;
 
-const PopularSearchContainer = styled.View`
-`;
+const PopularSearchContainer = styled.View``;
 
 const SearchSectionHeader = styled.View`
   flex-direction: row;
@@ -144,131 +147,145 @@ const UpdateDateText = styled.Text`
   color: ${themes.light.textColor.Primary30};
 `;
 
-const SearchMedicineScreen = ({ navigation, route }) => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [recentSearches, setRecentSearches] = useState([]);
+const SearchMedicineScreen = ({navigation, route}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState([]);
 
-    // 인기 검색어 (임시)데이터
-    const popularSearches = [
-      { rank: 1, term: '소화제', rankChange: 'up' },
-      { rank: 2, term: '베스타제당의정', rankChange: 'stay' },
-      { rank: 3, term: '해열제', rankChange: 'down' },
-      { rank: 4, term: '타이레놀', rankChange: 'up' },
-      { rank: 5, term: '제산제', rankChange: 'stay' },
+  // 인기 검색어 (임시)데이터
+  const popularSearches = [
+    {rank: 1, term: '소화제', rankChange: 'up'},
+    {rank: 2, term: '베스타제당의정', rankChange: 'stay'},
+    {rank: 3, term: '해열제', rankChange: 'down'},
+    {rank: 4, term: '타이레놀', rankChange: 'up'},
+    {rank: 5, term: '제산제', rankChange: 'stay'},
+  ];
+
+  const handleSearch = () => {
+    if (searchQuery.trim() !== '') {
+      const updatedSearches = [
+        searchQuery,
+        ...recentSearches.filter(item => item !== searchQuery),
+      ];
+      setRecentSearches(updatedSearches);
+      navigation.navigate('SearchMedicineResults', {
+        searchQuery,
+        recentSearches: updatedSearches,
+      });
+    }
+  };
+
+  const handleRecentSearchClick = query => {
+    const updatedSearches = [
+      query,
+      ...recentSearches.filter(item => item !== query),
     ];
+    setRecentSearches(updatedSearches);
+    navigation.navigate('SearchMedicineResults', {
+      searchQuery: query,
+      recentSearches: updatedSearches,
+    });
+  };
 
-    const handleSearch = () => {
-      if (searchQuery.trim() !== '') {
-          const updatedSearches = [searchQuery, ...recentSearches.filter(item => item !== searchQuery)];
-          setRecentSearches(updatedSearches);
-          navigation.navigate('SearchMedicineResults', { 
-              searchQuery,
-              recentSearches: updatedSearches 
-          });
-      }
-    };
+  const handlePopularSearchClick = term => {
+    const updatedSearches = [
+      term,
+      ...recentSearches.filter(item => item !== term),
+    ];
+    setRecentSearches(updatedSearches);
+    navigation.navigate('SearchMedicineResults', {
+      searchQuery: term,
+      recentSearches: updatedSearches,
+    });
+  };
 
-    const handleRecentSearchClick = (query) => {
-      const updatedSearches = [query, ...recentSearches.filter(item => item !== query)];
-      setRecentSearches(updatedSearches);
-      navigation.navigate('SearchMedicineResults', { 
-          searchQuery: query,
-          recentSearches: updatedSearches 
-      });
-    };
+  const handleDeleteSearch = query => {
+    setRecentSearches(recentSearches.filter(item => item !== query));
+  };
 
-    const handlePopularSearchClick = (term) => {
-      const updatedSearches = [term, ...recentSearches.filter(item => item !== term)];
-      setRecentSearches(updatedSearches);
-      navigation.navigate('SearchMedicineResults', { 
-          searchQuery: term,
-          recentSearches: updatedSearches 
-      });
-    };
+  const handleClearAll = () => {
+    setRecentSearches([]);
+  };
 
-    const handleDeleteSearch = (query) => {
-        setRecentSearches(recentSearches.filter(item => item !== query));
-    };
+  const getRankChangeIcon = rankChange => {
+    switch (rankChange) {
+      case 'up':
+        return <RankingUpIcon width={9.14} height={17} />;
+      case 'down':
+        return <RankingDownIcon width={9.14} height={17} />;
+      case 'stay':
+        return <RankingStayText>-</RankingStayText>;
+      default:
+        return null;
+    }
+  };
 
-    const handleClearAll = () => {
-        setRecentSearches([]);
-    };
-
-    const getRankChangeIcon = (rankChange) => {
-      switch (rankChange) {
-          case 'up':
-              return <RankUp width={9.14} height={17}/>;
-          case 'down':
-              return <RankDown width={9.14} height={17} />;
-          case 'stay':
-              return <RankingStayText>-</RankingStayText>;
-          default:
-              return null;
-      }
-    };
-
-    return (
-      <Container>
-        <ChevronAndSearchContainer>
-            <ChevronIconButton>
-                <Chevron height={17} width={17}/>
-            </ChevronIconButton>
-            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} onSearch={handleSearch} />
-        </ChevronAndSearchContainer>
-        <SearchesContainer>
-          <RecentSearchesContainer>
-              <SearchSectionHeader>
-                  <SearchTitle>최근 검색어</SearchTitle>
-                  <ClearAllButton onPress={handleClearAll}>
-                      <ClearAllText>전체 삭제</ClearAllText>
-                  </ClearAllButton>
-              </SearchSectionHeader>      
-              {recentSearches.length > 0 ? (
-                  <RecentSearchListContainer
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                  >
-                      {recentSearches.map((item, index) => (
-                          <RecentSearchItemButton key={index} onPress={() => handleRecentSearchClick(item)}>
-                              <RecentSearchItemText>{item}</RecentSearchItemText>
-                              <DeleteIconButton onPress={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteSearch(item);
-                              }}>
-                                  <Delete height={10} width={10}/>
-                              </DeleteIconButton>
-                          </RecentSearchItemButton>
-                      ))}
-                  </RecentSearchListContainer>
-              ) : (
-                  <NoRecentSearchesText>검색 기록이 없습니다.</NoRecentSearchesText>
-              )}
-          </RecentSearchesContainer>
-          <PopularSearchContainer>
-            <SearchSectionHeader>
-              <SearchTitle>인기 검색어</SearchTitle>
-            </SearchSectionHeader>
-            <PopularSearchListContainer>
-              {popularSearches.map((item) => (
-                  <PopularSearchItemButton 
-                      key={item.rank} 
-                      onPress={() => handlePopularSearchClick(item.term)}
-                  >
-                      <RankingText>{item.rank}</RankingText>
-                      <PopularSearchText>{item.term}</PopularSearchText>
-                      <IconContainer>
-                        {getRankChangeIcon(item.rankChange)}
-                      </IconContainer>
-                  </PopularSearchItemButton>
+  return (
+    <Container>
+      <ChevronAndSearchContainer>
+        <ChevronIconButton>
+          <ChevronIcon height={17} width={17} />
+        </ChevronIconButton>
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onSearch={handleSearch}
+        />
+      </ChevronAndSearchContainer>
+      <SearchesContainer>
+        <RecentSearchesContainer>
+          <SearchSectionHeader>
+            <SearchTitle>최근 검색어</SearchTitle>
+            <ClearAllButton onPress={handleClearAll}>
+              <ClearAllText>전체 삭제</ClearAllText>
+            </ClearAllButton>
+          </SearchSectionHeader>
+          {recentSearches.length > 0 ? (
+            <RecentSearchListContainer
+              horizontal
+              showsHorizontalScrollIndicator={false}>
+              {recentSearches.map((item, index) => (
+                <RecentSearchItemButton
+                  key={index}
+                  onPress={() => handleRecentSearchClick(item)}>
+                  <RecentSearchItemText>{item}</RecentSearchItemText>
+                  <DeleteIconButton
+                    onPress={e => {
+                      e.stopPropagation();
+                      handleDeleteSearch(item);
+                    }}>
+                    <DeleteIcon height={10} width={10} />
+                  </DeleteIconButton>
+                </RecentSearchItemButton>
               ))}
-            </PopularSearchListContainer>
-            <UpdateDateContainer>
-              <UpdateDateText>업데이트 2025-02-13</UpdateDateText>
-            </UpdateDateContainer>
-          </PopularSearchContainer>
-        </SearchesContainer>
-      </Container>
-    );
+            </RecentSearchListContainer>
+          ) : (
+            <NoRecentSearchesText>검색 기록이 없습니다.</NoRecentSearchesText>
+          )}
+        </RecentSearchesContainer>
+        <PopularSearchContainer>
+          <SearchSectionHeader>
+            <SearchTitle>인기 검색어</SearchTitle>
+          </SearchSectionHeader>
+          <PopularSearchListContainer>
+            {popularSearches.map(item => (
+              <PopularSearchItemButton
+                key={item.rank}
+                onPress={() => handlePopularSearchClick(item.term)}>
+                <RankingText>{item.rank}</RankingText>
+                <PopularSearchText>{item.term}</PopularSearchText>
+                <IconContainer>
+                  {getRankChangeIcon(item.rankChange)}
+                </IconContainer>
+              </PopularSearchItemButton>
+            ))}
+          </PopularSearchListContainer>
+          <UpdateDateContainer>
+            <UpdateDateText>업데이트 2025-02-13</UpdateDateText>
+          </UpdateDateContainer>
+        </PopularSearchContainer>
+      </SearchesContainer>
+    </Container>
+  );
 };
 
 export default SearchMedicineScreen;
