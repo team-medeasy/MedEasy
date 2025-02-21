@@ -31,7 +31,7 @@ import MedicineIcon from './icons/routine/medicine.svg';
 // 설정 아이콘
 import AnnouncementIcon from './icons/settings/announcement.svg';
 import AppVersionIcon from './icons/settings/app_version.svg';
-import DeleteIcon from './icons/settings/delete.svg';
+import TrashcanIcon from './icons/settings/delete.svg';
 import FAQIcon from './icons/settings/faq.svg';
 import FavoritesIcon from './icons/settings/favorites.svg';
 import FeedbackIcon from './icons/settings/feedback.svg';
@@ -43,6 +43,7 @@ import TextSizeIcon from './icons/settings/text_size.svg';
 // 기타 아이콘
 import ChatIcon from './icons/chat.svg';
 import DeleteCircleIcon from './icons/delete_circle.svg';
+import DeleteIcon from './icons/delete.svg';
 import HeartOffIcon from './icons/heartOff.svg';
 import HeartOnIcon from './icons/heartOn.svg';
 import KarteIcon from './icons/karte.svg';
@@ -79,6 +80,7 @@ export const LogoIcons = {
   logoKr: LogoKrIcon,
   logo: LogoIcon,
 };
+
 export const RoutineIcons = {
   checkOff: CheckOffIcon,
   checkOn: CheckOnIcon,
@@ -89,7 +91,7 @@ export const RoutineIcons = {
 export const SettingsIcons = {
   announcement: AnnouncementIcon,
   appVersion: AppVersionIcon,
-  delete: DeleteIcon,
+  trashcan: TrashcanIcon,
   faq: FAQIcon,
   favorites: FavoritesIcon,
   feedback: FeedbackIcon,
@@ -102,6 +104,7 @@ export const SettingsIcons = {
 export const OtherIcons = {
   chat: ChatIcon,
   deleteCircle: DeleteCircleIcon,
+  delete: DeleteIcon,
   heartOff: HeartOffIcon,
   heartOn: HeartOnIcon,
   karte: KarteIcon,

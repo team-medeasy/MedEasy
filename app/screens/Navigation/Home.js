@@ -7,7 +7,7 @@ import {pointColor, themes} from './../../styles';
 import {HeaderIcons, RoutineIcons, LogoIcons} from './../../../assets/icons';
 
 const {notification: NotificationIcon, chevron: ArrowIcon} = HeaderIcons;
-const {logoKr: LogoKrIcon, logo: LogoIcon} = LogoIcons;
+const {logoKr: LogoKrIcon, logo: LogoIcon, logoAdd: LogoAddIcon} = LogoIcons;
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 // 요일을 한글로 설정
@@ -75,6 +75,7 @@ const Home = () => {
           {/* 버튼 추가 */}
           <RoutineContainer>
             <RoutineButton onPress={() => console.log('루틴 추가')}>
+              <LogoAddIcon height={115} />
               <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
             </RoutineButton>
           </RoutineContainer>
