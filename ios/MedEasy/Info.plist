@@ -58,5 +58,13 @@
 		<string>MaterialCommunityIcons.ttf</string>
   		<string>FontAwesome.ttf</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>카메라 접근 권한이 필요합니다</string>
+	
+	<!-- 만약 사진 저장 기능도 필요하다면 -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>사진 저장을 위해 갤러리 접근 권한이 필요합니다</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>사진 저장을 위해 갤러리 접근 권한이 필요합니다</string>
 </dict>
 </plist>

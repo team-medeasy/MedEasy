@@ -2,18 +2,19 @@ import React, {useState, useCallback} from 'react';
 import styled from 'styled-components/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Camera} from 'react-native-vision-camera';
 import {useNavigation} from '@react-navigation/native';
-import {pointColor} from './../styles';
 
 import Home from '../screens/Navigation/Home';
 import SearchMedicineScreen from '../screens/Search/SearchMedicine';
 import SearchMedicineResultsScreen from '../screens/Search/SearchMedicineResults';
 import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
+import CameraScreen from '../screens/CameraScreen.js';
 
+import {pointColor} from './../styles';
 import {TabIcons} from './../../assets/icons';
+import CameraIcon from './../../assets/icons/camera/camera.svg';
 
 const {
   home: HomeIcon,
@@ -43,11 +44,12 @@ const SearchStackNavigator = () => {
 const CameraButton = ({onPress}) => {
   return (
     <StyledCameraButton onPress={onPress}>
-      <MaterialCommunityIcons name="camera" size={25} color="#fff" />
+      <CameraIcon width={25} height={25} color="#ffffff" />
     </StyledCameraButton>
   );
 };
 
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -124,8 +126,17 @@ const TabNavigator = () => {
   );
 };
 
+const RootNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="TabNavigator" component={TabNavigator} />
+      <Stack.Screen name="Camera" component={CameraScreen} />
+    </Stack.Navigator>
+  );
+};
+
 const NavigationBar = () => {
-  return <TabNavigator />;
+  return <RootNavigator />;
 };
 
 const MainContainer = styled.View`

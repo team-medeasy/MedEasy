@@ -1,27 +1,39 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const Camera = () => {
+const CameraScreen = () => {
   const devices = useCameraDevices();
   const device = devices.back;
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const camera = React.useRef(null);
+  const cameraRef = useRef(null);
+
+  useEffect(() => {
+    (async () => {
+      const permission = await Camera.requestCameraPermission();
+      if (permission !== 'authorized') {
+        console.warn('카메라 권한이 없습니다.');
+        navigation.goBack();
+      }
+    })();
+  }, [navigation]);
 
   const handleCapture = async () => {
+    if (!cameraRef.current) return;
+
     try {
-      const photo = await camera.current.takePhoto({
+      const photo = await cameraRef.current.takePhoto({
         qualityPrioritization: 'quality',
-        flash: 'off',
+        flash: 'off', // 플래시 설정 가능 ('on' | 'off' | 'auto')
       });
       console.log('Photo taken:', photo.path);
       navigation.goBack();
     } catch (error) {
-      console.error('Failed to take photo:', error);
+      console.error('사진 촬영 실패:', error);
     }
   };
 
@@ -35,13 +47,15 @@ const Camera = () => {
 
   return (
     <CameraContainer>
-      <Camera
-        ref={camera}
-        style={{ flex: 1 }}
-        device={device}
-        isActive={isFocused}
-        photo={true}
-      />
+      {isFocused && (
+        <Camera
+          ref={cameraRef}
+          style={{ flex: 1 }}
+          device={device}
+          isActive={true}
+          photo={true}
+        />
+      )}
       <CameraOverlay>
         <CloseButton onPress={() => navigation.goBack()}>
           <MaterialCommunityIcons name="close" size={30} color="#fff" />
@@ -68,7 +82,7 @@ const CameraContainer = styled.View`
 
 const CameraOverlay = styled.View`
   position: absolute;
-  bottom: 0;
+  bottom: 50px;
   left: 0;
   right: 0;
   height: 200px;
@@ -96,9 +110,9 @@ const CaptureButtonInner = styled.View`
 
 const CloseButton = styled.TouchableOpacity`
   position: absolute;
-  top: -500px;
+  top: 40px;
   right: 20px;
   padding: 10px;
 `;
 
-export default Camera;
+export default CameraScreen;
