@@ -16,6 +16,12 @@ import CogIcon from './icons/header/cog.svg';
 import NotificationIcon from './icons/header/notification.svg';
 import TrashIcon from './icons/header/trash.svg';
 
+// 메디지 로고 아이콘
+import LogoAddIcon from './icons/logo/logo_add.svg';
+import LogoEnIcon from './icons/logo/logo_en.svg';
+import LogoKrIcon from './icons/logo/logo_kr.svg';
+import LogoIcon from './icons/logo/logo.svg';
+
 // 루틴 아이콘
 import CheckOffIcon from './icons/routine/checkOff.svg';
 import CheckOnIcon from './icons/routine/checkOn.svg';
@@ -67,6 +73,12 @@ export const HeaderIcons = {
   trash: TrashIcon,
 };
 
+export const LogoIcons = {
+  logoAdd: LogoAddIcon,
+  logoEn: LogoEnIcon,
+  logoKr: LogoKrIcon,
+  logo: LogoIcon,
+};
 export const RoutineIcons = {
   checkOff: CheckOffIcon,
   checkOn: CheckOnIcon,

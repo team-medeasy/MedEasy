@@ -1,43 +1,69 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { SafeAreaView, TouchableOpacity } from 'react-native';
-import { pointColor, themes } from './../../styles';
+import {Calendar, LocaleConfig} from 'react-native-calendars';
+import {SafeAreaView, TouchableOpacity} from 'react-native';
+import {pointColor, themes} from './../../styles';
 
-import Logo from './../../../assets/icons/logo/logo.svg';
-import Logo_kr from './../../../assets/icons/logo/logo_kr.svg';
-import NotiIcon from './../../../assets/icons/header/notification.svg';
-import AddLogoIcon from './../../../assets/icons/logo/logo_add.svg';
-import ArrowIcon from './../../../assets/icons/header/chevron.svg';
-import MediIcon from './../../../assets/icons/routine/medicine.svg';
-import HospitalIcon from './../../../assets/icons/routine/hospital.svg';
+import {HeaderIcons, RoutineIcons, LogoIcons} from './../../../assets/icons';
+
+const {notification: NotificationIcon, chevron: ArrowIcon} = HeaderIcons;
+const {logoKr: LogoKrIcon, logo: LogoIcon} = LogoIcons;
+const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 // 요일을 한글로 설정
 LocaleConfig.locales['ko'] = {
   monthNames: [
-    '1월', '2월', '3월', '4월', '5월', '6월', '7월',
-    '8월', '9월', '10월', '11월', '12월'
+    '1월',
+    '2월',
+    '3월',
+    '4월',
+    '5월',
+    '6월',
+    '7월',
+    '8월',
+    '9월',
+    '10월',
+    '11월',
+    '12월',
   ],
   monthNamesShort: [
-    '1월', '2월', '3월', '4월', '5월', '6월', '7월',
-    '8월', '9월', '10월', '11월', '12월'
+    '1월',
+    '2월',
+    '3월',
+    '4월',
+    '5월',
+    '6월',
+    '7월',
+    '8월',
+    '9월',
+    '10월',
+    '11월',
+    '12월',
   ],
-  dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+  dayNames: [
+    '일요일',
+    '월요일',
+    '화요일',
+    '수요일',
+    '목요일',
+    '금요일',
+    '토요일',
+  ],
   dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
-  today: '오늘'
+  today: '오늘',
 };
 
 LocaleConfig.defaultLocale = 'ko';
 
 const Home = () => {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <LogoContainer>
-        <Logo height={23} />
-        <Logo_kr height={20} style={{ marginLeft: -210 }} />
+        <LogoIcon height={23} />
+        <LogoKrIcon height={20} style={{marginLeft: -210}} />
         <TouchableOpacity>
           <Notification>
-            <NotiIcon height={23} />
+            <NotificationIcon height={23} />
           </Notification>
         </TouchableOpacity>
       </LogoContainer>
@@ -49,23 +75,28 @@ const Home = () => {
           {/* 버튼 추가 */}
           <RoutineContainer>
             <RoutineButton onPress={() => console.log('루틴 추가')}>
-              <AddLogoIcon />
               <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
             </RoutineButton>
           </RoutineContainer>
           <ButtonContainer>
             <AddButton onPress={() => console.log('복용 루틴 추가')}>
               <ButtonContent>
-                <MediIcon height={16} style={{ marginRight: -150 }} />
+                <MediIcon height={16} style={{marginRight: -150}} />
                 <ButtonText>복용 루틴 추가하기</ButtonText>
-                <ArrowIcon height={16} style={{ transform: [{ rotate: '180deg' }], opacity: 0.5 }} />
+                <ArrowIcon
+                  height={16}
+                  style={{transform: [{rotate: '180deg'}], opacity: 0.5}}
+                />
               </ButtonContent>
             </AddButton>
             <AddButton onPress={() => console.log('병원 진료 추가')}>
               <ButtonContent>
-                <HospitalIcon height={16} style={{ marginRight: -150 }} />
+                <HospitalIcon height={16} style={{marginRight: -150}} />
                 <ButtonText>병원 진료 추가하기</ButtonText>
-                <ArrowIcon height={16} style={{ transform: [{ rotate: '180deg' }], opacity: 0.5 }} />
+                <ArrowIcon
+                  height={16}
+                  style={{transform: [{rotate: '180deg'}], opacity: 0.5}}
+                />
               </ButtonContent>
             </AddButton>
           </ButtonContainer>
@@ -180,14 +211,17 @@ const StyledCalendar = styled(Calendar).attrs({
     textDayHeaderFontWeight: '800', // 요일 굵기
     'stylesheet.calendar.header': {
       dayTextAtIndex0: {
-        color: pointColor.pointSecondary  // 일요일 (index 0)
-      }
-    }
+        color: pointColor.pointSecondary, // 일요일 (index 0)
+      },
+    },
   },
   monthFormat: 'yyyy.MM',
-  renderArrow: (direction) => (
+  renderArrow: direction => (
     <ArrowIcon
-      style={{ transform: [{ rotate: direction === 'left' ? '0deg' : '180deg' }], marginHorizontal: 20, }}
+      style={{
+        transform: [{rotate: direction === 'left' ? '0deg' : '180deg'}],
+        marginHorizontal: 20,
+      }}
       height={16}
     />
   ),
