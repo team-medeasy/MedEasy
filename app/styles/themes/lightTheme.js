@@ -8,14 +8,21 @@ export const lightTheme = {
         buttonText: '#ffffff',
     },
     boxColor: {
+        navBG: '#ffffff',
         buttonPrimary: '#000000',
         buttonSecondary: '#ffffff',
         inputPrimary: '#0000000A',
-        inputSecondary: '#0000000F'
+        inputSecondary: '#0000000F',
+        tagPrimary:'#4273ED1A',
+        tagSecondary: '#0000001A',
+        tagTetiary: '#87A6FFB3',
+        tagQuaternart: '#ffffff33',
     },
     bgColor: {
         bgPrimary: '#ffffff',
         bgSecondary: '#f5f5f5',
+        footerBG: '#00000012',
+        headerBG: '#ffffff',
     },
     borderColor: {
         borderPrimary: '#0000001A',
