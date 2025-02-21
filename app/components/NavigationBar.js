@@ -10,6 +10,7 @@ import SearchMedicineScreen from '../screens/Search/SearchMedicine';
 import SearchMedicineResultsScreen from '../screens/Search/SearchMedicineResults';
 import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
+import Search from '../screens/Navigation/Search.js';
 import CameraScreen from '../screens/CameraScreen.js';
 
 import {pointColor} from './../styles';
@@ -27,7 +28,15 @@ const SearchStack = createStackNavigator();
 
 const SearchStackNavigator = () => {
   return (
-    <SearchStack.Navigator screenOptions={{headerShown: false}}>
+    <SearchStack.Navigator 
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <SearchStack.Screen
+        name="약 검색"
+        component={Search}
+      />
       <SearchStack.Screen
         name="SearchMedicine"
         component={SearchMedicineScreen}
