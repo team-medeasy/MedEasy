@@ -6,6 +6,7 @@ export const lightTheme = {
         Primary50: '#00000080',
         Primary70: '#000000B3',
         buttonText: '#ffffff',
+        buttonText70: '#ffffffB3',
     },
     boxColor: {
         navBG: '#ffffff',
