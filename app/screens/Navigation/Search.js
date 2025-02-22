@@ -3,7 +3,7 @@ import {SafeAreaView, TouchableOpacity, ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, pointColor} from './../../styles';
 
-import SearchBar from './../../components/SearchBar';
+import {SearchBar} from './../../components/SearchBar';
 import {OtherIcons, HeaderIcons, LogoIcons} from '../../../assets/icons';
 
 const {

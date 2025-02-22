@@ -40,4 +40,4 @@ const ProgressBar = ({ progress }) => {
   );
 };
 
-export default ProgressBar;
+export { ProgressBar };

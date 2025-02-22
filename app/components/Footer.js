@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { themes } from '../styles';
+import {themes} from '../styles';
 import {LogoIcons} from '../../assets/icons';
 
 const {
@@ -57,4 +57,4 @@ const FooterLogoContainer = styled.View`
   margin-top: 10px;
 `;
 
-export default Footer;
+export { Footer };

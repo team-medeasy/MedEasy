@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import {SafeAreaView, TouchableOpacity, ScrollView} from 'react-native';
+import {SafeAreaView, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, pointColor} from './../../styles';
 
-import SearchBar from './../../components/SearchBar';
+import {SearchBar} from './../../components';
 import {OtherIcons, HeaderIcons} from '../../../assets/icons';
 
 const {

@@ -1,7 +1,4 @@
-import Button from './Button';
-import ProgressBar from './ProgressBar';
-import SearchBar from './SearchBar';
-import Footer from './Footer';
-
-
-export { Button, ProgressBar, SearchBar, Footer };
+export { Button, BackAndNextButtons } from './Button';
+export { ProgressBar } from './ProgressBar';
+export { SearchBar } from './SearchBar';
+export { Footer } from './Footer';

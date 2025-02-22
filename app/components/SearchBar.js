@@ -43,4 +43,4 @@ const SearchBar = ({searchQuery, setSearchQuery, onSearch}) => {
   );
 };
 
-export default SearchBar;
+export { SearchBar };
