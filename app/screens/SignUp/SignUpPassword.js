@@ -1,22 +1,12 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text } from 'react-native';
 import styled from 'styled-components/native';
-import { themes, pointColor, fonts } from './../../styles';
-import { ProgressBar, Button } from './../../components';
+import { themes, fonts } from './../../styles';
+import { ProgressBar, BackAndNextButtons } from './../../components';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
   background-color: #fff;
-`;
-
-const BackButtonContainer = styled.View`
-  width: 100%;
-  align-items: flex-start;
-  padding: 20px 25px 10px;
-`;
-
-const BackButton = styled.TouchableOpacity`
-  padding: 10px;
 `;
 
 const Container1 = styled.View`
@@ -38,11 +28,9 @@ const InputContainer = styled.View`
 `;
 
 const BtnContainer = styled.View`
-  width: 100%;
-  height: 8.5%;
-  justify-content: center; 
-  align-items: center;    
   margin-top: auto;
+  padding-left: 20px;
+  padding-right: 20px;
 `;
 
 const TextInput = styled.TextInput`
@@ -79,12 +67,6 @@ const SignUpPasswordScreen = ({ navigation, route }) => {
     return (
       <Container>
           <ProgressBar progress={progress}/>
-
-          <BackButtonContainer>
-            <BackButton onPress={() => navigation.goBack()}>
-              <Text style={{ fontSize: 18, color: 'black' }}>←</Text>
-            </BackButton>
-          </BackButtonContainer>
         <Container1>
           <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
             {firstName}님, 반가워요!
@@ -109,7 +91,7 @@ const SignUpPasswordScreen = ({ navigation, route }) => {
             </InputContainer>
         </Container2>
         <BtnContainer>
-          <Button title="다음" onPress={handleNext}/>
+          <BackAndNextButtons onPressPrev={() => navigation.goBack()} onPressNext={handleNext}/>
         </BtnContainer>
       </Container>
     );
