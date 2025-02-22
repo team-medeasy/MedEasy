@@ -32,7 +32,7 @@ const Footer = () => {
 
 const FooterContainer = styled.View`
   padding: 10px 20px 130px 20px;
-  background-color: ${themes.light.bgColor.footerBG};
+  //background-color: ${themes.light.bgColor.footerBG};
 `;
 
 const FooterText = styled.Text`
