@@ -20,11 +20,12 @@ const Splash = () => {
             style={{
               opacity: 0.5,
               transform: [{ rotate: '8deg' }],
+              color: pointColor.primary20
             }} 
           />
         </MainLogoWrapper>
         <SubLogoWrapper>
-          <Logo_kr width={82} />
+          <Logo_kr width={82} style={{ color: themes.light.textColor.buttonText}}/>
         </SubLogoWrapper>
       </LogoContainer>
     </Container>
