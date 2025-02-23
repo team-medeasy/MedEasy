@@ -92,11 +92,9 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				E626DE112D63417200703519 /* FontAwesome.ttf */,
 				E626DE102D63417200703519 /* KimjungchulGothic-Bold.otf */,
 				E626DE142D63417200703519 /* KimjungchulGothic-Light.otf */,
 				E626DE132D63417200703519 /* KimjungchulGothic-Regular.otf */,
-				E626DE172D63417200703519 /* MaterialCommunityIcons.ttf */,
 				E626DE152D63417200703519 /* Pretendard-ExtraBold.otf */,
 				E626DE162D63417200703519 /* Pretendard-Regular.otf */,
 				E626DE122D63417200703519 /* Pretendard-SemiBold.otf */,
@@ -415,7 +413,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -485,7 +486,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
