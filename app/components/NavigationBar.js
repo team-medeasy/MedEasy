@@ -13,16 +13,9 @@ import MyPage from '../screens/Navigation/MyPage';
 import Search from '../screens/Navigation/Search.js';
 import CameraScreen from '../screens/CameraScreen.js';
 
-import {pointColor} from './../styles';
+import {pointColor, themes} from './../styles';
 import {TabIcons} from './../../assets/icons';
 import CameraIcon from './../../assets/icons/camera/camera.svg';
-
-const {
-  home: HomeIcon,
-  search: SearchIcon,
-  routine: RoutineIcon,
-  my: MyIcon,
-} = TabIcons;
 
 const SearchStack = createStackNavigator();
 
@@ -82,6 +75,7 @@ const TabNavigator = () => {
             paddingTop: 10,
           },
           tabBarActiveTintColor: pointColor.pointPrimary,
+          tabBarInactiveTintColor: themes.light.textColor.Primary50,
         }}>
         <Tab.Screen
           name="홈"
@@ -89,7 +83,7 @@ const TabNavigator = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
-              <HomeIcon width={30} height={30} fill={color} />
+              <TabIcons.home width={30} height={30} fill={color}/>
             ),
           }}
         />
@@ -99,7 +93,7 @@ const TabNavigator = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
-              <SearchIcon width={30} height={30} fill={color} />
+              <TabIcons.search width={30} height={30} fill={color}/>
             ),
             tabBarItemStyle: {
               marginLeft: -30,
@@ -112,7 +106,7 @@ const TabNavigator = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
-              <RoutineIcon width={30} height={30} fill={color} />
+              <TabIcons.routine width={30} height={30} fill={color}/>
             ),
             tabBarItemStyle: {
               marginRight: -30,
@@ -125,7 +119,7 @@ const TabNavigator = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
-              <MyIcon width={30} height={30} fill={color} />
+              <TabIcons.my width={30} height={30} fill={color}/>
             ),
           }}
         />

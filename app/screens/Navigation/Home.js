@@ -59,7 +59,7 @@ const Home = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <LogoContainer>
-        <LogoIcon height={23} />
+        <LogoIcon height={23} style={{color: themes.light.textColor.textPrimary}}/>
         <LogoKrIcon
           height={20}
           style={{marginLeft: -210, color: themes.light.textColor.textPrimary}}
@@ -78,7 +78,7 @@ const Home = () => {
           {/* 버튼 추가 */}
           <RoutineContainer>
             <RoutineButton onPress={() => console.log('루틴 추가')}>
-              <LogoAddIcon height={115} />
+              <LogoAddIcon height={115} style={{ color: themes.light.pointColor.primary30}}/>
               <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
             </RoutineButton>
           </RoutineContainer>
@@ -87,7 +87,7 @@ const Home = () => {
               <ButtonContent>
                 <MediIcon
                   height={16}
-                  style={{marginRight: -150, color: pointColor.pointPrimary}}
+                  style={{marginRight: -150, color: themes.light.pointColor.Primary}}
                 />
                 <ButtonText>복용 루틴 추가하기</ButtonText>
                 <ArrowIcon
@@ -100,7 +100,7 @@ const Home = () => {
               <ButtonContent>
                 <HospitalIcon
                   height={16}
-                  style={{marginRight: -150, color: pointColor.pointSecondary}}
+                  style={{marginRight: -150, color: themes.light.pointColor.Secondary}}
                 />
                 <ButtonText>병원 진료 추가하기</ButtonText>
                 <ArrowIcon
@@ -157,7 +157,7 @@ const RoutineContainer = styled.View`
 `;
 
 const RoutineButton = styled(TouchableOpacity)`
-  background-color: ${pointColor.primary20};
+  background-color: ${themes.light.pointColor.Primary20};
   width: 100%;
   height: 220px;
   justify-content: space-evenly;
@@ -169,7 +169,7 @@ const RoutineButton = styled(TouchableOpacity)`
 const RoutineButtonText = styled.Text`
   font-size: 16px;
   font-family: 'KimjungchulGothic-Bold';
-  color: ${pointColor.pointPrimary};
+  color: ${themes.light.pointColor.Primary};
 `;
 
 const ButtonContainer = styled.View`
@@ -208,7 +208,7 @@ const StyledCalendar = styled(Calendar).attrs({
     textSectionTitleColor: themes.light.textColor.textPrimary,
     //selectedDayBackgroundColor: '#000000',
     //selectedDayTextColor: '#ffffff',
-    todayTextColor: pointColor.pointPrimary,
+    todayTextColor: themes.light.pointColor.Primary,
     dayTextColor: themes.light.textColor.textPrimary,
     textDisabledColor: themes.light.textColor.Primary20,
     arrowColor: themes.light.textColor.textPrimary,
@@ -221,7 +221,7 @@ const StyledCalendar = styled(Calendar).attrs({
     textDayHeaderFontWeight: '800', // 요일 굵기
     'stylesheet.calendar.header': {
       dayTextAtIndex0: {
-        color: pointColor.pointSecondary, // 일요일 (index 0)
+        color: themes.light.pointColor.Secondary, // 일요일 (index 0)
       },
     },
   },
