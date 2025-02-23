@@ -9,6 +9,8 @@ import SignUpEmailScreen from './screens/SignUp/SignUpEmail';
 import SignUpPasswordScreen from './screens/SignUp/SignUpPassword';
 import SignUpDOBGenderScreen from './screens/SignUp/SignUpDOBGender';
 import NavigationBar from './components/NavigationBar';
+import SearchMedicineScreen from './screens/Search/SearchMedicine';
+import SearchMedicineResultsScreen from './screens/Search/SearchMedicineResults';
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -19,14 +21,8 @@ const AuthNavigator = () => {
       <AuthStack.Screen name="SignUpStart" component={SignUpStartScreen} />
       <AuthStack.Screen name="SignUpName" component={SignUpNameScreen} />
       <AuthStack.Screen name="SignUpEmail" component={SignUpEmailScreen} />
-      <AuthStack.Screen
-        name="SignUpPassword"
-        component={SignUpPasswordScreen}
-      />
-      <AuthStack.Screen
-        name="SignUpDOBGender"
-        component={SignUpDOBGenderScreen}
-      />
+      <AuthStack.Screen name="SignUpPassword" component={SignUpPasswordScreen} />
+      <AuthStack.Screen name="SignUpDOBGender" component={SignUpDOBGenderScreen} />
     </AuthStack.Navigator>
   );
 };
@@ -49,10 +45,14 @@ const App = () => {
         <Splash />
       ) : (
         <RootStack.Navigator screenOptions={{headerShown: false}}>
-          {/* ✅ 회원가입 네비게이터 */}
+          {/* 👥 회원가입 네비게이터 */}
           <RootStack.Screen name="Auth" component={AuthNavigator} />
-          {/* ✅ 메인 네비게이션 */}
+          {/* 🔎 메인 네비게이션 */}
           <RootStack.Screen name="NavigationBar" component={NavigationBar} />
+
+          {/* 🖥️ 네비게이션바 없는 화면들 */}
+          <RootStack.Screen name="SearchMedicine" component={SearchMedicineScreen} />
+          <RootStack.Screen name="SearchMedicineResults" component={SearchMedicineResultsScreen} />
         </RootStack.Navigator>
       )}
     </NavigationContainer>
