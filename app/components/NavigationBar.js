@@ -1,9 +1,9 @@
-import React, {useCallback} from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createStackNavigator} from '@react-navigation/stack';
-import {Camera} from 'react-native-vision-camera';
-import {useNavigation} from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import { Camera } from 'react-native-vision-camera';
+import { useNavigation } from '@react-navigation/native';
 
 import Home from '../screens/Navigation/Home';
 import Routine from '../screens/Navigation/Routine';
@@ -11,15 +11,16 @@ import MyPage from '../screens/Navigation/MyPage';
 import Search from '../screens/Navigation/Search.js';
 import CameraScreen from '../screens/CameraScreen.js';
 
-import {pointColor, themes} from './../styles';
-import {TabIcons} from './../../assets/icons';
-import CameraIcon from './../../assets/icons/camera/camera.svg';
+import { pointColor, themes } from './../styles';
+import { TabIcons } from './../../assets/icons';
+import { CameraIcons } from './../../assets/icons';
+import { OtherIcons } from './../../assets/icons';
 
 // 카메라 버튼
-const CameraButton = ({onPress}) => {
+const CameraButton = ({ onPress }) => {
   return (
     <StyledCameraButton onPress={onPress}>
-      <CameraIcon width={25} height={25} color="#ffffff" />
+      <CameraIcons.camera width={25} height={25} color="#ffffff" />
     </StyledCameraButton>
   );
 };
@@ -47,7 +48,7 @@ const TabNavigator = () => {
             paddingBottom: 15,
             paddingTop: 10,
           },
-          tabBarActiveTintColor: pointColor.pointPrimary,
+          tabBarActiveTintColor: themes.light.pointColor.Primary,
           tabBarInactiveTintColor: themes.light.textColor.Primary50,
         }}>
         <Tab.Screen
@@ -55,8 +56,8 @@ const TabNavigator = () => {
           component={Home}
           options={{
             headerShown: false,
-            tabBarIcon: ({color, size}) => (
-              <TabIcons.home width={30} height={30} fill={color}/>
+            tabBarIcon: ({ color, size }) => (
+              <TabIcons.home width={30} height={30} fill={color} />
             ),
           }}
         />
@@ -65,8 +66,8 @@ const TabNavigator = () => {
           component={Search}
           options={{
             headerShown: false,
-            tabBarIcon: ({color, size}) => (
-              <TabIcons.search width={30} height={30} fill={color}/>
+            tabBarIcon: ({ color, size }) => (
+              <TabIcons.search width={30} height={30} fill={color} />
             ),
             tabBarItemStyle: {
               marginLeft: -30,
@@ -78,8 +79,8 @@ const TabNavigator = () => {
           component={Routine}
           options={{
             headerShown: false,
-            tabBarIcon: ({color, size}) => (
-              <TabIcons.routine width={30} height={30} fill={color}/>
+            tabBarIcon: ({ color, size }) => (
+              <TabIcons.routine width={30} height={30} fill={color} />
             ),
             tabBarItemStyle: {
               marginRight: -30,
@@ -91,20 +92,27 @@ const TabNavigator = () => {
           component={MyPage}
           options={{
             headerShown: false,
-            tabBarIcon: ({color, size}) => (
-              <TabIcons.my width={30} height={30} fill={color}/>
+            tabBarIcon: ({ color, size }) => (
+              <TabIcons.my width={30} height={30} fill={color} />
             ),
           }}
         />
       </Tab.Navigator>
       <CameraButton onPress={handleCameraPress} />
+      <ChatContainer>
+        <ChatBuble>
+          <BubbleTail />
+          <BubbleText>챗봇 약사와{'\n'}상담해보세요!</BubbleText>
+        </ChatBuble>
+        <ChatButton><OtherIcons.chat width={25} height={25} style={{ color: themes.light.pointColor.Primary }} /></ChatButton>
+      </ChatContainer>
     </MainContainer>
   );
 };
 
 const RootNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="Camera" component={CameraScreen} />
     </Stack.Navigator>
@@ -129,6 +137,58 @@ const StyledCameraButton = styled.TouchableOpacity`
   border-radius: 30px;
   justify-content: center;
   align-items: center;
+`;
+
+const ChatContainer = styled.View`
+  
+`;
+
+const ChatBuble = styled.View`
+  position: absolute;
+  background-color: ${themes.light.boxColor.buttonPrimary};
+  width: 100px;
+  height: 50px;
+  right: 20px;
+  bottom: 170px;
+  border-radius: 15px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const BubbleTail = styled.View`
+  position: absolute;
+  background-color: ${themes.light.boxColor.buttonPrimary};
+  width: 20px;
+  height: 20px;
+  right: 15px;
+  bottom: -6px;
+  transform: rotate(45deg);
+`;
+
+const BubbleText = styled.Text`
+  color: ${themes.light.textColor.buttonText};
+  font-family: 'KimjungchulGothic-Bold';
+  font-size: 12px;
+`;
+
+const ChatButton = styled.TouchableOpacity`
+  position: absolute;
+  right: 20px;
+  bottom: 100px;
+  background-color: ${themes.light.bgColor.bgPrimary};
+  width: 50px;
+  height: 50px;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+  /* Android 그림자 */
+  elevation: 5;
+
+  /* iOS 그림자 */
+  shadow-color: #000;
+  shadow-offset: 2px 2px;
+  shadow-opacity: 0.2;
+  shadow-radius: 4px;
 `;
 
 export default NavigationBar;
