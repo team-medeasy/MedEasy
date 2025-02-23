@@ -63,7 +63,7 @@ const Home = () => {
         <LogoKrIcon height={20} style={{marginLeft: -210}} />
         <TouchableOpacity>
           <Notification>
-            <NotificationIcon height={23} />
+            <NotificationIcon height={23} style={{color: 'red'}} />
           </Notification>
         </TouchableOpacity>
       </LogoContainer>
