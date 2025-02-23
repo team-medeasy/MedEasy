@@ -60,10 +60,13 @@ const Home = () => {
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <LogoContainer>
         <LogoIcon height={23} />
-        <LogoKrIcon height={20} style={{marginLeft: -210}} />
+        <LogoKrIcon
+          height={20}
+          style={{marginLeft: -210, color: themes.light.textColor.textPrimary}}
+        />
         <TouchableOpacity>
           <Notification>
-            <NotificationIcon height={23} style={{color: 'red'}} />
+            <NotificationIcon height={23} />
           </Notification>
         </TouchableOpacity>
       </LogoContainer>
@@ -82,7 +85,10 @@ const Home = () => {
           <ButtonContainer>
             <AddButton onPress={() => console.log('복용 루틴 추가')}>
               <ButtonContent>
-                <MediIcon height={16} style={{marginRight: -150}} />
+                <MediIcon
+                  height={16}
+                  style={{marginRight: -150, color: pointColor.pointPrimary}}
+                />
                 <ButtonText>복용 루틴 추가하기</ButtonText>
                 <ArrowIcon
                   height={16}
@@ -92,7 +98,10 @@ const Home = () => {
             </AddButton>
             <AddButton onPress={() => console.log('병원 진료 추가')}>
               <ButtonContent>
-                <HospitalIcon height={16} style={{marginRight: -150}} />
+                <HospitalIcon
+                  height={16}
+                  style={{marginRight: -150, color: pointColor.pointSecondary}}
+                />
                 <ButtonText>병원 진료 추가하기</ButtonText>
                 <ArrowIcon
                   height={16}
