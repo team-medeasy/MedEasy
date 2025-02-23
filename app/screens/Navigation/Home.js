@@ -1,14 +1,14 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {Calendar, LocaleConfig} from 'react-native-calendars';
-import {SafeAreaView, TouchableOpacity} from 'react-native';
-import {pointColor, themes} from './../../styles';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { SafeAreaView, TouchableOpacity } from 'react-native';
+import { themes } from './../../styles';
 
-import {HeaderIcons, RoutineIcons, LogoIcons} from './../../../assets/icons';
+import { HeaderIcons, RoutineIcons, LogoIcons } from './../../../assets/icons';
 
-const {notification: NotificationIcon, chevron: ArrowIcon} = HeaderIcons;
-const {logoKr: LogoKrIcon, logo: LogoIcon, logoAdd: LogoAddIcon} = LogoIcons;
-const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
+const { notification: NotificationIcon, chevron: ArrowIcon } = HeaderIcons;
+const { logoKr: LogoKrIcon, logo: LogoIcon, logoAdd: LogoAddIcon } = LogoIcons;
+const { medicine: MediIcon, hospital: HospitalIcon } = RoutineIcons;
 
 // 요일을 한글로 설정
 LocaleConfig.locales['ko'] = {
@@ -57,12 +57,12 @@ LocaleConfig.defaultLocale = 'ko';
 
 const Home = () => {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <LogoContainer>
-        <LogoIcon height={23} style={{color: themes.light.textColor.textPrimary}}/>
+        <LogoIcon height={23} style={{ color: themes.light.pointColor.Primary }} />
         <LogoKrIcon
           height={20}
-          style={{marginLeft: -210, color: themes.light.textColor.textPrimary}}
+          style={{ marginLeft: -210, color: themes.light.pointColor.Primary }}
         />
         <TouchableOpacity>
           <Notification>
@@ -74,11 +74,17 @@ const Home = () => {
       <ScrollContainer>
         {/* 약 알림 */}
         <PillReminderContainer>
-          <ReminderText>한성님, {'\n'}까먹은 약이 있어요.</ReminderText>
+          <TextContainer>
+            <ReminderText>한성님, {'\n'}까먹은 약이 있어요.</ReminderText>
+            <LogoIcon width={70} height={112} style={{
+              color: themes.light.pointColor.Primary10, transform: [{ rotate: '10deg' }], position: 'absolute',
+              bottom: -20,right: 20
+            }} />
+          </TextContainer>
           {/* 버튼 추가 */}
           <RoutineContainer>
             <RoutineButton onPress={() => console.log('루틴 추가')}>
-              <LogoAddIcon height={115} style={{ color: themes.light.pointColor.primary30}}/>
+              <LogoAddIcon height={115} style={{ color: themes.light.pointColor.primary30 }} />
               <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
             </RoutineButton>
           </RoutineContainer>
@@ -87,12 +93,12 @@ const Home = () => {
               <ButtonContent>
                 <MediIcon
                   height={16}
-                  style={{marginRight: -150, color: themes.light.pointColor.Primary}}
+                  style={{ marginRight: -150, color: themes.light.pointColor.Primary }}
                 />
                 <ButtonText>복용 루틴 추가하기</ButtonText>
                 <ArrowIcon
                   height={16}
-                  style={{transform: [{rotate: '180deg'}], opacity: 0.5}}
+                  style={{ transform: [{ rotate: '180deg' }], opacity: 0.5 }}
                 />
               </ButtonContent>
             </AddButton>
@@ -100,12 +106,12 @@ const Home = () => {
               <ButtonContent>
                 <HospitalIcon
                   height={16}
-                  style={{marginRight: -150, color: themes.light.pointColor.Secondary}}
+                  style={{ marginRight: -150, color: themes.light.pointColor.Secondary }}
                 />
                 <ButtonText>병원 진료 추가하기</ButtonText>
                 <ArrowIcon
                   height={16}
-                  style={{transform: [{rotate: '180deg'}], opacity: 0.5}}
+                  style={{ transform: [{ rotate: '180deg' }], opacity: 0.5 }}
                 />
               </ButtonContent>
             </AddButton>
@@ -137,12 +143,19 @@ const Notification = styled.View`
 `;
 
 const PillReminderContainer = styled.View`
-  padding: 15px;
+  padding: 20px;
   flex-direction: column;
   justify-content: space-between;
-  margin-top: 20px;
   border-bottom-width: 10px;
   border-bottom-color: ${themes.light.bgColor.bgSecondary};
+`;
+
+const TextContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 20px 0px;
 `;
 
 const ReminderText = styled.Text`
@@ -152,7 +165,6 @@ const ReminderText = styled.Text`
 `;
 
 const RoutineContainer = styled.View`
-  padding: 20px 0px;
   align-items: center;
 `;
 
@@ -160,16 +172,17 @@ const RoutineButton = styled(TouchableOpacity)`
   background-color: ${themes.light.pointColor.Primary20};
   width: 100%;
   height: 220px;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
   border-radius: 10px;
-  margin: 10px;
+  margin-bottom: 20px;
 `;
 
 const RoutineButtonText = styled.Text`
   font-size: 16px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.pointColor.Primary};
+  margin-top: 10px;
 `;
 
 const ButtonContainer = styled.View`
@@ -208,6 +221,7 @@ const StyledCalendar = styled(Calendar).attrs({
     textSectionTitleColor: themes.light.textColor.textPrimary,
     //selectedDayBackgroundColor: '#000000',
     //selectedDayTextColor: '#ffffff',
+    monthTextColor: themes.light.textColor.textPrimary,
     todayTextColor: themes.light.pointColor.Primary,
     dayTextColor: themes.light.textColor.textPrimary,
     textDisabledColor: themes.light.textColor.Primary20,
@@ -229,7 +243,7 @@ const StyledCalendar = styled(Calendar).attrs({
   renderArrow: direction => (
     <ArrowIcon
       style={{
-        transform: [{rotate: direction === 'left' ? '0deg' : '180deg'}],
+        transform: [{ rotate: direction === 'left' ? '0deg' : '180deg' }],
         marginHorizontal: 20,
       }}
       height={16}
