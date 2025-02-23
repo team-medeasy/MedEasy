@@ -11,39 +11,33 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		48DD9F26B2F42C2C8FD3B9BB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
+		7DD95C872D6B00B700D5FB7D /* KimjungchulGothic-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE102D63417200703519 /* KimjungchulGothic-Bold.otf */; };
+		7DD95C882D6B00B700D5FB7D /* KimjungchulGothic-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE142D63417200703519 /* KimjungchulGothic-Light.otf */; };
+		7DD95C892D6B00B700D5FB7D /* KimjungchulGothic-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE132D63417200703519 /* KimjungchulGothic-Regular.otf */; };
+		7DD95C8B2D6B00B700D5FB7D /* Pretendard-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE152D63417200703519 /* Pretendard-ExtraBold.otf */; };
+		7DD95C8C2D6B00B700D5FB7D /* Pretendard-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE162D63417200703519 /* Pretendard-Regular.otf */; };
+		7DD95C8D2D6B00B700D5FB7D /* Pretendard-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE122D63417200703519 /* Pretendard-SemiBold.otf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		E626DE182D63417200703519 /* KimjungchulGothic-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE102D63417200703519 /* KimjungchulGothic-Bold.otf */; };
-		E626DE1A2D63417200703519 /* Pretendard-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE122D63417200703519 /* Pretendard-SemiBold.otf */; };
-		E626DE1B2D63417200703519 /* KimjungchulGothic-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE132D63417200703519 /* KimjungchulGothic-Regular.otf */; };
-		E626DE1C2D63417200703519 /* KimjungchulGothic-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE142D63417200703519 /* KimjungchulGothic-Light.otf */; };
-		E626DE1D2D63417200703519 /* Pretendard-ExtraBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE152D63417200703519 /* Pretendard-ExtraBold.otf */; };
-		E626DE1E2D63417200703519 /* Pretendard-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = E626DE162D63417200703519 /* Pretendard-Regular.otf */; };
+		9185AB028E2E41D7BE38CCD8 /* Pretendard-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = E2B2266BBB274CE28790DD94 /* Pretendard-Bold.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0F2445C1F1D945CCAE33B47A /* KimjungchulGothic-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "KimjungchulGothic-Bold.otf"; path = "../app/assets/fonts/KimjungchulGothic-Bold.otf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* MedEasy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MedEasy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = MedEasy/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = MedEasy/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = MedEasy/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		39A0CC99C0624C4FBBFDE3C2 /* Pretendard-ExtraBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-ExtraBold.otf"; path = "../app/assets/fonts/Pretendard-ExtraBold.otf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-MedEasy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MedEasy.debug.xcconfig"; path = "Target Support Files/Pods-MedEasy/Pods-MedEasy.debug.xcconfig"; sourceTree = "<group>"; };
-		4FC8F41FFC8E4817B312A758 /* KimjungchulGothic-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "KimjungchulGothic-Regular.otf"; path = "../app/assets/fonts/KimjungchulGothic-Regular.otf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-MedEasy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MedEasy.release.xcconfig"; path = "Target Support Files/Pods-MedEasy/Pods-MedEasy.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-MedEasy.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MedEasy.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6EDD6D2623D1410CBC8FFAE6 /* KimjungchulGothic-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "KimjungchulGothic-Light.otf"; path = "../app/assets/fonts/KimjungchulGothic-Light.otf"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = MedEasy/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = MedEasy/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		82A5E8A06C0C4AFF9417BD4B /* Pretendard-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Regular.otf"; path = "../app/assets/fonts/Pretendard-Regular.otf"; sourceTree = "<group>"; };
-		91084A7603EE455F8F0F8F00 /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-SemiBold.otf"; path = "../app/assets/fonts/Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
+		E2B2266BBB274CE28790DD94 /* Pretendard-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Pretendard-Bold.otf"; path = "../assets/fonts/Pretendard-Bold.otf"; sourceTree = "<group>"; };
 		E626DE102D63417200703519 /* KimjungchulGothic-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "KimjungchulGothic-Bold.otf"; path = "../assets/fonts/KimjungchulGothic-Bold.otf"; sourceTree = "<group>"; };
-		E626DE112D63417200703519 /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome.ttf; path = ../assets/fonts/FontAwesome.ttf; sourceTree = "<group>"; };
 		E626DE122D63417200703519 /* Pretendard-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Pretendard-SemiBold.otf"; path = "../assets/fonts/Pretendard-SemiBold.otf"; sourceTree = "<group>"; };
 		E626DE132D63417200703519 /* KimjungchulGothic-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "KimjungchulGothic-Regular.otf"; path = "../assets/fonts/KimjungchulGothic-Regular.otf"; sourceTree = "<group>"; };
 		E626DE142D63417200703519 /* KimjungchulGothic-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "KimjungchulGothic-Light.otf"; path = "../assets/fonts/KimjungchulGothic-Light.otf"; sourceTree = "<group>"; };
 		E626DE152D63417200703519 /* Pretendard-ExtraBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Pretendard-ExtraBold.otf"; path = "../assets/fonts/Pretendard-ExtraBold.otf"; sourceTree = "<group>"; };
 		E626DE162D63417200703519 /* Pretendard-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Pretendard-Regular.otf"; path = "../assets/fonts/Pretendard-Regular.otf"; sourceTree = "<group>"; };
-		E626DE172D63417200703519 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = ../assets/fonts/MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -83,12 +77,7 @@
 		67DD21EE89934BACA90F8E7A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				0F2445C1F1D945CCAE33B47A /* KimjungchulGothic-Bold.otf */,
-				6EDD6D2623D1410CBC8FFAE6 /* KimjungchulGothic-Light.otf */,
-				4FC8F41FFC8E4817B312A758 /* KimjungchulGothic-Regular.otf */,
-				39A0CC99C0624C4FBBFDE3C2 /* Pretendard-ExtraBold.otf */,
-				82A5E8A06C0C4AFF9417BD4B /* Pretendard-Regular.otf */,
-				91084A7603EE455F8F0F8F00 /* Pretendard-SemiBold.otf */,
+				E2B2266BBB274CE28790DD94 /* Pretendard-Bold.otf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -200,12 +189,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E626DE182D63417200703519 /* KimjungchulGothic-Bold.otf in Resources */,
-				E626DE1A2D63417200703519 /* Pretendard-SemiBold.otf in Resources */,
-				E626DE1B2D63417200703519 /* KimjungchulGothic-Regular.otf in Resources */,
-				E626DE1C2D63417200703519 /* KimjungchulGothic-Light.otf in Resources */,
-				E626DE1D2D63417200703519 /* Pretendard-ExtraBold.otf in Resources */,
-				E626DE1E2D63417200703519 /* Pretendard-Regular.otf in Resources */,
+				7DD95C872D6B00B700D5FB7D /* KimjungchulGothic-Bold.otf in Resources */,
+				7DD95C882D6B00B700D5FB7D /* KimjungchulGothic-Light.otf in Resources */,
+				7DD95C892D6B00B700D5FB7D /* KimjungchulGothic-Regular.otf in Resources */,
+				7DD95C8B2D6B00B700D5FB7D /* Pretendard-ExtraBold.otf in Resources */,
+				7DD95C8C2D6B00B700D5FB7D /* Pretendard-Regular.otf in Resources */,
+				7DD95C8D2D6B00B700D5FB7D /* Pretendard-SemiBold.otf in Resources */,
+				9185AB028E2E41D7BE38CCD8 /* Pretendard-Bold.otf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				48DD9F26B2F42C2C8FD3B9BB /* PrivacyInfo.xcprivacy in Resources */,
@@ -425,10 +415,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -498,10 +485,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
