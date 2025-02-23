@@ -3,6 +3,7 @@ export const lightTheme = {
         Primary: 'rgba(66, 115, 237, 1)',
         Primary10: 'rgba(236, 241, 253, 1)',
         Primary20: 'rgba(217, 227, 251, 1)',
+        primary30: '#4273ED4D',
         PrimaryDark: 'rgba(46, 80, 168, 1)',
         Secondary: 'rgba(255, 101, 101, 1)',
     },
