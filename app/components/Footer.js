@@ -23,8 +23,8 @@ const Footer = () => {
       </FooterText>
 
       <FooterLogoContainer>
-        <LogoIcon width={13} height={21} style={{ marginRight: 13 }} />
-        <LogoKrIcon width={52.16} height={18.13} />
+        <LogoIcon width={13} height={21} style={{ marginRight: 13 , color: themes.light.textColor.Primary20}} />
+        <LogoKrIcon width={52.16} height={18.13} style={{ color: themes.light.textColor.Primary20}}/>
       </FooterLogoContainer>
     </FooterContainer>
   );
