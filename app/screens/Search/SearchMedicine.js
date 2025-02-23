@@ -14,9 +14,15 @@ const {
 
 const {chevron: ChevronIcon} = HeaderIcons;
 
-const Container = styled(SafeAreaView)`
+const Container = styled.View`
   flex: 1;
-  background-color: #fff;
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
+
+const HeaderContainer = styled.View`
+  padding-top: 70px;
+  padding-bottom: 7px;
+  background-color: ${themes.light.bgColor.headerBG};
 `;
 
 const ChevronAndSearchContainer = styled.View`
@@ -24,7 +30,6 @@ const ChevronAndSearchContainer = styled.View`
   align-items: center;
   padding-right: 15px;
   padding-left: 12px;
-  margin-bottom: 7px;
 `;
 
 const ChevronIconButton = styled(TouchableOpacity)`
@@ -205,16 +210,18 @@ const SearchMedicineScreen = ({navigation, route}) => {
 
   return (
     <Container>
-      <ChevronAndSearchContainer>
-        <ChevronIconButton onPress={() => navigation.goBack()}>
-          <ChevronIcon height={17} width={17} />
-        </ChevronIconButton>
-        <SearchBar
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          onSearch={() => handleSearch(searchQuery)}
-        />
-      </ChevronAndSearchContainer>
+      <HeaderContainer>
+        <ChevronAndSearchContainer>
+          <ChevronIconButton onPress={() => navigation.goBack()}>
+            <ChevronIcon height={17} width={17} />
+          </ChevronIconButton>
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={() => handleSearch(searchQuery)}
+          />
+        </ChevronAndSearchContainer>
+      </HeaderContainer>
       <SearchesContainer>
         <RecentSearchesContainer>
           <SearchSectionHeader>

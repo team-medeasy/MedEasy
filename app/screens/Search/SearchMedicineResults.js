@@ -13,9 +13,15 @@ const {
 const {search: SearchGeneralIcon} = OtherIcons;
 const {chevron: ChevronIcon} = HeaderIcons;
 
-const Container = styled(SafeAreaView)`
+const Container = styled.View`
   flex: 1;
-  background-color: #fff;
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
+
+const HeaderContainer = styled.View`
+  padding-top: 70px;
+  padding-bottom: 10px;
+  background-color: ${themes.light.bgColor.headerBG};
 `;
 
 const ChevronAndSearchContainer = styled.View`
@@ -53,7 +59,8 @@ const ChevronIconButton = styled(TouchableOpacity)`
 
 const SearchResultContainer = styled.View`
   flex: 1;
-  margin-top: 20px;
+  margin-top: 10px;
+  background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
 const SearchResultItem = styled.View`
@@ -90,7 +97,7 @@ const ManufacturerText = styled.Text`
 
 const MedicineNameText = styled.Text`
   font-size: 17px;
-  font-family: 'Pretendard-SemiBold';
+  font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
@@ -277,13 +284,6 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
         setSearchResults(dummyData);
     }, [searchQuery]);
 
-    const handleSearch = () => {
-        if (newSearchQuery.trim() !== '') {
-            // 검색어가 있을 때, MedicineSearchDetail로 검색어 전달
-            navigation.push('SearchMedicineResults', { searchQuery: newSearchQuery });
-        }
-    };
-
     // SearchBar 터치 핸들러
     const handleSearchBarPress = () => {
       navigation.navigate('SearchMedicine');
@@ -322,51 +322,53 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
 
     return (
       <Container>
-        <ChevronAndSearchContainer>
-          <ChevronIconButton onPress={() => navigation.goBack()}>
-            <ChevronIcon height={17} width={17} />
-          </ChevronIconButton>
-          <SearchBarTouchable onPress={handleSearchBarPress}>
-            <SearchQueryText>{searchQuery}</SearchQueryText>
-            <SearchIconContainer>
-              <SearchGeneralIcon width={17.5} height={17.5} />
-            </SearchIconContainer>
-          </SearchBarTouchable>
-        </ChevronAndSearchContainer>
-        {searchResults.length > 0 && (
-          <FeatureSearchContainer>
-              <FeatureSearchText>특징 검색</FeatureSearchText>
-              <ScrollableFilterContainer 
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-              >
-                <FilterButton onPress={() => setColorModalVisible(true)}>
-                    <FilterButtonText selected={selectedColor}>
-                        {selectedColor || '색상'}
-                    </FilterButtonText>
-                    <Ionicons name="chevron-down" size={15} color="#0005"/>
-                </FilterButton>
-                <FilterButton onPress={() => setShapeModalVisible(true)}>
-                    <FilterButtonText selected={selectedShape}>
-                        {selectedShape || '모양'}
-                    </FilterButtonText>
-                    <Ionicons name="chevron-down" size={15} color="#0005"/>
-                </FilterButton>
-                <FilterButton onPress={() => setSizeModalVisible(true)}>
-                    <FilterButtonText selected={selectedSize}>
-                        {selectedSize || '크기'}
-                    </FilterButtonText>
-                    <Ionicons name="chevron-down" size={15} color="#0005"/>
-                </FilterButton>
-                <FilterButton onPress={() => setSplitModalVisible(true)}>
-                    <FilterButtonText selected={selectedSplit}>
-                        {selectedSplit || '분할선'}
-                    </FilterButtonText>
-                    <Ionicons name="chevron-down" size={15} color="#0005"/>
-                </FilterButton>
-              </ScrollableFilterContainer>
-          </FeatureSearchContainer>
-        )}
+        <HeaderContainer>
+          <ChevronAndSearchContainer>
+            <ChevronIconButton onPress={() => navigation.goBack()}>
+              <ChevronIcon height={17} width={17} />
+            </ChevronIconButton>
+            <SearchBarTouchable onPress={handleSearchBarPress}>
+              <SearchQueryText>{searchQuery}</SearchQueryText>
+              <SearchIconContainer>
+                <SearchGeneralIcon width={17.5} height={17.5} />
+              </SearchIconContainer>
+            </SearchBarTouchable>
+          </ChevronAndSearchContainer>
+          {searchResults.length > 0 && (
+            <FeatureSearchContainer>
+                <FeatureSearchText>특징 검색</FeatureSearchText>
+                <ScrollableFilterContainer 
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                >
+                  <FilterButton onPress={() => setColorModalVisible(true)}>
+                      <FilterButtonText selected={selectedColor}>
+                          {selectedColor || '색상'}
+                      </FilterButtonText>
+                      <Ionicons name="chevron-down" size={15} color="#0005"/>
+                  </FilterButton>
+                  <FilterButton onPress={() => setShapeModalVisible(true)}>
+                      <FilterButtonText selected={selectedShape}>
+                          {selectedShape || '모양'}
+                      </FilterButtonText>
+                      <Ionicons name="chevron-down" size={15} color="#0005"/>
+                  </FilterButton>
+                  <FilterButton onPress={() => setSizeModalVisible(true)}>
+                      <FilterButtonText selected={selectedSize}>
+                          {selectedSize || '크기'}
+                      </FilterButtonText>
+                      <Ionicons name="chevron-down" size={15} color="#0005"/>
+                  </FilterButton>
+                  <FilterButton onPress={() => setSplitModalVisible(true)}>
+                      <FilterButtonText selected={selectedSplit}>
+                          {selectedSplit || '분할선'}
+                      </FilterButtonText>
+                      <Ionicons name="chevron-down" size={15} color="#0005"/>
+                  </FilterButton>
+                </ScrollableFilterContainer>
+            </FeatureSearchContainer>
+          )}
+        </HeaderContainer>
         <SearchResultContainer>
             {searchResults.length > 0 ? (
                 <FlatList
