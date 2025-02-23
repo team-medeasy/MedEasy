@@ -14,7 +14,7 @@ export const darkTheme = {
       bgPrimary: '#000000',
       bgSecondary: '#ffffff1A',
       footerBG: '#ffffff1A',
-      headerBG: '#000000',
+      headerBG: '#272727',
     },
     borderColor: {
       borderPrimary: '#ffffff33'
