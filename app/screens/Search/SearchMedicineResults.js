@@ -109,7 +109,7 @@ const TypeContainer = styled.View`
 const TypeText = styled.Text`
   font-size: 13px;
   font-family: 'Pretendard-SemiBold';
-  background-color: ${(props) => props.bgColor || themes.light.boxColor.tagPrimary};
+  background-color: ${(props) => props.bgColor || themes.light.boxColor.tagResultPrimary};
   color: ${(props) => props.color || pointColor.pointPrimary};
   border-radius: 5px;
   padding: 4px 7px;
@@ -385,7 +385,7 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
                                 <MedicineNameText>{item.name}</MedicineNameText>
                                 <TypeContainer>
                                     <TypeText>{item.medicineType}</TypeText>
-                                    <TypeText color={themes.light.textColor.textPrimary} bgColor={themes.light.boxColor.tagSecondary}>{item.functionalType}</TypeText>
+                                    <TypeText color={themes.light.textColor.textPrimary} bgColor={themes.light.boxColor.tagResultSecondary}>{item.functionalType}</TypeText>
                                 </TypeContainer>
                             </InfoContainer>
                         </SearchResultItem>

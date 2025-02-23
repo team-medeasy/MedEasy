@@ -6,7 +6,7 @@ import { ProgressBar, BackAndNextButtons } from './../../components';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
-  background-color: #fff;
+  background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
 const Container1 = styled.View`
