@@ -1,68 +1,27 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { SafeAreaView, TouchableOpacity } from 'react-native';
-import { themes } from './../../styles';
+import {Calendar} from 'react-native-calendars';
+import {SafeAreaView, TouchableOpacity} from 'react-native';
+import {themes} from './../../styles';
 
-import { HeaderIcons, RoutineIcons, LogoIcons } from './../../../assets/icons';
+import {HeaderIcons, RoutineIcons, LogoIcons} from './../../../assets/icons';
+import CalendarWidget from '../../components/CalendarWidget';
 
-const { notification: NotificationIcon, chevron: ArrowIcon } = HeaderIcons;
-const { logoKr: LogoKrIcon, logo: LogoIcon, logoAdd: LogoAddIcon } = LogoIcons;
-const { medicine: MediIcon, hospital: HospitalIcon } = RoutineIcons;
-
-// 요일을 한글로 설정
-LocaleConfig.locales['ko'] = {
-  monthNames: [
-    '1월',
-    '2월',
-    '3월',
-    '4월',
-    '5월',
-    '6월',
-    '7월',
-    '8월',
-    '9월',
-    '10월',
-    '11월',
-    '12월',
-  ],
-  monthNamesShort: [
-    '1월',
-    '2월',
-    '3월',
-    '4월',
-    '5월',
-    '6월',
-    '7월',
-    '8월',
-    '9월',
-    '10월',
-    '11월',
-    '12월',
-  ],
-  dayNames: [
-    '일요일',
-    '월요일',
-    '화요일',
-    '수요일',
-    '목요일',
-    '금요일',
-    '토요일',
-  ],
-  dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
-  today: '오늘',
-};
-
-LocaleConfig.defaultLocale = 'ko';
+const {notification: NotificationIcon, chevron: ArrowIcon} = HeaderIcons;
+const {logoKr: LogoKrIcon, logo: LogoIcon, logoAdd: LogoAddIcon} = LogoIcons;
+const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 const Home = () => {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <LogoContainer>
-        <LogoIcon height={23} style={{ color: themes.light.pointColor.Primary }} />
+        <LogoIcon
+          height={23}
+          style={{color: themes.light.pointColor.Primary}}
+        />
         <LogoKrIcon
           height={20}
-          style={{ marginLeft: -210, color: themes.light.pointColor.Primary }}
+          style={{marginLeft: -210, color: themes.light.pointColor.Primary}}
         />
         <TouchableOpacity>
           <Notification>
@@ -76,15 +35,25 @@ const Home = () => {
         <PillReminderContainer>
           <TextContainer>
             <ReminderText>한성님, {'\n'}까먹은 약이 있어요.</ReminderText>
-            <LogoIcon width={70} height={112} style={{
-              color: themes.light.pointColor.Primary10, transform: [{ rotate: '10deg' }], position: 'absolute',
-              bottom: -20,right: 20
-            }} />
+            <LogoIcon
+              width={70}
+              height={112}
+              style={{
+                color: themes.light.pointColor.Primary10,
+                transform: [{rotate: '10deg'}],
+                position: 'absolute',
+                bottom: -20,
+                right: 20,
+              }}
+            />
           </TextContainer>
           {/* 버튼 추가 */}
           <RoutineContainer>
             <RoutineButton onPress={() => console.log('루틴 추가')}>
-              <LogoAddIcon height={115} style={{ color: themes.light.pointColor.primary30 }} />
+              <LogoAddIcon
+                height={115}
+                style={{color: themes.light.pointColor.primary30}}
+              />
               <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
             </RoutineButton>
           </RoutineContainer>
@@ -93,12 +62,15 @@ const Home = () => {
               <ButtonContent>
                 <MediIcon
                   height={16}
-                  style={{ marginRight: -150, color: themes.light.pointColor.Primary }}
+                  style={{
+                    marginRight: -150,
+                    color: themes.light.pointColor.Primary,
+                  }}
                 />
                 <ButtonText>복용 루틴 추가하기</ButtonText>
                 <ArrowIcon
                   height={16}
-                  style={{ transform: [{ rotate: '180deg' }], opacity: 0.5 }}
+                  style={{transform: [{rotate: '180deg'}], opacity: 0.5}}
                 />
               </ButtonContent>
             </AddButton>
@@ -106,12 +78,15 @@ const Home = () => {
               <ButtonContent>
                 <HospitalIcon
                   height={16}
-                  style={{ marginRight: -150, color: themes.light.pointColor.Secondary }}
+                  style={{
+                    marginRight: -150,
+                    color: themes.light.pointColor.Secondary,
+                  }}
                 />
                 <ButtonText>병원 진료 추가하기</ButtonText>
                 <ArrowIcon
                   height={16}
-                  style={{ transform: [{ rotate: '180deg' }], opacity: 0.5 }}
+                  style={{transform: [{rotate: '180deg'}], opacity: 0.5}}
                 />
               </ButtonContent>
             </AddButton>
@@ -119,9 +94,7 @@ const Home = () => {
         </PillReminderContainer>
 
         {/* 달력 */}
-        <CalendarContainer>
-          <StyledCalendar locale="ko" />
-        </CalendarContainer>
+        <CalendarWidget />
       </ScrollContainer>
     </SafeAreaView>
   );
@@ -208,47 +181,5 @@ const ButtonText = styled.Text`
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
-
-const CalendarContainer = styled.View`
-  padding: 20px;
-  margin-top: 20px;
-`;
-
-const StyledCalendar = styled(Calendar).attrs({
-  theme: {
-    backgroundColor: themes.light.bgColor.bgPrimary,
-    calendarBackground: themes.light.bgColor.bgPrimary,
-    textSectionTitleColor: themes.light.textColor.textPrimary,
-    //selectedDayBackgroundColor: '#000000',
-    //selectedDayTextColor: '#ffffff',
-    monthTextColor: themes.light.textColor.textPrimary,
-    todayTextColor: themes.light.pointColor.Primary,
-    dayTextColor: themes.light.textColor.textPrimary,
-    textDisabledColor: themes.light.textColor.Primary20,
-    arrowColor: themes.light.textColor.textPrimary,
-    fontFamily: 'Pretendard-ExtraBold',
-    textDayFontSize: 15, // 날짜 폰트 크기
-    textMonthFontSize: 20, // 월 폰트 크기
-    textDayHeaderFontSize: 13, // 요일(월,화,수 등) 폰트 크기
-    textDayFontWeight: '600', // 날짜 굵기
-    textMonthFontWeight: '800', // 월 굵기
-    textDayHeaderFontWeight: '800', // 요일 굵기
-    'stylesheet.calendar.header': {
-      dayTextAtIndex0: {
-        color: themes.light.pointColor.Secondary, // 일요일 (index 0)
-      },
-    },
-  },
-  monthFormat: 'yyyy.MM',
-  renderArrow: direction => (
-    <ArrowIcon
-      style={{
-        transform: [{ rotate: direction === 'left' ? '0deg' : '180deg' }],
-        marginHorizontal: 20,
-      }}
-      height={16}
-    />
-  ),
-})``;
 
 export default Home;
