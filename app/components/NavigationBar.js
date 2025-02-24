@@ -8,7 +8,6 @@ import {useNavigation} from '@react-navigation/native';
 import Home from '../screens/Navigation/Home';
 import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
-import Search from '../screens/Navigation/Search.js';
 import CameraScreen from '../screens/CameraScreen.js';
 
 import {pointColor, themes} from './../styles';
@@ -25,6 +24,9 @@ const CameraButton = ({onPress}) => {
   );
 };
 
+// 약 검색 탭을 위한 빈 컴포넌트
+const EmptyScreen = () => <></>;
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -38,6 +40,10 @@ const TabNavigator = () => {
       return;
     }
     navigation.navigate('Camera');
+  }, [navigation]);
+
+  const handleSearchPress = useCallback(() => {
+    navigation.navigate('SearchMedicine');
   }, [navigation]);
 
   return (
@@ -63,7 +69,7 @@ const TabNavigator = () => {
         />
         <Tab.Screen
           name="약 검색"
-          component={Search}
+          component={EmptyScreen}
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
@@ -72,6 +78,12 @@ const TabNavigator = () => {
             tabBarItemStyle: {
               marginLeft: -30,
             },
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault(); // 기본 탭 동작 방지
+              handleSearchPress();
+            }
           }}
         />
         <Tab.Screen

@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, pointColor} from './../../styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {SearchBar} from './../../components';
 import {OtherIcons, HeaderIcons} from '../../../assets/icons';
@@ -90,6 +91,7 @@ const RecentSearchItemButton = styled(TouchableOpacity)`
 
 const RecentSearchItemText = styled.Text`
   font-size: 14px;
+  font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
 `;
 
@@ -144,6 +146,9 @@ const UpdateDateText = styled.Text`
   color: ${themes.light.textColor.Primary30};
 `;
 
+// AsyncStorage 키 상수 정의
+const RECENT_SEARCHES_STORAGE_KEY = '@mediapp:recent_searches';
+
 const SearchMedicineScreen = ({navigation, route}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState([]);
@@ -157,13 +162,51 @@ const SearchMedicineScreen = ({navigation, route}) => {
     {rank: 5, term: '제산제', rankChange: 'stay'},
   ];
 
+  // 컴포넌트 마운트 시 AsyncStorage에서 최근 검색어 로드
+  useEffect(() => {
+    loadRecentSearches();
+  }, []);
+
+  // route.params로부터 업데이트된 검색어 목록을 받아오는 로직
+  useEffect(() => {
+    if (route.params?.updatedSearches) {
+      setRecentSearches(route.params.updatedSearches);
+    }
+  }, [route.params?.updatedSearches]);
+
+  // AsyncStorage에서 최근 검색어 로드하는 함수
+  const loadRecentSearches = async () => {
+    try {
+      const storedSearches = await AsyncStorage.getItem(RECENT_SEARCHES_STORAGE_KEY);
+      if (storedSearches !== null) {
+        setRecentSearches(JSON.parse(storedSearches));
+      }
+    } catch (error) {
+      console.error('최근 검색어 로드 중 오류 발생:', error);
+    }
+  };
+
+  // AsyncStorage에 최근 검색어 저장하는 함수
+  const saveRecentSearches = async (searches) => {
+    try {
+      await AsyncStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(searches));
+    } catch (error) {
+      console.error('최근 검색어 저장 중 오류 발생:', error);
+    }
+  };
+
   const handleSearch = (query) => {
     if (query.trim() !== '') {
+      // 중복 검색어 제거하고 맨 앞에 새 검색어 추가
       const updatedSearches = [
         query,
         ...recentSearches.filter(item => item !== query),
-      ];
+      ].slice(0, 10); // 최대 10개까지만 유지
+      
+      // 상태 업데이트 및 AsyncStorage에 저장
       setRecentSearches(updatedSearches);
+      saveRecentSearches(updatedSearches);
+      
       navigation.replace('SearchMedicineResults', {
         searchQuery: query,
         recentSearches: updatedSearches,
@@ -172,19 +215,24 @@ const SearchMedicineScreen = ({navigation, route}) => {
   };
 
   const handleRecentSearchClick = (query) => {
+    setSearchQuery(query); // 검색창에 검색어 표시
     handleSearch(query);
   };
 
   const handlePopularSearchClick = (term) => {
+    setSearchQuery(term); // 검색창에 검색어 표시
     handleSearch(term);
   };
 
   const handleDeleteSearch = query => {
-    setRecentSearches(recentSearches.filter(item => item !== query));
+    const updatedSearches = recentSearches.filter(item => item !== query);
+    setRecentSearches(updatedSearches);
+    saveRecentSearches(updatedSearches);
   };
 
   const handleClearAll = () => {
     setRecentSearches([]);
+    saveRecentSearches([]);
   };
 
   const getRankChangeIcon = rankChange => {
