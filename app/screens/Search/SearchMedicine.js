@@ -1,18 +1,10 @@
 import React, {useState} from 'react';
-import {SafeAreaView, TouchableOpacity} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, pointColor} from './../../styles';
 
 import {SearchBar} from './../../components';
 import {OtherIcons, HeaderIcons} from '../../../assets/icons';
-
-const {
-  delete: DeleteIcon,
-  rankingDown: RankingDownIcon,
-  rankingUp: RankingUpIcon,
-} = OtherIcons;
-
-const {chevron: ChevronIcon} = HeaderIcons;
 
 const Container = styled.View`
   flex: 1;
@@ -198,9 +190,9 @@ const SearchMedicineScreen = ({navigation, route}) => {
   const getRankChangeIcon = rankChange => {
     switch (rankChange) {
       case 'up':
-        return <RankingUpIcon width={9.14} height={17} />;
+        return <OtherIcons.rankingUp width={9.14} height={17} style={{color: themes.light.pointColor.Secondary}}/>;
       case 'down':
-        return <RankingDownIcon width={9.14} height={17} />;
+        return <OtherIcons.rankingDown width={9.14} height={17} style={{color: themes.light.pointColor.Primary}}/>;
       case 'stay':
         return <RankingStayText>-</RankingStayText>;
       default:
@@ -213,7 +205,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
       <HeaderContainer>
         <ChevronAndSearchContainer>
           <ChevronIconButton onPress={() => navigation.goBack()}>
-            <ChevronIcon height={17} width={17} />
+            <HeaderIcons.chevron height={17} width={17} style={{color: themes.light.textColor.textPrimary}}/>
           </ChevronIconButton>
           <SearchBar
             searchQuery={searchQuery}
@@ -244,7 +236,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
                       e.stopPropagation();
                       handleDeleteSearch(item);
                     }}>
-                    <DeleteIcon height={10} width={10} />
+                    <OtherIcons.delete height={10} width={10} style={{color: themes.light.textColor.textPrimary}}/>
                   </DeleteIconButton>
                 </RecentSearchItemButton>
               ))}

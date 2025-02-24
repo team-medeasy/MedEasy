@@ -4,8 +4,6 @@ import {TouchableOpacity} from 'react-native';
 import {themes} from './../styles';
 import {OtherIcons} from './../../assets/icons';
 
-const {search: SearchGeneralIcon} = OtherIcons;
-
 const SearchBarContainer = styled.View`
   height: 44px;
   flex-direction: row;
@@ -37,7 +35,7 @@ const SearchBar = ({searchQuery, setSearchQuery, onSearch}) => {
         onChangeText={setSearchQuery}
       />
       <SearchButton onPress={onSearch}>
-        <SearchGeneralIcon width={17.5} height={17.5} />
+        <OtherIcons.search width={17.5} height={17.5} style={{color: themes.light.textColor.Primary20}}/>
       </SearchButton>
     </SearchBarContainer>
   );

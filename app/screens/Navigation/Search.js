@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {SafeAreaView, TouchableOpacity, ScrollView} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, pointColor} from './../../styles';
 
@@ -192,9 +192,9 @@ const Search = ({navigation, route}) => {
   const getRankChangeIcon = rankChange => {
     switch (rankChange) {
       case 'up':
-        return <OtherIcons.rankingUp width={9.14} height={17} />;
+        return <OtherIcons.rankingUp width={9.14} height={17} style={{color: themes.light.pointColor.Secondary}}/>;
       case 'down':
-        return <OtherIcons.rankingDown width={9.14} height={17} />;
+        return <OtherIcons.rankingDown width={9.14} height={17} style={{color: themes.light.pointColor.Primary}}/>;
       case 'stay':
         return <RankingStayText>-</RankingStayText>;
       default:
@@ -207,7 +207,7 @@ const Search = ({navigation, route}) => {
       <HeaderContainer>
         <LogoAndSearchContainer>
           <LogoIconContainer>
-            <LogoIcons.logo height={17} width={17} />
+            <LogoIcons.logo height={17} width={17} style={{color: themes.light.textColor.textPrimary}}/>
           </LogoIconContainer>
           <SearchBar
             searchQuery={searchQuery}
@@ -238,7 +238,7 @@ const Search = ({navigation, route}) => {
                       e.stopPropagation();
                       handleDeleteSearch(item);
                     }}>
-                    <OtherIcons.delete height={10} width={10} />
+                    <OtherIcons.delete height={10} width={10} style={{color: themes.light.textColor.textPrimary}}/>
                   </DeleteIconButton>
                 </RecentSearchItemButton>
               ))}
