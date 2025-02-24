@@ -209,7 +209,7 @@ const SimilarMedicinesContainer = styled.View`
 const Appearance = ({ label, value }) => (
   <View style={{ flexDirection: 'row', gap: 18 }}>
     <Text style={{ color: themes.light.textColor.Primary50, 
-                   fontFamily: 'Pretendard-Regular',
+                   fontFamily: 'Pretendard-Medium',
                    fontSize: FontSizes.caption.default,
     }}
     >{label}</Text>
@@ -224,8 +224,8 @@ const Appearance = ({ label, value }) => (
 const Usage = ({ label, value }) => (
   <View style={{ paddingVertical: 25 ,paddingHorizontal: 20, gap: 18, }}>
     <HeadingText>{label}</HeadingText>
-    <Text style={{ color: themes.light.pointColor.Primary70,
-                   fontFamily: 'Pretendard-Regular',
+    <Text style={{ color: themes.light.textColor.Primary70,
+                   fontFamily: 'Pretendard-Medium',
                    fontSize: FontSizes.body.default,
                    lineHeight: 30,
     }}

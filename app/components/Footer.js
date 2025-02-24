@@ -37,7 +37,7 @@ const FooterContainer = styled.View`
 
 const FooterText = styled.Text`
   font-size: 10px;
-  font-family: 'Pretendard-Regular';
+  font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
   padding: 20px 0;
   line-height: 20px;
