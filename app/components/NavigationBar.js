@@ -63,7 +63,7 @@ const TabNavigator = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
-              <TabIcons.home width={30} height={30} fill={color} />
+              <TabIcons.home width={30} height={30} style={{color: color}} />
             ),
           }}
         />
@@ -73,7 +73,7 @@ const TabNavigator = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
-              <TabIcons.search width={30} height={30} fill={color} />
+              <TabIcons.search width={30} height={30} style={{color: color}} />
             ),
             tabBarItemStyle: {
               marginLeft: -30,
@@ -92,7 +92,7 @@ const TabNavigator = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
-              <TabIcons.routine width={30} height={30} fill={color} />
+              <TabIcons.routine width={30} height={30} style={{color: color}} />
             ),
             tabBarItemStyle: {
               marginRight: -30,
@@ -105,7 +105,7 @@ const TabNavigator = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({color, size}) => (
-              <TabIcons.my width={30} height={30} fill={color} />
+              <TabIcons.my width={30} height={30} style={{color: color}} />
             ),
           }}
         />

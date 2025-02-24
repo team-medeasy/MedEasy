@@ -66,7 +66,7 @@ const SignUpNameScreen = ({ navigation }) => {
         <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
           안녕하세요, 메디지입니다 👋
         </Text>
-        <Text style={{ fontFamily: 'Pretendart-Regular', fontSize: 16, marginTop: 7, color: 'grey' }}>
+        <Text style={{ fontFamily: 'Pretendard-Medium', fontSize: 16, marginTop: 7, color: themes.light.textColor.Primary50 }}>
           이름을 입력해주세요.
         </Text>
       </Container1>

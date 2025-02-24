@@ -221,7 +221,7 @@ const SignUpDOBGenderScreen = ({ navigation, route }) => {
               <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
                   {firstName}님, 반가워요!
               </Text>
-              <Text style={{ fontFamily: 'Pretendart-Regular', fontSize: 16, marginTop: 7, color: 'grey' }}>
+              <Text style={{ fontFamily: 'Pretendard-Medium', fontSize: 16, marginTop: 7, color: themes.light.textColor.Primary50 }}>
                   생년월일과 성별을 입력해주세요.
               </Text>        
           </Container1>
@@ -236,7 +236,7 @@ const SignUpDOBGenderScreen = ({ navigation, route }) => {
                       maxLength={10}
                   />
                   {dateError ? (
-                      <Text style={{ color: 'red', marginTop: 5, fontSize: 12 }}>
+                      <Text style={{ fontFamily: 'Pretendard-Medium', color: 'red', marginTop: 5, fontSize: 12 }}>
                           {dateError}
                       </Text>
                   ) : null}

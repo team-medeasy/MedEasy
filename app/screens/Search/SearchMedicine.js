@@ -140,8 +140,8 @@ const UpdateDateContainer = styled.View`
 `;
 
 const UpdateDateText = styled.Text`
-  font-size: 11px;
-  font-family: 'Pretendard-Regular';
+  font-size: 12px;
+  font-family: 'Pretendard-Medium';
   margin-right: 20px;
   color: ${themes.light.textColor.Primary30};
 `;
@@ -284,7 +284,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
                       e.stopPropagation();
                       handleDeleteSearch(item);
                     }}>
-                    <OtherIcons.delete height={10} width={10} style={{color: themes.light.textColor.textPrimary}}/>
+                    <OtherIcons.delete height={10} width={10} style={{color: themes.light.textColor.Primary50}}/>
                   </DeleteIconButton>
                 </RecentSearchItemButton>
               ))}

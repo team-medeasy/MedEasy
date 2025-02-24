@@ -66,12 +66,12 @@ const SignUpPasswordScreen = ({ navigation, route }) => {
 
     return (
       <Container>
-          <ProgressBar progress={progress}/>
+        <ProgressBar progress={progress}/>
         <Container1>
           <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
             {firstName}님, 반가워요!
           </Text>
-          <Text style={{ fontFamily: 'Pretendart-Regular', fontSize: 16, marginTop: 7, color: 'grey' }}>
+          <Text style={{ fontFamily: 'Pretendard-Medium', fontSize: 16, marginTop: 7, color: themes.light.textColor.Primary50 }}>
             비밀번호를 입력해주세요.
           </Text>
         </Container1>
