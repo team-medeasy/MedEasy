@@ -24,7 +24,7 @@ const MyPage = () => {
               <LogoIcons.logo
                 width={30}
                 height={47}
-                style={{color: themes.light.pointColor.Primary20}}
+                style={{color: themes.light.pointColor.Primary10}}
               />
               <EditButton onPress={() => alert('프로필 수정')}>
                 <CameraIcons.camera
@@ -116,7 +116,7 @@ const SmallText = styled.Text`
 `;
 
 const EditProfile = styled.View`
-  padding: 20px;
+  padding: 25px;
 `;
 
 const ProfileAddButton = styled.TouchableOpacity`
