@@ -4,14 +4,8 @@ import styled from 'styled-components/native';
 import {themes, pointColor} from './../../styles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import {Footer} from './../../components';
+import {Footer, Tag} from './../../components';
 import {LogoIcons, HeaderIcons, OtherIcons} from '../../../assets/icons';
-
-const {
-  logo: LogoIcon,
-} = LogoIcons;
-const {search: SearchGeneralIcon} = OtherIcons;
-const {chevron: ChevronIcon} = HeaderIcons;
 
 const Container = styled.View`
   flex: 1;
@@ -106,26 +100,16 @@ const TypeContainer = styled.View`
   gap: 11px;
 `;
 
-const TypeText = styled.Text`
-  font-size: 13px;
-  font-family: 'Pretendard-SemiBold';
-  background-color: ${(props) => props.bgColor || themes.light.boxColor.tagResultPrimary};
-  color: ${(props) => props.color || pointColor.pointPrimary};
-  border-radius: 5px;
-  padding: 4px 7px;
-`;
-
 const NoResultsContainer = styled.View`
-  flex: 1;
   justify-content: center;
   align-items: center;
+  flex: 1;
 `;
 
 const NoResultsText = styled.Text`
   font-size: 18px;
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
-  margin-top: 34px;
 `;
 
 const NoResultsSubText = styled.Text`
@@ -225,59 +209,59 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
         const dummyData = [
           {
             id: '1',
-            name: '지엘타이밍정(카페인무수물)',
-            image: require("./../../../assets/images/med1.png"),
-            manufacturer: '지엘파마(주)',
-            medicineType: '일반의약품',
-            functionalType: '각성제'
+            item_name: '지엘타이밍정(카페인무수물)',
+            item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1NAT_bwbZd9',
+            entp_name: '지엘파마(주)',
+            etc_otc_name: '일반의약품',
+            class_name: '각성제'
           },
           {
             id: '2',
-            name: '베스타제당의정',
-            image: require("./../../../assets/images/med2.png"),
-            manufacturer: '동야제약(주)',
-            medicineType: '일반의약품',
-            functionalType: '건위소화제'
+            item_name: '베스타제당의정',
+            item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1MoApPycZgS',
+            entp_name: '동야제약(주)',
+            etc_otc_name: '일반의약품',
+            class_name: '건위소화제'
           },
           {
             id: '3',
-            name: '아네모정',
-            image: require("./../../../assets/images/med3.png"),
-            manufacturer: '삼진제약(주)',
-            medicineType: '일반의약품',
-            functionalType: '제산제'
+            item_name: '아네모정',
+            item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/152035092098000085',
+            entp_name: '삼진제약(주)',
+            etc_otc_name: '일반의약품',
+            class_name: '제산제'
           },
           {
             id: '4',
-            name: '에바치온캡슐',
-            image: require("./../../../assets/images/med4.png"),
-            manufacturer: '조아제약(주)',
-            medicineType: '일반의약품',
-            functionalType: '해독제'
+            item_name: '에바치온캡슐',
+            item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/151577167067000087',
+            entp_name: '조아제약(주)',
+            etc_otc_name: '일반의약품',
+            class_name: '해독제'
           },
           {
             id: '5',
-            name: '삐콤정',
-            image: require("./../../../assets/images/med5.png"),
-            manufacturer: '(주)유한양행',
-            medicineType: '일반의약품',
-            functionalType: '혼합비타민제'
+            item_name: '삐콤정',
+            item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/153495248483300010',
+            entp_name: '(주)유한양행',
+            etc_otc_name: '일반의약품',
+            class_name: '혼합비타민제'
           },
           {
             id: '6',
-            name: '게루삼정',
-            image: require("./../../../assets/images/med6.png"),
-            manufacturer: '삼남제약(주)',
-            medicineType: '일반의약품',
-            functionalType: '제산제'
+            item_name: '게루삼정',
+            item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/154307400984500104',
+            entp_name: '삼남제약(주)',
+            etc_otc_name: '일반의약품',
+            class_name: '제산제'
           },
           {
             id: '7',
-            name: '페니라민정(클로르페니라민)',
-            image: require("./../../../assets/images/med7.png"),
-            manufacturer: '지엘파마(주)',
-            medicineType: '일반의약품',
-            functionalType: '항히스타민제'
+            item_name: '페니라민정(클로르페니라민)',
+            item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1Orz9gcUHnw',
+            entp_name: '지엘파마(주)',
+            etc_otc_name: '일반의약품',
+            class_name: '항히스타민제'
           },
         ];
         setSearchResults(dummyData);
@@ -328,12 +312,12 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
         <HeaderContainer>
           <ChevronAndSearchContainer>
             <ChevronIconButton onPress={() => navigation.goBack()}>
-              <ChevronIcon height={17} width={17} />
+              <HeaderIcons.chevron height={17} width={17} style={{color: themes.light.textColor.textPrimary}}/>
             </ChevronIconButton>
             <SearchBarTouchable onPress={handleSearchBarPress}>
               <SearchQueryText>{searchQuery}</SearchQueryText>
               <SearchIconContainer>
-                <SearchGeneralIcon width={17.5} height={17.5} />
+                <OtherIcons.search width={17.5} height={17.5} style={{color: themes.light.textColor.Primary20}}/>
               </SearchIconContainer>
             </SearchBarTouchable>
           </ChevronAndSearchContainer>
@@ -380,15 +364,15 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
                     renderItem={({ item }) => (
                         <SearchResultItem onPress={() => handleSearchResultPress(item.id)}>
                             <ImageContainer>
-                                <MedicineImage source={item.image} style={{ resizeMode: 'stretch' }}/>
+                                <MedicineImage source={{uri: item.item_image}} style={{ resizeMode: 'stretch' }}/>
                             </ImageContainer>
                             
                             <InfoContainer>
-                                <ManufacturerText>{item.manufacturer}</ManufacturerText>
-                                <MedicineNameText>{item.name}</MedicineNameText>
+                                <ManufacturerText>{item.entp_name}</ManufacturerText>
+                                <MedicineNameText>{item.item_name}</MedicineNameText>
                                 <TypeContainer>
-                                    <TypeText>{item.medicineType}</TypeText>
-                                    <TypeText color={themes.light.textColor.textPrimary} bgColor={themes.light.boxColor.tagResultSecondary}>{item.functionalType}</TypeText>
+                                  <Tag sizeType='small' colorType='resultPrimary'>{item.etc_otc_name}</Tag>
+                                  <Tag sizeType='small' colorType='resultSecondary'>{item.class_name}</Tag>
                                 </TypeContainer>
                             </InfoContainer>
                         </SearchResultItem>
@@ -399,7 +383,6 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
                 />
             ) : (
             <NoResultsContainer>
-              <LogoIcon></LogoIcon>
               <NoResultsText>검색 결과가 없습니다.</NoResultsText>
               <NoResultsSubText>검색어를 다시 한 번{'\n'}확인해 주세요.</NoResultsSubText>
             </NoResultsContainer>
