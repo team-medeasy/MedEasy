@@ -11,6 +11,8 @@ import SignUpDOBGenderScreen from './screens/SignUp/SignUpDOBGender';
 import NavigationBar from './components/NavigationBar';
 import SearchMedicineScreen from './screens/Search/SearchMedicine';
 import SearchMedicineResultsScreen from './screens/Search/SearchMedicineResults';
+import SettingStack from './screens/Settings/SettingStack';
+
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
 const RootStack = createStackNavigator();
@@ -57,6 +59,9 @@ const App = () => {
             <RootStack.Screen name="Auth" component={AuthNavigator} />
             {/* 🔎 메인 네비게이션 */}
             <RootStack.Screen name="NavigationBar" component={NavigationBar} />
+
+            {/* ⚙️ 설정 네비게이션 */}
+            <RootStack.Screen name="SettingStack" component={SettingStack} />
 
             {/* 🖥️ 네비게이션바 없는 화면들 */}
             <RootStack.Screen
