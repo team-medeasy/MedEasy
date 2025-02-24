@@ -10,22 +10,46 @@ const SettingList = () => {
   const profileSettings = [
     {
       name: 'Profile',
-      icon: <SettingsIcons.profileSettings width={20} height={20} />,
+      icon: (
+        <SettingsIcons.profileSettings
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '프로필 설정',
     },
     {
       name: 'Notification',
-      icon: <SettingsIcons.notifications width={20} height={20} />,
+      icon: (
+        <SettingsIcons.notifications
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '알림 설정',
     },
     {
       name: 'FontSize',
-      icon: <SettingsIcons.textSize width={20} height={20} />,
+      icon: (
+        <SettingsIcons.textSize
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '글자 크기 설정',
     },
     {
       name: 'Favorites',
-      icon: <SettingsIcons.favorites width={20} height={20} />,
+      icon: (
+        <SettingsIcons.favorites
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '관심 목록',
     },
   ];
@@ -33,22 +57,46 @@ const SettingList = () => {
   const generalSettings = [
     {
       name: 'Announcements',
-      icon: <SettingsIcons.announcement width={20} height={20} />,
+      icon: (
+        <SettingsIcons.announcement
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '공지사항',
     },
     {
       name: 'Feedback',
-      icon: <SettingsIcons.feedback width={20} height={20} />,
+      icon: (
+        <SettingsIcons.feedback
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '의견 남기기',
     },
     {
       name: 'FAQ',
-      icon: <SettingsIcons.faq width={20} height={20} />,
+      icon: (
+        <SettingsIcons.faq
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '자주 하는 질문',
     },
     {
       name: 'AppVersion',
-      icon: <SettingsIcons.appVersion width={20} height={20} />,
+      icon: (
+        <SettingsIcons.appVersion
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '앱 버전',
     },
   ];
@@ -56,12 +104,24 @@ const SettingList = () => {
   const accountSettings = [
     {
       name: 'Logout',
-      icon: <SettingsIcons.logout width={20} height={20} />,
+      icon: (
+        <SettingsIcons.logout
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '로그아웃',
     },
     {
       name: 'DeleteAccount',
-      icon: <SettingsIcons.trashcan width={20} height={20} />,
+      icon: (
+        <SettingsIcons.trashcan
+          width={20}
+          height={20}
+          style={{color: themes.light.textColor.Primary30}}
+        />
+      ),
       label: '계정 삭제',
     },
   ];
@@ -73,7 +133,9 @@ const SettingList = () => {
         {profileSettings.map((item, index) => (
           <SettingItem
             key={item.name}
-            onPress={() => navigation.navigate(item.name)}>
+            onPress={() => {
+              navigation.navigate('SettingStack', {screen: item.name});
+            }}>
             {item.icon}
             <SettingText>{item.label}</SettingText>
           </SettingItem>
@@ -85,7 +147,9 @@ const SettingList = () => {
         {generalSettings.map((item, index) => (
           <SettingItem
             key={item.name}
-            onPress={() => navigation.navigate(item.name)}>
+            onPress={() => {
+              navigation.navigate('SettingStack', {screen: item.name});
+            }}>
             {item.icon}
             <SettingText>{item.label}</SettingText>
           </SettingItem>
@@ -97,7 +161,9 @@ const SettingList = () => {
         {accountSettings.map((item, index) => (
           <SettingItem
             key={item.name}
-            onPress={() => navigation.navigate(item.name)}>
+            onPress={() => {
+              navigation.navigate('SettingStack', {screen: item.name});
+            }}>
             {item.icon}
             <SettingText>{item.label}</SettingText>
           </SettingItem>
