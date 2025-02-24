@@ -4,16 +4,7 @@ import styled from 'styled-components/native';
 import {themes, pointColor} from './../../styles';
 
 import {SearchBar} from './../../components/SearchBar';
-import {OtherIcons, HeaderIcons, LogoIcons} from '../../../assets/icons';
-
-const {
-  delete: DeleteIcon,
-  rankingDown: RankingDownIcon,
-  rankingUp: RankingUpIcon,
-} = OtherIcons;
-const {logo: LogoIcon} = LogoIcons; 
-const {chevron: ChevronIcon} = HeaderIcons;
-
+import {OtherIcons, LogoIcons} from '../../../assets/icons';
 
 const Container = styled.View`
   flex: 1;
@@ -26,14 +17,14 @@ const HeaderContainer = styled.View`
   background-color: ${themes.light.bgColor.headerBG};
 `;
 
-const ChevronAndSearchContainer = styled.View`
+const LogoAndSearchContainer = styled.View`
   flex-direction: row;
   align-items: center;
   padding-right: 15px;
   padding-left: 12px;
 `;
 
-const ChevronIconContainer = styled.View`
+const LogoIconContainer = styled.View`
   margin-right: 12px;
 `;
 
@@ -201,9 +192,9 @@ const Search = ({navigation, route}) => {
   const getRankChangeIcon = rankChange => {
     switch (rankChange) {
       case 'up':
-        return <RankingUpIcon width={9.14} height={17} />;
+        return <OtherIcons.rankingUp width={9.14} height={17} />;
       case 'down':
-        return <RankingDownIcon width={9.14} height={17} />;
+        return <OtherIcons.rankingDown width={9.14} height={17} />;
       case 'stay':
         return <RankingStayText>-</RankingStayText>;
       default:
@@ -214,16 +205,16 @@ const Search = ({navigation, route}) => {
   return (
     <Container>
       <HeaderContainer>
-        <ChevronAndSearchContainer>
-          <ChevronIconContainer>
-            <LogoIcon height={17} width={17} />
-          </ChevronIconContainer>
+        <LogoAndSearchContainer>
+          <LogoIconContainer>
+            <LogoIcons.logo height={17} width={17} />
+          </LogoIconContainer>
           <SearchBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSearch={() => handleSearch(searchQuery)}
           />
-        </ChevronAndSearchContainer>
+        </LogoAndSearchContainer>
       </HeaderContainer>
       <SearchesContainer>
         <RecentSearchesContainer>
@@ -247,7 +238,7 @@ const Search = ({navigation, route}) => {
                       e.stopPropagation();
                       handleDeleteSearch(item);
                     }}>
-                    <DeleteIcon height={10} width={10} />
+                    <OtherIcons.delete height={10} width={10} />
                   </DeleteIconButton>
                 </RecentSearchItemButton>
               ))}
