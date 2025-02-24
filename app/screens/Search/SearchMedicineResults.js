@@ -63,7 +63,7 @@ const SearchResultContainer = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-const SearchResultItem = styled.View`
+const SearchResultItem = styled(TouchableOpacity)`
   height: 74.67px;
   flex-direction: row;
   align-items: center;
@@ -203,7 +203,6 @@ const FilterOptionText = styled.Text`
 const SearchMedicineResultsScreen = ({ route, navigation }) => {
     const { searchQuery } = route.params;  // MedicineSearchScreen에서 전달된 검색어
     const [searchResults, setSearchResults] = useState([]);
-    const [newSearchQuery, setNewSearchQuery] = useState(searchQuery);  // 검색어 변경을 위한 상태
 
     // 검색 필터링
     const [selectedColor, setSelectedColor] = useState(null);
@@ -284,9 +283,13 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
         setSearchResults(dummyData);
     }, [searchQuery]);
 
-    // SearchBar 터치 핸들러
     const handleSearchBarPress = () => {
       navigation.navigate('SearchMedicine');
+    };
+
+    // 임시로 id 값 넘김
+    const handleSearchResultPress = (medicineId) => {
+      navigation.navigate('MedicineDetail', { id: medicineId });
     };
 
     const renderFilterModal = (title, options, selected, setSelected, modalVisible, setModalVisible) => (
@@ -375,7 +378,7 @@ const SearchMedicineResultsScreen = ({ route, navigation }) => {
                     data={searchResults}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                        <SearchResultItem>
+                        <SearchResultItem onPress={() => handleSearchResultPress(item.id)}>
                             <ImageContainer>
                                 <MedicineImage source={item.image} style={{ resizeMode: 'stretch' }}/>
                             </ImageContainer>

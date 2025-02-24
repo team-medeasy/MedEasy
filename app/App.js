@@ -11,6 +11,7 @@ import SignUpDOBGenderScreen from './screens/SignUp/SignUpDOBGender';
 import NavigationBar from './components/NavigationBar';
 import SearchMedicineScreen from './screens/Search/SearchMedicine';
 import SearchMedicineResultsScreen from './screens/Search/SearchMedicineResults';
+import MedicineDetailScreen from './screens/Search/MedicineDetail';
 import SettingStack from './screens/Settings/SettingStack';
 
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
@@ -71,6 +72,10 @@ const App = () => {
             <RootStack.Screen
               name="SearchMedicineResults"
               component={SearchMedicineResultsScreen}
+            />
+            <RootStack.Screen
+              name="MedicineDetail"
+              component={MedicineDetailScreen}
             />
           </RootStack.Navigator>
         )}
