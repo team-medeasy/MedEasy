@@ -95,7 +95,6 @@ const ScrollContent = styled.ScrollView`
 const ProfileContainer = styled.View`
   align-items: center;
   background-color: ${themes.light.boxColor.buttonPrimary};
-  padding-bottom: 20px;
   flex-direction: row;
 `;
 const TextContainer = styled.View`
@@ -156,7 +155,7 @@ const DaysSinceMedication = styled.View`
   background-color: ${pointColor.pointPrimary};
   padding: 15px;
   width: 49%;
-  aspectratio: 1;
+  aspect-ratio: 1;
   border-radius: 10px;
   overflow: hidden;
 `;
@@ -165,7 +164,7 @@ const MedicationCount = styled.View`
   background-color: ${pointColor.pointPrimaryDark};
   padding: 15px;
   width: 49%;
-  aspectratio: 1;
+  aspect-ratio: 1;
   border-radius: 10px;
   overflow: hidden;
 `;
