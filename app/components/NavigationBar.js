@@ -102,7 +102,7 @@ const TabNavigator = () => {
       <ChatContainer>
         <ChatBuble>
           <BubbleTail />
-          <BubbleText>챗봇 약사와{'\n'}상담해보세요!</BubbleText>
+          <BubbleText>챗봇 약사에게{'\n'}상담해보세요!</BubbleText>
         </ChatBuble>
         <ChatButton>
           <OtherIcons.chat
