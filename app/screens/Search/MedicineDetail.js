@@ -9,12 +9,17 @@ import {
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
-import {HeaderIcons, OtherIcons} from './../../../assets/icons';
-import {Footer, Tag} from './../../components';
+import {OtherIcons} from './../../../assets/icons';
+import {Header, Footer, Tag} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const MedicineDetailScreen = ({navigation}) => {
   const [isFavorite, setIsFavorite] = useState(false);
+
+  // 임시로 item_seq 값 넘김
+  const handlePressEnlarge = (itemSeq) => {
+    navigation.navigate('MedicineImageDetail', { itemSeq });
+  };
 
   // 임시 데이터
   const medicine = {
@@ -105,19 +110,9 @@ const MedicineDetailScreen = ({navigation}) => {
 
   return (
     <Container>
-      <HeaderContainer>
-        <BackAndTitleContainer>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <HeaderIcons.chevron
-              width={17}
-              height={17}
-              style={{color: themes.light.textColor.textPrimary}}
-            />
-          </TouchableOpacity>
-          <Title>{medicine.item_name}</Title>
-          <View width={17} height={17} />
-        </BackAndTitleContainer>
-      </HeaderContainer>
+      <Header>
+        {medicine.item_name}
+      </Header>
 
       <ScrollView>
         <MedicineInfoContainer
@@ -128,7 +123,7 @@ const MedicineDetailScreen = ({navigation}) => {
           <View style={{position:'relative'}}>
             <MedicineImage source={{uri: medicine.item_image}} />
             <TouchableOpacity 
-              onPress={() => console.log('Image button pressed')}
+              onPress={() => handlePressEnlarge(medicine.item_seq)}
               style={{
                 position: 'absolute',
                 bottom: 14,
@@ -269,19 +264,6 @@ const Container = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-const HeaderContainer = styled.View`
-  height: 108px;
-  justify-content: flex-end;
-  padding-bottom: 10px;
-  background-color: ${themes.light.bgColor.bgPrimary};
-`;
-
-const BackAndTitleContainer = styled.View`
-  flex-direction: row;
-  padding: 0 15px;
-  align-items: center;
-`;
-
 const MedicineInfoContainer = styled(ImageBackground)`
   align-items: flex-start;
   padding: 38px 25px 25px 25px;
@@ -385,14 +367,6 @@ const SimilarMedicineItem = ({item}) => (
     </View>
   </View>
 );
-
-const Title = styled.Text`
-  flex: 1;
-  text-align: center;
-  font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.textPrimary};
-`;
 
 const HeadingText = styled.Text`
   color: ${themes.light.textColor.Primary};
