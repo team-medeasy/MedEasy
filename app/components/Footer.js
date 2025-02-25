@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {themes} from '../styles';
 import {LogoIcons} from '../../assets/icons';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 const {
   logo: LogoIcon,
@@ -22,12 +23,12 @@ const Footer = () => {
 
       <FooterText>
         관련 문의: https://github.com/team-medeasy{'\n'}
-        © 2025 MedEasy.
+        © 2025 Team MedEasy.
       </FooterText>
 
       <FooterLogoContainer>
-        <LogoIcon width={13} height={21} style={{ marginRight: 13 , color: themes.light.textColor.Primary20}} />
-        <LogoKrIcon width={52.16} height={18.13} style={{ color: themes.light.textColor.Primary20}}/>
+        <LogoIcon width={13} height={21} style={{ marginRight: 13 , color: themes.light.textColor.Primary30}} />
+        <LogoKrIcon width={52.16} height={18.13} style={{ color: themes.light.textColor.Primary30}}/>
       </FooterLogoContainer>
     </FooterContainer>
   );
@@ -39,11 +40,11 @@ const FooterContainer = styled.View`
 `;
 
 const FooterText = styled.Text`
-  font-size: 10px;
+  font-size: ${FontSizes.captionSm.default};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
   padding: 20px 0;
-  line-height: 20px;
+  line-height: 21px;
 `;
 
 const FooterLogoContainer = styled.View`
