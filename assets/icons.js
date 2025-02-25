@@ -21,6 +21,7 @@ import LogoAddIcon from './icons/logo/logo_add.svg';
 import LogoEnIcon from './icons/logo/logo_en.svg';
 import LogoKrIcon from './icons/logo/logo_kr.svg';
 import LogoIcon from './icons/logo/logo.svg';
+import ChatCautionIcon from './icons/logo/logo_chat_coution.svg';
 
 // 루틴 아이콘
 import CheckOffIcon from './icons/routine/checkOff.svg';
@@ -79,6 +80,7 @@ export const LogoIcons = {
   logoEn: LogoEnIcon,
   logoKr: LogoKrIcon,
   logo: LogoIcon,
+  chatCaution: ChatCautionIcon,
 };
 
 export const RoutineIcons = {
