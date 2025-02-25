@@ -34,20 +34,28 @@ const color = {
   },
 };
 
-const TagContainer = styled.Text`
+const TagContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
   font-size: ${(props) => (props.sizeType === 'small' ? size.small.fontSize : size.large.fontSize)};
   font-family: ${(props) => (props.sizeType === 'small' ? size.small.fontFamily : size.large.fontFamily)};
   background-color: ${(props) => 
     props.colorType ? 
       color[props.colorType].bgColor : 
       props.bgColor || themes.light.boxColor.tagDetailPrimary};
+  border-radius: 5px;
+  padding: ${(props) => (props.sizeType === 'small' ? size.small.padding : size.large.padding)};
+  align-self: flex-start;
+`;
+
+const TagText = styled.Text`
   color: ${(props) => 
     props.colorType ? 
       color[props.colorType].color : 
       props.color || themes.light.textColor.buttonText};
-  border-radius: 5px;
-  padding: ${(props) => (props.sizeType === 'small' ? size.small.padding : size.large.padding)};
-  align-self: flex-start;
+  font-size: ${(props) => (props.sizeType === 'small' ? size.small.fontSize : size.large.fontSize)};
+  font-family: ${(props) => (props.sizeType === 'small' ? size.small.fontFamily : size.large.fontFamily)};
 `;
 
 const Tag = ({ 
@@ -64,11 +72,10 @@ const Tag = ({
       sizeType={sizeType} 
       colorType={colorType} 
       bgColor={bgColor} 
-      color={color} 
       style={style} 
       {...rest}
     >
-      {children}
+      {typeof children === 'string' ? <TagText sizeType={sizeType} colorType={colorType}>{children}</TagText> : children}
     </TagContainer>
   );
 };
