@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import {
   ImageBackground,
@@ -9,11 +9,13 @@ import {
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
-import {HeaderIcons} from './../../../assets/icons';
+import {HeaderIcons, OtherIcons} from './../../../assets/icons';
 import {Footer, Tag} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const MedicineDetailScreen = ({navigation}) => {
+  const [isFavorite, setIsFavorite] = useState(false);
+
   // 임시 데이터
   const medicine = {
     item_name: '지엘타이밍정(카페인무수물)',
@@ -122,23 +124,68 @@ const MedicineDetailScreen = ({navigation}) => {
           source={{uri: medicine.item_image}}
           blurRadius={15}>
           <Overlay />
-          <MedicineImage source={{uri: medicine.item_image}} />
-          <MedicineInfoSub style={{marginTop: 19}}>
-            {medicine.entp_name}
-          </MedicineInfoSub>
-          <MedicineInfoName style={{marginTop: 6}}>
-            {medicine.item_name}
-          </MedicineInfoName>
-          <MedicineInfoSub style={{marginTop: 10}}>
-            {medicine.chart}
-          </MedicineInfoSub>
-          <View style={{flexDirection: 'row', gap: 11, marginTop: 15}}>
-            <Tag sizeType="large" colorType="detailPrimary">
-              {medicine.etc_otc_name}
-            </Tag>
-            <Tag sizeType="large" colorType="detailSecondary">
-              {medicine.class_name}
-            </Tag>
+
+          <View style={{position:'relative'}}>
+            <MedicineImage source={{uri: medicine.item_image}} />
+            <TouchableOpacity 
+              onPress={() => console.log('Image button pressed')}
+              style={{
+                position: 'absolute',
+                bottom: 14,
+                right: 14,
+
+              }}>
+              <Tag bgColor={themes.light.boxColor.tagResultSecondary}>
+                {/* 크게 보기 아이콘 */}
+                크게 보기
+              </Tag>
+            </TouchableOpacity>
+          </View>
+
+          <View 
+            style={{
+              alignItems: 'flex-start', 
+              flex: 1, 
+              marginTop: 19, marginHorizontal: 7,
+              gap: 10,
+            }}>
+
+            <MedicineInfoSub>
+              {medicine.entp_name}
+            </MedicineInfoSub>
+            <MedicineInfoName>
+              {medicine.item_name}
+            </MedicineInfoName>
+            <MedicineInfoSub>
+              {medicine.chart}
+            </MedicineInfoSub>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+              }}>
+
+              <View style={{ flexDirection: 'row', gap: 11 }}>
+                <Tag sizeType="large" colorType="detailPrimary">
+                  {medicine.etc_otc_name}
+                </Tag>
+                <Tag sizeType="large" colorType="detailSecondary">
+                  {medicine.class_name}
+                </Tag>
+              </View>
+              
+              <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
+                {isFavorite ? (
+                  <OtherIcons.heartOn width={24} height={24} style={{ color: themes.light.textColor.buttonText }} />
+                ) : (
+                  <OtherIcons.heartOff width={24} height={24} style={{ color: themes.light.textColor.buttonText }} />
+                )}
+              </TouchableOpacity>
+            </View>
+
           </View>
         </MedicineInfoContainer>
 
@@ -166,8 +213,6 @@ const MedicineDetailScreen = ({navigation}) => {
             <View
               style={{
                 paddingTop: 10,
-                borderBottomWidth: 10,
-                borderBottomColor: themes.light.borderColor.borderSecondary,
               }}>
               <Usage
                 label={'💊 이런 증상에 효과가 있어요'}
@@ -180,13 +225,10 @@ const MedicineDetailScreen = ({navigation}) => {
               <Usage
                 label={'🗄️ 이렇게 보관하세요'}
                 value={medicine.deposit_method_qesitm}
+                borderBottomWidth={10}
               />
             </View>
-            <View
-              style={{
-                borderBottomWidth: 10,
-                borderBottomColor: themes.light.borderColor.borderSecondary,
-              }}>
+            <View>
               <Usage
                 label={'⚠️ 이런 주의사항이 있어요'}
                 value={medicine.atpn_qesitm}
@@ -194,6 +236,7 @@ const MedicineDetailScreen = ({navigation}) => {
               <Usage
                 label={'🤒 이런 부작용이 예상돼요'}
                 value={medicine.se_qesitm}
+                borderBottomWidth={10}
               />
             </View>
           </MedicineUsageContainer>
@@ -215,7 +258,7 @@ const MedicineDetailScreen = ({navigation}) => {
             )}
           </SimilarMedicinesContainer>
         </MedicineDetailContainer>
-        <Footer />
+        <Footer/>
       </ScrollView>
     </Container>
   );
@@ -289,8 +332,15 @@ const Appearance = ({label, value}) => (
   </View>
 );
 
-const Usage = ({label, value}) => (
-  <View style={{paddingVertical: 25, paddingHorizontal: 20, gap: 18}}>
+const Usage = ({label, value, borderBottomWidth = 1}) => (
+  <View 
+    style={{
+      paddingVertical: 25, 
+      paddingHorizontal: 20, 
+      gap: 18,
+      borderBottomWidth: borderBottomWidth,
+      borderBottomColor: themes.light.borderColor.borderSecondary  
+    }}>
     <HeadingText>{label}</HeadingText>
     <Text
       style={{
