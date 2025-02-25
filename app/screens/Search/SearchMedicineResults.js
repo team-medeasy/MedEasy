@@ -11,7 +11,10 @@ import {themes, pointColor} from './../../styles';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {Footer, Tag} from './../../components';
-import {LogoIcons, HeaderIcons, OtherIcons} from '../../../assets/icons';
+import {HeaderIcons, OtherIcons} from '../../../assets/icons';
+
+const {chevron: ChevronIcon} = HeaderIcons;
+const {chevronDown: ChevronDownIcon} = OtherIcons;
 
 const Container = styled.View`
   flex: 1;
@@ -147,14 +150,15 @@ const FilterButton = styled(TouchableOpacity)`
   border-color: ${themes.light.boxColor.inputSecondary};
   flex-direction: row;
   border-width: 1.5px;
-  padding: 6px 9px 6px 11px;
+  padding: 6px 12px 6px 11px;
   border-radius: 40px;
   margin-right: 10px;
+  align-items: center;
 `;
 
 const FilterButtonText = styled.Text`
   font-size: 13px;
-  margin-right: 5px;
+  margin-right: 6px;
   font-family: 'Pretendard-SemiBold';
   color: ${props =>
     props.selected
@@ -348,7 +352,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       <HeaderContainer>
         <ChevronAndSearchContainer>
           <ChevronIconButton onPress={() => navigation.goBack()}>
-            <HeaderIcons.chevron
+            <ChevronIcon
               height={17}
               width={17}
               style={{color: themes.light.textColor.textPrimary}}
@@ -375,25 +379,25 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
                 <FilterButtonText selected={selectedColor}>
                   {selectedColor || '색상'}
                 </FilterButtonText>
-                <Ionicons name="chevron-down" size={15} color="#0005" />
+                <ChevronDownIcon />
               </FilterButton>
               <FilterButton onPress={() => setShapeModalVisible(true)}>
                 <FilterButtonText selected={selectedShape}>
                   {selectedShape || '모양'}
                 </FilterButtonText>
-                <Ionicons name="chevron-down" size={15} color="#0005" />
+                <ChevronDownIcon />
               </FilterButton>
               <FilterButton onPress={() => setSizeModalVisible(true)}>
                 <FilterButtonText selected={selectedSize}>
                   {selectedSize || '크기'}
                 </FilterButtonText>
-                <Ionicons name="chevron-down" size={15} color="#0005" />
+                <ChevronDownIcon />
               </FilterButton>
               <FilterButton onPress={() => setSplitModalVisible(true)}>
                 <FilterButtonText selected={selectedSplit}>
                   {selectedSplit || '분할선'}
                 </FilterButtonText>
-                <Ionicons name="chevron-down" size={15} color="#0005" />
+                <ChevronDownIcon />
               </FilterButton>
             </ScrollableFilterContainer>
           </FeatureSearchContainer>

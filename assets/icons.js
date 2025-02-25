@@ -21,7 +21,7 @@ import LogoAddIcon from './icons/logo/logo_add.svg';
 import LogoEnIcon from './icons/logo/logo_en.svg';
 import LogoKrIcon from './icons/logo/logo_kr.svg';
 import LogoIcon from './icons/logo/logo.svg';
-import ChatCautionIcon from './icons/logo/logo_chat_coution.svg';
+import ChatCautionIcon from './icons/logo/logo_chat_caution.svg';
 
 // 루틴 아이콘
 import CheckOffIcon from './icons/routine/checkOff.svg';
@@ -52,6 +52,7 @@ import RankingDownIcon from './icons/ranking_down.svg';
 import RankingUpIcon from './icons/ranking_up.svg';
 import ReturnIcon from './icons/return.svg';
 import SearchGeneralIcon from './icons/search.svg';
+import ChevronDownIcon from './icons/chevron_down.svg';
 
 // 전체 아이콘 객체로 정리
 export const TabIcons = {
@@ -114,4 +115,5 @@ export const OtherIcons = {
   rankingUp: RankingUpIcon,
   return: ReturnIcon,
   search: SearchGeneralIcon,
+  chevronDown: ChevronDownIcon,
 };
