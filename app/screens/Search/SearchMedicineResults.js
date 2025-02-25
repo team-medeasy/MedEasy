@@ -8,8 +8,6 @@ import {
 } from 'react-native';
 import styled from 'styled-components/native';
 import {themes, pointColor} from './../../styles';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-
 import {Footer, Tag} from './../../components';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 
@@ -379,25 +377,33 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
                 <FilterButtonText selected={selectedColor}>
                   {selectedColor || '색상'}
                 </FilterButtonText>
-                <ChevronDownIcon />
+                <ChevronDownIcon
+                  style={{color: themes.light.textColor.Primary30}}
+                />
               </FilterButton>
               <FilterButton onPress={() => setShapeModalVisible(true)}>
                 <FilterButtonText selected={selectedShape}>
                   {selectedShape || '모양'}
                 </FilterButtonText>
-                <ChevronDownIcon />
+                <ChevronDownIcon
+                  style={{color: themes.light.textColor.Primary30}}
+                />
               </FilterButton>
               <FilterButton onPress={() => setSizeModalVisible(true)}>
                 <FilterButtonText selected={selectedSize}>
                   {selectedSize || '크기'}
                 </FilterButtonText>
-                <ChevronDownIcon />
+                <ChevronDownIcon
+                  style={{color: themes.light.textColor.Primary30}}
+                />
               </FilterButton>
               <FilterButton onPress={() => setSplitModalVisible(true)}>
                 <FilterButtonText selected={selectedSplit}>
                   {selectedSplit || '분할선'}
                 </FilterButtonText>
-                <ChevronDownIcon />
+                <ChevronDownIcon
+                  style={{color: themes.light.textColor.Primary30}}
+                />
               </FilterButton>
             </ScrollableFilterContainer>
           </FeatureSearchContainer>
