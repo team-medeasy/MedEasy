@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { Camera, useCameraDevices } from 'react-native-vision-camera';
-import { useNavigation, useIsFocused } from '@react-navigation/native';
+import React, {useEffect, useRef, useState} from 'react';
+import {ActivityIndicator} from 'react-native';
+import {Camera, useCameraDevices} from 'react-native-vision-camera';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -50,7 +50,7 @@ const CameraScreen = () => {
       {isFocused && (
         <Camera
           ref={cameraRef}
-          style={{ flex: 1 }}
+          style={{flex: 1}}
           device={device}
           isActive={true}
           photo={true}

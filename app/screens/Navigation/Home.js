@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {Calendar} from 'react-native-calendars';
 import {SafeAreaView, TouchableOpacity} from 'react-native';
 import {themes} from './../../styles';
 

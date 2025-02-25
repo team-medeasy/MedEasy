@@ -157,7 +157,7 @@ const Search = ({navigation, route}) => {
     {rank: 5, term: '제산제', rankChange: 'stay'},
   ];
 
-  const handleSearch = (query) => {
+  const handleSearch = query => {
     if (query.trim() !== '') {
       const updatedSearches = [
         query,
@@ -165,19 +165,19 @@ const Search = ({navigation, route}) => {
       ];
       setRecentSearches(updatedSearches);
       setSearchQuery(''); // 검색 후 입력 필드 초기화
-  
+
       navigation.navigate('SearchMedicineResults', {
         searchQuery: query,
         recentSearches: updatedSearches,
       });
     }
-  };  
+  };
 
-  const handleRecentSearchClick = (query) => {
+  const handleRecentSearchClick = query => {
     handleSearch(query);
   };
 
-  const handlePopularSearchClick = (term) => {
+  const handlePopularSearchClick = term => {
     handleSearch(term);
   };
 
@@ -192,9 +192,21 @@ const Search = ({navigation, route}) => {
   const getRankChangeIcon = rankChange => {
     switch (rankChange) {
       case 'up':
-        return <OtherIcons.rankingUp width={9.14} height={17} style={{color: themes.light.pointColor.Secondary}}/>;
+        return (
+          <OtherIcons.rankingUp
+            width={9.14}
+            height={17}
+            style={{color: themes.light.pointColor.Secondary}}
+          />
+        );
       case 'down':
-        return <OtherIcons.rankingDown width={9.14} height={17} style={{color: themes.light.pointColor.Primary}}/>;
+        return (
+          <OtherIcons.rankingDown
+            width={9.14}
+            height={17}
+            style={{color: themes.light.pointColor.Primary}}
+          />
+        );
       case 'stay':
         return <RankingStayText>-</RankingStayText>;
       default:
@@ -207,7 +219,11 @@ const Search = ({navigation, route}) => {
       <HeaderContainer>
         <LogoAndSearchContainer>
           <LogoIconContainer>
-            <LogoIcons.logo height={17} width={17} style={{color: themes.light.textColor.textPrimary}}/>
+            <LogoIcons.logo
+              height={17}
+              width={17}
+              style={{color: themes.light.textColor.textPrimary}}
+            />
           </LogoIconContainer>
           <SearchBar
             searchQuery={searchQuery}
@@ -238,7 +254,11 @@ const Search = ({navigation, route}) => {
                       e.stopPropagation();
                       handleDeleteSearch(item);
                     }}>
-                    <OtherIcons.delete height={10} width={10} style={{color: themes.light.textColor.textPrimary}}/>
+                    <OtherIcons.delete
+                      height={10}
+                      width={10}
+                      style={{color: themes.light.textColor.textPrimary}}
+                    />
                   </DeleteIconButton>
                 </RecentSearchItemButton>
               ))}

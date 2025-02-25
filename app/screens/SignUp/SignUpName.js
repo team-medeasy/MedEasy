@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { SafeAreaView, Text } from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView, Text} from 'react-native';
 import styled from 'styled-components/native';
-import { themes, fonts } from './../../styles';
-import { ProgressBar, BackAndNextButtons } from './../../components';
+import {themes, fonts} from './../../styles';
+import {ProgressBar, BackAndNextButtons} from './../../components';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -10,14 +10,14 @@ const Container = styled(SafeAreaView)`
 `;
 
 const Container1 = styled.View`
-  justify-content: center; 
+  justify-content: center;
   margin-top: 78px;
   margin-left: 30px;
 `;
 
 const Container2 = styled.View`
-  justify-content: center; 
-  align-items: center;  
+  justify-content: center;
+  align-items: center;
   flex-direction: row;
   margin-left: 25px;
   margin-right: 25px;
@@ -26,8 +26,8 @@ const Container2 = styled.View`
 
 const InputContainer = styled.View`
   flex: 1;
-  margin-left: ${(props) => props.marginLeft || '0px'};
-  margin-right: ${(props) => props.marginRight || '0px'}; 
+  margin-left: ${props => props.marginLeft || '0px'};
+  margin-right: ${props => props.marginRight || '0px'};
 `;
 
 const BtnContainer = styled.View`
@@ -44,7 +44,7 @@ const TextInput = styled.TextInput`
   font-size: 16px;
 `;
 
-const SignUpNameScreen = ({ navigation }) => {
+const SignUpNameScreen = ({navigation}) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const progress = '25%';
@@ -53,7 +53,7 @@ const SignUpNameScreen = ({ navigation }) => {
     if (firstName && lastName) {
       console.log('이름:', firstName, '성:', lastName);
       // 다음 페이지로 이동
-      navigation.navigate('SignUpEmail', { lastName, firstName });
+      navigation.navigate('SignUpEmail', {lastName, firstName});
     } else {
       alert('성을 포함한 이름을 모두 입력하세요.');
     }
@@ -63,10 +63,20 @@ const SignUpNameScreen = ({ navigation }) => {
     <Container>
       <ProgressBar progress={progress} />
       <Container1>
-        <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
+        <Text
+          style={{
+            fontFamily: fonts.title.fontFamily,
+            fontSize: fonts.title.fontSize,
+          }}>
           안녕하세요, 메디지입니다 👋
         </Text>
-        <Text style={{ fontFamily: 'Pretendard-Medium', fontSize: 16, marginTop: 7, color: themes.light.textColor.Primary50 }}>
+        <Text
+          style={{
+            fontFamily: 'Pretendard-Medium',
+            fontSize: 16,
+            marginTop: 7,
+            color: themes.light.textColor.Primary50,
+          }}>
           이름을 입력해주세요.
         </Text>
       </Container1>
@@ -87,9 +97,12 @@ const SignUpNameScreen = ({ navigation }) => {
         </InputContainer>
       </Container2>
       <BtnContainer>
-        <BackAndNextButtons onPressPrev={() => navigation.goBack()} onPressNext={handleNext}/>
+        <BackAndNextButtons
+          onPressPrev={() => navigation.goBack()}
+          onPressNext={handleNext}
+        />
       </BtnContainer>
     </Container>
   );
-}
+};
 export default SignUpNameScreen;

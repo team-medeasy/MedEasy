@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { SafeAreaView, Text } from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView, Text} from 'react-native';
 import styled from 'styled-components/native';
-import { themes, fonts } from './../../styles';
-import { ProgressBar, BackAndNextButtons } from './../../components';
+import {themes, fonts} from './../../styles';
+import {ProgressBar, BackAndNextButtons} from './../../components';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -10,7 +10,7 @@ const Container = styled(SafeAreaView)`
 `;
 
 const Container1 = styled.View`
-  justify-content: center; 
+  justify-content: center;
   margin-top: 78px;
   margin-left: 30px;
 `;
@@ -23,8 +23,8 @@ const Container2 = styled.View`
 
 const InputContainer = styled.View`
   width: 100%;
-  margin-top: ${(props) => props.marginTop || '0px'};
-  margin-bottom: ${(props) => props.marginBottom || '0px'}; 
+  margin-top: ${props => props.marginTop || '0px'};
+  margin-bottom: ${props => props.marginBottom || '0px'};
 `;
 
 const BtnContainer = styled.View`
@@ -49,8 +49,8 @@ const TxtLabel = styled.Text`
   font-size: 16px;
 `;
 
-const SignUpEmailScreen = ({ navigation, route }) => {
-  const { lastName, firstName } = route.params;
+const SignUpEmailScreen = ({navigation, route}) => {
+  const {lastName, firstName} = route.params;
   const [email, setEmail] = useState('');
   const progress = '50%';
 
@@ -58,7 +58,7 @@ const SignUpEmailScreen = ({ navigation, route }) => {
     if (email) {
       console.log('이메일:', email);
       // 다음 페이지로 이동
-      navigation.navigate('SignUpPassword', { lastName, firstName, email });
+      navigation.navigate('SignUpPassword', {lastName, firstName, email});
     } else {
       alert('이메일을 입력하세요.');
     }
@@ -68,10 +68,20 @@ const SignUpEmailScreen = ({ navigation, route }) => {
     <Container>
       <ProgressBar progress={progress} />
       <Container1>
-        <Text style={{ fontFamily: fonts.title.fontFamily, fontSize: fonts.title.fontSize }}>
+        <Text
+          style={{
+            fontFamily: fonts.title.fontFamily,
+            fontSize: fonts.title.fontSize,
+          }}>
           {firstName}님, 반가워요!
         </Text>
-        <Text style={{ fontFamily: 'Pretendard-Medium', fontSize: 16, marginTop: 7, color: themes.light.textColor.Primary50 }}>
+        <Text
+          style={{
+            fontFamily: 'Pretendard-Medium',
+            fontSize: 16,
+            marginTop: 7,
+            color: themes.light.textColor.Primary50,
+          }}>
           이메일 주소를 입력해주세요.
         </Text>
       </Container1>
@@ -88,7 +98,10 @@ const SignUpEmailScreen = ({ navigation, route }) => {
         </InputContainer>
       </Container2>
       <BtnContainer>
-        <BackAndNextButtons onPressPrev={() => navigation.goBack()} onPressNext={handleNext}/>
+        <BackAndNextButtons
+          onPressPrev={() => navigation.goBack()}
+          onPressNext={handleNext}
+        />
       </BtnContainer>
     </Container>
   );
