@@ -92,9 +92,11 @@ const StyledCalendar = styled(Calendar).attrs({
     <ChevronIcon
       style={{
         transform: [{rotate: direction === 'left' ? '0deg' : '180deg'}],
-        marginHorizontal: 20,
+        marginHorizontal: 40,
+        color: themes.light.textColor.textPrimary,
       }}
       height={16}
+      width={16}
     />
   ),
 })``;
