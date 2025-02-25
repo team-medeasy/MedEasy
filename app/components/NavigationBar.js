@@ -55,7 +55,7 @@ const TabNavigator = () => {
             paddingTop: 10,
           },
           tabBarActiveTintColor: themes.light.pointColor.Primary,
-          tabBarInactiveTintColor: themes.light.textColor.Primary50,
+          tabBarInactiveTintColor: themes.light.textColor.Primary20,
         }}>
         <Tab.Screen
           name="홈"
@@ -80,10 +80,10 @@ const TabNavigator = () => {
             },
           }}
           listeners={{
-            tabPress: (e) => {
+            tabPress: e => {
               e.preventDefault(); // 기본 탭 동작 방지
               handleSearchPress();
-            }
+            },
           }}
         />
         <Tab.Screen

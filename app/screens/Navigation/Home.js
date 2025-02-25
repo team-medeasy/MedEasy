@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {Calendar} from 'react-native-calendars';
 import {SafeAreaView, TouchableOpacity} from 'react-native';
 import {themes} from './../../styles';
 
@@ -14,23 +13,30 @@ const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 const Home = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      <LogoContainer>
-        <LogoIcon
-          height={23}
-          style={{color: themes.light.pointColor.Primary}}
-        />
-        <LogoKrIcon
-          height={20}
-          style={{marginLeft: -210, color: themes.light.pointColor.Primary}}
-        />
-        <TouchableOpacity>
-          <Notification>
-            <NotificationIcon height={23} />
-          </Notification>
-        </TouchableOpacity>
-      </LogoContainer>
-
       <ScrollContainer>
+        <Header>
+          <LogoContainer>
+            <LogoIcon
+              height={20}
+              width={13}
+              style={{color: themes.light.pointColor.Primary}}
+              marginRight={10}
+            />
+            <LogoKrIcon
+              height={19}
+              width={54}
+              style={{color: themes.light.pointColor.Primary}}
+            />
+          </LogoContainer>
+          <TouchableOpacity>
+            <NotificationIcon
+              height={20}
+              width={22}
+              style={{color: themes.light.textColor.textPrimary}}
+            />
+          </TouchableOpacity>
+        </Header>
+
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
@@ -103,16 +109,16 @@ const Home = () => {
 const ScrollContainer = styled.ScrollView`
   flex: 1;
 `;
+const Header = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding: 0px 25px;
+`;
 
 const LogoContainer = styled.View`
   flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 10px;
-`;
-
-const Notification = styled.View`
-  margin-right: 10px;
+  padding: 0px;
 `;
 
 const PillReminderContainer = styled.View`
