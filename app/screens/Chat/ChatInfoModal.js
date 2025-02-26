@@ -1,8 +1,9 @@
 import React from 'react';
-import { Modal, View, TouchableOpacity, Text } from 'react-native';
+import { Modal } from 'react-native';
 import styled from 'styled-components/native';
+import { Button } from './../../components';
 import { themes } from '../../styles';
-import { LogoIcons, OtherIcons } from '../../../assets/icons';
+import { LogoIcons } from '../../../assets/icons';
 
 const ChatInfoModal = ({ visible, onClose }) => {
     return (
@@ -22,9 +23,7 @@ const ChatInfoModal = ({ visible, onClose }) => {
                             제공되는 모든 의약품 정보는 참고용으로만 제공됩니다. AI의 답변은 전문 의료 상담이 아니므로, 구체적인 복용법 및 치료에 관해서는 반드시 의사 또는 약사와 상담 후 결정하시기 바랍니다.
                         </CautionText>
                     </CautionContainer>
-                    <CloseButton onPress={onClose}>
-                        <CloseButtonText>확인</CloseButtonText>
-                    </CloseButton>
+                    <Button title='확인' onPress={onClose}></Button>
                 </ModalContent>
             </ModalContainer>
         </Modal>
@@ -74,23 +73,6 @@ const CautionText = styled.Text`
     color: ${themes.light.textColor.Primary50};
     padding: 30px 20px;
     line-height: 25px;
-`;
-
-const CloseButton = styled.TouchableOpacity`
-  position: absolute;
-  width: 100%;
-  height: 60px;
-  justify-content: center;
-  align-items: center;
-  background-color: ${themes.light.boxColor.buttonPrimary};
-  border-radius: 10px;
-  bottom: 40px;
-`;
-
-const CloseButtonText = styled.Text`
-  font-size: 18px;
-  font-family: 'KimjungchulGothic-Bold';
-  color: ${themes.light.textColor.buttonText};
 `;
 
 export default ChatInfoModal;
