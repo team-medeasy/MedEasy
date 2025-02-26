@@ -10,10 +10,12 @@ import SettingList from '../../components/SettingList';
 const MyPage = () => {
   return (
     <Container>
-      <HeaderContainer>
-        <Title>내 정보</Title>
-      </HeaderContainer>
       <ScrollContent>
+        {/* 헤더 */}
+        <HeaderContainer>
+          <Title>내 정보</Title>
+        </HeaderContainer>
+        {/* 웰컴 메시지, 프로필 설정 */}
         <ProfileContainer>
           <TextContainer>
             <UserText>안녕하세요, 김한성님🩵</UserText>
@@ -37,6 +39,7 @@ const MyPage = () => {
             </ProfileAddButton>
           </EditProfile>
         </ProfileContainer>
+        {/* 약 챙겨먹은 일수 */}
         <InfoContainer>
           <DaysSinceMedication>
             <WithMedeasy>메디지와 함께</WithMedeasy>
@@ -61,7 +64,9 @@ const MyPage = () => {
             </IconWrapper>
           </MedicationCount>
         </InfoContainer>
+        {/* 설정 리스트 */}
         <SettingList />
+        {/* Footer */}
         <Footer />
       </ScrollContent>
     </Container>
