@@ -1,19 +1,20 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import {pointColor, themes} from './../../styles';
-import KarteIcon from './../../../assets/icons/karte.svg';
-import LogoIcon from './../../../assets/icons/logo/logo.svg';
 import {LogoIcons, CameraIcons} from './../../../assets/icons';
 import {Footer} from '../../components';
+import MedicationInfo from '../../components/MedicationInfo';
 import SettingList from '../../components/SettingList';
 
 const MyPage = () => {
   return (
     <Container>
-      <HeaderContainer>
-        <Title>내 정보</Title>
-      </HeaderContainer>
       <ScrollContent>
+        {/* 헤더 */}
+        <HeaderContainer>
+          <Title>내 정보</Title>
+        </HeaderContainer>
+        {/* 웰컴 메시지, 프로필 설정 */}
         <ProfileContainer>
           <TextContainer>
             <UserText>안녕하세요, 김한성님🩵</UserText>
@@ -24,43 +25,24 @@ const MyPage = () => {
               <LogoIcons.logo
                 width={30}
                 height={47}
-                style={{color: themes.light.pointColor.Primary10}}
+                style={{color: themes.light.bgColor.protileIcon}}
               />
               <EditButton onPress={() => alert('프로필 수정')}>
                 <CameraIcons.camera
                   width={15}
                   height={15}
                   style={{color: themes.light.textColor.buttonText}}
+                  opacity={0.5}
                 />
               </EditButton>
             </ProfileAddButton>
           </EditProfile>
         </ProfileContainer>
-        <InfoContainer>
-          <DaysSinceMedication>
-            <WithMedeasy>메디지와 함께</WithMedeasy>
-            <InfoText>약 챙겨먹은지 </InfoText>
-            <InfoNum>32일째</InfoNum>
-            <IconWrapper>
-              <KarteIcon
-                width={90}
-                height={90}
-                style={{color: themes.light.boxColor.tagDetailPrimary}}
-              />
-            </IconWrapper>
-          </DaysSinceMedication>
-          <MedicationCount>
-            <WithMedeasy>메디지와 함께</WithMedeasy>
-            <InfoText>복용중인 약 </InfoText>
-            <InfoNum>5개</InfoNum>
-            <IconWrapper>
-              <LogoIcon
-                style={{color: themes.light.boxColor.tagDetailPrimary}}
-              />
-            </IconWrapper>
-          </MedicationCount>
-        </InfoContainer>
+        {/* 약 챙겨먹은 일수 */}
+        <MedicationInfo days={32} medicationCount={5} />
+        {/* 설정 리스트 */}
         <SettingList />
+        {/* Footer */}
         <Footer />
       </ScrollContent>
     </Container>
@@ -123,7 +105,7 @@ const ProfileAddButton = styled.TouchableOpacity`
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background-color: ${themes.light.bgColor.navBG};
+  background-color: ${themes.light.bgColor.protileIcon};
   justify-content: center;
   align-items: center;
   position: relative;
@@ -141,93 +123,6 @@ const EditButton = styled.TouchableOpacity`
   right: -5px;
   border-width: 1px;
   border-color: ${themes.light.boxColor.tagDetailSecondary};
-`;
-
-const InfoContainer = styled.View`
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 10px 20px;
-  background-color: ${themes.light.boxColor.buttonPrimary};
-`;
-
-const DaysSinceMedication = styled.View`
-  background-color: ${pointColor.pointPrimary};
-  padding: 15px;
-  width: 49%;
-  aspect-ratio: 1;
-  border-radius: 10px;
-  overflow: hidden;
-`;
-
-const MedicationCount = styled.View`
-  background-color: ${pointColor.pointPrimaryDark};
-  padding: 15px;
-  width: 49%;
-  aspect-ratio: 1;
-  border-radius: 10px;
-  overflow: hidden;
-`;
-
-const IconWrapper = styled.View`
-  position: absolute;
-  transform: rotate(8deg);
-  overflow: hidden;
-  bottom: -10px;
-  right: 20px;
-`;
-
-const WithMedeasy = styled.Text`
-  font-size: 12px;
-  font-family: 'Pretendard-Regular';
-  color: ${themes.light.textColor.buttonText};
-  padding-bottom: 10px;
-`;
-
-const InfoText = styled.Text`
-  font-size: 18px;
-  font-family: 'KimjungchulGothic-Bold';
-  color: ${themes.light.textColor.buttonText70};
-`;
-
-const InfoNum = styled.Text`
-  font-size: 18px;
-  font-family: 'KimjungchulGothic-Bold';
-  color: ${themes.light.textColor.buttonText};
-`;
-
-const ProfileSettings = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  justify-content: center;
-  border-bottom-width: 10px;
-  border-color: ${themes.light.borderColor.borderPrimary};
-`;
-
-const Settings = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  justify-content: center;
-  margin-bottom: 10px;
-  border-bottom-width: 10px;
-  border-color: ${themes.light.borderColor.borderPrimary};
-`;
-
-const AccountSetting = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  justify-content: center;
-`;
-
-const SettingItem = styled.TouchableOpacity`
-  flex-direction: row;
-  padding: 16px 25px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${themes.light.borderColor.borderPrimary};
-`;
-
-const SettingText = styled.Text`
-  font-size: 16px;
-  font-family: 'Pretendard-Regular';
-  color: ${themes.light.textColor.textPrimary};
-  margin-left: 20px;
 `;
 
 export default MyPage;
