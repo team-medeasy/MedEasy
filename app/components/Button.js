@@ -5,9 +5,9 @@ import { themes } from '../styles';
 
 // 기본 버튼
 const ButtonContainer = styled(TouchableOpacity)`
-  flex: ${(props) => (props.flex || 'auto')};
-  width: ${props => props.width || '100%'};
-  height: ${props => props.height || '60px'};
+  flex: ${({ flex }) => flex ?? '0 1 auto'};
+  width: ${({ width }) => width || '100%'};
+  height: ${({ height }) => height ?? '60px'};
   background-color: ${(props) => props.bgColor || themes.light.boxColor.buttonPrimary};
   justify-content: center;
   align-items: center;
