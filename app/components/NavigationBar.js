@@ -11,9 +11,13 @@ import MyPage from '../screens/Navigation/MyPage';
 import CameraScreen from '../screens/CameraScreen.js';
 import Chat from '../screens/Chat/Chat.js';
 import {pointColor, themes} from './../styles';
-import {TabIcons} from './../../assets/icons';
-import {CameraIcons} from './../../assets/icons';
-import {OtherIcons} from './../../assets/icons';
+import {
+  TabIcons,
+  CameraIcons,
+  OtherIcons,
+  HeaderIcons,
+} from './../../assets/icons';
+const {chevron: ChevronIcon} = HeaderIcons;
 
 // 카메라 버튼
 const CameraButton = ({onPress}) => {
@@ -134,10 +138,27 @@ const TabNavigator = () => {
 
 const RootNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="TabNavigator" component={TabNavigator} />
-      <Stack.Screen name="Camera" component={CameraScreen} />
-      <Stack.Screen name="Chat" component={Chat} />
+    <Stack.Navigator>
+      <Stack.Screen
+        name="TabNavigator"
+        component={TabNavigator}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Camera"
+        component={CameraScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={Chat}
+        options={{
+          headerTitle: 'AI 챗봇 메디씨',
+          headerBackTitle: '',
+          headerShown: true,
+          headerBackImage: () => <ChevronIcon height={17} />,
+        }}
+      />
     </Stack.Navigator>
   );
 };

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import ChatInfoModal from './ChatInfoModal';
 
 const Chat = () => {
@@ -17,16 +17,14 @@ const Chat = () => {
 
   return (
     <Container>
-      {/* 뒤로가기 버튼 */}
-      <BackButton onPress={handleGoBack}>
-        <BackButtonText>뒤로가기</BackButtonText>
-      </BackButton>
-
       {/* 채팅 제목 */}
       <Title>채팅</Title>
 
       {/* 채팅 이용 안내 모달 */}
-      <ChatInfoModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <ChatInfoModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </Container>
   );
 };
