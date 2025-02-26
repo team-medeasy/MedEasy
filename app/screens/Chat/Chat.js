@@ -81,16 +81,16 @@ const Chat = () => {
                 ))}
               </BotOptions>
             )}
-            <MessageTime>{item.time}</MessageTime>
           </BotMessage>
+          <MessageTime>{item.time}</MessageTime>
         </BotMessageContainer>
       );
     } else {
       return (
         <UserMessageContainer>
+          <MessageTime>{item.time}</MessageTime>
           <UserMessageBubble>
             <UserMessage>{item.text}</UserMessage>
-            <MessageTime>{item.time}</MessageTime>
           </UserMessageBubble>
         </UserMessageContainer>
       );
@@ -115,14 +115,39 @@ const Chat = () => {
 
       {/* 메시지 입력창 */}
       <InputContainer>
-        <Input
-          placeholder="무엇이든 물어보세요!"
-          value={inputText}
-          onChangeText={setInputText}
-        />
-        <SendButton onPress={sendMessage}>
-          <SendIcon width={24} height={24} />
-        </SendButton>
+        {/* 추가 아이콘 컨테이너 */}
+        <AddIconContainer>
+          <AddIcon
+            width={18}
+            height={18}
+            style={{color: themes.light.textColor.Primary30}}
+          />
+        </AddIconContainer>
+
+        {/* 입력 필드 및 전송 버튼 컨테이너 */}
+        <TextInputContainer>
+          <Input
+            placeholder="무엇이든 물어보세요!"
+            value={inputText}
+            onChangeText={setInputText}
+          />
+          <SendButton onPress={sendMessage}>
+            <SendIcon
+              width={16}
+              height={16}
+              style={{color: themes.light.textColor.Primary30}}
+            />
+          </SendButton>
+        </TextInputContainer>
+
+        {/* 마이크 아이콘 컨테이너 */}
+        <MikeIconContainer>
+          <MikeIcon
+            width={17}
+            height={20}
+            style={{color: themes.light.textColor.Primary}}
+          />
+        </MikeIconContainer>
       </InputContainer>
     </Container>
   );
@@ -131,7 +156,7 @@ const Chat = () => {
 // 스타일 정의
 const Container = styled.View`
   flex: 1;
-  background-color: white;
+  background-color: ${themes.light.bgColor.bgSecondary};
 `;
 
 const BotMessageContainer = styled.View`
@@ -179,6 +204,8 @@ const OptionText = styled.Text`
 `;
 
 const UserMessageContainer = styled.View`
+  flex-direction: row;
+  justify-content: flex-end;
   align-items: flex-end;
   margin-bottom: 10px;
 `;
@@ -207,10 +234,43 @@ const UserMessageBubble = styled.View`
 
 const InputContainer = styled.View`
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  border-top-width: 1px;
-  border-top-color: #ddd;
+  width: 100%;
+  padding: 10px 10px;
+  padding-bottom: 30px;
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
+
+const AddIconContainer = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: ${themes.light.boxColor.inputSecondary};
+  flex-shrink: 0;
+`;
+
+const TextInputContainer = styled.View`
+  height: 40px;
+  flex: 1;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 30px;
+  margin: 0px 10px;
+  background-color: ${themes.light.boxColor.inputSecondary};
+`;
+
+const MikeIconContainer = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: ${themes.light.boxColor.inputSecondary};
+  flex-shrink: 0;
 `;
 
 const Input = styled.TextInput`
