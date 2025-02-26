@@ -1,11 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import {useNavigation} from '@react-navigation/native';
 import {FlatList, TextInput, TouchableOpacity} from 'react-native';
 import ChatInfoModal from './ChatInfoModal';
 import {ChatIcons} from '../../../assets/icons';
+import {themes} from '../../styles';
 
-const {send: SendIcon} = ChatIcons;
+const {
+  add: AddIcon,
+  mike: MikeIcon,
+  robot: RobotIcon,
+  send: SendIcon,
+} = ChatIcons;
 
 const Chat = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -57,7 +62,14 @@ const Chat = () => {
     if (item.type === 'bot') {
       return (
         <BotMessageContainer>
-          <BotIcon>🤖</BotIcon>
+          <RobotIconContainer>
+            <RobotIcon
+              height={30}
+              width={30}
+              style={{color: themes.light.textColor.buttonText}}
+            />
+          </RobotIconContainer>
+
           <BotMessage>
             <BotText>{item.text}</BotText>
             {item.options && (
@@ -128,9 +140,13 @@ const BotMessageContainer = styled.View`
   margin-bottom: 10px;
 `;
 
-const BotIcon = styled.Text`
-  font-size: 20px;
-  margin-right: 8px;
+const RobotIconContainer = styled.View`
+  background-color: ${themes.light.pointColor.Primary};
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
 `;
 
 const BotMessage = styled.View`
