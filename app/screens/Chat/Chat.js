@@ -69,28 +69,29 @@ const Chat = () => {
               style={{color: themes.light.textColor.buttonText}}
             />
           </RobotIconContainer>
-
-          <BotMessage>
+          <BotMessageBubble>
             <BotText>{item.text}</BotText>
             {item.options && (
               <BotOptions>
                 {item.options.map((option, index) => (
-                  <OptionButton key={index}>
+                  <OptionButton
+                    key={index}
+                    isLast={index === item.options.length - 1}>
                     <OptionText>{option}</OptionText>
                   </OptionButton>
                 ))}
               </BotOptions>
             )}
-            <MessageTime>{item.time}</MessageTime>
-          </BotMessage>
+          </BotMessageBubble>
+          <MessageTime>{item.time}</MessageTime>
         </BotMessageContainer>
       );
     } else {
       return (
         <UserMessageContainer>
+          <MessageTime>{item.time}</MessageTime>
           <UserMessageBubble>
-            <UserMessage>{item.text}</UserMessage>
-            <MessageTime>{item.time}</MessageTime>
+            <UserText>{item.text}</UserText>
           </UserMessageBubble>
         </UserMessageContainer>
       );
@@ -115,14 +116,40 @@ const Chat = () => {
 
       {/* 메시지 입력창 */}
       <InputContainer>
-        <Input
-          placeholder="무엇이든 물어보세요!"
-          value={inputText}
-          onChangeText={setInputText}
-        />
-        <SendButton onPress={sendMessage}>
-          <SendIcon width={24} height={24} />
-        </SendButton>
+        {/* 추가 아이콘 컨테이너 */}
+        <AddIconContainer>
+          <AddIcon
+            width={18}
+            height={18}
+            style={{color: themes.light.textColor.Primary30}}
+          />
+        </AddIconContainer>
+
+        {/* 입력 필드 및 전송 버튼 컨테이너 */}
+        <TextInputContainer>
+          <Input
+            placeholder="무엇이든 물어보세요!"
+            value={inputText}
+            onChangeText={setInputText}
+            multiline={true}
+          />
+          <SendButton onPress={sendMessage}>
+            <SendIcon
+              width={16}
+              height={16}
+              style={{color: themes.light.textColor.Primary30}}
+            />
+          </SendButton>
+        </TextInputContainer>
+
+        {/* 마이크 아이콘 컨테이너 */}
+        <MikeIconContainer>
+          <MikeIcon
+            width={17}
+            height={20}
+            style={{color: themes.light.textColor.Primary}}
+          />
+        </MikeIconContainer>
       </InputContainer>
     </Container>
   );
@@ -131,13 +158,20 @@ const Chat = () => {
 // 스타일 정의
 const Container = styled.View`
   flex: 1;
-  background-color: white;
+  background-color: ${themes.light.bgColor.bgSecondary};
 `;
 
 const BotMessageContainer = styled.View`
   flex-direction: row;
   align-items: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  /* iOS 그림자 */
+  shadow-color: black;
+  shadow-offset: 5px 5px;
+  shadow-opacity: 0.07;
+  shadow-radius: 30px;
+  /* Android 그림자 */
+  elevation: 5;
 `;
 
 const RobotIconContainer = styled.View`
@@ -147,80 +181,125 @@ const RobotIconContainer = styled.View`
   justify-content: center;
   align-items: center;
   border-radius: 20px;
+  margin-right: 10px;
 `;
 
-const BotMessage = styled.View`
-  background-color: #f0f0f0;
-  padding: 12px;
-  border-radius: 10px;
-  max-width: 70%;
+const BotMessageBubble = styled.View`
+  background-color: ${themes.light.bgColor.bgPrimary};
+  padding: 15px 20px;
+  border-radius: 20px;
+  border-top-left-radius: 3px;
+  max-width: 65%;
 `;
 
 const BotText = styled.Text`
-  font-size: 16px;
-  color: black;
+  font-size: 15px;
+  line-height: 24px;
+  color: ${themes.light.textColor.Primary};
+  font-family: 'Pretendard-Medium';
 `;
 
 const BotOptions = styled.View`
-  margin-top: 8px;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  background-color: ${themes.light.pointColor.Primary10};
+  border-radius: 12px;
 `;
 
 const OptionButton = styled.TouchableOpacity`
-  background-color: white;
-  padding: 8px;
-  margin-top: 5px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  border-bottom-width: ${({isLast}) => (isLast ? '0px' : '1px')};
+  border-bottom-color: ${themes.light.borderColor.borderPrimary};
 `;
 
 const OptionText = styled.Text`
-  color: blue;
-  font-size: 14px;
+  color: ${themes.light.pointColor.Primary};
+  font-size: 15px;
+  font-family: 'Pretendard-Semibold';
 `;
 
 const UserMessageContainer = styled.View`
+  flex-direction: row;
+  justify-content: flex-end;
   align-items: flex-end;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 `;
 
-const UserMessage = styled.Text`
-  background-color: #007aff;
-  padding: 12px;
-  border-radius: 10px;
-  max-width: 70%;
-  color: white;
+const UserText = styled.Text`
+  color: ${themes.light.textColor.buttonText};
+  font-family: 'Pretendard-SemiBold';
 `;
 
 const MessageTime = styled.Text`
   font-size: 12px;
-  color: gray;
-  margin-top: 5px;
+  margin: 0px 10px;
   align-self: flex-end;
+  color: ${themes.light.textColor.Primary30};
+  font-family: 'Pretendard-Medium';
 `;
 
 const UserMessageBubble = styled.View`
-  background-color: #007aff;
-  padding: 12px;
-  border-radius: 10px;
+  background-color: ${themes.light.pointColor.Primary};
+  padding: 15px 20px;
+  border-radius: 20px;
+  border-top-right-radius: 3px;
   max-width: 70%;
 `;
 
 const InputContainer = styled.View`
   flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 10px;
+  padding-bottom: 30px;
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
+
+const AddIconContainer = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  justify-content: center;
   align-items: center;
-  padding: 10px;
-  border-top-width: 1px;
-  border-top-color: #ddd;
+  margin-bottom: 10px;
+  background-color: ${themes.light.boxColor.inputSecondary};
+  flex-shrink: 0;
+`;
+
+const TextInputContainer = styled.View`
+  flex: 1;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 20px;
+  margin: 0px 10px;
+  min-height: 40px;
+  padding: 5px 0px;
+  background-color: ${themes.light.boxColor.inputSecondary};
+`;
+
+const MikeIconContainer = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: ${themes.light.boxColor.inputSecondary};
+  flex-shrink: 0;
 `;
 
 const Input = styled.TextInput`
   flex: 1;
-  padding: 10px;
+  padding-left: 15px;
+  padding-right: 10px;
   font-size: 16px;
+  max-height: 100px;
 `;
 
 const SendButton = styled.TouchableOpacity`
-  padding: 10px;
+  padding-right: 15px;
 `;
 
 export default Chat;
