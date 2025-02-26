@@ -253,6 +253,7 @@ const UserMessageBubble = styled.View`
 const InputContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   padding: 10px 10px;
   padding-bottom: 30px;
@@ -265,7 +266,6 @@ const AddIconContainer = styled.View`
   border-radius: 100%;
   justify-content: center;
   align-items: center;
-  margin-bottom: 10px;
   background-color: ${themes.light.boxColor.inputSecondary};
   flex-shrink: 0;
 `;
