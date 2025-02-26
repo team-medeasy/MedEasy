@@ -24,13 +24,14 @@ const MyPage = () => {
               <LogoIcons.logo
                 width={30}
                 height={47}
-                style={{color: themes.light.pointColor.Primary10}}
+                style={{color: themes.light.bgColor.protileIcon}}
               />
               <EditButton onPress={() => alert('프로필 수정')}>
                 <CameraIcons.camera
                   width={15}
                   height={15}
                   style={{color: themes.light.textColor.buttonText}}
+                  opacity={0.5}
                 />
               </EditButton>
             </ProfileAddButton>
@@ -123,7 +124,7 @@ const ProfileAddButton = styled.TouchableOpacity`
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background-color: ${themes.light.bgColor.navBG};
+  background-color: ${themes.light.bgColor.protileIcon};
   justify-content: center;
   align-items: center;
   position: relative;
@@ -194,40 +195,6 @@ const InfoNum = styled.Text`
   font-size: 18px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
-`;
-
-const ProfileSettings = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  justify-content: center;
-  border-bottom-width: 10px;
-  border-color: ${themes.light.borderColor.borderPrimary};
-`;
-
-const Settings = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  justify-content: center;
-  margin-bottom: 10px;
-  border-bottom-width: 10px;
-  border-color: ${themes.light.borderColor.borderPrimary};
-`;
-
-const AccountSetting = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  justify-content: center;
-`;
-
-const SettingItem = styled.TouchableOpacity`
-  flex-direction: row;
-  padding: 16px 25px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${themes.light.borderColor.borderPrimary};
-`;
-
-const SettingText = styled.Text`
-  font-size: 16px;
-  font-family: 'Pretendard-Regular';
-  color: ${themes.light.textColor.textPrimary};
-  margin-left: 20px;
 `;
 
 export default MyPage;
