@@ -69,7 +69,6 @@ const Chat = () => {
               style={{color: themes.light.textColor.buttonText}}
             />
           </RobotIconContainer>
-
           <BotMessage>
             <BotText>{item.text}</BotText>
             {item.options && (
@@ -99,11 +98,10 @@ const Chat = () => {
 
   return (
     <Container>
-      {/* 채팅 이용 안내 모달 */}
-      <ChatInfoModal
+      {/* 채팅 이용 안내 모달 <ChatInfoModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-      />
+      />*/}
 
       {/* 채팅 메시지 목록 */}
       <FlatList
@@ -133,7 +131,7 @@ const Chat = () => {
           />
           <SendButton onPress={sendMessage}>
             <SendIcon
-              width={16}
+              width={30}
               height={16}
               style={{color: themes.light.textColor.Primary30}}
             />
@@ -163,6 +161,13 @@ const BotMessageContainer = styled.View`
   flex-direction: row;
   align-items: flex-start;
   margin-bottom: 10px;
+  /* iOS 그림자 */
+  shadow-color: black;
+  shadow-offset: 5px 5px;
+  shadow-opacity: 0.07;
+  shadow-radius: 30px;
+  /* Android 그림자 */
+  elevation: 5;
 `;
 
 const RobotIconContainer = styled.View`
@@ -172,35 +177,41 @@ const RobotIconContainer = styled.View`
   justify-content: center;
   align-items: center;
   border-radius: 20px;
+  margin-right: 10px;
 `;
 
 const BotMessage = styled.View`
-  background-color: #f0f0f0;
-  padding: 12px;
-  border-radius: 10px;
-  max-width: 70%;
+  background-color: ${themes.light.bgColor.bgPrimary};
+  padding: 15px 20px;
+  border-radius: 20px;
+  border-top-left-radius: 3px;
+  max-width: 65%;
 `;
 
 const BotText = styled.Text`
-  font-size: 16px;
-  color: black;
+  font-size: 15px;
+  line-height: 24px;
+  color: ${themes.light.textColor.Primary};
+  font-family: 'Pretendard-Medium';
 `;
 
 const BotOptions = styled.View`
-  margin-top: 8px;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  background-color: ${themes.light.pointColor.Primary10};
+  border-radius: 12px;
 `;
 
 const OptionButton = styled.TouchableOpacity`
-  background-color: white;
-  padding: 8px;
-  margin-top: 5px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
 `;
 
 const OptionText = styled.Text`
-  color: blue;
-  font-size: 14px;
+  color: ${themes.light.pointColor.Primary};
+  font-size: 15px;
+  font-family: 'Pretendard-Semibold';
 `;
 
 const UserMessageContainer = styled.View`
@@ -220,9 +231,9 @@ const UserMessage = styled.Text`
 
 const MessageTime = styled.Text`
   font-size: 12px;
-  color: gray;
-  margin-top: 5px;
   align-self: flex-end;
+  color: ${themes.light.textColor.Primary30};
+  font-family: 'Pretendard-Medium';
 `;
 
 const UserMessageBubble = styled.View`
@@ -275,7 +286,7 @@ const MikeIconContainer = styled.View`
 
 const Input = styled.TextInput`
   flex: 1;
-  padding: 10px;
+  padding: 0px 20px;
   font-size: 16px;
 `;
 
