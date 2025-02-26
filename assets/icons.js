@@ -10,6 +10,12 @@ import CameraSwitchIcon from './icons/camera/cameraSwitch.svg';
 import FlashIcon from './icons/camera/flash.svg';
 import TipIcon from './icons/camera/tip.svg';
 
+// 채팅 아이콘
+import AddIcon from './icons/chat/add.svg';
+import MikeIcon from './icons/chat/mike.svg';
+import RobotIcon from './icons/chat/robot.svg';
+import SendIcon from './icons/chat/send.svg';
+
 // 헤더 아이콘
 import ChevronIcon from './icons/header/chevron.svg';
 import CogIcon from './icons/header/cog.svg';
@@ -71,6 +77,13 @@ export const CameraIcons = {
   cameraSwitch: CameraSwitchIcon,
   flash: FlashIcon,
   tip: TipIcon,
+};
+
+export const ChatIcons = {
+  add: AddIcon,
+  mike: MikeIcon,
+  robot: RobotIcon,
+  send: SendIcon,
 };
 
 export const HeaderIcons = {
