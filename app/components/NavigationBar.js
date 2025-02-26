@@ -152,17 +152,7 @@ const RootNavigator = () => {
       <Stack.Screen
         name="Chat"
         component={Chat}
-        options={{
-          headerTitle: 'AI 챗봇 메디씨',
-          headerBackTitle: '',
-          headerShown: true,
-          headerBackImage: () => (
-            <ChevronIcon
-              height={17}
-              style={{color: themes.light.textColor.Primary}}
-            />
-          ),
-        }}
+        options={{headerShown: false}}
       />
     </Stack.Navigator>
   );

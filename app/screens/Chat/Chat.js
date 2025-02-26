@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import {FlatList, TextInput, TouchableOpacity} from 'react-native';
+import {FlatList} from 'react-native';
 import ChatInfoModal from './ChatInfoModal';
+import {Header} from './../../components';
 import {ChatIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
 
@@ -100,6 +101,8 @@ const Chat = () => {
 
   return (
     <Container>
+      <Header>AI 챗봇 메디씨</Header>
+
       {/* 채팅 이용 안내 모달 */}
       <ChatInfoModal
         visible={modalVisible}
