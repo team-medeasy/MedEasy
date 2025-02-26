@@ -228,6 +228,8 @@ const UserMessageContainer = styled.View`
 `;
 
 const UserText = styled.Text`
+  font-size: 15px;
+  line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-SemiBold';
 `;
