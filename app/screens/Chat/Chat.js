@@ -69,18 +69,20 @@ const Chat = () => {
               style={{color: themes.light.textColor.buttonText}}
             />
           </RobotIconContainer>
-          <BotMessage>
+          <BotMessageBubble>
             <BotText>{item.text}</BotText>
             {item.options && (
               <BotOptions>
                 {item.options.map((option, index) => (
-                  <OptionButton key={index}>
+                  <OptionButton
+                    key={index}
+                    isLast={index === item.options.length - 1}>
                     <OptionText>{option}</OptionText>
                   </OptionButton>
                 ))}
               </BotOptions>
             )}
-          </BotMessage>
+          </BotMessageBubble>
           <MessageTime>{item.time}</MessageTime>
         </BotMessageContainer>
       );
@@ -89,7 +91,7 @@ const Chat = () => {
         <UserMessageContainer>
           <MessageTime>{item.time}</MessageTime>
           <UserMessageBubble>
-            <UserMessage>{item.text}</UserMessage>
+            <UserText>{item.text}</UserText>
           </UserMessageBubble>
         </UserMessageContainer>
       );
@@ -160,7 +162,7 @@ const Container = styled.View`
 const BotMessageContainer = styled.View`
   flex-direction: row;
   align-items: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   /* iOS 그림자 */
   shadow-color: black;
   shadow-offset: 5px 5px;
@@ -180,7 +182,7 @@ const RobotIconContainer = styled.View`
   margin-right: 10px;
 `;
 
-const BotMessage = styled.View`
+const BotMessageBubble = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
   padding: 15px 20px;
   border-radius: 20px;
@@ -206,6 +208,8 @@ const OptionButton = styled.TouchableOpacity`
   padding: 10px;
   justify-content: center;
   align-items: center;
+  border-bottom-width: ${({isLast}) => (isLast ? '0px' : '1px')};
+  border-bottom-color: ${themes.light.borderColor.borderPrimary};
 `;
 
 const OptionText = styled.Text`
@@ -218,28 +222,27 @@ const UserMessageContainer = styled.View`
   flex-direction: row;
   justify-content: flex-end;
   align-items: flex-end;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 `;
 
-const UserMessage = styled.Text`
-  background-color: #007aff;
-  padding: 12px;
-  border-radius: 10px;
-  max-width: 70%;
-  color: white;
+const UserText = styled.Text`
+  color: ${themes.light.textColor.buttonText};
+  font-family: 'Pretendard-SemiBold';
 `;
 
 const MessageTime = styled.Text`
   font-size: 12px;
+  margin: 0px 10px;
   align-self: flex-end;
   color: ${themes.light.textColor.Primary30};
   font-family: 'Pretendard-Medium';
 `;
 
 const UserMessageBubble = styled.View`
-  background-color: #007aff;
-  padding: 12px;
-  border-radius: 10px;
+  background-color: ${themes.light.pointColor.Primary};
+  padding: 15px 20px;
+  border-radius: 20px;
+  border-top-right-radius: 3px;
   max-width: 70%;
 `;
 
