@@ -9,7 +9,7 @@ import Home from '../screens/Navigation/Home';
 import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
 import CameraScreen from '../screens/CameraScreen.js';
-
+import Chat from '../screens/Chat/Chat.js';
 import {pointColor, themes} from './../styles';
 import {TabIcons} from './../../assets/icons';
 import {CameraIcons} from './../../assets/icons';
@@ -44,6 +44,10 @@ const TabNavigator = () => {
 
   const handleSearchPress = useCallback(() => {
     navigation.navigate('SearchMedicine');
+  }, [navigation]);
+
+  const handleChatPress = useCallback(() => {
+    navigation.navigate('Chat');
   }, [navigation]);
 
   return (
@@ -116,7 +120,7 @@ const TabNavigator = () => {
           <BubbleTail />
           <BubbleText>챗봇 약사에게{'\n'}상담해보세요!</BubbleText>
         </ChatBuble>
-        <ChatButton>
+        <ChatButton onPress={handleChatPress}>
           <OtherIcons.chat
             width={25}
             height={25}
@@ -133,6 +137,7 @@ const RootNavigator = () => {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="Camera" component={CameraScreen} />
+      <Stack.Screen name="Chat" component={Chat} />
     </Stack.Navigator>
   );
 };
