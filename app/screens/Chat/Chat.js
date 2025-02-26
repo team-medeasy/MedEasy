@@ -26,11 +26,30 @@ const Chat = () => {
   const sendMessage = () => {
     if (inputText.trim() === '') return;
 
-    // 사용자 메시지 추가
+    const currentTime = new Date();
+    const hours = currentTime.getHours();
+    const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+    const period = hours >= 12 ? '오후' : '오전';
+    const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+    const formattedTime = `${period} ${formattedHours}:${minutes}`;
+
     setMessages(prevMessages => [
       ...prevMessages,
-      {id: Date.now(), type: 'user', text: inputText},
+      {id: Date.now(), type: 'user', text: inputText, time: formattedTime},
     ]);
+
+    setTimeout(() => {
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {
+          id: Date.now() + 1,
+          type: 'bot',
+          text: '네, 해당 내용에 대해 알려드릴게요!',
+          time: formattedTime,
+        },
+      ]);
+    }, 1000);
+
     setInputText('');
   };
 
@@ -50,6 +69,7 @@ const Chat = () => {
                 ))}
               </BotOptions>
             )}
+            <MessageTime>{item.time}</MessageTime>
           </BotMessage>
         </BotMessageContainer>
       );
@@ -58,6 +78,7 @@ const Chat = () => {
         <UserMessageContainer>
           <UserMessageBubble>
             <UserMessage>{item.text}</UserMessage>
+            <MessageTime>{item.time}</MessageTime>
           </UserMessageBubble>
         </UserMessageContainer>
       );
@@ -152,6 +173,13 @@ const UserMessage = styled.Text`
   border-radius: 10px;
   max-width: 70%;
   color: white;
+`;
+
+const MessageTime = styled.Text`
+  font-size: 12px;
+  color: gray;
+  margin-top: 5px;
+  align-self: flex-end;
 `;
 
 const UserMessageBubble = styled.View`
