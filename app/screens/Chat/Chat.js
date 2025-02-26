@@ -1,11 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import {useNavigation} from '@react-navigation/native';
 import {FlatList, TextInput, TouchableOpacity} from 'react-native';
 import ChatInfoModal from './ChatInfoModal';
 import {ChatIcons} from '../../../assets/icons';
+import {themes} from '../../styles';
 
-const {send: SendIcon} = ChatIcons;
+const {
+  add: AddIcon,
+  mike: MikeIcon,
+  robot: RobotIcon,
+  send: SendIcon,
+} = ChatIcons;
 
 const Chat = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -26,11 +31,30 @@ const Chat = () => {
   const sendMessage = () => {
     if (inputText.trim() === '') return;
 
-    // 사용자 메시지 추가
+    const currentTime = new Date();
+    const hours = currentTime.getHours();
+    const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+    const period = hours >= 12 ? '오후' : '오전';
+    const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+    const formattedTime = `${period} ${formattedHours}:${minutes}`;
+
     setMessages(prevMessages => [
       ...prevMessages,
-      {id: Date.now(), type: 'user', text: inputText},
+      {id: Date.now(), type: 'user', text: inputText, time: formattedTime},
     ]);
+
+    setTimeout(() => {
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {
+          id: Date.now() + 1,
+          type: 'bot',
+          text: '네, 해당 내용에 대해 알려드릴게요!',
+          time: formattedTime,
+        },
+      ]);
+    }, 1000);
+
     setInputText('');
   };
 
@@ -38,7 +62,14 @@ const Chat = () => {
     if (item.type === 'bot') {
       return (
         <BotMessageContainer>
-          <BotIcon>🤖</BotIcon>
+          <RobotIconContainer>
+            <RobotIcon
+              height={30}
+              width={30}
+              style={{color: themes.light.textColor.buttonText}}
+            />
+          </RobotIconContainer>
+
           <BotMessage>
             <BotText>{item.text}</BotText>
             {item.options && (
@@ -50,6 +81,7 @@ const Chat = () => {
                 ))}
               </BotOptions>
             )}
+            <MessageTime>{item.time}</MessageTime>
           </BotMessage>
         </BotMessageContainer>
       );
@@ -58,6 +90,7 @@ const Chat = () => {
         <UserMessageContainer>
           <UserMessageBubble>
             <UserMessage>{item.text}</UserMessage>
+            <MessageTime>{item.time}</MessageTime>
           </UserMessageBubble>
         </UserMessageContainer>
       );
@@ -107,9 +140,13 @@ const BotMessageContainer = styled.View`
   margin-bottom: 10px;
 `;
 
-const BotIcon = styled.Text`
-  font-size: 20px;
-  margin-right: 8px;
+const RobotIconContainer = styled.View`
+  background-color: ${themes.light.pointColor.Primary};
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
 `;
 
 const BotMessage = styled.View`
@@ -152,6 +189,13 @@ const UserMessage = styled.Text`
   border-radius: 10px;
   max-width: 70%;
   color: white;
+`;
+
+const MessageTime = styled.Text`
+  font-size: 12px;
+  color: gray;
+  margin-top: 5px;
+  align-self: flex-end;
 `;
 
 const UserMessageBubble = styled.View`

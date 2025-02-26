@@ -156,7 +156,12 @@ const RootNavigator = () => {
           headerTitle: 'AI 챗봇 메디씨',
           headerBackTitle: '',
           headerShown: true,
-          headerBackImage: () => <ChevronIcon height={17} />,
+          headerBackImage: () => (
+            <ChevronIcon
+              height={17}
+              style={{color: themes.light.textColor.Primary}}
+            />
+          ),
         }}
       />
     </Stack.Navigator>
