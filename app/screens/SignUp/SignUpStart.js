@@ -3,8 +3,10 @@ import {SafeAreaView, Image, TouchableOpacity, Text} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {themes, fonts} from './../../styles';
-import LogoSvg from './../../../assets/images/logo.svg';
+import {OtherIcons} from './../../../assets/icons';
+const {kakao: KakaoIcon} = OtherIcons;
 
+import LogoSvg from './../../../assets/images/logo.svg';
 const currentTheme = themes.light;
 
 const Container = styled(SafeAreaView)`
@@ -80,6 +82,11 @@ const SignUpStartScreen = ({navigation}) => {
       </Container2>
       <Container3>
         <SignUpBtn onPress={() => navigation.navigate('NavigationBar')}>
+          <KakaoIcon
+            height={18}
+            width={18}
+            style={{color: themes.light.textColor.buttonText}}
+          />
           <BtnText>카카오톡으로 시작하기</BtnText>
         </SignUpBtn>
         <SignUpBtn onPress={() => console.log('Google 로그인')}>

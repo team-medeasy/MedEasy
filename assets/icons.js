@@ -53,6 +53,10 @@ import RankingUpIcon from './icons/ranking_up.svg';
 import ReturnIcon from './icons/return.svg';
 import SearchGeneralIcon from './icons/search.svg';
 import ChevronDownIcon from './icons/chevron_down.svg';
+import CupIcon from './icons/cup.svg';
+import KakaoIcon from './icons/kakao.svg';
+import MoonIcon from './icons/moon.svg';
+import SunIcon from './icons/sun.svg';
 
 // 전체 아이콘 객체로 정리
 export const TabIcons = {
@@ -116,4 +120,8 @@ export const OtherIcons = {
   return: ReturnIcon,
   search: SearchGeneralIcon,
   chevronDown: ChevronDownIcon,
+  cup: CupIcon,
+  kakao: KakaoIcon,
+  moon: MoonIcon,
+  sun: SunIcon,
 };
