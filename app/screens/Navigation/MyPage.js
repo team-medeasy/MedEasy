@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {pointColor, themes} from './../../styles';
+import {Platform} from 'react-native';
+import {themes} from './../../styles';
 import {LogoIcons, CameraIcons} from './../../../assets/icons';
 import {Footer} from '../../components';
 import MedicationInfo from '../../components/MedicationInfo';
