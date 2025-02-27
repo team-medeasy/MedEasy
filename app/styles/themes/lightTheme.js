@@ -35,7 +35,7 @@ export const lightTheme = {
     navBG: 'rgba(255, 255, 255, 0.7)',
     detailImageBG: 'rgba(0, 0, 0, 0.4)',
     profileBG: 'rgba(0, 0, 0, 1)',
-    protileIcon: 'rgba(255, 255, 255, 0.2)',
+    profileIcon: 'rgba(255, 255, 255, 0.2)',
     modalBG: 'rgba(0, 0, 0, 0.3)',
   },
   borderColor: {

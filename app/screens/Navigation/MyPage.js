@@ -25,7 +25,7 @@ const MyPage = () => {
               <LogoIcons.logo
                 width={30}
                 height={47}
-                style={{color: themes.light.bgColor.protileIcon}}
+                style={{color: themes.light.bgColor.profileIcon}}
               />
               <EditButton onPress={() => alert('프로필 수정')}>
                 <CameraIcons.camera
