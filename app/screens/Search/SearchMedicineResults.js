@@ -13,23 +13,23 @@ import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {chevron: ChevronIcon} = HeaderIcons;
-const {chevronDown: ChevronDownIcon} = OtherIcons;
+const {chevronDown: ChevronDownIcon, delete: Delete} = OtherIcons;
 
 const SearchMedicineResultsScreen = ({route, navigation}) => {
   const {searchQuery} = route.params; // MedicineSearchScreen에서 전달된 검색어
   const [searchResults, setSearchResults] = useState([]);
 
-  const [selectedColor, setSelectedColor] = useState(null);
-  const [selectedShape, setSelectedShape] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedSplit, setSelectedSplit] = useState(null);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedShapes, setSelectedShapes] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedSplits, setSelectedSplits] = useState([]);
 
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [tempFilters, setTempFilters] = useState({
-    color: null,
-    shape: null,
-    size: null,
-    split: null
+    color: [],
+    shape: [],
+    size: [],
+    split: []
   });
 
   useEffect(() => {
@@ -104,8 +104,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
   // 필터 옵션들
   const filterOptions = {
-    color: ['하양', '노랑', '주황', '분홍', '빨강', '갈색', '초록', '그 외'],
-    shape: ['원형', '타원형', '장방형', '삼각형', '사각형', '마름모형', '오각형', '팔각형'],
+    color: ['하양', '노랑', '주황', '분홍', '빨강', '갈색', '초록', '청록', '파랑', '남색', '자주', '보라', '회색', '검정', '투명'],
+    shape: ['원형', '타원형', '장방형', '삼각형', '사각형', '마름모형', '오각형', '육각형', '팔각형', '반원형', '기타'],
     size: ['소형', '중형', '대형'],
     split: ['없음', '(+)형', '(-)형']
   };
@@ -119,35 +119,121 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     '빨강': '#FF0000',
     '갈색': '#8B4513',
     '초록': '#008000',
-    '그 외': '#CCCCCC'
+    '청록': '#00CED1',
+    '파랑': '#0000FF',
+    '남색': '#000080',
+    '자주': '#800080',
+    '보라': '#9370DB',
+    '회색': '#808080',
+    '검정': '#000000',
+    '투명': 'transparent'
+  };  
+
+  const shapeCodes = {
   };
 
   const openFilterModal = () => {
     // 현재 선택된 필터들로 임시 상태 초기화
     setTempFilters({
-      color: selectedColor,
-      shape: selectedShape,
-      size: selectedSize,
-      split: selectedSplit
+      color: [...selectedColors],
+      shape: [...selectedShapes],
+      size: [...selectedSizes],
+      split: [...selectedSplits]
     });
     setFilterModalVisible(true);
   };
 
   const applyFilters = () => {
     // 임시 상태에서 실제 필터 상태로 적용
-    setSelectedColor(tempFilters.color);
-    setSelectedShape(tempFilters.shape);
-    setSelectedSize(tempFilters.size);
-    setSelectedSplit(tempFilters.split);
+    setSelectedColors(tempFilters.color);
+    setSelectedShapes(tempFilters.shape);
+    setSelectedSizes(tempFilters.size);
+    setSelectedSplits(tempFilters.split);
     setFilterModalVisible(false);
   };
 
   const handleFilterChange = (type, value) => {
-    setTempFilters(prev => ({
-      ...prev,
-      // 같은 값을 다시 클릭하면 null로 변경 (선택 취소)
-      [type]: prev[type] === value ? null : value
-    }));
+    setTempFilters(prev => {
+      const currentValues = [...prev[type]];
+      const valueIndex = currentValues.indexOf(value);
+      
+      // 값이 이미 있으면 제거, 없으면 추가
+      if (valueIndex !== -1) {
+        currentValues.splice(valueIndex, 1);
+      } else {
+        currentValues.push(value);
+      }
+      
+      return {
+        ...prev,
+        [type]: currentValues
+      };
+    });
+  };
+
+  const getFilterButtonText = (type, selectedItems) => {
+    if (selectedItems.length === 0) {
+      // 선택된 항목이 없을 때
+      return type === 'color' ? '색상' : 
+             type === 'shape' ? '모양' :
+             type === 'size' ? '크기' : '분할선';
+    } else if (selectedItems.length === 1) {
+      // 하나만 선택되었을 때
+      return selectedItems[0];
+    } else {
+      // 여러 개 선택되었을 때
+      return `${selectedItems[0]} 외 ${selectedItems.length - 1}건`;
+    }
+  };
+
+  // 필터 버튼 아이콘 렌더링
+  const renderFilterButtonIcon = (type, selectedItems) => {
+    if (selectedItems.length === 0) return null;
+    
+    const firstItem = selectedItems[0];
+    
+    if (type === 'color') {
+      return (
+        <View
+          style={{
+            width: 14,
+            height: 14,
+            borderRadius: 7,
+            backgroundColor: colorCodes[firstItem],
+            borderWidth: 1.5,
+            borderColor: themes.light.borderColor.borderCircle,
+            marginRight: 7,
+          }}
+        />
+      );
+    } else if (type === 'shape') {
+      return (
+        <View
+          style={{
+            width: 14,
+            height: 14,
+            borderRadius: 7,
+            borderWidth: 1.5,
+            borderColor: themes.light.textColor.Primary50,
+            marginRight: 7,
+          }}
+        />
+      );
+    }
+    
+    return null;
+  };
+
+  const clearFilter = (type) => {
+    if (type === 'color') {
+      setSelectedColors([]);
+    } else if (type === 'shape') {
+      setSelectedShapes([]);
+    } else if (type === 'size') {
+      setSelectedSizes([]);
+    } else if (type === 'split') {
+      setSelectedSplits([]);
+    }
   };
 
   const renderFilterSection = (title, type, options) => (
@@ -169,7 +255,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
               paddingHorizontal: 10,
               gap: 10,
               borderRadius: 5,
-              backgroundColor: tempFilters[type] === option ? 
+              backgroundColor: tempFilters[type].includes(option) ? 
                               themes.light.pointColor.Primary : themes.light.boxColor.inputPrimary,
             }}
             onPress={() => handleFilterChange(type, option)}>
@@ -177,8 +263,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
             {type === 'color' && (
               <View
                 style={{
-                  width: 12.5,
-                  height: 12.5,
+                  width: 14,
+                  height: 14,
                   borderRadius: 7,
                   backgroundColor: colorCodes[option],
                   borderWidth: 1.5,
@@ -189,18 +275,17 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
             {type === 'shape' && (
               <View
                 style={{
-                  width: 12.5,
-                  height: 12.5,
+                  width: 14,
+                  height: 14,
                   borderRadius: 7,
-                  backgroundColor: colorCodes['노랑'],
-                  borderWidth: 1,
-                  borderColor: themes.light.borderColor.borderCircle,
+                  borderWidth: 1.5,
+                  borderColor: themes.light.textColor.Primary50,
                 }}
               />
             )}
             <Text
               style={{
-                color: tempFilters[type] === option ? 
+                color: tempFilters[type].includes(option) ? 
                       themes.light.textColor.buttonText : themes.light.textColor.Primary50,
                 fontFamily: 'Pretendard-SemiBold',
               }}>
@@ -302,37 +387,94 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
           <ScrollableFilterContainer
             horizontal={true}
             showsHorizontalScrollIndicator={false}>
-            <FilterButton onPress={openFilterModal}>
-              <FilterButtonText selected={selectedColor}>
-                {selectedColor || '색상'}
-              </FilterButtonText>
-              <ChevronDownIcon
-                style={{ color: themes.light.textColor.Primary30 }}
-              />
+            <FilterButton 
+              onPress={openFilterModal}
+              selected={selectedColors.length > 0}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {renderFilterButtonIcon('color', selectedColors)}
+                <FilterButtonText selected={selectedColors.length > 0}>
+                  {getFilterButtonText('color', selectedColors)}
+                </FilterButtonText>
+              </View>
+              {selectedColors.length > 0 ? (
+                <TouchableOpacity onPress={() => clearFilter('color')}>
+                  <Delete
+                    width={10} 
+                    height={10}
+                    style={{ color: themes.light.textColor.Primary30 }}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <ChevronDownIcon
+                  style={{ color: themes.light.textColor.Primary30 }}
+                />
+              )}
             </FilterButton>
-            <FilterButton onPress={openFilterModal}>
-              <FilterButtonText selected={selectedShape}>
-                {selectedShape || '모양'}
-              </FilterButtonText>
-              <ChevronDownIcon
-                style={{ color: themes.light.textColor.Primary30 }}
-              />
+
+            <FilterButton 
+              onPress={openFilterModal}
+              selected={selectedShapes.length > 0}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {renderFilterButtonIcon('shape', selectedShapes)}
+                <FilterButtonText selected={selectedShapes.length > 0}>
+                  {getFilterButtonText('shape', selectedShapes)}
+                </FilterButtonText>
+              </View>
+              {selectedShapes.length > 0 ? (
+                <TouchableOpacity onPress={() => clearFilter('shape')}>
+                  <Delete
+                    width={10} 
+                    height={10}
+                    style={{ color: themes.light.textColor.Primary30 }}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <ChevronDownIcon
+                  style={{ color: themes.light.textColor.Primary30 }}
+                />
+              )}
             </FilterButton>
-            <FilterButton onPress={openFilterModal}>
-              <FilterButtonText selected={selectedSize}>
-                {selectedSize || '크기'}
+
+            <FilterButton 
+              onPress={openFilterModal}
+              selected={selectedSizes.length > 0}>
+              <FilterButtonText selected={selectedSizes.length > 0}>
+                {getFilterButtonText('size', selectedSizes)}
               </FilterButtonText>
-              <ChevronDownIcon
-                style={{ color: themes.light.textColor.Primary30 }}
-              />
+              {selectedSizes.length > 0 ? (
+                <TouchableOpacity onPress={() => clearFilter('size')}>
+                  <Delete
+                    width={10} 
+                    height={10}
+                    style={{ color: themes.light.textColor.Primary30 }}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <ChevronDownIcon
+                  style={{ color: themes.light.textColor.Primary30 }}
+                />
+              )}
             </FilterButton>
-            <FilterButton onPress={openFilterModal}>
-              <FilterButtonText selected={selectedSplit}>
-                {selectedSplit || '분할선'}
+
+            <FilterButton 
+              onPress={openFilterModal}
+              selected={selectedSplits.length > 0}>
+              <FilterButtonText selected={selectedSplits.length > 0}>
+                {getFilterButtonText('split', selectedSplits)}
               </FilterButtonText>
-              <ChevronDownIcon
-                style={{ color: themes.light.textColor.Primary30 }}
-              />
+              {selectedSplits.length > 0 ? (
+                <TouchableOpacity onPress={() => clearFilter('split')}>
+                  <Delete
+                    width={10} 
+                    height={10}
+                    style={{ color: themes.light.textColor.Primary30 }}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <ChevronDownIcon
+                  style={{ color: themes.light.textColor.Primary30 }}
+                />
+              )}
             </FilterButton>
           </ScrollableFilterContainer>
         </FeatureSearchContainer>
@@ -517,17 +659,20 @@ const ScrollableFilterContainer = styled.ScrollView`
 `;
 
 const FilterButton = styled(TouchableOpacity)`
-  border-color: ${themes.light.boxColor.inputSecondary};
+  border-color: ${props => props.selected ? 
+    themes.light.pointColor.primary30 : themes.light.boxColor.inputSecondary};
   flex-direction: row;
   border-width: 1.5px;
-  padding: 6px 12px 6px 11px;
+  padding: 6px 9px 6px 11px;
   border-radius: 40px;
   margin-right: 10px;
   align-items: center;
+  background-color: ${props => props.selected ? 
+    themes.light.pointColor.Primary10 : 'transparent'};
 `;
 
 const FilterButtonText = styled.Text`
-  font-size: 13px;
+  font-size: ${FontSizes.body.default};
   margin-right: 6px;
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
