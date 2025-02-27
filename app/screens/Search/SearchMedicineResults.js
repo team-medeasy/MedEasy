@@ -166,7 +166,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
               flexDirection: 'row',
               alignItems: 'center',
               paddingVertical: 8,
-              paddingHorizontal: 15, /* 추후 변경 */
+              paddingHorizontal: 10,
+              gap: 10,
               borderRadius: 5,
               backgroundColor: tempFilters[type] === option ? 
                               themes.light.pointColor.Primary : themes.light.boxColor.inputPrimary,
@@ -182,7 +183,6 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
                   backgroundColor: colorCodes[option],
                   borderWidth: 1.5,
                   borderColor: themes.light.borderColor.borderCircle,
-                  marginRight: 5,
                 }}
               />
             )}
@@ -195,7 +195,6 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
                   backgroundColor: colorCodes['노랑'],
                   borderWidth: 1,
                   borderColor: themes.light.borderColor.borderCircle,
-                  marginRight: 5,
                 }}
               />
             )}
