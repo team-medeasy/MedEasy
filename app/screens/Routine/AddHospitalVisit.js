@@ -1,11 +1,6 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import {
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
+import {ScrollView, TouchableOpacity} from 'react-native';
 import {themes} from './../../styles';
 import {Header} from '../../components';
 import {RoutineIcons} from '../../../assets/icons';
@@ -20,7 +15,7 @@ const AddHospitalVisit = () => {
 
   const handleAdd = () => {
     // 추가 로직 구현
-    console.log('병원 이름:', hospitalName);
+    console.log('병원 일정명:', hospitalName);
     console.log('시간:', time);
     console.log('날짜:', date);
   };
@@ -28,7 +23,7 @@ const AddHospitalVisit = () => {
   return (
     <Container>
       <Header>병원 진료 추가</Header>
-      <ScrollView contentContainerStyle={{padding: 20}}>
+      <MainContainer>
         <InputContainer>
           <HospitalIcon
             width={20}
@@ -36,29 +31,25 @@ const AddHospitalVisit = () => {
             style={{marginRight: 10, color: themes.light.pointColor.Secondary}}
           />
           <TextInput
-            style={styles.input}
-            placeholder="병원 이름"
+            placeholder="예: 메디지병원 진료 예약"
+            placeholderTextColor={themes.light.textColor.Primary20}
             value={hospitalName}
             onChangeText={setHospitalName}
           />
         </InputContainer>
-        <InputContainer>
-          <TextInput
-            style={styles.input}
-            placeholder="시간 (예: 오전 10시)"
-            value={time}
-            onChangeText={setTime}
-          />
-        </InputContainer>
-        <InputContainer>
-          <TextInput
-            style={styles.input}
-            placeholder="날짜 (YYYY-MM-DD)"
-            value={date}
-            onChangeText={setDate}
-          />
-        </InputContainer>
-      </ScrollView>
+        <SchedulePickerContainer>
+          <PickerTitle>날짜</PickerTitle>
+          <SchedulePicker>
+            <PickerPlaceHolder>날짜를 선택해주세요.</PickerPlaceHolder>
+          </SchedulePicker>
+        </SchedulePickerContainer>
+        <SchedulePickerContainer>
+          <PickerTitle>시각</PickerTitle>
+          <SchedulePicker>
+            <PickerPlaceHolder>시각을 선택해주세요.</PickerPlaceHolder>
+          </SchedulePicker>
+        </SchedulePickerContainer>
+      </MainContainer>
       <BtnContainer>
         <Button
           title="루틴 추가하기"
@@ -78,22 +69,45 @@ const Container = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
+const MainContainer = styled.View`
+  padding: 0px 20px;
+`;
+
 const InputContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-bottom: 15px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${themes.light.borderColor.primary};
+  margin: 30px 0px;
 `;
 
-const styles = {
-  input: {
-    flex: 1,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: themes.light.textColor.textPrimary,
-  },
-};
+const TextInput = styled.TextInput`
+  flex: 1;
+  font-size: 22px;
+  color: ${themes.light.textColor.Primary};
+  font-family: 'Pretendard-ExtraBold';
+`;
+
+const SchedulePickerContainer = styled.View``;
+
+const PickerTitle = styled.Text`
+  font-size: 18px;
+  font-family: 'Pretendard-Bold';
+  margin-bottom: 15px;
+  color: ${themes.light.textColor.Primary};
+`;
+
+const PickerPlaceHolder = styled.Text`
+  font-size: 15px;
+  font-family: 'Pretendard-SemiBold';
+  color: ${themes.light.textColor.Primary30};
+`;
+
+const SchedulePicker = styled(TouchableOpacity)`
+  width: 100%;
+  background-color: ${themes.light.boxColor.inputPrimary};
+  padding: 18px 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+`;
 
 const BtnContainer = styled.View`
   margin-top: auto;
