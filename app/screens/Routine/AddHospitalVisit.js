@@ -9,6 +9,7 @@ import {
 import {themes} from './../../styles';
 import {Header} from '../../components';
 import {RoutineIcons} from '../../../assets/icons';
+import {Button} from '../../components/Button';
 
 const {hospital: HospitalIcon} = RoutineIcons;
 
@@ -17,8 +18,8 @@ const AddHospitalVisit = () => {
   const [time, setTime] = useState('');
   const [date, setDate] = useState('');
 
-  const handleSave = () => {
-    // 저장 로직 구현
+  const handleAdd = () => {
+    // 추가 로직 구현
     console.log('병원 이름:', hospitalName);
     console.log('시간:', time);
     console.log('날짜:', date);
@@ -57,17 +58,26 @@ const AddHospitalVisit = () => {
             onChangeText={setDate}
           />
         </InputContainer>
-        <SaveButton onPress={handleSave}>
-          <SaveButtonText>저장</SaveButtonText>
-        </SaveButton>
       </ScrollView>
+      <BtnContainer>
+        <Button
+          title="루틴 추가하기"
+          onPress={handleAdd}
+          bgColor={themes.light.boxColor.buttonPrimary}
+          width="100%"
+          height="60px"
+          fontSize="18px"
+        />
+      </BtnContainer>
     </Container>
   );
 };
+
 const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
+
 const InputContainer = styled.View`
   flex-direction: row;
   align-items: center;
@@ -85,18 +95,10 @@ const styles = {
   },
 };
 
-const SaveButton = styled(TouchableOpacity)`
-  background-color: ${themes.light.pointColor.Secondary};
-  padding: 15px;
-  border-radius: 10px;
-  align-items: center;
-  margin-top: 20px;
-`;
-
-const SaveButtonText = styled.Text`
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
+const BtnContainer = styled.View`
+  margin-top: auto;
+  padding: 0px 20px;
+  padding-bottom: 30px;
 `;
 
 export default AddHospitalVisit;
