@@ -14,6 +14,7 @@ import SearchMedicineResultsScreen from './screens/Search/SearchMedicineResults'
 import MedicineDetailScreen from './screens/Search/MedicineDetail';
 import MedicineImageDetailScreen from './screens/Search/MedicineImageDetail';
 import SettingStack from './screens/Settings/SettingStack';
+import NotificationScreen from './screens/Notification';
 
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
@@ -81,6 +82,10 @@ const App = () => {
             <RootStack.Screen
               name="MedicineImageDetail"
               component={MedicineImageDetailScreen}
+            />
+            <RootStack.Screen
+              name="Notification"
+              component={NotificationScreen}
             />
           </RootStack.Navigator>
         )}
