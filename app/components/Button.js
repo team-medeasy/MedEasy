@@ -1,35 +1,46 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { themes } from '../styles';
+import {Text, TouchableOpacity, View} from 'react-native';
+import {themes} from '../styles';
 
 // 기본 버튼
 const ButtonContainer = styled(TouchableOpacity)`
-  flex: ${({ flex }) => flex ?? '0 1 auto'};
-  width: ${({ width }) => width || '100%'};
-  height: ${({ height }) => height ?? '60px'};
-  background-color: ${(props) => props.bgColor || themes.light.boxColor.buttonPrimary};
+  flex: ${({flex}) => flex ?? '0 1 auto'};
+  width: ${({width}) => width || '100%'};
+  height: ${({height}) => height ?? '60px'};
+  background-color: ${props =>
+    props.bgColor || themes.light.boxColor.buttonPrimary};
   justify-content: center;
   align-items: center;
   border-radius: 10px;
 `;
 
 const ButtonText = styled(Text)`
-  color: ${(props) => props.color || themes.light.textColor.buttonText};
+  color: ${props => props.color || themes.light.textColor.buttonText};
   font-size: ${props => props.fontSize || '18px'};
   font-family: 'KimjungchulGothic-Bold';
 `;
 
-const Button = ({ title, onPress, bgColor, textColor, fontSize, width, height, flex }) => {
+const Button = ({
+  title,
+  onPress,
+  bgColor,
+  textColor,
+  fontSize,
+  width,
+  height,
+  flex,
+}) => {
   return (
-    <ButtonContainer 
-      onPress={onPress} 
-      bgColor={bgColor} 
-      width={width} 
+    <ButtonContainer
+      onPress={onPress}
+      bgColor={bgColor}
+      width={width}
       height={height}
-      flex={flex}
-    >
-      <ButtonText color={textColor} fontSize={fontSize}>{title}</ButtonText>
+      flex={flex}>
+      <ButtonText color={textColor} fontSize={fontSize}>
+        {title}
+      </ButtonText>
     </ButtonContainer>
   );
 };
@@ -41,7 +52,7 @@ const ButtonsContainer = styled(View)`
   gap: 10px;
 `;
 
-const BackAndNextButtons = ({ onPressPrev, onPressNext, nextTitle = "다음" }) => {
+const BackAndNextButtons = ({onPressPrev, onPressNext, nextTitle = '다음'}) => {
   return (
     <ButtonsContainer>
       <Button
@@ -51,13 +62,9 @@ const BackAndNextButtons = ({ onPressPrev, onPressNext, nextTitle = "다음" }) 
         bgColor={themes.light.boxColor.inputSecondary}
         textColor={themes.light.textColor.Primary50}
       />
-      <Button
-        title={nextTitle}
-        onPress={onPressNext}
-        flex={2}
-      />
+      <Button title={nextTitle} onPress={onPressNext} flex={2} />
     </ButtonsContainer>
   );
 };
 
-export { Button, BackAndNextButtons };
+export {Button, BackAndNextButtons};

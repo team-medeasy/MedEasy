@@ -51,7 +51,6 @@ const AddMedicineRoutine = () => {
         <InputContainer>
           <TextInput
             style={{
-              // styles 객체를 인라인 스타일로 변경
               flex: 1,
               paddingVertical: 10,
               fontSize: 16,
@@ -65,7 +64,6 @@ const AddMedicineRoutine = () => {
         <InputContainer>
           <TextInput
             style={{
-              // styles 객체를 인라인 스타일로 변경
               flex: 1,
               paddingVertical: 10,
               fontSize: 16,
@@ -79,7 +77,6 @@ const AddMedicineRoutine = () => {
         <InputContainer>
           <TextInput
             style={{
-              // styles 객체를 인라인 스타일로 변경
               flex: 1,
               paddingVertical: 10,
               fontSize: 16,
