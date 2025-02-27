@@ -208,7 +208,13 @@ const Header = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
   flex-direction: row;
   padding: 0px 20px;
-  margin-top: 74px;
+  
+  ${Platform.OS === 'ios' && `
+        margin-top: 70px;
+      `}
+      ${Platform.OS === 'android' && `
+        margin-top: 40px;
+      `}
   justify-content: space-between;
 `;
 

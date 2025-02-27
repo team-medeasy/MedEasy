@@ -57,7 +57,12 @@ const Container = styled.View`
 const HeaderContainer = styled.View`
   justify-content: flex-end;
   background-color: ${themes.light.boxColor.buttonPrimary};
-  padding-top: 50px;
+  ${Platform.OS === 'ios' && `
+        padding-top: 50px;
+      `}
+      ${Platform.OS === 'android' && `
+        padding-top: 20px;
+      `}
   padding-left: 20px;
 `;
 
