@@ -138,8 +138,8 @@ const Chat = () => {
           />
           <SendButton onPress={sendMessage}>
             <SendIcon
-              width={16}
-              height={16}
+              width={18}
+              height={18}
               style={{color: themes.light.textColor.Primary30}}
             />
           </SendButton>
@@ -211,6 +211,7 @@ const BotOptions = styled.View`
 
 const OptionButton = styled.TouchableOpacity`
   padding: 10px;
+  margin: 0px 10px;
   justify-content: center;
   align-items: center;
   border-bottom-width: ${({isLast}) => (isLast ? '0px' : '1px')};
