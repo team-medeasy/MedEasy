@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {Header} from './../../components';
+import {Header} from '../../components/\bHeader/Header';
 import {themes} from '../../styles';
 
 const MedicineImageDetailScreen = () => {
@@ -8,18 +8,15 @@ const MedicineImageDetailScreen = () => {
     item_name: '지엘타이밍정(카페인무수물)',
     item_seq: '196500051',
     item_image:
-    'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1NAT_bwbZd9',
-  }
+      'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1NAT_bwbZd9',
+  };
 
   return (
     <Container>
-      <Header>
-        {medicine.item_name}
-      </Header>
+      <Header>{medicine.item_name}</Header>
 
       <ImageContainer>
-        <MedicineImage 
-          source={{uri: medicine.item_image,}}/>
+        <MedicineImage source={{uri: medicine.item_image}} />
       </ImageContainer>
     </Container>
   );

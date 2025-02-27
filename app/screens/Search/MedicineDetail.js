@@ -10,7 +10,8 @@ import {
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
 import {RoutineIcons} from './../../../assets/icons';
-import {Header, Footer, Tag} from './../../components';
+import {Footer, Tag} from './../../components';
+import {Header} from '../../components/\bHeader/Header';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {heartOff: HeartOffIcon, heartOn: HeartOnIcon} = RoutineIcons;

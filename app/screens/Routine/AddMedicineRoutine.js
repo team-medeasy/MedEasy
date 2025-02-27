@@ -7,7 +7,7 @@ import {
   TextInput,
 } from 'react-native';
 import {themes} from './../../styles';
-import {Header} from '../../components';
+import {Header} from '../../components/\bHeader/Header';
 import {RoutineIcons} from '../../../assets/icons';
 
 const {medicine: MediIcon} = RoutineIcons;
