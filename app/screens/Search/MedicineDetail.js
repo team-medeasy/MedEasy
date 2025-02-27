@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {
   ImageBackground,
@@ -9,16 +9,18 @@ import {
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
-import {OtherIcons} from './../../../assets/icons';
+import {RoutineIcons} from './../../../assets/icons';
 import {Header, Footer, Tag} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
+
+const {heartOff: HeartOffIcon, heartOn: HeartOnIcon} = RoutineIcons;
 
 const MedicineDetailScreen = ({navigation}) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
   // 임시로 item_seq 값 넘김
-  const handlePressEnlarge = (itemSeq) => {
-    navigation.navigate('MedicineImageDetail', { itemSeq });
+  const handlePressEnlarge = itemSeq => {
+    navigation.navigate('MedicineImageDetail', {itemSeq});
   };
 
   // 임시 데이터
@@ -110,9 +112,7 @@ const MedicineDetailScreen = ({navigation}) => {
 
   return (
     <Container>
-      <Header>
-        {medicine.item_name}
-      </Header>
+      <Header>{medicine.item_name}</Header>
 
       <ScrollView>
         <MedicineInfoContainer
@@ -120,15 +120,14 @@ const MedicineDetailScreen = ({navigation}) => {
           blurRadius={15}>
           <Overlay />
 
-          <View style={{position:'relative'}}>
+          <View style={{position: 'relative'}}>
             <MedicineImage source={{uri: medicine.item_image}} />
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => handlePressEnlarge(medicine.item_seq)}
               style={{
                 position: 'absolute',
                 bottom: 14,
                 right: 14,
-
               }}>
               <Tag bgColor={themes.light.boxColor.tagResultSecondary}>
                 {/* 크게 보기 아이콘 */}
@@ -137,23 +136,17 @@ const MedicineDetailScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
 
-          <View 
+          <View
             style={{
-              alignItems: 'flex-start', 
-              flex: 1, 
-              marginTop: 19, marginHorizontal: 7,
+              alignItems: 'flex-start',
+              flex: 1,
+              marginTop: 19,
+              marginHorizontal: 7,
               gap: 10,
             }}>
-
-            <MedicineInfoSub>
-              {medicine.entp_name}
-            </MedicineInfoSub>
-            <MedicineInfoName>
-              {medicine.item_name}
-            </MedicineInfoName>
-            <MedicineInfoSub>
-              {medicine.chart}
-            </MedicineInfoSub>
+            <MedicineInfoSub>{medicine.entp_name}</MedicineInfoSub>
+            <MedicineInfoName>{medicine.item_name}</MedicineInfoName>
+            <MedicineInfoSub>{medicine.chart}</MedicineInfoSub>
 
             <View
               style={{
@@ -162,8 +155,7 @@ const MedicineDetailScreen = ({navigation}) => {
                 justifyContent: 'space-between',
                 width: '100%',
               }}>
-
-              <View style={{ flexDirection: 'row', gap: 11 }}>
+              <View style={{flexDirection: 'row', gap: 11}}>
                 <Tag sizeType="large" colorType="detailPrimary">
                   {medicine.etc_otc_name}
                 </Tag>
@@ -171,16 +163,23 @@ const MedicineDetailScreen = ({navigation}) => {
                   {medicine.class_name}
                 </Tag>
               </View>
-              
+
               <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
                 {isFavorite ? (
-                  <OtherIcons.heartOn width={24} height={24} style={{ color: themes.light.textColor.buttonText }} />
+                  <HeartOnIcon
+                    width={24}
+                    height={24}
+                    style={{color: themes.light.textColor.buttonText}}
+                  />
                 ) : (
-                  <OtherIcons.heartOff width={24} height={24} style={{ color: themes.light.textColor.buttonText }} />
+                  <HeartOffIcon
+                    width={24}
+                    height={24}
+                    style={{color: themes.light.textColor.buttonText}}
+                  />
                 )}
               </TouchableOpacity>
             </View>
-
           </View>
         </MedicineInfoContainer>
 
@@ -253,7 +252,7 @@ const MedicineDetailScreen = ({navigation}) => {
             )}
           </SimilarMedicinesContainer>
         </MedicineDetailContainer>
-        <Footer/>
+        <Footer />
       </ScrollView>
     </Container>
   );
@@ -315,13 +314,13 @@ const Appearance = ({label, value}) => (
 );
 
 const Usage = ({label, value, borderBottomWidth = 1}) => (
-  <View 
+  <View
     style={{
-      paddingVertical: 25, 
-      paddingHorizontal: 20, 
+      paddingVertical: 25,
+      paddingHorizontal: 20,
       gap: 18,
       borderBottomWidth: borderBottomWidth,
-      borderBottomColor: themes.light.borderColor.borderSecondary  
+      borderBottomColor: themes.light.borderColor.borderSecondary,
     }}>
     <HeadingText>{label}</HeadingText>
     <Text

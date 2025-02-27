@@ -5,12 +5,18 @@ import {themes} from './../../styles';
 
 import {HeaderIcons, RoutineIcons, LogoIcons} from './../../../assets/icons';
 import CalendarWidget from '../../components/CalendarWidget';
+import {useNavigation} from '@react-navigation/native';
 
 const {notification: NotificationIcon, chevron: ArrowIcon} = HeaderIcons;
 const {logoKr: LogoKrIcon, logo: LogoIcon, logoAdd: LogoAddIcon} = LogoIcons;
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 const Home = () => {
+  const navigation = useNavigation();
+  const handleNotificationPress = () => {
+    navigation.navigate('Notification'); // Notification 스크린으로 이동
+  };
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <ScrollContainer>
@@ -28,7 +34,7 @@ const Home = () => {
               style={{color: themes.light.pointColor.Primary}}
             />
           </LogoContainer>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleNotificationPress}>
             <NotificationIcon
               height={20}
               width={22}
