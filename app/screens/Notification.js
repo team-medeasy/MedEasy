@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import styled from 'styled-components/native';
 import {FlatList} from 'react-native';
 import {themes} from '../styles';
@@ -8,7 +8,8 @@ import {RoutineIcons} from './../../assets/icons';
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 const Notification = () => {
-  const notifications = [
+  const [refreshing, setRefreshing] = useState(false);
+  const [notifications, setNotifications] = useState([
     {
       id: 1,
       title: '아침 식사 전 복용해야 하는 약이 있어요.',
@@ -93,7 +94,26 @@ const Notification = () => {
       time: '어제',
       type: 'hospital',
     },
-  ];
+  ]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // 새로고침 로직 (예: API 호출)
+    setTimeout(() => {
+      // 새로운 알림 목록으로 업데이트
+      setNotifications([
+        {
+          id: Date.now(),
+          title: '새로운 알림',
+          message: '새로운 알림 메시지',
+          time: '방금',
+          type: 'medicine',
+        },
+        ...notifications,
+      ]);
+      setRefreshing(false);
+    }, 500); // 0.5초 후 새로고침 완료
+  }, [notifications]);
 
   const renderItem = ({item}) => (
     <NotificationItem>
@@ -130,6 +150,8 @@ const Notification = () => {
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={{paddingBottom: 100}}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
     </Container>
   );
