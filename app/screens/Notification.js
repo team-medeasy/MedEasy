@@ -98,7 +98,7 @@ const Notification = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    // 새로고침 로직 (예: API 호출)
+    // 새로고침 로직
     setTimeout(() => {
       // 새로운 알림 목록으로 업데이트
       setNotifications([

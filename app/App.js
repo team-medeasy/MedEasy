@@ -15,6 +15,8 @@ import MedicineDetailScreen from './screens/Search/MedicineDetail';
 import MedicineImageDetailScreen from './screens/Search/MedicineImageDetail';
 import SettingStack from './screens/Settings/SettingStack';
 import NotificationScreen from './screens/Notification';
+import AddMedicineRoutineScreen from './screens/Routine/AddMedicineRoutine';
+import AddHospitalVisitScreen from './screens/Routine/AddHospitalVisit';
 
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
@@ -86,6 +88,14 @@ const App = () => {
             <RootStack.Screen
               name="Notification"
               component={NotificationScreen}
+            />
+            <RootStack.Screen
+              name="AddMedicineRoutine"
+              component={AddMedicineRoutineScreen}
+            />
+            <RootStack.Screen
+              name="AddHospitalVisit"
+              component={AddHospitalVisitScreen}
             />
           </RootStack.Navigator>
         )}
