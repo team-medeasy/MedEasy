@@ -2,11 +2,11 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {HeaderIcons} from '../../assets/icons';
-import {themes} from '../styles';
-import FontSizes from '../../assets/fonts/fontSizes';
+import {HeaderIcons} from '../../../assets/icons';
+import {themes} from '../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
-const Header = ({children, onBackPress}) => {
+const ModalHeader = ({children, onBackPress}) => {
   const navigation = useNavigation();
   const handleBackPress = onBackPress || (() => navigation.goBack());
 
@@ -28,9 +28,8 @@ const Header = ({children, onBackPress}) => {
 };
 
 const HeaderContainer = styled.View`
-  height: 108px;
   justify-content: flex-end;
-  padding-bottom: 10px;
+  padding: 15px 0px;
   background-color: ${themes.light.bgColor.bgPrimary};
   border-bottom-width: 1;
   border-bottom-color: ${themes.light.borderColor.borderPrimary};
@@ -50,4 +49,4 @@ const Title = styled.Text`
   color: ${themes.light.textColor.textPrimary};
 `;
 
-export {Header};
+export {ModalHeader};

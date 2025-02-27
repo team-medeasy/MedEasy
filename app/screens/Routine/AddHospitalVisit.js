@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {ScrollView, TouchableOpacity} from 'react-native';
 import {themes} from './../../styles';
-import {Header} from '../../components';
+import {ModalHeader} from '../../components/\bHeader/ModalHeader';
 import {RoutineIcons} from '../../../assets/icons';
 import {Button} from '../../components/Button';
 
@@ -22,7 +22,7 @@ const AddHospitalVisit = () => {
 
   return (
     <Container>
-      <Header>병원 진료 추가</Header>
+      <ModalHeader>병원 진료 추가</ModalHeader>
       <MainContainer>
         <InputContainer>
           <HospitalIcon
