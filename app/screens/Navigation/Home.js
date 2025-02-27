@@ -17,6 +17,14 @@ const Home = () => {
     navigation.navigate('Notification');
   };
 
+  const handleAddMedicineRoutine = () => {
+    navigation.navigate('AddMedicineRoutine'); // 복용 루틴 추가 화면으로 이동
+  };
+
+  const handleAddHospitalVisit = () => {
+    navigation.navigate('AddHospitalVisit'); // 병원 진료 추가 화면으로 이동
+  };
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
       <ScrollContainer>
@@ -70,7 +78,7 @@ const Home = () => {
             </RoutineButton>
           </RoutineContainer>
           <ButtonContainer>
-            <AddButton onPress={() => console.log('복용 루틴 추가')}>
+            <AddButton onPress={handleAddMedicineRoutine}>
               <ButtonContent>
                 <ButtonInfo>
                   <MediIcon
@@ -92,7 +100,7 @@ const Home = () => {
                 />
               </ButtonContent>
             </AddButton>
-            <AddButton onPress={() => console.log('병원 진료 추가')}>
+            <AddButton onPress={handleAddHospitalVisit}>
               <ButtonContent>
                 <ButtonInfo>
                   <HospitalIcon
