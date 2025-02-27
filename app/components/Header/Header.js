@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {HeaderIcons} from '../../assets/icons';
-import {themes} from '../styles';
-import FontSizes from '../../assets/fonts/fontSizes';
+import {HeaderIcons} from '../../../assets/icons';
+import {themes} from '../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Header = ({children, onBackPress}) => {
   const navigation = useNavigation();
