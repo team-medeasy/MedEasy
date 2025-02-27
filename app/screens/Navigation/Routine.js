@@ -1,25 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import { ScrollView } from 'react-native';
 import styled from 'styled-components/native';
-import { TouchableOpacity } from 'react-native';
 import { OtherIcons } from '../../../assets/icons';
 import { themes } from '../../styles';
 import dayjs from 'dayjs';
 
+import { RoutineIcons } from '../../../assets/icons';
+
+const timeMapping = {
+  MORNING: { label: '아침', time: '오전 8:00' },
+  LUNCH: { label: '점심', time: '오후 12:30' },
+  DINNER: { label: '저녁', time: '오후 6:30' },
+  BEDTIME: { label: '자기 전', time: '오후 10:00' }
+};
+
 const Routine = () => {
   const today = dayjs();
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-  
-  // 초기 상태에 month 정보 추가
+
   const [selectedDate, setSelectedDate] = useState({
     day: weekDays[today.day()],
     date: today.date(),
-    month: today.month() + 1, // 1부터 시작하는 월 (1-12)
+    month: today.month() + 1,
     year: today.year(),
-    fullDate: today // 전체 날짜 객체 저장
+    fullDate: today
   });
 
-  // 루틴 탭이 포커스될 때마다 오늘 날짜로 초기화
   useFocusEffect(
     React.useCallback(() => {
       setSelectedDate({
@@ -32,72 +39,78 @@ const Routine = () => {
     }, [])
   );
 
-  // 현재 주의 날짜들 계산
   const currentWeek = Array.from({ length: 7 }, (_, i) => {
     const date = today.startOf('week').add(i, 'day');
     return {
       day: weekDays[date.day()],
       date: date.date(),
-      month: date.month() + 1, // 1-12로 표시
+      month: date.month() + 1,
       year: date.year(),
-      fullDate: date, // 전체 날짜 객체 저장
-      // 날짜, 월, 년도 모두 같을 때만 오늘로 인식
-      isToday: date.date() === today.date() && 
-               date.month() === today.month() && 
-               date.year() === today.year()
+      fullDate: date,
+      isToday: date.date() === today.date() &&
+        date.month() === today.month() &&
+        date.year() === today.year()
     };
   });
 
   const getRelativeDayText = (selectedDate, today) => {
-    // 선택된 날짜의 yyyy-mm-dd 형식 문자열 생성
-    const selectedStr = `${selectedDate.year}-${String(selectedDate.month).padStart(2, '0')}-${String(selectedDate.date).padStart(2, '0')}`;
-    const todayStr = `${today.year()}-${String(today.month() + 1).padStart(2, '0')}-${String(today.date()).padStart(2, '0')}`;
-    
-    // 두 날짜를 비교를 위해 동일한 형식으로 변환
-    const selectedDateObj = dayjs(selectedStr);
-    const todayObj = dayjs(todayStr);
-    
-    // 날짜 간 차이 계산 (일수)
+    const selectedDateObj = dayjs(`${selectedDate.year}-${selectedDate.month}-${selectedDate.date}`);
+    const todayObj = dayjs(`${today.year()}-${today.month() + 1}-${today.date()}`);
     const diff = selectedDateObj.diff(todayObj, 'day');
-    
+
     if (diff === 0) return '오늘';
     if (diff === -1) return '어제';
-    if (diff <= -2) return `${Math.abs(diff)}일 전`;
     if (diff === 1) return '내일';
     if (diff === 2) return '모레';
-    if (diff > 2) return `${diff}일 후`;
-    return `${diff}일 후`; // 기본값
+    return diff < 0 ? `${Math.abs(diff)}일 전` : `${diff}일 후`;
   };
-  
-  // 약과 병원 일정 데이터 (시간, 제목, 설명 포함)
-  const medicationSchedule = [
-    { time: '08:00', title: '약 1정', description: '오전 8시에 복용' },
-    { time: '14:00', title: '약 2정', description: '오후 2시에 복용' },
-  ];
 
-  const hospitalSchedule = [
-    { time: '10:00', title: '병원 예약', description: '오전 10시에 병원 예약' },
-    { time: '15:00', title: '병원 예약', description: '오후 3시에 병원 예약' },
-  ];
+  const [medicineRoutines, setMedicineRoutines] = useState([
+    {
+      medicine_id: 3594,
+      nickname: '아스피린',
+      dose: 1,
+      total_quantity: 30,
+      day_of_weeks: [1, 2, 3],
+      types: ['MORNING', 'LUNCH', 'DINNER', 'BEDTIME']
+    },
+    {
+      medicine_id: 9876,
+      nickname: '타이레놀',
+      dose: 2,
+      total_quantity: 20,
+      day_of_weeks: [2, 4, 6],
+      types: ['MORNING', 'DINNER']
+    }
+  ]);
 
-  // 두 스케줄을 하나로 합치기
-  const combinedSchedule = [...medicationSchedule, ...hospitalSchedule];
+  const groupByTime = (routines) => {
+    const grouped = {
+      MORNING: [],
+      LUNCH: [],
+      DINNER: [],
+      BEDTIME: []
+    };
+    routines.forEach((medicine) => {
+      if (medicine.day_of_weeks.includes(selectedDate.fullDate.day() + 1)) {
+        medicine.types.forEach((type) => {
+          if (grouped[type]) {
+            grouped[type].push(medicine);
+          }
+        });
+      }
+    });
+    return grouped;
+  };
 
-  // 시간 순으로 정렬
-  const sortedSchedule = combinedSchedule.sort((a, b) => {
-    return dayjs(a.time, 'HH:mm').isBefore(dayjs(b.time, 'HH:mm')) ? -1 : 1;
-  });
-  
+  const groupedMedicines = groupByTime(medicineRoutines);
+
   return (
     <Container>
       <Header>
         <HeaderText>루틴</HeaderText>
         <ReturnButton>
-          <OtherIcons.return
-            width={11}
-            height={9}
-            style={{ color: themes.light.textColor.Primary50 }}
-          />
+          <OtherIcons.return width={11} height={9} style={{ color: themes.light.textColor.Primary50 }} />
           <ButtonText>돌아가기</ButtonText>
         </ReturnButton>
       </Header>
@@ -106,40 +119,45 @@ const Routine = () => {
           <DayBox
             key={index}
             isToday={dayInfo.isToday}
-            isSelected={
-              selectedDate.date === dayInfo.date && 
-              selectedDate.month === dayInfo.month && 
-              selectedDate.year === dayInfo.year
-            }
+            isSelected={selectedDate.date === dayInfo.date && selectedDate.month === dayInfo.month && selectedDate.year === dayInfo.year}
             onPress={() => setSelectedDate(dayInfo)}>
             <DayText>{dayInfo.day}</DayText>
             <DateText isToday={dayInfo.isToday}>{dayInfo.date}</DateText>
           </DayBox>
         ))}
       </DayContainer>
-      <ScheduleContainer>
-        <TodayContainer>
-          <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
-          <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
-        </TodayContainer>
-
-        {/* 스케줄 */}
-        <ScheduleContainerInner>
-          {sortedSchedule.map((item, index) => (
-            <ScheduleItem key={index}>
-              <ItemTime>{item.time}</ItemTime>
-              <ItemText>{item.title}</ItemText>
-              <ItemDescription>{item.description}</ItemDescription>
-            </ScheduleItem>
+      <ScrollView>
+        <ScheduleContainer>
+          <TodayContainer>
+            <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
+            <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
+          </TodayContainer>
+          {Object.entries(groupedMedicines).map(([time, medicines]) => (
+            medicines.length > 0 && (
+              <MedicineRoutine key={time}>
+                <TimeContainer>
+                  <LogoContainer><RoutineIcons.medicine width={22} height={22} style={{color: themes.light.pointColor.Primary}}/></LogoContainer>
+                  <TextContainer>
+                    <TypeText>{timeMapping[time].label}</TypeText>
+                    <TimeText>{timeMapping[time].time}</TimeText>
+                  </TextContainer>
+                </TimeContainer>
+                <Routines>
+                  {medicines.map((medicine) => (
+                    <MedicineText key={medicine.medicine_id}>{`${medicine.nickname} (${medicine.dose}정)`}</MedicineText>
+                  ))}
+                </Routines>
+              </MedicineRoutine>
+            )
           ))}
-        </ScheduleContainerInner>
-      </ScheduleContainer>
+        </ScheduleContainer>
+      </ScrollView>
     </Container>
   );
 };
 
-// 스타일 컴포넌트는 변경 없음
 const Container = styled.View`
+  flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
@@ -228,30 +246,59 @@ const TodayDate = styled.Text`
   color: ${themes.light.textColor.Primary30};
 `;
 
-const ScheduleContainerInner = styled.View`
+const MedicineRoutine = styled.View`
+  background-color: ${themes.light.bgColor.bgPrimary};
+  padding: 0px 20px;
+  border-radius: 10px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 30px;
+`;
+
+const TimeContainer = styled.View`
+  flex-direction: row;
+  border-bottom-width: 1px;
+  border-bottom-color: ${themes.light.borderColor.borderPrimary};
+  padding: 20px 0px;
+`;
+
+const LogoContainer = styled.View`
+  padding-right: 15px;
+`;
+
+const TextContainer = styled.View``;
+
+const Routines = styled.View``;
+
+const TypeText = styled.Text`
+  font-size: 18px;
+  font-family: 'Pretendard-ExtraBold';
+`;
+
+const TimeText = styled.Text`
+  font-size: 15px;  
+  font-family: 'Pretendard-Regular';
+  color: ${themes.light.textColor.Primary50};
+`;
+
+const MedicineText = styled.Text`
+  font-size: 15px;
+  font-family: 'Pretendard-Regular';
   padding: 20px;
 `;
 
-const ScheduleItem = styled.View`
-  padding: 5px 0;
-  flex-direction: row;
-  align-items: center;
+const HospitalRoutine = styled.View`
+  background-color: ${themes.light.bgColor.bgPrimary};
+  padding: 20px 20px;
+  border-radius: 10px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 30px;
 `;
 
-const ItemTime = styled.Text`
-  font-size: 16px;
-  color: ${themes.light.textColor.Primary30};
-  margin-right: 10px;
-`;
-
-const ItemText = styled.Text`
-  font-size: 16px;
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const ItemDescription = styled.Text`
-  font-size: 14px;
-  color: ${themes.light.textColor.Primary50};
+const HospitalText = styled.Text`
+  font-size: 18px;
+  font-family: 'Pretendard-ExtraBold';
 `;
 
 export default Routine;
