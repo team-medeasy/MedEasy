@@ -59,8 +59,7 @@ const TabNavigator = () => {
       <Tab.Navigator
         screenOptions={{
           tabBarStyle: {
-            paddingBottom: 15,
-            paddingTop: 10,
+            paddingTop: 3,
           },
           tabBarActiveTintColor: themes.light.pointColor.Primary,
           tabBarInactiveTintColor: themes.light.textColor.Primary20,
@@ -86,6 +85,10 @@ const TabNavigator = () => {
             tabBarItemStyle: {
               marginLeft: -30,
             },
+            tabBarItemStyle: {
+              marginLeft: -35,
+              marginRight: 15,
+            },
           }}
           listeners={{
             tabPress: e => {
@@ -104,6 +107,10 @@ const TabNavigator = () => {
             ),
             tabBarItemStyle: {
               marginRight: -30,
+            },
+            tabBarItemStyle: {
+              marginLeft: 15,
+              marginRight: -35,
             },
           }}
         />
