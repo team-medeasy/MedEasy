@@ -96,6 +96,7 @@ const App = () => {
             <RootStack.Screen
               name="AddHospitalVisit"
               component={AddHospitalVisitScreen}
+              options={{presentation: 'modal'}}
             />
           </RootStack.Navigator>
         )}
