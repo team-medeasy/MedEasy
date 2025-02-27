@@ -3,14 +3,14 @@ import {
   FlatList,
   TouchableOpacity,
   Modal,
-  ScrollView,
   View,
   Text,
 } from 'react-native';
 import styled from 'styled-components/native';
-import {themes, pointColor} from './../../styles';
+import {themes} from './../../styles';
 import {Footer, Tag, Button} from './../../components';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {chevron: ChevronIcon} = HeaderIcons;
 const {chevronDown: ChevronDownIcon} = OtherIcons;
@@ -104,10 +104,22 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
   // 필터 옵션들
   const filterOptions = {
-    color: ['선택 없음', '하양', '파랑', '빨강', '초록', '노랑', '분홍'],
-    shape: ['선택 없음', '원형', '타원형', '장방형', '삼각형', '사각형'],
-    size: ['선택 없음', '소형', '중형', '대형'],
-    split: ['선택 없음', '있음', '없음']
+    color: ['하양', '노랑', '주황', '분홍', '빨강', '갈색', '초록', '그 외'],
+    shape: ['원형', '타원형', '장방형', '삼각형', '사각형', '마름모형', '오각형', '팔각형'],
+    size: ['소형', '중형', '대형'],
+    split: ['없음', '(+)형', '(-)형']
+  };
+
+  // 색상 코드 매핑 (약 색상 - 필터 옵션)
+  const colorCodes = {
+    '하양': '#FFFFFF',
+    '노랑': 'rgba(255, 221, 0, 1)',
+    '주황': '#FFA500',
+    '분홍': '#FFC0CB',
+    '빨강': '#FF0000',
+    '갈색': '#8B4513',
+    '초록': '#008000',
+    '그 외': '#CCCCCC'
   };
 
   const openFilterModal = () => {
@@ -133,33 +145,64 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   const handleFilterChange = (type, value) => {
     setTempFilters(prev => ({
       ...prev,
-      [type]: value === '선택 없음' ? null : value
+      // 같은 값을 다시 클릭하면 null로 변경 (선택 취소)
+      [type]: prev[type] === value ? null : value
     }));
   };
 
   const renderFilterSection = (title, type, options) => (
-    <View style={{ marginBottom: 20 }}>
-      <Text style={{ fontFamily: 'Pretendard-Bold', fontSize: 16, marginBottom: 10 }}>{title}</Text>
+    <View>
+      <Text style={{ 
+        fontFamily: 'Pretendard-Bold', 
+        fontSize: FontSizes.heading.default, 
+        marginBottom: 15,
+        color: themes.light.textColor.textPrimary,
+      }}>{title}</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
         {options.map((option, index) => (
           <TouchableOpacity
             key={index}
             style={{
+              flexDirection: 'row',
+              alignItems: 'center',
               paddingVertical: 8,
-              paddingHorizontal: 15,
-              borderRadius: 20,
-              backgroundColor: tempFilters[type] === (option === '선택 없음' ? null : option) 
-                ? '#000' 
-                : '#fff',
-              borderWidth: 1,
-              borderColor: '#e0e0e0',
+              paddingHorizontal: 15, /* 추후 변경 */
+              borderRadius: 5,
+              backgroundColor: tempFilters[type] === option ? 
+                              themes.light.pointColor.Primary : themes.light.boxColor.inputPrimary,
             }}
             onPress={() => handleFilterChange(type, option)}>
+
+            {type === 'color' && (
+              <View
+                style={{
+                  width: 12.5,
+                  height: 12.5,
+                  borderRadius: 7,
+                  backgroundColor: colorCodes[option],
+                  borderWidth: 1.5,
+                  borderColor: themes.light.borderColor.borderCircle,
+                  marginRight: 5,
+                }}
+              />
+            )}
+            {type === 'shape' && (
+              <View
+                style={{
+                  width: 12.5,
+                  height: 12.5,
+                  borderRadius: 7,
+                  backgroundColor: colorCodes['노랑'],
+                  borderWidth: 1,
+                  borderColor: themes.light.borderColor.borderCircle,
+                  marginRight: 5,
+                }}
+              />
+            )}
             <Text
               style={{
-                color: tempFilters[type] === (option === '선택 없음' ? null : option) 
-                  ? 'white' 
-                  : 'black',
+                color: tempFilters[type] === option ? 
+                      themes.light.textColor.buttonText : themes.light.textColor.Primary50,
                 fontFamily: 'Pretendard-SemiBold',
               }}>
               {option}
@@ -180,34 +223,43 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       <View style={{ 
         flex: 1, 
         justifyContent: 'flex-end', 
-        backgroundColor: 'rgba(0, 0, 0, 0.5)' 
+        backgroundColor: 'rgba(0, 0, 0, 0.3)' 
       }}>
         <View style={{ 
-          backgroundColor: 'white', 
-          borderTopLeftRadius: 20, 
-          borderTopRightRadius: 20, 
-          padding: 20,
-          maxHeight: '80%'
+          backgroundColor: themes.light.bgColor.bgPrimary, 
+          borderTopLeftRadius: 40, 
+          borderTopRightRadius: 40,
+          paddingTop: 10,
+          paddingBottom: 40,
         }}>
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            marginBottom: 20 
-          }}>
-            <Text style={{ fontSize: 18, fontFamily: 'Pretendard-Bold' }}>특징 검색</Text>
-            <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
-              <Text style={{ fontSize: 16, fontFamily: 'Pretendard-SemiBold', color: '#888' }}>취소</Text>
-            </TouchableOpacity>
+          <View style={{alignItems: 'center', marginBottom: 25}}>
+            <View style={{
+              width: 40,
+              height: 5,
+              borderRadius: 4,
+              backgroundColor: themes.light.boxColor.modalBar,
+            }}/>
           </View>
+
+          <View style={{ 
+            paddingHorizontal: 20,
+            gap: 30,
+            alignItems: 'center'
+          }}>
+            <Text style={{ 
+              fontSize: FontSizes.title.default, 
+              fontFamily: 'KimjungchulGothic-Bold',
+              color: themes.light.textColor.textPrimary,
+            }}>특징 검색</Text>
           
-          <ScrollView style={{ maxHeight: '70%' }}>
-            {renderFilterSection('색상', 'color', filterOptions.color)}
-            {renderFilterSection('모양', 'shape', filterOptions.shape)}
-            {renderFilterSection('크기', 'size', filterOptions.size)}
-            {renderFilterSection('분할선', 'split', filterOptions.split)}
-          </ScrollView>
-          <Button title='적용하기' onPress={applyFilters} />
+            <View style={{gap: 30}}>
+              {renderFilterSection('색상', 'color', filterOptions.color)}
+              {renderFilterSection('모양', 'shape', filterOptions.shape)}
+              {renderFilterSection('크기', 'size', filterOptions.size)}
+              {renderFilterSection('분할선', 'split', filterOptions.split)}
+            </View>
+            <Button title='적용하기' onPress={applyFilters} />
+          </View>
         </View>
       </View>
     </Modal>
@@ -479,10 +531,7 @@ const FilterButtonText = styled.Text`
   font-size: 13px;
   margin-right: 6px;
   font-family: 'Pretendard-SemiBold';
-  color: ${props =>
-    props.selected
-      ? pointColor.pointPrimary
-      : themes.light.textColor.textPrimary};
+  color: ${themes.light.textColor.textPrimary};
 `;
 
 export default SearchMedicineResultsScreen;
