@@ -1,5 +1,6 @@
 import React, {useCallback} from 'react';
 import styled from 'styled-components/native';
+import {Platform} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Camera} from 'react-native-vision-camera';
@@ -175,7 +176,12 @@ const MainContainer = styled.View`
 
 const StyledCameraButton = styled.TouchableOpacity`
   position: absolute;
-  bottom: 50px;
+  ${Platform.OS === 'ios' && `
+      bottom: 50px;
+    `}
+    ${Platform.OS === 'android' && `
+      bottom: 20px;
+    `}
   align-self: center;
   background-color: ${pointColor.pointPrimary};
   width: 55px;
@@ -193,7 +199,12 @@ const ChatBuble = styled.View`
   width: 100px;
   height: 50px;
   right: 20px;
-  bottom: 170px;
+  ${Platform.OS === 'ios' && `
+      bottom: 170px;
+    `}
+    ${Platform.OS === 'android' && `
+      bottom: 140px;
+    `}
   border-radius: 15px;
   justify-content: center;
   align-items: center;
@@ -218,7 +229,12 @@ const BubbleText = styled.Text`
 const ChatButton = styled.TouchableOpacity`
   position: absolute;
   right: 20px;
-  bottom: 100px;
+  ${Platform.OS === 'ios' && `
+      bottom: 100px;
+    `}
+    ${Platform.OS === 'android' && `
+      bottom: 70px;
+    `}
   background-color: ${themes.light.bgColor.bgPrimary};
   width: 50px;
   height: 50px;
