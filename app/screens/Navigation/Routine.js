@@ -9,9 +9,14 @@ import dayjs from 'dayjs';
 const Routine = () => {
   const today = dayjs();
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+  
+  // 초기 상태에 month 정보 추가
   const [selectedDate, setSelectedDate] = useState({
     day: weekDays[today.day()],
     date: today.date(),
+    month: today.month() + 1, // 1부터 시작하는 월 (1-12)
+    year: today.year(),
+    fullDate: today // 전체 날짜 객체 저장
   });
 
   // 루틴 탭이 포커스될 때마다 오늘 날짜로 초기화
@@ -20,21 +25,50 @@ const Routine = () => {
       setSelectedDate({
         day: weekDays[today.day()],
         date: today.date(),
+        month: today.month() + 1,
+        year: today.year(),
+        fullDate: today
       });
     }, [])
   );
 
+  // 현재 주의 날짜들 계산
   const currentWeek = Array.from({ length: 7 }, (_, i) => {
     const date = today.startOf('week').add(i, 'day');
     return {
-      day: weekDays[i],
+      day: weekDays[date.day()],
       date: date.date(),
-      isToday: today.isSame(date, 'day'),
+      month: date.month() + 1, // 1-12로 표시
+      year: date.year(),
+      fullDate: date, // 전체 날짜 객체 저장
+      // 날짜, 월, 년도 모두 같을 때만 오늘로 인식
+      isToday: date.date() === today.date() && 
+               date.month() === today.month() && 
+               date.year() === today.year()
     };
   });
 
-  const month = today.format('M');
-
+  const getRelativeDayText = (selectedDate, today) => {
+    // 선택된 날짜의 yyyy-mm-dd 형식 문자열 생성
+    const selectedStr = `${selectedDate.year}-${String(selectedDate.month).padStart(2, '0')}-${String(selectedDate.date).padStart(2, '0')}`;
+    const todayStr = `${today.year()}-${String(today.month() + 1).padStart(2, '0')}-${String(today.date()).padStart(2, '0')}`;
+    
+    // 두 날짜를 비교를 위해 동일한 형식으로 변환
+    const selectedDateObj = dayjs(selectedStr);
+    const todayObj = dayjs(todayStr);
+    
+    // 날짜 간 차이 계산 (일수)
+    const diff = selectedDateObj.diff(todayObj, 'day');
+    
+    if (diff === 0) return '오늘';
+    if (diff === -1) return '어제';
+    if (diff <= -2) return `${Math.abs(diff)}일 전`;
+    if (diff === 1) return '내일';
+    if (diff === 2) return '모레';
+    if (diff > 2) return `${diff}일 후`;
+    return `${diff}일 후`; // 기본값
+  };
+  
   // 약과 병원 일정 데이터 (시간, 제목, 설명 포함)
   const medicationSchedule = [
     { time: '08:00', title: '약 1정', description: '오전 8시에 복용' },
@@ -53,6 +87,7 @@ const Routine = () => {
   const sortedSchedule = combinedSchedule.sort((a, b) => {
     return dayjs(a.time, 'HH:mm').isBefore(dayjs(b.time, 'HH:mm')) ? -1 : 1;
   });
+  
   return (
     <Container>
       <Header>
@@ -67,23 +102,25 @@ const Routine = () => {
         </ReturnButton>
       </Header>
       <DayContainer>
-        {currentWeek.map(({ day, date, isToday }, index) => (
+        {currentWeek.map((dayInfo, index) => (
           <DayBox
             key={index}
-            isToday={isToday}
-            isSelected={selectedDate.date === date} // 선택된 날짜 확인
-            onPress={() => setSelectedDate({ day, date })}>
-            <DayText>{day}</DayText>
-            <DateText isToday={isToday}>{date}</DateText>
+            isToday={dayInfo.isToday}
+            isSelected={
+              selectedDate.date === dayInfo.date && 
+              selectedDate.month === dayInfo.month && 
+              selectedDate.year === dayInfo.year
+            }
+            onPress={() => setSelectedDate(dayInfo)}>
+            <DayText>{dayInfo.day}</DayText>
+            <DateText isToday={dayInfo.isToday}>{dayInfo.date}</DateText>
           </DayBox>
         ))}
       </DayContainer>
       <ScheduleContainer>
         <TodayContainer>
-          {selectedDate.date === today.date() && (
-            <TodayText>오늘</TodayText>
-          )}
-          <TodayDate>{`${month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
+          <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
+          <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
         </TodayContainer>
 
         {/* 스케줄 */}
@@ -100,6 +137,8 @@ const Routine = () => {
     </Container>
   );
 };
+
+// 스타일 컴포넌트는 변경 없음
 const Container = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
@@ -214,6 +253,5 @@ const ItemDescription = styled.Text`
   font-size: 14px;
   color: ${themes.light.textColor.Primary50};
 `;
-
 
 export default Routine;
