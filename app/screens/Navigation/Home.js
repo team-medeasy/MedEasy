@@ -14,7 +14,7 @@ const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 const Home = () => {
   const navigation = useNavigation();
   const handleNotificationPress = () => {
-    navigation.navigate('Notification'); // Notification 스크린으로 이동
+    navigation.navigate('Notification');
   };
 
   return (
@@ -72,33 +72,45 @@ const Home = () => {
           <ButtonContainer>
             <AddButton onPress={() => console.log('복용 루틴 추가')}>
               <ButtonContent>
-                <MediIcon
-                  height={16}
-                  style={{
-                    marginRight: -150,
-                    color: themes.light.pointColor.Primary,
-                  }}
-                />
-                <ButtonText>복용 루틴 추가하기</ButtonText>
+                <ButtonInfo>
+                  <MediIcon
+                    height={16}
+                    width={16}
+                    style={{
+                      color: themes.light.pointColor.Primary,
+                      marginRight: 10,
+                    }}
+                  />
+                  <ButtonText>복용 루틴 추가하기</ButtonText>
+                </ButtonInfo>
                 <ArrowIcon
                   height={16}
-                  style={{transform: [{rotate: '180deg'}], opacity: 0.5}}
+                  style={{
+                    color: themes.light.textColor.Primary20,
+                    transform: [{rotate: '180deg'}],
+                  }}
                 />
               </ButtonContent>
             </AddButton>
             <AddButton onPress={() => console.log('병원 진료 추가')}>
               <ButtonContent>
-                <HospitalIcon
-                  height={16}
-                  style={{
-                    marginRight: -150,
-                    color: themes.light.pointColor.Secondary,
-                  }}
-                />
-                <ButtonText>병원 진료 추가하기</ButtonText>
+                <ButtonInfo>
+                  <HospitalIcon
+                    height={16}
+                    width={16}
+                    style={{
+                      color: themes.light.pointColor.Secondary,
+                      marginRight: 10,
+                    }}
+                  />
+                  <ButtonText>병원 진료 추가하기</ButtonText>
+                </ButtonInfo>
                 <ArrowIcon
                   height={16}
-                  style={{transform: [{rotate: '180deg'}], opacity: 0.5}}
+                  style={{
+                    color: themes.light.textColor.Primary20,
+                    transform: [{rotate: '180deg'}],
+                  }}
                 />
               </ButtonContent>
             </AddButton>
@@ -177,7 +189,7 @@ const ButtonContainer = styled.View`
 
 const AddButton = styled(TouchableOpacity)`
   background-color: ${themes.light.bgColor.bgPrimary};
-  padding: 10px 0px;
+  padding: 10px;
   flex: 1;
 `;
 
@@ -186,6 +198,10 @@ const ButtonContent = styled.View`
   justify-content: space-between;
   align-items: center;
   width: 100%;
+`;
+
+const ButtonInfo = styled.View`
+  flex-direction: row;
 `;
 
 const ButtonText = styled.Text`
