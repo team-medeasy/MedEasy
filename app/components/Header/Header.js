@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View, Platform} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {HeaderIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
@@ -28,7 +28,12 @@ const Header = ({children, onBackPress}) => {
 };
 
 const HeaderContainer = styled.View`
-  height: 108px;
+  ${Platform.OS === 'ios' && `
+    height: 108px;
+  `}
+  ${Platform.OS === 'android' && `
+    height: 50px;
+  `}
   justify-content: flex-end;
   padding-bottom: 10px;
   background-color: ${themes.light.bgColor.bgPrimary};
