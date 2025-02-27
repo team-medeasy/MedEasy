@@ -65,6 +65,31 @@ const Routine = () => {
     return diff < 0 ? `${Math.abs(diff)}일 전` : `${diff}일 후`;
   };
 
+  const [checkedItems, setCheckedItems] = useState({});
+
+  const toggleCheck = (medicineId, time) => {
+    setCheckedItems((prev) => ({
+      ...prev,
+      [`${medicineId}-${time}`]: !prev[`${medicineId}-${time}`]
+    }));
+  };
+
+  const toggleTimeCheck = (time) => {
+    const allChecked = Object.entries(checkedItems)
+      .filter(([key]) => key.endsWith(`-${time}`))
+      .every(([, value]) => value);
+
+    const updatedChecks = { ...checkedItems };
+    Object.keys(checkedItems).forEach((key) => {
+      if (key.endsWith(`-${time}`)) {
+        updatedChecks[key] = !allChecked;
+      }
+    });
+    setCheckedItems(updatedChecks);
+  };
+
+
+
   const [medicineRoutines, setMedicineRoutines] = useState([
     {
       medicine_id: 3594,
@@ -136,16 +161,34 @@ const Routine = () => {
             medicines.length > 0 && (
               <MedicineRoutine key={time}>
                 <TimeContainer>
-                  <LogoContainer><RoutineIcons.medicine width={22} height={22} style={{color: themes.light.pointColor.Primary}}/></LogoContainer>
+                  <IconContainer><RoutineIcons.medicine width={22} height={22} style={{ color: themes.light.pointColor.Primary }} /></IconContainer>
                   <TextContainer>
                     <TypeText>{timeMapping[time].label}</TypeText>
                     <TimeText>{timeMapping[time].time}</TimeText>
                   </TextContainer>
+                  <CheckBox onPress={() => toggleTimeCheck(time)}>
+                    {Object.keys(checkedItems).some(key => key.endsWith(`-${time}`) && checkedItems[key]) ? (
+                      <RoutineIcons.checkOn width={26} height={26} style={{ color: themes.light.pointColor.Primary }} />
+                    ) : (
+                      <RoutineIcons.checkOff width={26} height={26} style={{ color: themes.light.boxColor.inputSecondary }} />
+                    )}
+                  </CheckBox>
                 </TimeContainer>
                 <Routines>
-                  {medicines.map((medicine) => (
-                    <MedicineText key={medicine.medicine_id}>{`${medicine.nickname} (${medicine.dose}정)`}</MedicineText>
-                  ))}
+                  <RoutineList>
+                    {medicines.map((medicine) => (
+                      <MedicineItem key={medicine.medicine_id}>
+                        <MedicineText>{`${medicine.nickname} (${medicine.dose}정)`}</MedicineText>
+                        <CheckBox onPress={() => toggleCheck(medicine.medicine_id, time)}>
+                          {checkedItems[`${medicine.medicine_id}-${time}`] ? (
+                            <RoutineIcons.checkOn width={26} height={26} style={{ color: themes.light.pointColor.Primary }} />
+                          ) : (
+                            <RoutineIcons.checkOff width={26} height={26} style={{ color: themes.light.boxColor.inputSecondary }} />
+                          )}
+                        </CheckBox>
+                      </MedicineItem>
+                    ))}
+                  </RoutineList>
                 </Routines>
               </MedicineRoutine>
             )
@@ -248,11 +291,13 @@ const TodayDate = styled.Text`
 
 const MedicineRoutine = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
-  padding: 0px 20px;
+  padding: 0 20px;
   border-radius: 10px;
-  width: 100%;
+  width: auto;
   height: auto;
   margin-bottom: 30px;
+  margin-left: 55px;
+  margin-right: 20px;
 `;
 
 const TimeContainer = styled.View`
@@ -260,15 +305,14 @@ const TimeContainer = styled.View`
   border-bottom-width: 1px;
   border-bottom-color: ${themes.light.borderColor.borderPrimary};
   padding: 20px 0px;
+  align-items: center;
 `;
 
-const LogoContainer = styled.View`
+const IconContainer = styled.View`
   padding-right: 15px;
 `;
 
 const TextContainer = styled.View``;
-
-const Routines = styled.View``;
 
 const TypeText = styled.Text`
   font-size: 18px;
@@ -280,6 +324,21 @@ const TimeText = styled.Text`
   font-family: 'Pretendard-Regular';
   color: ${themes.light.textColor.Primary50};
 `;
+
+const RoutineList = styled.View``;
+
+const MedicineItem = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const CheckBox = styled.TouchableOpacity`
+  position: absolute;
+  right: 0;
+`;
+
+const Routines = styled.View``;
 
 const MedicineText = styled.Text`
   font-size: 15px;
