@@ -34,6 +34,11 @@ import CheckOffIcon from './icons/routine/checkOff.svg';
 import CheckOnIcon from './icons/routine/checkOn.svg';
 import HospitalIcon from './icons/routine/hospital.svg';
 import MedicineIcon from './icons/routine/medicine.svg';
+import CupIcon from './icons/routine/cup.svg';
+import MoonIcon from './icons/routine/moon.svg';
+import SunIcon from './icons/routine/sun.svg';
+import HeartOffIcon from './icons/routine/heartOff.svg';
+import HeartOnIcon from './icons/routine/heartOn.svg';
 
 // 설정 아이콘
 import AnnouncementIcon from './icons/settings/announcement.svg';
@@ -51,18 +56,13 @@ import TextSizeIcon from './icons/settings/text_size.svg';
 import ChatIcon from './icons/chat.svg';
 import DeleteCircleIcon from './icons/delete_circle.svg';
 import DeleteIcon from './icons/delete.svg';
-import HeartOffIcon from './icons/heartOff.svg';
-import HeartOnIcon from './icons/heartOn.svg';
 import KarteIcon from './icons/karte.svg';
 import RankingDownIcon from './icons/ranking_down.svg';
 import RankingUpIcon from './icons/ranking_up.svg';
 import ReturnIcon from './icons/return.svg';
 import SearchGeneralIcon from './icons/search.svg';
 import ChevronDownIcon from './icons/chevron_down.svg';
-import CupIcon from './icons/cup.svg';
 import KakaoIcon from './icons/kakao.svg';
-import MoonIcon from './icons/moon.svg';
-import SunIcon from './icons/sun.svg';
 
 // 전체 아이콘 객체로 정리
 export const TabIcons = {
@@ -106,6 +106,12 @@ export const RoutineIcons = {
   checkOn: CheckOnIcon,
   hospital: HospitalIcon,
   medicine: MedicineIcon,
+  cup: CupIcon,
+  kakao: KakaoIcon,
+  moon: MoonIcon,
+  sun: SunIcon,
+  heartOff: HeartOffIcon,
+  heartOn: HeartOnIcon,
 };
 
 export const SettingsIcons = {
@@ -125,16 +131,11 @@ export const OtherIcons = {
   chat: ChatIcon,
   deleteCircle: DeleteCircleIcon,
   delete: DeleteIcon,
-  heartOff: HeartOffIcon,
-  heartOn: HeartOnIcon,
   karte: KarteIcon,
   rankingDown: RankingDownIcon,
   rankingUp: RankingUpIcon,
   return: ReturnIcon,
   search: SearchGeneralIcon,
   chevronDown: ChevronDownIcon,
-  cup: CupIcon,
   kakao: KakaoIcon,
-  moon: MoonIcon,
-  sun: SunIcon,
 };
