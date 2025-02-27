@@ -25,7 +25,7 @@ export const lightTheme = {
     tagResultSecondary: 'rgba(0,0,0,0.1)',
     tagDetailPrimary: 'rgba(135,166,255,0.7)',
     tagDetailSecondary: 'rgba(255, 255, 255, 0.2)',
-    modalBar: 'rgba(0, 0, 0, 0.15)'
+    modalBar: 'rgba(0, 0, 0, 0.15)',
   },
   bgColor: {
     bgPrimary: 'rgba(255, 255, 255, 1)',
@@ -36,10 +36,11 @@ export const lightTheme = {
     detailImageBG: 'rgba(0, 0, 0, 0.4)',
     profileBG: 'rgba(0, 0, 0, 1)',
     protileIcon: 'rgba(255, 255, 255, 0.2)',
+    modalBG: 'rgba(0, 0, 0, 0.3)',
   },
   borderColor: {
     borderPrimary: 'rgba(0, 0, 0, 0.1)',
     borderSecondary: 'rgba(0, 0, 0, 0.07)',
-    borderCircle: 'rgba(0, 0, 0, 0.2)'
+    borderCircle: 'rgba(0, 0, 0, 0.2)',
   },
 };
