@@ -222,7 +222,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       <View style={{ 
         flex: 1, 
         justifyContent: 'flex-end', 
-        backgroundColor: 'rgba(0, 0, 0, 0.3)' 
+        backgroundColor: themes.light.bgColor.modalBG,
       }}>
         <View style={{ 
           backgroundColor: themes.light.bgColor.bgPrimary, 

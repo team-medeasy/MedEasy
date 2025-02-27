@@ -32,7 +32,7 @@ const ChatInfoModal = ({ visible, onClose }) => {
 
 const ModalContainer = styled.View`
   flex: 1;
-  background-color: ${themes.light.bgColor.footerBG};
+  background-color: ${themes.light.bgColor.modalBG};
 `;
 
 const TopBar = styled.View`
