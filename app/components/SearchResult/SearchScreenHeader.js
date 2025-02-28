@@ -11,9 +11,9 @@ const SearchScreenHeader = ({
   searchQuery,
   onBackPress,
   onSearchPress,
-  onFilterPress,
   selectedColors,
   selectedShapes,
+  onFilterPress,
   selectedDosageForms,
   selectedSplits,
   onClearFilter,
@@ -49,42 +49,26 @@ const SearchScreenHeader = ({
           <ScrollableFilterContainer
             horizontal={true}
             showsHorizontalScrollIndicator={false}>
-            <FilterButton
-              type="color"
-              selectedItems={selectedColors}
-              onFilterPress={onFilterPress}
-              onClearFilter={onClearFilter}
-              getFilterButtonText={getFilterButtonText}
-              renderFilterButtonIcon={renderFilterButtonIcon}
-              colorCodes={colorCodes}
-            />
-            <FilterButton
-              type="shape"
-              selectedItems={selectedShapes}
-              onFilterPress={onFilterPress}
-              onClearFilter={onClearFilter}
-              getFilterButtonText={getFilterButtonText}
-              renderFilterButtonIcon={renderFilterButtonIcon}
-              colorCodes={colorCodes}
-            />
-            <FilterButton
-              type="dosageForm"
-              selectedItems={selectedDosageForms}
-              onFilterPress={onFilterPress}
-              onClearFilter={onClearFilter}
-              getFilterButtonText={getFilterButtonText}
-              renderFilterButtonIcon={renderFilterButtonIcon}
-              colorCodes={colorCodes}
-            />
-            <FilterButton
-              type="split"
-              selectedItems={selectedSplits}
-              onFilterPress={onFilterPress}
-              onClearFilter={onClearFilter}
-              getFilterButtonText={getFilterButtonText}
-              renderFilterButtonIcon={renderFilterButtonIcon}
-              colorCodes={colorCodes}
-            />
+            {['color', 'shape', 'dosageForm', 'split'].map(type => (
+              <FilterButton
+                key={type}
+                type={type}
+                selectedItems={
+                  type === 'color'
+                    ? selectedColors
+                    : type === 'shape'
+                    ? selectedShapes
+                    : type === 'dosageForm'
+                    ? selectedDosageForms
+                    : selectedSplits
+                }
+                onFilterPress={() => onFilterPress(type)}
+                onClearFilter={onClearFilter}
+                getFilterButtonText={getFilterButtonText}
+                renderFilterButtonIcon={renderFilterButtonIcon}
+                colorCodes={colorCodes}
+              />
+            ))}
           </ScrollableFilterContainer>
         </FeatureSearchContainer>
       )}
