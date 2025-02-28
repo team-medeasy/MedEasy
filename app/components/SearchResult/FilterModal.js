@@ -144,8 +144,7 @@ const Title = styled.Text`
 
 const FilterOptionsContainer = styled.View`
   flex-direction: row;
-  flex-wrap: ${({isDosageForm}) =>
-    isDosageForm ? 'wrap' : 'wrap'}; /* 무조건 줄바꿈 허용 */
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 30px;
   align-self: flex-start;
@@ -164,11 +163,9 @@ const FilterOptionButton = styled.TouchableOpacity`
   border-radius: 5px;
   align-items: center;
   justify-content: center;
-  width: ${({isDosageForm}) =>
-    isDosageForm ? '48%' : 'auto'}; /* 한 줄에 두 개 배치 */
+  width: ${({isDosageForm}) => (isDosageForm ? '48%' : 'auto')};
   height: ${({isDosageForm}) => (isDosageForm ? '110px' : 'auto')};
   flex-direction: column;
-  margin-bottom: 10px; /* 줄 간격 추가 */
 `;
 
 const FilterOptionText = styled.Text`
