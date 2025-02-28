@@ -5,7 +5,7 @@ import {useNavigation, useIsFocused} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CameraScreen = () => {
+const CameraSearchScreen = () => {
   const devices = useCameraDevices();
   const device = devices.back;
   const navigation = useNavigation();
@@ -115,4 +115,4 @@ const CloseButton = styled.TouchableOpacity`
   padding: 10px;
 `;
 
-export default CameraScreen;
+export default CameraSearchScreen;
