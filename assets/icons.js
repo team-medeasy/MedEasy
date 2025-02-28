@@ -52,6 +52,12 @@ import NotificationsIcon from './icons/settings/notifications.svg';
 import ProfileSettingsIcon from './icons/settings/profile_settings.svg';
 import TextSizeIcon from './icons/settings/text_size.svg';
 
+// 알약 이미지
+import TabletIcon from './icons/pills/tablet.svg';
+import HardCapsuleIcon from './icons/pills/hard_capsule.svg';
+import SoftCapsuleIcon from './icons/pills/soft_capsule.svg';
+import OtherPillIcon from './icons/pills/etc.svg';
+
 // 기타 아이콘
 import ChatIcon from './icons/chat.svg';
 import DeleteCircleIcon from './icons/delete_circle.svg';
@@ -125,6 +131,13 @@ export const SettingsIcons = {
   notifications: NotificationsIcon,
   profileSettings: ProfileSettingsIcon,
   textSize: TextSizeIcon,
+};
+
+export const PillsIcon = {
+  tablet: TabletIcon,
+  hard_capsule: HardCapsuleIcon,
+  soft_capsule: SoftCapsuleIcon,
+  etc: OtherPillIcon,
 };
 
 export const OtherIcons = {
