@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {TouchableOpacity, Modal, View, Text} from 'react-native';
+import {View} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
-import {Button} from './../../components';
-import FontSizes from '../../../assets/fonts/fontSizes';
+
 import SearchResultsList from './../../components/SearchResult/SearchResultsList'; // Import SearchResultsList
 import NoSearchResults from '../../components/SearchResult/NoSearchResults';
 import SearchScreenHeader from '../../components/SearchResult/SearchScreenHeader';
+import FilterModal from '../../components/SearchResult/FilterModal';
 
 const SearchMedicineResultsScreen = ({route, navigation}) => {
   const {searchQuery} = route.params; // MedicineSearchScreen에서 전달된 검색어
@@ -18,6 +18,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   const [selectedSplits, setSelectedSplits] = useState([]);
 
   const [filterModalVisible, setFilterModalVisible] = useState(false);
+
   const [tempFilters, setTempFilters] = useState({
     color: [],
     shape: [],
@@ -152,15 +153,20 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
   const shapeCodes = {};
 
-  const openFilterModal = () => {
-    // 현재 선택된 필터들로 임시 상태 초기화
-    setTempFilters({
-      color: [...selectedColors],
-      shape: [...selectedShapes],
-      dosageForm: [...selectedDosageForms],
-      split: [...selectedSplits],
-    });
-    setFilterModalVisible(true);
+  const openFilterModal = type => {
+    setFilterModalVisible(type);
+    setTempFilters(prev => ({
+      ...prev,
+      [type]: [
+        ...(type === 'color'
+          ? selectedColors
+          : type === 'shape'
+          ? selectedShapes
+          : type === 'dosageForm'
+          ? selectedDosageForms
+          : selectedSplits),
+      ],
+    }));
   };
 
   const applyFilters = () => {
@@ -260,135 +266,6 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     }
   };
 
-  const renderFilterSection = (title, type, options) => (
-    <View>
-      <Text
-        style={{
-          fontFamily: 'Pretendard-Bold',
-          fontSize: FontSizes.heading.default,
-          marginBottom: 15,
-          color: themes.light.textColor.textPrimary,
-        }}>
-        {title}
-      </Text>
-      <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 10}}>
-        {options.map((option, index) => (
-          <TouchableOpacity
-            key={index}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingVertical: 8,
-              paddingHorizontal: 10,
-              gap: 10,
-              borderRadius: 5,
-              backgroundColor: tempFilters[type].includes(option)
-                ? themes.light.pointColor.Primary
-                : themes.light.boxColor.inputPrimary,
-            }}
-            onPress={() => handleFilterChange(type, option)}>
-            {type === 'color' && (
-              <View
-                style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: 7,
-                  backgroundColor: colorCodes[option],
-                  borderWidth: 1.5,
-                  borderColor: themes.light.borderColor.borderCircle,
-                }}
-              />
-            )}
-            {type === 'shape' && (
-              <View
-                style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: 7,
-                  borderWidth: 1.5,
-                  borderColor: themes.light.textColor.Primary50,
-                }}
-              />
-            )}
-            <Text
-              style={{
-                color: tempFilters[type].includes(option)
-                  ? themes.light.textColor.buttonText
-                  : themes.light.textColor.Primary50,
-                fontFamily: 'Pretendard-SemiBold',
-              }}>
-              {option}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-
-  // 통합 필터 모달
-  const renderIntegratedFilterModal = () => (
-    <Modal
-      visible={filterModalVisible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={() => setFilterModalVisible(false)}>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'flex-end',
-          backgroundColor: themes.light.bgColor.modalBG,
-        }}>
-        <View
-          style={{
-            backgroundColor: themes.light.bgColor.bgPrimary,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-            paddingTop: 10,
-            paddingBottom: 40,
-          }}>
-          <View style={{alignItems: 'center', marginBottom: 25}}>
-            <View
-              style={{
-                width: 40,
-                height: 5,
-                borderRadius: 4,
-                backgroundColor: themes.light.boxColor.modalBar,
-              }}
-            />
-          </View>
-
-          <View
-            style={{
-              paddingHorizontal: 20,
-              gap: 30,
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                fontSize: FontSizes.title.default,
-                fontFamily: 'KimjungchulGothic-Bold',
-                color: themes.light.textColor.textPrimary,
-              }}>
-              특징 검색
-            </Text>
-
-            <View style={{gap: 30}}>
-              {renderFilterSection('색상', 'color', filterOptions.color)}
-              {renderFilterSection('모양', 'shape', filterOptions.shape)}
-              {renderFilterSection(
-                '제형',
-                'dosageForm',
-                filterOptions.dosageForm,
-              )}
-              {renderFilterSection('분할선', 'split', filterOptions.split)}
-            </View>
-            <Button title="적용하기" onPress={applyFilters} />
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-
   const handleSearchBarPress = () => {
     navigation.navigate('SearchMedicine');
   };
@@ -414,7 +291,20 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         getFilterButtonText={getFilterButtonText}
         renderFilterButtonIcon={renderFilterButtonIcon}
       />
-      {renderIntegratedFilterModal()}
+      {['color', 'shape', 'dosageForm', 'split'].map(type => (
+        <FilterModal
+          key={type}
+          visible={filterModalVisible === type}
+          onClose={() => setFilterModalVisible(false)}
+          filterType={type}
+          filterOptions={filterOptions}
+          tempFilters={tempFilters}
+          handleFilterChange={handleFilterChange}
+          applyFilters={applyFilters}
+          renderFilterButtonIcon={renderFilterButtonIcon}
+          colorCodes={colorCodes}
+        />
+      ))}
       <SearchResultContainer>
         {searchResults.length > 0 ? (
           <SearchResultsList
