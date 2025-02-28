@@ -6,6 +6,7 @@ import {Button} from './../../components';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import SearchResultsList from './../../components/SearchResult/SearchResultsList'; // Import SearchResultsList
+import NoSearchResults from '../../components/SearchResult/NoSearchResults';
 
 const {chevron: ChevronIcon} = HeaderIcons;
 const {chevronDown: ChevronDownIcon, delete: Delete} = OtherIcons;
@@ -529,12 +530,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
             handleSearchResultPress={handleSearchResultPress}
           />
         ) : (
-          <NoResultsContainer>
-            <NoResultsText>검색 결과가 없습니다.</NoResultsText>
-            <NoResultsSubText>
-              검색어를 다시 한 번{'\n'}확인해 주세요.
-            </NoResultsSubText>
-          </NoResultsContainer>
+          <NoSearchResults />
         )}
       </SearchResultContainer>
     </Container>
@@ -589,69 +585,6 @@ const SearchResultContainer = styled.View`
   flex: 1;
   margin-top: 10px;
   background-color: ${themes.light.bgColor.bgPrimary};
-`;
-
-const SearchResultItem = styled(TouchableOpacity)`
-  height: 74.67px;
-  flex-direction: row;
-  align-items: center;
-  margin: 0 15px 25px 15px;
-`;
-
-const ImageContainer = styled.View`
-  width: 140px;
-  height: 74.67px;
-  margin-right: 15px;
-  border-radius: 10px;
-`;
-
-const MedicineImage = styled.Image`
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
-`;
-
-const InfoContainer = styled.View`
-  height: 100%;
-  gap: 7px;
-  justify-content: center;
-`;
-
-const ManufacturerText = styled.Text`
-  font-size: 13px;
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.Primary50};
-`;
-
-const MedicineNameText = styled.Text`
-  font-size: 17px;
-  font-family: 'Pretendard-Bold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const TypeContainer = styled.View`
-  flex-direction: row;
-  gap: 11px;
-`;
-
-const NoResultsContainer = styled.View`
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-`;
-
-const NoResultsText = styled.Text`
-  font-size: 18px;
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const NoResultsSubText = styled.Text`
-  font-size: 14px;
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.Primary30};
-  margin-top: 18px;
-  text-align: center;
 `;
 
 const FeatureSearchContainer = styled.View`
