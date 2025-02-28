@@ -7,6 +7,7 @@ import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import SearchResultsList from './../../components/SearchResult/SearchResultsList'; // Import SearchResultsList
 import NoSearchResults from '../../components/SearchResult/NoSearchResults';
+import SearchScreenHeader from '../../components/SearchResult/SearchScreenHeader';
 
 const {chevron: ChevronIcon} = HeaderIcons;
 const {chevronDown: ChevronDownIcon, delete: Delete} = OtherIcons;
@@ -399,130 +400,21 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
   return (
     <Container>
-      <HeaderContainer>
-        <ChevronAndSearchContainer>
-          <ChevronIconButton onPress={() => navigation.goBack()}>
-            <ChevronIcon
-              height={17}
-              width={17}
-              style={{color: themes.light.textColor.textPrimary}}
-            />
-          </ChevronIconButton>
-          <SearchBarTouchable onPress={handleSearchBarPress}>
-            <SearchQueryText>{searchQuery}</SearchQueryText>
-            <SearchIconContainer>
-              <OtherIcons.search
-                width={17.5}
-                height={17.5}
-                style={{color: themes.light.textColor.Primary20}}
-              />
-            </SearchIconContainer>
-          </SearchBarTouchable>
-        </ChevronAndSearchContainer>
-
-        {searchResults.length > 0 && (
-          <FeatureSearchContainer>
-            <FeatureSearchText>특징 검색</FeatureSearchText>
-            <ScrollableFilterContainer
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}>
-              <FilterButton
-                onPress={openFilterModal}
-                selected={selectedColors.length > 0}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  {renderFilterButtonIcon('color', selectedColors)}
-                  <FilterButtonText selected={selectedColors.length > 0}>
-                    {getFilterButtonText('color', selectedColors)}
-                  </FilterButtonText>
-                </View>
-                {selectedColors.length > 0 ? (
-                  <TouchableOpacity onPress={() => clearFilter('color')}>
-                    <Delete
-                      width={10}
-                      height={10}
-                      style={{color: themes.light.textColor.Primary30}}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <ChevronDownIcon
-                    style={{color: themes.light.textColor.Primary30}}
-                  />
-                )}
-              </FilterButton>
-
-              <FilterButton
-                onPress={openFilterModal}
-                selected={selectedShapes.length > 0}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  {renderFilterButtonIcon('shape', selectedShapes)}
-                  <FilterButtonText selected={selectedShapes.length > 0}>
-                    {getFilterButtonText('shape', selectedShapes)}
-                  </FilterButtonText>
-                </View>
-                {selectedShapes.length > 0 ? (
-                  <TouchableOpacity onPress={() => clearFilter('shape')}>
-                    <Delete
-                      width={10}
-                      height={10}
-                      style={{color: themes.light.textColor.Primary30}}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <ChevronDownIcon
-                    style={{color: themes.light.textColor.Primary30}}
-                  />
-                )}
-              </FilterButton>
-
-              <FilterButton
-                onPress={openFilterModal}
-                selected={selectedSizes.length > 0}>
-                <FilterButtonText selected={selectedSizes.length > 0}>
-                  {getFilterButtonText('size', selectedSizes)}
-                </FilterButtonText>
-                {selectedSizes.length > 0 ? (
-                  <TouchableOpacity onPress={() => clearFilter('size')}>
-                    <Delete
-                      width={10}
-                      height={10}
-                      style={{color: themes.light.textColor.Primary30}}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <ChevronDownIcon
-                    style={{color: themes.light.textColor.Primary30}}
-                  />
-                )}
-              </FilterButton>
-
-              <FilterButton
-                onPress={openFilterModal}
-                selected={selectedSplits.length > 0}>
-                <FilterButtonText selected={selectedSplits.length > 0}>
-                  {getFilterButtonText('split', selectedSplits)}
-                </FilterButtonText>
-                {selectedSplits.length > 0 ? (
-                  <TouchableOpacity onPress={() => clearFilter('split')}>
-                    <Delete
-                      width={10}
-                      height={10}
-                      style={{color: themes.light.textColor.Primary30}}
-                    />
-                  </TouchableOpacity>
-                ) : (
-                  <ChevronDownIcon
-                    style={{color: themes.light.textColor.Primary30}}
-                  />
-                )}
-              </FilterButton>
-            </ScrollableFilterContainer>
-          </FeatureSearchContainer>
-        )}
-
-        {/* 통합 필터 모달 렌더링 */}
-        {renderIntegratedFilterModal()}
-      </HeaderContainer>
-
+      <SearchScreenHeader
+        searchQuery={searchQuery}
+        onBackPress={() => navigation.goBack()}
+        onSearchPress={handleSearchBarPress}
+        onFilterPress={openFilterModal}
+        selectedColors={selectedColors}
+        selectedShapes={selectedShapes}
+        selectedSizes={selectedSizes}
+        selectedSplits={selectedSplits}
+        onClearFilter={clearFilter}
+        colorCodes={colorCodes}
+        getFilterButtonText={getFilterButtonText}
+        renderFilterButtonIcon={renderFilterButtonIcon}
+      />
+      {renderIntegratedFilterModal()}
       <SearchResultContainer>
         {searchResults.length > 0 ? (
           <SearchResultsList
