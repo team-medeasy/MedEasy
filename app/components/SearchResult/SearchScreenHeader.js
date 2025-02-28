@@ -3,7 +3,6 @@ import {TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
-import FontSizes from '../../../assets/fonts/fontSizes';
 import FilterButton from './FilterButton';
 
 const {chevron: ChevronIcon} = HeaderIcons;
@@ -15,7 +14,7 @@ const SearchScreenHeader = ({
   onFilterPress,
   selectedColors,
   selectedShapes,
-  selectedSizes,
+  selectedDosageForms,
   selectedSplits,
   onClearFilter,
   colorCodes,
@@ -69,8 +68,8 @@ const SearchScreenHeader = ({
               colorCodes={colorCodes}
             />
             <FilterButton
-              type="size"
-              selectedItems={selectedSizes}
+              type="dosageForm"
+              selectedItems={selectedDosageForms}
               onFilterPress={onFilterPress}
               onClearFilter={onClearFilter}
               getFilterButtonText={getFilterButtonText}
