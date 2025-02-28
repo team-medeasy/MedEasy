@@ -4,9 +4,9 @@ import styled from 'styled-components/native';
 import {themes} from './../../styles';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import FilterButton from './FilterButton';
 
 const {chevron: ChevronIcon} = HeaderIcons;
-const {chevronDown: ChevronDownIcon, delete: Delete} = OtherIcons;
 
 const SearchScreenHeader = ({
   searchQuery,
@@ -51,94 +51,41 @@ const SearchScreenHeader = ({
             horizontal={true}
             showsHorizontalScrollIndicator={false}>
             <FilterButton
-              onPress={onFilterPress}
-              selected={selectedColors.length > 0}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                {renderFilterButtonIcon('color', selectedColors, colorCodes)}
-                <FilterButtonText selected={selectedColors.length > 0}>
-                  {getFilterButtonText('color', selectedColors)}
-                </FilterButtonText>
-              </View>
-              {selectedColors.length > 0 ? (
-                <TouchableOpacity onPress={() => onClearFilter('color')}>
-                  <Delete
-                    width={10}
-                    height={10}
-                    style={{color: themes.light.textColor.Primary30}}
-                  />
-                </TouchableOpacity>
-              ) : (
-                <ChevronDownIcon
-                  style={{color: themes.light.textColor.Primary30}}
-                />
-              )}
-            </FilterButton>
-
+              type="color"
+              selectedItems={selectedColors}
+              onFilterPress={onFilterPress}
+              onClearFilter={onClearFilter}
+              getFilterButtonText={getFilterButtonText}
+              renderFilterButtonIcon={renderFilterButtonIcon}
+              colorCodes={colorCodes}
+            />
             <FilterButton
-              onPress={onFilterPress}
-              selected={selectedShapes.length > 0}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                {renderFilterButtonIcon('shape', selectedShapes, colorCodes)}
-                <FilterButtonText selected={selectedShapes.length > 0}>
-                  {getFilterButtonText('shape', selectedShapes)}
-                </FilterButtonText>
-              </View>
-              {selectedShapes.length > 0 ? (
-                <TouchableOpacity onPress={() => onClearFilter('shape')}>
-                  <Delete
-                    width={10}
-                    height={10}
-                    style={{color: themes.light.textColor.Primary30}}
-                  />
-                </TouchableOpacity>
-              ) : (
-                <ChevronDownIcon
-                  style={{color: themes.light.textColor.Primary30}}
-                />
-              )}
-            </FilterButton>
-
+              type="shape"
+              selectedItems={selectedShapes}
+              onFilterPress={onFilterPress}
+              onClearFilter={onClearFilter}
+              getFilterButtonText={getFilterButtonText}
+              renderFilterButtonIcon={renderFilterButtonIcon}
+              colorCodes={colorCodes}
+            />
             <FilterButton
-              onPress={onFilterPress}
-              selected={selectedSizes.length > 0}>
-              <FilterButtonText selected={selectedSizes.length > 0}>
-                {getFilterButtonText('size', selectedSizes)}
-              </FilterButtonText>
-              {selectedSizes.length > 0 ? (
-                <TouchableOpacity onPress={() => onClearFilter('size')}>
-                  <Delete
-                    width={10}
-                    height={10}
-                    style={{color: themes.light.textColor.Primary30}}
-                  />
-                </TouchableOpacity>
-              ) : (
-                <ChevronDownIcon
-                  style={{color: themes.light.textColor.Primary30}}
-                />
-              )}
-            </FilterButton>
-
+              type="size"
+              selectedItems={selectedSizes}
+              onFilterPress={onFilterPress}
+              onClearFilter={onClearFilter}
+              getFilterButtonText={getFilterButtonText}
+              renderFilterButtonIcon={renderFilterButtonIcon}
+              colorCodes={colorCodes}
+            />
             <FilterButton
-              onPress={onFilterPress}
-              selected={selectedSplits.length > 0}>
-              <FilterButtonText selected={selectedSplits.length > 0}>
-                {getFilterButtonText('split', selectedSplits)}
-              </FilterButtonText>
-              {selectedSplits.length > 0 ? (
-                <TouchableOpacity onPress={() => onClearFilter('split')}>
-                  <Delete
-                    width={10}
-                    height={10}
-                    style={{color: themes.light.textColor.Primary30}}
-                  />
-                </TouchableOpacity>
-              ) : (
-                <ChevronDownIcon
-                  style={{color: themes.light.textColor.Primary30}}
-                />
-              )}
-            </FilterButton>
+              type="split"
+              selectedItems={selectedSplits}
+              onFilterPress={onFilterPress}
+              onClearFilter={onClearFilter}
+              getFilterButtonText={getFilterButtonText}
+              renderFilterButtonIcon={renderFilterButtonIcon}
+              colorCodes={colorCodes}
+            />
           </ScrollableFilterContainer>
         </FeatureSearchContainer>
       )}
@@ -199,28 +146,6 @@ const FeatureSearchText = styled.Text`
 
 const ScrollableFilterContainer = styled.ScrollView`
   flex-direction: row;
-`;
-
-const FilterButton = styled(TouchableOpacity)`
-  border-color: ${props =>
-    props.selected
-      ? themes.light.pointColor.primary30
-      : themes.light.boxColor.inputSecondary};
-  flex-direction: row;
-  border-width: 1.5px;
-  padding: 6px 9px 6px 11px;
-  border-radius: 40px;
-  margin-right: 10px;
-  align-items: center;
-  background-color: ${props =>
-    props.selected ? themes.light.pointColor.Primary10 : 'transparent'};
-`;
-
-const FilterButtonText = styled.Text`
-  font-size: ${FontSizes.body.default};
-  margin-right: 6px;
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.textPrimary};
 `;
 
 export default SearchScreenHeader;
