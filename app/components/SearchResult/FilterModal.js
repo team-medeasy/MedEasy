@@ -4,6 +4,14 @@ import styled from 'styled-components/native';
 import {Button} from './../../components';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {PillsIcon} from '../../../assets/icons';
+
+const pillIcons = {
+  정제: PillsIcon.tablet,
+  경질캡슐: PillsIcon.hard_capsule,
+  연질캡슐: PillsIcon.soft_capsule,
+  '그 외': PillsIcon.etc,
+};
 
 const FilterModal = ({
   visible,
@@ -36,43 +44,61 @@ const FilterModal = ({
               : '분할선 선택'}
           </Title>
 
-          <FilterOptionsContainer>
+          <FilterOptionsContainer isDosageForm={filterType === 'dosageForm'}>
             {filterOptions[filterType].map((option, index) => (
               <FilterOptionButton
                 key={index}
                 selected={tempFilters[filterType].includes(option)}
+                isDosageForm={filterType === 'dosageForm'}
                 onPress={() => handleFilterChange(filterType, option)}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  {filterType === 'color' && (
-                    <View
-                      style={{
-                        width: 14,
-                        height: 14,
-                        borderRadius: 7,
-                        backgroundColor: colorCodes[option],
-                        borderWidth: 1.5,
-                        borderColor: themes.light.borderColor.borderCircle,
-                        marginRight: 7,
-                      }}
-                    />
-                  )}
-                  {filterType === 'shape' && (
-                    <View
-                      style={{
-                        width: 14,
-                        height: 14,
-                        borderRadius: 7,
-                        borderWidth: 1.5,
-                        borderColor: themes.light.textColor.Primary50,
-                        marginRight: 7,
-                      }}
-                    />
-                  )}
-                  <FilterOptionText
-                    selected={tempFilters[filterType].includes(option)}>
-                    {option}
-                  </FilterOptionText>
-                </View>
+                {filterType === 'dosageForm' ? (
+                  // 제형 선택 시
+                  <>
+                    {pillIcons[option] &&
+                      React.createElement(pillIcons[option], {
+                        width: 77,
+                        height: 50,
+                      })}
+
+                    <FilterOptionText
+                      selected={tempFilters[filterType].includes(option)}>
+                      {option}
+                    </FilterOptionText>
+                  </>
+                ) : (
+                  // 색상, 모양, 분할선 선택 시
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    {filterType === 'color' && (
+                      <View
+                        style={{
+                          width: 14,
+                          height: 14,
+                          borderRadius: 7,
+                          backgroundColor: colorCodes[option],
+                          borderWidth: 1.5,
+                          borderColor: themes.light.borderColor.borderCircle,
+                          marginRight: 7,
+                        }}
+                      />
+                    )}
+                    {filterType === 'shape' && (
+                      <View
+                        style={{
+                          width: 14,
+                          height: 14,
+                          borderRadius: 7,
+                          borderWidth: 1.5,
+                          borderColor: themes.light.textColor.Primary50,
+                          marginRight: 7,
+                        }}
+                      />
+                    )}
+                    <FilterOptionText
+                      selected={tempFilters[filterType].includes(option)}>
+                      {option}
+                    </FilterOptionText>
+                  </View>
+                )}
               </FilterOptionButton>
             ))}
           </FilterOptionsContainer>
@@ -118,10 +144,15 @@ const Title = styled.Text`
 
 const FilterOptionsContainer = styled.View`
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: ${({isDosageForm}) =>
+    isDosageForm ? 'wrap' : 'wrap'}; /* 무조건 줄바꿈 허용 */
   gap: 10px;
   margin-bottom: 30px;
   align-self: flex-start;
+  width: 100%;
+  align-items: ${({isDosageForm}) => (isDosageForm ? 'center' : 'flex-start')};
+  justify-content: ${({isDosageForm}) =>
+    isDosageForm ? 'space-between' : 'flex-start'};
 `;
 
 const FilterOptionButton = styled.TouchableOpacity`
@@ -131,8 +162,13 @@ const FilterOptionButton = styled.TouchableOpacity`
       : themes.light.boxColor.inputPrimary};
   padding: 8px 16px;
   border-radius: 5px;
-  flex-direction: row;
   align-items: center;
+  justify-content: center;
+  width: ${({isDosageForm}) =>
+    isDosageForm ? '48%' : 'auto'}; /* 한 줄에 두 개 배치 */
+  height: ${({isDosageForm}) => (isDosageForm ? '110px' : 'auto')};
+  flex-direction: column;
+  margin-bottom: 10px; /* 줄 간격 추가 */
 `;
 
 const FilterOptionText = styled.Text`
