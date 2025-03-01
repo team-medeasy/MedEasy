@@ -326,7 +326,7 @@ const Container = styled.View`
 
 const SearchResultContainer = styled.View`
   flex: 1;
-  margin-top: 10px;
+  margin-top: 16px;
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
