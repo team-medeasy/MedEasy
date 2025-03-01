@@ -35,7 +35,7 @@ const MessageInput = ({inputText, setInputText, sendMessage}) => {
         <MikeIcon
           width={17}
           height={20}
-          style={{color: themes.light.textColor.Primary}}
+          style={{color: themes.light.textColor.textPrimary}}
         />
       </MikeIconContainer>
     </InputContainer>
@@ -89,8 +89,11 @@ const Input = styled(TextInput)`
   flex: 1;
   padding-left: 15px;
   padding-right: 10px;
-  font-size: 16px;
+  font-size: 15px;
   max-height: 100px;
+  font-family: 'Pretendard-semiBold';
+  padding-top: 5px; 
+  padding-bottom: 5px;
 `;
 
 const SendButton = styled(TouchableOpacity)`
