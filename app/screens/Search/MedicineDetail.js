@@ -10,8 +10,7 @@ import {
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
 import {RoutineIcons} from './../../../assets/icons';
-import {Footer, Tag} from './../../components';
-import {Header} from '../../components/\bHeader/Header';
+import {Footer, Tag, Header, MedicineAppearance, Button} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {heartOff: HeartOffIcon, heartOn: HeartOnIcon} = RoutineIcons;
@@ -186,22 +185,7 @@ const MedicineDetailScreen = ({navigation}) => {
 
         <MedicineDetailContainer>
           <MedicineAppearanceContainer>
-            <View
-              style={{
-                backgroundColor: themes.light.boxColor.inputPrimary,
-                padding: 10,
-                gap: 8,
-                borderRadius: 10,
-              }}>
-              <Appearance label={'표시(앞) '} value={medicine.print_front} />
-              <Appearance label={'표시(뒤) '} value={medicine.print_back} />
-              <Appearance label={'모양       '} value={medicine.drug_shape} />
-              <Appearance label={'색상       '} value={medicine.color_class1} />
-              <Appearance
-                label={'크기       '}
-                value={`${medicine.leng_long} X ${medicine.leng_short} X ${medicine.thick} (mm)`}
-              />
-            </View>
+              <MedicineAppearance item={medicine}/>
           </MedicineAppearanceContainer>
 
           <MedicineUsageContainer>
@@ -255,6 +239,18 @@ const MedicineDetailScreen = ({navigation}) => {
         </MedicineDetailContainer>
         <Footer />
       </ScrollView>
+
+      <View style={{
+        position: 'absolute',
+        bottom: 0, left: 0, right: 0,
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingBottom: 30,
+        alignItems: 'center',
+      }}>
+        <Button title='루틴 추가하기' onPress={() => {}}></Button>
+      </View>
+
     </Container>
   );
 };
@@ -292,27 +288,6 @@ const SimilarMedicinesContainer = styled.View`
   padding: 30px 0;
   gap: 30px;
 `;
-
-const Appearance = ({label, value}) => (
-  <View style={{flexDirection: 'row', gap: 18}}>
-    <Text
-      style={{
-        color: themes.light.textColor.Primary50,
-        fontFamily: 'Pretendard-Medium',
-        fontSize: FontSizes.caption.default,
-      }}>
-      {label}
-    </Text>
-    <Text
-      style={{
-        color: themes.light.pointColor.Primary,
-        fontFamily: 'Pretendard-Bold',
-        fontSize: FontSizes.caption.default,
-      }}>
-      {value}
-    </Text>
-  </View>
-);
 
 const Usage = ({label, value, borderBottomWidth = 1}) => (
   <View
