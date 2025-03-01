@@ -54,10 +54,6 @@ const AddHospitalVisit = () => {
         <Button
           title="루틴 추가하기"
           onPress={handleAdd}
-          bgColor={themes.light.boxColor.buttonPrimary}
-          width="100%"
-          height="60px"
-          fontSize="18px"
         />
       </BtnContainer>
     </Container>
