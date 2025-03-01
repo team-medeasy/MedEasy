@@ -254,16 +254,35 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     return null;
   };
 
+  // 개별 필터 초기화
   const clearFilter = type => {
     if (type === 'color') {
       setSelectedColors([]);
+      setTempFilters(prev => ({ ...prev, color: [] }));
     } else if (type === 'shape') {
       setSelectedShapes([]);
+      setTempFilters(prev => ({ ...prev, shape: [] }));
     } else if (type === 'dosageForm') {
       setSelectedDosageForms([]);
+      setTempFilters(prev => ({ ...prev, dosageForm: [] }));
     } else if (type === 'split') {
       setSelectedSplits([]);
+      setTempFilters(prev => ({ ...prev, split: [] }));
     }
+  };
+
+  // 모든 필터 초기화
+  const clearAllFilters = () => {
+    setSelectedColors([]);
+    setSelectedShapes([]);
+    setSelectedDosageForms([]);
+    setSelectedSplits([]);
+    setTempFilters({
+      color: [],
+      shape: [],
+      dosageForm: [],
+      split: [],
+    });
   };
 
   const handleSearchBarPress = () => {
