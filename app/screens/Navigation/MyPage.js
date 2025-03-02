@@ -6,6 +6,7 @@ import {LogoIcons, CameraIcons} from './../../../assets/icons';
 import {Footer} from '../../components';
 import MedicationInfo from '../../components/MedicationInfo';
 import SettingList from '../../components/SettingList';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const MyPage = () => {
   return (
@@ -89,18 +90,19 @@ const TextContainer = styled.View`
   justify-content: center;
   padding: 20px;
   position: relative;
+  gap: 9px;
 `;
 
 const UserText = styled.Text`
-  font-size: 22px;
+  font-size: ${FontSizes.title.default};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
 `;
 
 const SmallText = styled.Text`
-  font-size: 14px;
+  font-size: ${FontSizes.body.default};
   font-family: 'KimjungchulGothic-Regular';
-  color: ${themes.light.textColor.buttonText};
+  color: ${themes.light.textColor.buttonText60};
 `;
 
 const EditProfile = styled.View`
