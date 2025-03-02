@@ -3,74 +3,9 @@ import {SafeAreaView, Text} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, pointColor, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
+import {LogoIcons} from './../../../assets/icons';
+const {logo: LogoIcon} = LogoIcons;
 
-const Container = styled(SafeAreaView)`
-  flex: 1;
-  background-color: ${themes.light.bgColor.bgPrimary};
-`;
-
-const Container1 = styled.View`
-  justify-content: center;
-  margin-top: 78px;
-  margin-left: 30px;
-`;
-
-const Container2 = styled.View`
-  margin-left: 25px;
-  margin-right: 25px;
-  margin-top: 37px;
-`;
-
-const Container3 = styled.View`
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  margin-left: 25px;
-  margin-right: 25px;
-  margin-top: 10px;
-`;
-
-const InputContainer = styled.View`
-  width: 100%;
-  margin-top: ${props => props.marginTop || '0px'};
-  margin-bottom: ${props => props.marginBottom || '0px'};
-`;
-
-const BtnContainer = styled.View`
-  margin-top: auto;
-  padding-left: 20px;
-  padding-right: 20px;
-`;
-
-const GenderContainer = styled.View`
-  flex: 1;
-  margin-left: ${props => props.marginLeft || '0px'};
-  margin-right: ${props => props.marginRight || '0px'};
-`;
-
-const TextInput = styled.TextInput`
-  height: 60px;
-  border-radius: 10px;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  padding: 20px;
-  font-size: 16px;
-`;
-
-const GenderBtn = styled.TouchableOpacity`
-  height: 150px;
-  background-color: ${props =>
-    props.selected
-      ? pointColor.pointPrimary
-      : themes.light.boxColor.inputPrimary};
-  border-radius: 15px;
-`;
-
-const GenderText = styled.Text`
-  color: ${props => (props.selected ? '#fff' : '#000')};
-  font-size: 22px;
-  font-weight: bold;
-  margin: 20px;
-`;
 
 const SignUpDOBGenderScreen = ({navigation, route}) => {
   const {firstName} = route.params;
@@ -266,21 +201,18 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
       </Container2>
 
       <Container3>
-        <GenderContainer marginRight="10px">
-          <GenderBtn
-            selected={gender === 'male'}
-            onPress={() => setGender('male')}>
-            <GenderText selected={gender === 'male'}>남자</GenderText>
-          </GenderBtn>
-        </GenderContainer>
-        <GenderContainer marginLeft="10px">
-          <GenderBtn
-            selected={gender === 'female'}
-            onPress={() => setGender('female')}>
-            <GenderText selected={gender === 'female'}>여자</GenderText>
-          </GenderBtn>
-        </GenderContainer>
+        <GenderOption 
+          type="male"
+          selected={gender === 'male'}
+          onSelect={setGender}
+        />
+        <GenderOption 
+          type="female"
+          selected={gender === 'female'}
+          onSelect={setGender}
+        />
       </Container3>
+
       <BtnContainer>
         <BackAndNextButtons
           nextTitle="메디지 시작하기"
@@ -291,5 +223,93 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
     </Container>
   );
 };
+
+const GenderOption = ({ type, selected, onSelect }) => (
+    <GenderBtn selected={selected} onPress={() => onSelect(type)}>
+      <GenderText selected={selected}>
+        {type === 'male' ? '남자' : '여자'}
+      </GenderText>
+      <LogoIcon   
+        height={87}
+        width={59}
+        style={{
+          color: selected 
+          ? themes.light.textColor.buttonText10
+          : themes.light.textColor.Primary6,
+          transform: [{rotate: '10deg'}],
+          position: 'absolute',
+          bottom: -5,
+          right: 25,
+        }}
+      />
+    </GenderBtn>
+);
+
+const Container = styled(SafeAreaView)`
+  flex: 1;
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
+
+const Container1 = styled.View`
+  justify-content: center;
+  margin-top: 78px;
+  margin-left: 30px;
+`;
+
+const Container2 = styled.View`
+  margin-left: 25px;
+  margin-right: 25px;
+  margin-top: 37px;
+`;
+
+const Container3 = styled.View`
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  margin-left: 25px;
+  margin-right: 25px;
+  margin-top: 10px;
+  gap: 15px;
+`;
+
+const InputContainer = styled.View`
+  width: 100%;
+  margin-top: ${props => props.marginTop || '0px'};
+  margin-bottom: ${props => props.marginBottom || '0px'};
+`;
+
+const BtnContainer = styled.View`
+  margin-top: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+`;
+
+const TextInput = styled.TextInput`
+  height: 60px;
+  border-radius: 10px;
+  background-color: ${themes.light.boxColor.inputPrimary};
+  padding: 20px;
+  font-size: 16px;
+`;
+
+const GenderBtn = styled.TouchableOpacity`
+  flex: 1 0 0;
+  height: 150px;
+  background-color: ${props =>
+    props.selected
+      ? pointColor.pointPrimary
+      : themes.light.boxColor.inputPrimary};
+  border-radius: 15px;
+  padding: 20px;
+  overflow: hidden;
+`;
+
+const GenderText = styled.Text`
+  color: ${props => props.selected 
+    ? themes.light.textColor.buttonText 
+    : themes.light.textColor.textPrimary};
+  font-size: 22px;
+  font-weight: bold;
+`;
 
 export default SignUpDOBGenderScreen;
