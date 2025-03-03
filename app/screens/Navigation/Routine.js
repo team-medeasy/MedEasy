@@ -18,6 +18,7 @@ import {
   getWeekDays,
   getRelativeDayText
 } from '../../../assets/data/data';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Routine = () => {
   const today = dayjs();
@@ -241,8 +242,8 @@ const Header = styled.View`
 `;
 
 const HeaderText = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
+  font-size: ${FontSizes.title.default};
+  font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
   padding-left: 10px;
 `;
@@ -258,7 +259,7 @@ const ReturnButton = styled.TouchableOpacity`
 `;
 
 const ButtonText = styled.Text`
-  font-size: 12px;
+  font-size: ${FontSizes.caption.default};
   font-family: 'Pretendart-Regular';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -283,13 +284,13 @@ const DayBox = styled.TouchableOpacity`
 `;
 
 const DayText = styled.Text`
-  font-size: 12px;
+  font-size: ${FontSizes.caption.default};
   font-family: 'Pretendard-Regular';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const DateText = styled.Text`
-  font-size: 18px;
+  font-size: ${FontSizes.heading.default};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -306,13 +307,13 @@ const TodayContainer = styled.View`
 `;
 
 const TodayText = styled.Text`
-  font-size: 22px;
+  font-size: ${FontSizes.title.default};
   font-family: 'Pretendard-ExtraBold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const TodayDate = styled.Text`
-  font-size: 22px;
+  font-size: ${FontSizes.title.default};
   font-family: 'Pretendard-ExtraBold';
   color: ${themes.light.textColor.Primary30};
 `;
@@ -336,7 +337,7 @@ const TimeContainer = styled.View`
   align-items: center;
 `;
 
-// 병원 루틴용 컨테이너 - border가 없는 버전
+// 병원 루틴용 컨테이너
 const HospitalTimeContainer = styled.View`
   flex-direction: row;
   padding: 20px 0px;
@@ -350,12 +351,12 @@ const IconContainer = styled.View`
 const TextContainer = styled.View``;
 
 const TypeText = styled.Text`
-  font-size: 18px;
+  font-size: ${FontSizes.heading.default};
   font-family: 'Pretendard-ExtraBold';
 `;
 
 const TimeText = styled.Text`
-  font-size: 15px;  
+  font-size: ${FontSizes.body.default};  
   font-family: 'Pretendard-Regular';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -376,7 +377,7 @@ const CheckBox = styled.TouchableOpacity`
 const Routines = styled.View``;
 
 const MedicineText = styled.Text`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Regular';
   padding: 20px;
 `;
