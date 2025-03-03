@@ -113,7 +113,7 @@ const ProfileAddButton = styled.TouchableOpacity`
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background-color: ${themes.light.bgColor.protileIcon};
+  background-color: ${themes.light.bgColor.profileIcon};
   justify-content: center;
   align-items: center;
   position: relative;
