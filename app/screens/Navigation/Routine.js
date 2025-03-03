@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { ScrollView } from 'react-native';
+import { ScrollView, Dimensions, FlatList } from 'react-native';
 import styled from 'styled-components/native';
 import { Platform } from 'react-native';
 import { OtherIcons } from '../../../assets/icons';
@@ -9,10 +9,10 @@ import dayjs from 'dayjs';
 import { RoutineIcons } from '../../../assets/icons';
 
 // data.js에서 데이터 import
-import { 
-  timeMapping, 
-  getTimeValue, 
-  initialMedicineRoutines, 
+import {
+  timeMapping,
+  getTimeValue,
+  initialMedicineRoutines,
   initialHospitalRoutines,
   weekDays,
   getWeekDays,
@@ -20,8 +20,42 @@ import {
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
+const { width } = Dimensions.get('window');
+const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
+
 const Routine = () => {
   const today = dayjs();
+  const flatListRef = useRef(null);
+
+  // 현재 주차를 중심으로 이전 4주, 이후 4주까지 총 9주 데이터 생성
+  const generateWeeks = (centerDate) => {
+    const weeks = [];
+
+    // 이전 4주
+    for (let i = -4; i <= 4; i++) {
+      const startOfWeek = centerDate.startOf('week').add(i * 7, 'day');
+      const weekData = [];
+
+      for (let j = 0; j < 7; j++) {
+        const currentDate = startOfWeek.add(j, 'day');
+        weekData.push({
+          day: weekDays[currentDate.day()],
+          date: currentDate.date(),
+          month: currentDate.month() + 1,
+          year: currentDate.year(),
+          fullDate: currentDate,
+          isToday: currentDate.format('YYYY-MM-DD') === today.format('YYYY-MM-DD')
+        });
+      }
+
+      weeks.push(weekData);
+    }
+
+    return weeks;
+  };
+
+  const [weeks, setWeeks] = useState(() => generateWeeks(today));
+  const [currentPage, setCurrentPage] = useState(4); // 현재 주차 인덱스 (중앙 = 4)
 
   const [selectedDate, setSelectedDate] = useState({
     day: weekDays[today.day()],
@@ -40,10 +74,16 @@ const Routine = () => {
         year: today.year(),
         fullDate: today
       });
+
+      // 오늘 날짜가 있는 페이지로 스크롤
+      if (flatListRef.current) {
+        flatListRef.current.scrollToIndex({
+          index: 4,
+          animated: true
+        });
+      }
     }, [])
   );
-
-  const currentWeek = getWeekDays();
 
   const [checkedItems, setCheckedItems] = useState({});
 
@@ -88,13 +128,13 @@ const Routine = () => {
   const getAllRoutinesByTime = () => {
     // 오늘 날짜에 해당하는 약 복용 아이템 생성
     const todayMedicineItems = [];
-    
+
     Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
-      const medicinesForTime = medicineRoutines.filter(medicine => 
-        medicine.types.includes(timeKey) && 
+      const medicinesForTime = medicineRoutines.filter(medicine =>
+        medicine.types.includes(timeKey) &&
         medicine.day_of_weeks.includes(selectedDate.fullDate.day() + 1)
       );
-      
+
       if (medicinesForTime.length > 0) {
         todayMedicineItems.push({
           id: `medicine-${timeKey}`,
@@ -107,7 +147,7 @@ const Routine = () => {
         });
       }
     });
-    
+
     // 오늘 날짜에 해당하는 병원 방문 아이템 생성
     const todayHospitalItems = hospitalRoutines
       .filter(hospital => hospital.day_of_weeks.includes(selectedDate.fullDate.day() + 1))
@@ -119,13 +159,59 @@ const Routine = () => {
         type: 'hospital',
         hospital
       }));
-    
+
     // 모든 아이템 합치고 시간순 정렬
     return [...todayMedicineItems, ...todayHospitalItems]
       .sort((a, b) => a.sortValue - b.sortValue);
   };
 
   const allRoutines = getAllRoutinesByTime();
+
+  // 페이지 변경 처리
+  const onPageChange = (index) => {
+    setCurrentPage(index);
+  };
+
+  // 페이지 변경 감지
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    if (viewableItems.length > 0) {
+      setCurrentPage(viewableItems[0].index);
+    }
+  }).current;
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50
+  }).current;
+
+  // 에러 방지를 위한 스크롤 인덱스 처리 함수
+  const handleScrollToIndexFailed = (info) => {
+    const wait = new Promise(resolve => setTimeout(resolve, 500));
+    wait.then(() => {
+      if (flatListRef.current) {
+        flatListRef.current.scrollToIndex({ index: info.index, animated: true });
+      }
+    });
+  };
+
+  // 각 주차를 렌더링하는 함수
+  const renderWeek = ({ item, index }) => (
+    <WeekContainer>
+      {item.map((dayInfo, dayIndex) => (
+        <DayBox
+          key={dayIndex}
+          isToday={dayInfo.isToday}
+          isSelected={
+            selectedDate.date === dayInfo.date &&
+            selectedDate.month === dayInfo.month &&
+            selectedDate.year === dayInfo.year
+          }
+          onPress={() => setSelectedDate(dayInfo)}>
+          <DayText>{dayInfo.day}</DayText>
+          <DateText isToday={dayInfo.isToday}>{dayInfo.date}</DateText>
+        </DayBox>
+      ))}
+    </WeekContainer>
+  );
 
   return (
     <Container>
@@ -136,25 +222,31 @@ const Routine = () => {
           <ButtonText>돌아가기</ButtonText>
         </ReturnButton>
       </Header>
-      <DayContainer>
-        {currentWeek.map((dayInfo, index) => (
-          <DayBox
-            key={index}
-            isToday={dayInfo.isToday}
-            isSelected={selectedDate.date === dayInfo.date && selectedDate.month === dayInfo.month && selectedDate.year === dayInfo.year}
-            onPress={() => setSelectedDate(dayInfo)}>
-            <DayText>{dayInfo.day}</DayText>
-            <DateText isToday={dayInfo.isToday}>{dayInfo.date}</DateText>
-          </DayBox>
-        ))}
-      </DayContainer>
+
+      {/* 페이징 가능한 DayContainer */}
+      <DayContainerWrapper>
+        <FlatList
+          ref={flatListRef}
+          data={weeks}
+          renderItem={renderWeek}
+          keyExtractor={(_, index) => `week-${index}`}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          initialScrollIndex={4} // 현재 주차로 초기 스크롤
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
+          onScrollToIndexFailed={handleScrollToIndexFailed}
+        />
+      </DayContainerWrapper>
+
       <ScrollView>
         <ScheduleContainer>
           <TodayContainer>
             <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
             <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
           </TodayContainer>
-          
+
           {/* 모든 루틴을 시간순으로 렌더링 */}
           {allRoutines.map((routine) => (
             <RoutineContainer key={routine.id}>
@@ -168,7 +260,7 @@ const Routine = () => {
                     <TimeText>{routine.time}</TimeText>
                   </TextContainer>
                   <CheckBox onPress={() => toggleTimeCheck(routine.timeKey)}>
-                    {routine.medicines.every(medicine => 
+                    {routine.medicines.every(medicine =>
                       checkedItems[`medicine-${medicine.medicine_id}-${routine.timeKey}`]) ? (
                       <RoutineIcons.checkOn width={26} height={26} style={{ color: themes.light.pointColor.Primary }} />
                     ) : (
@@ -194,7 +286,7 @@ const Routine = () => {
                   </CheckBox>
                 </HospitalTimeContainer>
               )}
-              
+
               {/* 약 복용 루틴일 경우에만 약 목록 표시 */}
               {routine.type === 'medicine' && (
                 <Routines>
@@ -264,11 +356,16 @@ const ButtonText = styled.Text`
   color: ${themes.light.textColor.Primary50};
 `;
 
-const DayContainer = styled.View`
+// 페이징을 위한 컨테이너
+const DayContainerWrapper = styled.View`
+`;
+
+// 주차 단위 컨테이너
+const WeekContainer = styled.View`
   flex-direction: row;
   justify-content: space-around;
-  padding: 30px 20px;
-  gap: 9px;
+  width: ${width}px;
+  padding: 20px 20px;
 `;
 
 const DayBox = styled.TouchableOpacity`
