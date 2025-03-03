@@ -6,31 +6,21 @@ import { Platform } from 'react-native';
 import { OtherIcons } from '../../../assets/icons';
 import { themes } from '../../styles';
 import dayjs from 'dayjs';
-
 import { RoutineIcons } from '../../../assets/icons';
 
-// 시간 매핑에 시간값 추가 (정렬을 위한 숫자값 포함)
-const timeMapping = {
-  MORNING: { label: '아침', time: '오전 8:00', sortValue: 800 },
-  LUNCH: { label: '점심', time: '오후 12:30', sortValue: 1230 },
-  DINNER: { label: '저녁', time: '오후 6:30', sortValue: 1830 },
-  BEDTIME: { label: '자기 전', time: '오후 10:00', sortValue: 2200 }
-};
-
-// 병원 시간을 숫자값으로 변환하는 함수
-const getTimeValue = (timeString) => {
-  if (!timeString) return 0;
-
-  const isPM = timeString.includes('오후');
-  let [hour, minute] = timeString.replace('오전 ', '').replace('오후 ', '').split(':').map(Number);
-
-  if (isPM && hour !== 12) hour += 12;
-  return hour * 100 + minute;
-};
+// data.js에서 데이터 import
+import { 
+  timeMapping, 
+  getTimeValue, 
+  initialMedicineRoutines, 
+  initialHospitalRoutines,
+  weekDays,
+  getWeekDays,
+  getRelativeDayText
+} from '../../../assets/data/data';
 
 const Routine = () => {
   const today = dayjs();
-  const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
   const [selectedDate, setSelectedDate] = useState({
     day: weekDays[today.day()],
@@ -52,31 +42,7 @@ const Routine = () => {
     }, [])
   );
 
-  const currentWeek = Array.from({ length: 7 }, (_, i) => {
-    const date = today.startOf('week').add(i, 'day');
-    return {
-      day: weekDays[date.day()],
-      date: date.date(),
-      month: date.month() + 1,
-      year: date.year(),
-      fullDate: date,
-      isToday: date.date() === today.date() &&
-        date.month() === today.month() &&
-        date.year() === today.year()
-    };
-  });
-
-  const getRelativeDayText = (selectedDate, today) => {
-    const selectedDateObj = dayjs(`${selectedDate.year}-${selectedDate.month}-${selectedDate.date}`);
-    const todayObj = dayjs(`${today.year()}-${today.month() + 1}-${today.date()}`);
-    const diff = selectedDateObj.diff(todayObj, 'day');
-
-    if (diff === 0) return '오늘';
-    if (diff === -1) return '어제';
-    if (diff === 1) return '내일';
-    if (diff === 2) return '모레';
-    return diff < 0 ? `${Math.abs(diff)}일 전` : `${diff}일 후`;
-  };
+  const currentWeek = getWeekDays();
 
   const [checkedItems, setCheckedItems] = useState({});
 
@@ -113,65 +79,21 @@ const Routine = () => {
     setCheckedItems(updatedChecks);
   };
 
-  //임시 약 데이터
-  const [medicineRoutines, setMedicineRoutines] = useState([
-    {
-      medicine_id: 3594,
-      nickname: '아스피린',
-      dose: 1,
-      total_quantity: 30,
-      day_of_weeks: [1, 2, 3],
-      types: ['MORNING', 'LUNCH', 'DINNER', 'BEDTIME']
-    },
-    {
-      medicine_id: 9876,
-      nickname: '타이레놀',
-      dose: 2,
-      total_quantity: 20,
-      day_of_weeks: [2, 4, 6],
-      types: ['MORNING', 'DINNER']
-    }
-  ]);
-
-  //임시 병원 데이터
-  const [hospitalRoutines, setHospitalRoutines] = useState([
-    {
-      hospital_id: 1001,
-      name: '한성대병원 외래 진료',
-      time: 'MORNING',
-      specific_time: '오전 10:30',
-      sortValue: 1030,
-      day_of_weeks: [1, 3, 5]
-    },
-    {
-      hospital_id: 1002,
-      name: '연세세브란스병원',
-      time: 'AFTERNOON',
-      specific_time: '오후 2:00',
-      sortValue: 1400,
-      day_of_weeks: [2, 4]
-    },
-    {
-      hospital_id: 1003,
-      name: '고려대학병원',
-      time: 'MORNING',
-      specific_time: '오전 11:00',
-      sortValue: 1100,
-      day_of_weeks: [3, 6]
-    }
-  ]);
+  // 임시 데이터 설정
+  const [medicineRoutines, setMedicineRoutines] = useState(initialMedicineRoutines);
+  const [hospitalRoutines, setHospitalRoutines] = useState(initialHospitalRoutines);
 
   // 모든 루틴 (약 복용 + 병원 방문)을 시간순으로 정렬
   const getAllRoutinesByTime = () => {
     // 오늘 날짜에 해당하는 약 복용 아이템 생성
     const todayMedicineItems = [];
-
+    
     Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
-      const medicinesForTime = medicineRoutines.filter(medicine =>
-        medicine.types.includes(timeKey) &&
+      const medicinesForTime = medicineRoutines.filter(medicine => 
+        medicine.types.includes(timeKey) && 
         medicine.day_of_weeks.includes(selectedDate.fullDate.day() + 1)
       );
-
+      
       if (medicinesForTime.length > 0) {
         todayMedicineItems.push({
           id: `medicine-${timeKey}`,
@@ -184,7 +106,7 @@ const Routine = () => {
         });
       }
     });
-
+    
     // 오늘 날짜에 해당하는 병원 방문 아이템 생성
     const todayHospitalItems = hospitalRoutines
       .filter(hospital => hospital.day_of_weeks.includes(selectedDate.fullDate.day() + 1))
@@ -196,7 +118,7 @@ const Routine = () => {
         type: 'hospital',
         hospital
       }));
-
+    
     // 모든 아이템 합치고 시간순 정렬
     return [...todayMedicineItems, ...todayHospitalItems]
       .sort((a, b) => a.sortValue - b.sortValue);
@@ -231,8 +153,8 @@ const Routine = () => {
             <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
             <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
           </TodayContainer>
-
-          // 렌더링 부분에서 조건부로 컨테이너 사용
+          
+          {/* 모든 루틴을 시간순으로 렌더링 */}
           {allRoutines.map((routine) => (
             <RoutineContainer key={routine.id}>
               {routine.type === 'medicine' ? (
@@ -245,7 +167,7 @@ const Routine = () => {
                     <TimeText>{routine.time}</TimeText>
                   </TextContainer>
                   <CheckBox onPress={() => toggleTimeCheck(routine.timeKey)}>
-                    {routine.medicines.every(medicine =>
+                    {routine.medicines.every(medicine => 
                       checkedItems[`medicine-${medicine.medicine_id}-${routine.timeKey}`]) ? (
                       <RoutineIcons.checkOn width={26} height={26} style={{ color: themes.light.pointColor.Primary }} />
                     ) : (
@@ -271,7 +193,7 @@ const Routine = () => {
                   </CheckBox>
                 </HospitalTimeContainer>
               )}
-
+              
               {/* 약 복용 루틴일 경우에만 약 목록 표시 */}
               {routine.type === 'medicine' && (
                 <Routines>
@@ -414,6 +336,7 @@ const TimeContainer = styled.View`
   align-items: center;
 `;
 
+// 병원 루틴용 컨테이너 - border가 없는 버전
 const HospitalTimeContainer = styled.View`
   flex-direction: row;
   padding: 20px 0px;
