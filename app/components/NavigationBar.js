@@ -19,6 +19,7 @@ import {
   OtherIcons,
   HeaderIcons,
 } from './../../assets/icons';
+import FontSizes from '../../assets/fonts/fontSizes.js';
 const {chevron: ChevronIcon} = HeaderIcons;
 
 // 카메라 버튼
@@ -227,7 +228,7 @@ const BubbleTail = styled.View`
 const BubbleText = styled.Text`
   color: ${themes.light.textColor.buttonText};
   font-family: 'KimjungchulGothic-Bold';
-  font-size: 12px;
+  font-size: ${FontSizes.caption.default};
 `;
 
 const ChatButton = styled.TouchableOpacity`
