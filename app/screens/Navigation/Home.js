@@ -6,6 +6,7 @@ import {themes} from './../../styles';
 import {HeaderIcons, RoutineIcons, LogoIcons} from './../../../assets/icons';
 import CalendarWidget from '../../components/CalendarWidget';
 import {useNavigation} from '@react-navigation/native';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {notification: NotificationIcon, chevron: ArrowIcon} = HeaderIcons;
 const {logoKr: LogoKrIcon, logo: LogoIcon, logoAdd: LogoAddIcon} = LogoIcons;
@@ -164,7 +165,7 @@ const TextContainer = styled.View`
 `;
 
 const ReminderText = styled.Text`
-  font-size: 22px;
+  font-size: ${FontSizes.title.default};
   font-family: 'KimjungchulGothic-Bold';
   margin-left: 10px;
 `;
@@ -213,7 +214,7 @@ const ButtonInfo = styled.View`
 `;
 
 const ButtonText = styled.Text`
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
