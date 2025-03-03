@@ -2,18 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { ScrollView } from 'react-native';
 import styled from 'styled-components/native';
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import { OtherIcons } from '../../../assets/icons';
 import { themes } from '../../styles';
 import dayjs from 'dayjs';
 
 import { RoutineIcons } from '../../../assets/icons';
 
+// 시간 매핑에 시간값 추가 (정렬을 위한 숫자값 포함)
 const timeMapping = {
-  MORNING: { label: '아침', time: '오전 8:00' },
-  LUNCH: { label: '점심', time: '오후 12:30' },
-  DINNER: { label: '저녁', time: '오후 6:30' },
-  BEDTIME: { label: '자기 전', time: '오후 10:00' }
+  MORNING: { label: '아침', time: '오전 8:00', sortValue: 800 },
+  LUNCH: { label: '점심', time: '오후 12:30', sortValue: 1230 },
+  DINNER: { label: '저녁', time: '오후 6:30', sortValue: 1830 },
+  BEDTIME: { label: '자기 전', time: '오후 10:00', sortValue: 2200 }
+};
+
+// 병원 시간을 숫자값으로 변환하는 함수
+const getTimeValue = (timeString) => {
+  if (!timeString) return 0;
+
+  const isPM = timeString.includes('오후');
+  let [hour, minute] = timeString.replace('오전 ', '').replace('오후 ', '').split(':').map(Number);
+
+  if (isPM && hour !== 12) hour += 12;
+  return hour * 100 + minute;
 };
 
 const Routine = () => {
@@ -71,26 +83,37 @@ const Routine = () => {
   const toggleCheck = (medicineId, time) => {
     setCheckedItems((prev) => ({
       ...prev,
-      [`${medicineId}-${time}`]: !prev[`${medicineId}-${time}`]
+      [`medicine-${medicineId}-${time}`]: !prev[`medicine-${medicineId}-${time}`]
+    }));
+  };
+
+  const toggleHospitalCheck = (hospitalId) => {
+    setCheckedItems((prev) => ({
+      ...prev,
+      [`hospital-${hospitalId}`]: !prev[`hospital-${hospitalId}`]
     }));
   };
 
   const toggleTimeCheck = (time) => {
-    const allChecked = Object.entries(checkedItems)
-      .filter(([key]) => key.endsWith(`-${time}`))
-      .every(([, value]) => value);
+    // 특정 시간대의 모든 약물이 체크되었는지 확인
+    const medicinesForTime = medicineRoutines.filter(medicine =>
+      medicine.types.includes(time) &&
+      medicine.day_of_weeks.includes(selectedDate.fullDate.day() + 1)
+    );
 
+    const allChecked = medicinesForTime.length > 0 &&
+      medicinesForTime.every(medicine => checkedItems[`medicine-${medicine.medicine_id}-${time}`]);
+
+    // 해당 시간대의 모든 약물 체크 상태를 변경
     const updatedChecks = { ...checkedItems };
-    Object.keys(checkedItems).forEach((key) => {
-      if (key.endsWith(`-${time}`)) {
-        updatedChecks[key] = !allChecked;
-      }
+    medicinesForTime.forEach(medicine => {
+      updatedChecks[`medicine-${medicine.medicine_id}-${time}`] = !allChecked;
     });
+
     setCheckedItems(updatedChecks);
   };
 
-
-
+  //임시 약 데이터
   const [medicineRoutines, setMedicineRoutines] = useState([
     {
       medicine_id: 3594,
@@ -110,26 +133,76 @@ const Routine = () => {
     }
   ]);
 
-  const groupByTime = (routines) => {
-    const grouped = {
-      MORNING: [],
-      LUNCH: [],
-      DINNER: [],
-      BEDTIME: []
-    };
-    routines.forEach((medicine) => {
-      if (medicine.day_of_weeks.includes(selectedDate.fullDate.day() + 1)) {
-        medicine.types.forEach((type) => {
-          if (grouped[type]) {
-            grouped[type].push(medicine);
-          }
+  //임시 병원 데이터
+  const [hospitalRoutines, setHospitalRoutines] = useState([
+    {
+      hospital_id: 1001,
+      name: '한성대병원 외래 진료',
+      time: 'MORNING',
+      specific_time: '오전 10:30',
+      sortValue: 1030,
+      day_of_weeks: [1, 3, 5]
+    },
+    {
+      hospital_id: 1002,
+      name: '연세세브란스병원',
+      time: 'AFTERNOON',
+      specific_time: '오후 2:00',
+      sortValue: 1400,
+      day_of_weeks: [2, 4]
+    },
+    {
+      hospital_id: 1003,
+      name: '고려대학병원',
+      time: 'MORNING',
+      specific_time: '오전 11:00',
+      sortValue: 1100,
+      day_of_weeks: [3, 6]
+    }
+  ]);
+
+  // 모든 루틴 (약 복용 + 병원 방문)을 시간순으로 정렬
+  const getAllRoutinesByTime = () => {
+    // 오늘 날짜에 해당하는 약 복용 아이템 생성
+    const todayMedicineItems = [];
+
+    Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
+      const medicinesForTime = medicineRoutines.filter(medicine =>
+        medicine.types.includes(timeKey) &&
+        medicine.day_of_weeks.includes(selectedDate.fullDate.day() + 1)
+      );
+
+      if (medicinesForTime.length > 0) {
+        todayMedicineItems.push({
+          id: `medicine-${timeKey}`,
+          label: timeInfo.label,
+          time: timeInfo.time,
+          sortValue: timeInfo.sortValue,
+          type: 'medicine',
+          timeKey,
+          medicines: medicinesForTime
         });
       }
     });
-    return grouped;
+
+    // 오늘 날짜에 해당하는 병원 방문 아이템 생성
+    const todayHospitalItems = hospitalRoutines
+      .filter(hospital => hospital.day_of_weeks.includes(selectedDate.fullDate.day() + 1))
+      .map(hospital => ({
+        id: `hospital-${hospital.hospital_id}`,
+        label: hospital.name,
+        time: hospital.specific_time,
+        sortValue: hospital.sortValue,
+        type: 'hospital',
+        hospital
+      }));
+
+    // 모든 아이템 합치고 시간순 정렬
+    return [...todayMedicineItems, ...todayHospitalItems]
+      .sort((a, b) => a.sortValue - b.sortValue);
   };
 
-  const groupedMedicines = groupByTime(medicineRoutines);
+  const allRoutines = getAllRoutinesByTime();
 
   return (
     <Container>
@@ -158,30 +231,56 @@ const Routine = () => {
             <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
             <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
           </TodayContainer>
-          {Object.entries(groupedMedicines).map(([time, medicines]) => (
-            medicines.length > 0 && (
-              <MedicineRoutine key={time}>
+
+          // 렌더링 부분에서 조건부로 컨테이너 사용
+          {allRoutines.map((routine) => (
+            <RoutineContainer key={routine.id}>
+              {routine.type === 'medicine' ? (
                 <TimeContainer>
-                  <IconContainer><RoutineIcons.medicine width={22} height={22} style={{ color: themes.light.pointColor.Primary }} /></IconContainer>
+                  <IconContainer>
+                    <RoutineIcons.medicine width={22} height={22} style={{ color: themes.light.pointColor.Primary }} />
+                  </IconContainer>
                   <TextContainer>
-                    <TypeText>{timeMapping[time].label}</TypeText>
-                    <TimeText>{timeMapping[time].time}</TimeText>
+                    <TypeText>{routine.label}</TypeText>
+                    <TimeText>{routine.time}</TimeText>
                   </TextContainer>
-                  <CheckBox onPress={() => toggleTimeCheck(time)}>
-                    {Object.keys(checkedItems).some(key => key.endsWith(`-${time}`) && checkedItems[key]) ? (
+                  <CheckBox onPress={() => toggleTimeCheck(routine.timeKey)}>
+                    {routine.medicines.every(medicine =>
+                      checkedItems[`medicine-${medicine.medicine_id}-${routine.timeKey}`]) ? (
                       <RoutineIcons.checkOn width={26} height={26} style={{ color: themes.light.pointColor.Primary }} />
                     ) : (
                       <RoutineIcons.checkOff width={26} height={26} style={{ color: themes.light.boxColor.inputSecondary }} />
                     )}
                   </CheckBox>
                 </TimeContainer>
+              ) : (
+                <HospitalTimeContainer>
+                  <IconContainer>
+                    <RoutineIcons.hospital width={22} height={22} style={{ color: themes.light.pointColor.Secondary }} />
+                  </IconContainer>
+                  <TextContainer>
+                    <TypeText>{routine.label}</TypeText>
+                    <TimeText>{routine.time}</TimeText>
+                  </TextContainer>
+                  <CheckBox onPress={() => toggleHospitalCheck(routine.hospital.hospital_id)}>
+                    {checkedItems[`hospital-${routine.hospital.hospital_id}`] ? (
+                      <RoutineIcons.checkOn width={26} height={26} style={{ color: themes.light.pointColor.Primary }} />
+                    ) : (
+                      <RoutineIcons.checkOff width={26} height={26} style={{ color: themes.light.boxColor.inputSecondary }} />
+                    )}
+                  </CheckBox>
+                </HospitalTimeContainer>
+              )}
+
+              {/* 약 복용 루틴일 경우에만 약 목록 표시 */}
+              {routine.type === 'medicine' && (
                 <Routines>
                   <RoutineList>
-                    {medicines.map((medicine) => (
+                    {routine.medicines.map((medicine) => (
                       <MedicineItem key={medicine.medicine_id}>
                         <MedicineText>{`${medicine.nickname} (${medicine.dose}정)`}</MedicineText>
-                        <CheckBox onPress={() => toggleCheck(medicine.medicine_id, time)}>
-                          {checkedItems[`${medicine.medicine_id}-${time}`] ? (
+                        <CheckBox onPress={() => toggleCheck(medicine.medicine_id, routine.timeKey)}>
+                          {checkedItems[`medicine-${medicine.medicine_id}-${routine.timeKey}`] ? (
                             <RoutineIcons.checkOn width={26} height={26} style={{ color: themes.light.pointColor.Primary }} />
                           ) : (
                             <RoutineIcons.checkOff width={26} height={26} style={{ color: themes.light.boxColor.inputSecondary }} />
@@ -191,8 +290,8 @@ const Routine = () => {
                     ))}
                   </RoutineList>
                 </Routines>
-              </MedicineRoutine>
-            )
+              )}
+            </RoutineContainer>
           ))}
         </ScheduleContainer>
       </ScrollView>
@@ -296,7 +395,7 @@ const TodayDate = styled.Text`
   color: ${themes.light.textColor.Primary30};
 `;
 
-const MedicineRoutine = styled.View`
+const RoutineContainer = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
   padding: 0 20px;
   border-radius: 10px;
@@ -311,6 +410,12 @@ const TimeContainer = styled.View`
   flex-direction: row;
   border-bottom-width: 1px;
   border-bottom-color: ${themes.light.borderColor.borderPrimary};
+  padding: 20px 0px;
+  align-items: center;
+`;
+
+const HospitalTimeContainer = styled.View`
+  flex-direction: row;
   padding: 20px 0px;
   align-items: center;
 `;
@@ -351,20 +456,6 @@ const MedicineText = styled.Text`
   font-size: 15px;
   font-family: 'Pretendard-Regular';
   padding: 20px;
-`;
-
-const HospitalRoutine = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  padding: 20px 20px;
-  border-radius: 10px;
-  width: 100%;
-  height: auto;
-  margin-bottom: 30px;
-`;
-
-const HospitalText = styled.Text`
-  font-size: 18px;
-  font-family: 'Pretendard-ExtraBold';
 `;
 
 export default Routine;
