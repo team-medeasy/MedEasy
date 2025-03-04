@@ -8,10 +8,6 @@ import CalendarWidget from '../../components/CalendarWidget';
 import {useNavigation} from '@react-navigation/native';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
-const {notification: NotificationIcon, chevron: ArrowIcon} = HeaderIcons;
-const {logoKr: LogoKrIcon, logo: LogoIcon, logoAdd: LogoAddIcon} = LogoIcons;
-const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
-
 const Home = () => {
   const navigation = useNavigation();
   const handleNotificationPress = () => {
@@ -31,20 +27,20 @@ const Home = () => {
       <ScrollContainer>
         <Header>
           <LogoContainer>
-            <LogoIcon
+            <LogoIcons.logo
               height={20}
               width={13}
               style={{color: themes.light.pointColor.Primary}}
               marginRight={10}
             />
-            <LogoKrIcon
+            <LogoIcons.logoKr
               height={19}
               width={54}
               style={{color: themes.light.pointColor.Primary}}
             />
           </LogoContainer>
           <TouchableOpacity onPress={handleNotificationPress}>
-            <NotificationIcon
+            <HeaderIcons.notification
               height={20}
               width={22}
               style={{color: themes.light.textColor.textPrimary}}
@@ -56,7 +52,7 @@ const Home = () => {
         <PillReminderContainer>
           <TextContainer>
             <ReminderText>한성님, {'\n'}까먹은 약이 있어요.</ReminderText>
-            <LogoIcon
+            <LogoIcons.logo
               width={70}
               height={112}
               style={{
@@ -71,7 +67,7 @@ const Home = () => {
           {/* 버튼 추가 */}
           <RoutineContainer>
             <RoutineButton onPress={() => console.log('루틴 추가')}>
-              <LogoAddIcon
+              <LogoIcons.logoAdd
                 height={115}
                 style={{color: themes.light.pointColor.primary30}}
               />
@@ -82,7 +78,7 @@ const Home = () => {
             <AddButton onPress={handleAddMedicineRoutine}>
               <ButtonContent>
                 <ButtonInfo>
-                  <MediIcon
+                  <RoutineIcons.medicine
                     height={16}
                     width={16}
                     style={{
@@ -92,7 +88,7 @@ const Home = () => {
                   />
                   <ButtonText>복용 루틴 추가하기</ButtonText>
                 </ButtonInfo>
-                <ArrowIcon
+                <HeaderIcons.chevron
                   height={16}
                   style={{
                     color: themes.light.textColor.Primary20,
@@ -104,7 +100,7 @@ const Home = () => {
             <AddButton onPress={handleAddHospitalVisit}>
               <ButtonContent>
                 <ButtonInfo>
-                  <HospitalIcon
+                  <RoutineIcons.hospital
                     height={16}
                     width={16}
                     style={{
@@ -114,7 +110,7 @@ const Home = () => {
                   />
                   <ButtonText>병원 진료 추가하기</ButtonText>
                 </ButtonInfo>
-                <ArrowIcon
+                <HeaderIcons.chevron
                   height={16}
                   style={{
                     color: themes.light.textColor.Primary20,
