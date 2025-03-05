@@ -36,44 +36,45 @@ const shapeCodes = {
   기타: '',
 };
 
-const ColorShapeView = ({ type, value, marginRight }) => {
-    if (type === 'color') {
-      return (
-        <ColorView 
-          style={{ 
-            backgroundColor: colorCodes[value],
-            marginRight : marginRight || 7,
-          }} 
-        />
-      );
-    }
-    
-    if (type === 'shape') {
-      return (
-        <ShapeView 
-          style={{ 
-            marginRight: marginRight || 7,
-          }}/>
-      );
-    }
-    
-    return null;
-  };
+const ColorShapeView = ({ type, value, marginRight, width, height }) => {
+  if (type === 'color') {
+    return (
+      <ColorView 
+        style={{ 
+          backgroundColor: colorCodes[value],
+          marginRight : marginRight || 7,
+          width: width || 14,
+          height: height || 14,
+        }} 
+      />
+    );
+  }
+  
+  if (type === 'shape') {
+    return (
+      <ShapeView 
+        style={{ 
+          marginRight: marginRight || 7,
+          width: width || 14,
+          height: height || 14,
+        }}
+      />
+    );
+  }
+  
+  return null;
+};
 
-  const ShapeView = styled.View`
-  width: 14px;
-  height: 14px;
+const ShapeView = styled.View`
   border-radius: 7px;
   border-width: 1.5px;
   border-color: ${themes.light.textColor.Primary50};
 `;
 
 const ColorView = styled.View`
-  width: 14px;
-  height: 14px;
   border-radius: 7px;
   border-width: 1.5px;
   border-color: ${themes.light.borderColor.borderCircle};
 `;
   
-  export { ColorShapeView, colorCodes, shapeCodes };
+export { ColorShapeView };
