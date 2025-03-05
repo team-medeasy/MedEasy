@@ -35,8 +35,9 @@ const Container = styled.View`
   width: 100%;
   flex-direction: row;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 0px 20px;
   background-color: ${themes.light.boxColor.buttonPrimary};
+  gap: 10px;
 `;
 
 const DaysSinceMedication = styled.View`
