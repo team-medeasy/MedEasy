@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {View} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
+import { ColorShapeView} from '../../components';
 
 import SearchResultsList from './../../components/SearchResult/SearchResultsList'; // Import SearchResultsList
 import NoSearchResults from '../../components/SearchResult/NoSearchResults';
@@ -132,27 +133,6 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     split: ['없음', '(+)형', '(-)형'],
   };
 
-  // 색상 코드 매핑 (약 색상 - 필터 옵션)
-  const colorCodes = {
-    하양: '#FFFFFF',
-    노랑: 'rgba(255, 221, 0, 1)',
-    주황: '#FFA500',
-    분홍: '#FFC0CB',
-    빨강: '#FF0000',
-    갈색: '#8B4513',
-    초록: '#008000',
-    청록: '#00CED1',
-    파랑: '#0000FF',
-    남색: '#000080',
-    자주: '#800080',
-    보라: '#9370DB',
-    회색: '#808080',
-    검정: '#000000',
-    투명: 'transparent',
-  };
-
-  const shapeCodes = {};
-
   const openFilterModal = type => {
     setFilterModalVisible(type);
     setTempFilters(prev => ({
@@ -222,36 +202,12 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
     const firstItem = selectedItems[0];
 
-    if (type === 'color') {
-      return (
-        <View
-          style={{
-            width: 14,
-            height: 14,
-            borderRadius: 7,
-            backgroundColor: colorCodes[firstItem],
-            borderWidth: 1.5,
-            borderColor: themes.light.borderColor.borderCircle,
-            marginRight: 7,
-          }}
-        />
-      );
-    } else if (type === 'shape') {
-      return (
-        <View
-          style={{
-            width: 14,
-            height: 14,
-            borderRadius: 7,
-            borderWidth: 1.5,
-            borderColor: themes.light.textColor.Primary50,
-            marginRight: 7,
-          }}
-        />
-      );
-    }
-
-    return null;
+    return (
+      <ColorShapeView
+        type={type}
+        value={firstItem}
+      />
+    );
   };
 
   // 개별 필터 초기화
@@ -306,7 +262,6 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         selectedDosageForms={selectedDosageForms}
         selectedSplits={selectedSplits}
         onClearFilter={clearFilter}
-        colorCodes={colorCodes}
         getFilterButtonText={getFilterButtonText}
         renderFilterButtonIcon={renderFilterButtonIcon}
       />
@@ -321,7 +276,6 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
           handleFilterChange={handleFilterChange}
           applyFilters={applyFilters}
           renderFilterButtonIcon={renderFilterButtonIcon}
-          colorCodes={colorCodes}
         />
       ))}
       <SearchResultContainer>

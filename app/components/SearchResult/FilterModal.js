@@ -1,7 +1,7 @@
 import React from 'react';
 import {Modal, View} from 'react-native';
 import styled from 'styled-components/native';
-import {Button} from './../../components';
+import {Button, ColorShapeView, colorCodes} from './../../components';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {PillsIcon} from '../../../assets/icons';
@@ -21,7 +21,6 @@ const FilterModal = ({
   tempFilters,
   handleFilterChange,
   applyFilters,
-  colorCodes,
 }) => {
   if (!filterType) return null;
 
@@ -69,28 +68,15 @@ const FilterModal = ({
                   // 색상, 모양, 분할선 선택 시
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     {filterType === 'color' && (
-                      <View
-                        style={{
-                          width: 14,
-                          height: 14,
-                          borderRadius: 7,
-                          backgroundColor: colorCodes[option],
-                          borderWidth: 1.5,
-                          borderColor: themes.light.borderColor.borderCircle,
-                          marginRight: 7,
-                        }}
+                      <ColorShapeView
+                        type={filterType}
+                        value={option}
                       />
                     )}
                     {filterType === 'shape' && (
-                      <View
-                        style={{
-                          width: 14,
-                          height: 14,
-                          borderRadius: 7,
-                          borderWidth: 1.5,
-                          borderColor: themes.light.textColor.Primary50,
-                          marginRight: 7,
-                        }}
+                      <ColorShapeView
+                        type={filterType}
+                        value={option}
                       />
                     )}
                     <FilterOptionText

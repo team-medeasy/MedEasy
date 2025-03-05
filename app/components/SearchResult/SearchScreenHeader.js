@@ -17,7 +17,6 @@ const SearchScreenHeader = ({
   selectedDosageForms,
   selectedSplits,
   onClearFilter,
-  colorCodes,
   getFilterButtonText,
   renderFilterButtonIcon,
 }) => {
@@ -66,7 +65,6 @@ const SearchScreenHeader = ({
                 onClearFilter={onClearFilter}
                 getFilterButtonText={getFilterButtonText}
                 renderFilterButtonIcon={renderFilterButtonIcon}
-                colorCodes={colorCodes}
               />
             ))}
           </ScrollableFilterContainer>

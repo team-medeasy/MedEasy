@@ -14,12 +14,11 @@ const FilterButton = ({
   onClearFilter,
   getFilterButtonText,
   renderFilterButtonIcon,
-  colorCodes,
 }) => {
   return (
     <FilterBtn onPress={onFilterPress} selected={selectedItems.length > 0}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        {renderFilterButtonIcon(type, selectedItems, colorCodes)}
+        {renderFilterButtonIcon(type, selectedItems)}
         <FilterButtonText selected={selectedItems.length > 0}>
           {getFilterButtonText(type, selectedItems)}
         </FilterButtonText>
