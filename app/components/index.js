@@ -8,3 +8,4 @@ export {Header};
 export {Footer} from './Footer';
 export {Tag} from './Tag';
 export {MedicineAppearance};
+export {ColorShapeView} from './ColorShapeView'
