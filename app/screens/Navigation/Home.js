@@ -194,7 +194,7 @@ const ButtonContainer = styled.View`
 
 const AddButton = styled(TouchableOpacity)`
   background-color: ${themes.light.bgColor.bgPrimary};
-  padding: 10px;
+  padding: 10px 0;
   flex: 1;
 `;
 
@@ -207,6 +207,7 @@ const ButtonContent = styled.View`
 
 const ButtonInfo = styled.View`
   flex-direction: row;
+  padding: 0 10px;
 `;
 
 const ButtonText = styled.Text`
