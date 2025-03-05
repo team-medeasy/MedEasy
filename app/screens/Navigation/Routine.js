@@ -74,7 +74,7 @@ const Routine = () => {
         year: today.year(),
         fullDate: today
       });
-
+  
       // 오늘 날짜가 있는 페이지로 스크롤
       if (flatListRef.current) {
         flatListRef.current.scrollToIndex({
@@ -233,10 +233,16 @@ const Routine = () => {
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
-          initialScrollIndex={4} // 현재 주차로 초기 스크롤
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
           onScrollToIndexFailed={handleScrollToIndexFailed}
+          // 새로 추가할 prop
+          getItemLayout={(data, index) => ({
+            length: width,
+            offset: width * index,
+            index,
+          })}
+        // initialScrollIndex 제거
         />
       </DayContainerWrapper>
 
