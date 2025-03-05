@@ -72,3 +72,9 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Link assets manifest (자동 생성됨)
+link-assets-manifest.json
+
+# iOS Xcode workspace & build artifacts
+ios/MedEasy.xcworkspace/
