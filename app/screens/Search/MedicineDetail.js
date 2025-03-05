@@ -23,6 +23,10 @@ const MedicineDetailScreen = ({navigation}) => {
     navigation.navigate('MedicineImageDetail', {itemSeq});
   };
 
+  const handleSetMedicineRoutine = () => {
+    navigation.navigate('SetMedicineRoutine');
+  };
+
   // 임시 데이터
   const medicine = {
     item_name: '지엘타이밍정(카페인무수물)',
@@ -248,7 +252,7 @@ const MedicineDetailScreen = ({navigation}) => {
         paddingBottom: 30,
         alignItems: 'center',
       }}>
-        <Button title='루틴 추가하기' onPress={() => {}}></Button>
+        <Button title='루틴 추가하기' onPress={handleSetMedicineRoutine} ></Button>
       </View>
 
     </Container>
