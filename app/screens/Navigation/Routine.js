@@ -233,10 +233,16 @@ const Routine = () => {
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
-          initialScrollIndex={4} // 현재 주차로 초기 스크롤
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
           onScrollToIndexFailed={handleScrollToIndexFailed}
+          // 새로 추가할 prop
+          getItemLayout={(data, index) => ({
+            length: width,
+            offset: width * index,
+            index,
+          })}
+        // initialScrollIndex 제거
         />
       </DayContainerWrapper>
 
@@ -293,7 +299,11 @@ const Routine = () => {
                   <RoutineList>
                     {routine.medicines.map((medicine) => (
                       <MedicineItem key={medicine.medicine_id}>
-                        <MedicineText>{`${medicine.nickname} (${medicine.dose}정)`}</MedicineText>
+                        <MedicineText
+                          isChecked={checkedItems[`medicine-${medicine.medicine_id}-${routine.timeKey}`]}
+                        >
+                          {`${medicine.nickname} (${medicine.dose}정)`}
+                        </MedicineText>
                         <CheckBox onPress={() => toggleCheck(medicine.medicine_id, routine.timeKey)}>
                           {checkedItems[`medicine-${medicine.medicine_id}-${routine.timeKey}`] ? (
                             <RoutineIcons.checkOn width={26} height={26} style={{ color: themes.light.pointColor.Primary }} />
@@ -477,6 +487,9 @@ const MedicineText = styled.Text`
   font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Regular';
   padding: 20px;
+  text-decoration-line: ${({ isChecked }) => isChecked ? 'line-through' : 'none'};
+  color: ${({ isChecked }) => 
+    isChecked ? themes.light.textColor.Primary50 : themes.light.textColor.textPrimary};
 `;
 
 export default Routine;
