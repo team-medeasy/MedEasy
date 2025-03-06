@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { themes } from './../../styles';
+import { OtherIcons } from '../../../assets/icons';
 import { ModalHeader, Button } from '../../components';
+import FontSizes from '../../../assets/fonts/fontSizes';
+import { Text } from 'react-native-gesture-handler';
+const {deleteCircle: DeleteCircleIcon} = OtherIcons;
 
 const SetMedicineRoutine = () => {
   const [medicineName, setMedicineName] = useState('');
@@ -26,71 +30,92 @@ const SetMedicineRoutine = () => {
     );
   };
 
+  const handleSetTimings = () => {
+    // 여기에 시간대 설정 로직 구현
+    console.log('시간대 설정하기 클릭');
+  };
+
   return (
     <Container>
-      <ModalHeader>루틴 추가</ModalHeader>
+      <ModalHeader 
+        showDelete='true' 
+        onDeletePress={() => {}}
+      >루틴 추가</ModalHeader>
 
       <ScrollView
         contentContainerStyle={{
-          padding: 20,
+          marginTop: 28,
+          paddingHorizontal: 20,
           flexDirection: 'column',
           gap: 30,
         }}
       >
-        <View>
-          <SectionTitle>별명</SectionTitle>
-          <StyledInput
+        {/* 별명 */}
+        <Section>
+          <SectionHeader title="별명" />
+          <InputWithDelete
             placeholder="약 별명을 입력하세요"
             value={medicineName}
             onChangeText={setMedicineName}
           />
-        </View>
+        </Section>
 
         {/* 요일 선택 */}
-        <View>
-          <SectionTitle>복용 요일</SectionTitle>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        <Section>
+          <SectionHeader title="복용 요일" />
+          <View style={{ flexDirection: 'row', gap: '10' }}>
             {days.map((day) => (
               <ToggleButton key={day} selected={selectedDays.includes(day)} onPress={() => toggleDay(day)}>
                 <ToggleButtonText selected={selectedDays.includes(day)}>{day}</ToggleButtonText>
               </ToggleButton>
             ))}
           </View>
-        </View>
+        </Section>
 
         {/* 시간대 선택 */}
-        <View>
-          <SectionTitle>복용 시간대</SectionTitle>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        <Section>
+          <SectionHeader 
+            title="복용 시간대" 
+            buttonText="시간대 설정하기" 
+            onButtonPress={handleSetTimings} 
+          />
+          <View style={{ flexDirection: 'row', gap: '10' }}>
             {timings.map((timing) => (
-              <ToggleButton key={timing} selected={selectedTimings.includes(timing)} onPress={() => toggleTiming(timing)}>
+              <ToggleButton 
+                key={timing} 
+                selected={selectedTimings.includes(timing)} 
+                onPress={() => toggleTiming(timing)}
+                style={{  
+                    paddingHorizontal: '15',
+                }}
+              >
                 <ToggleButtonText selected={selectedTimings.includes(timing)}>{timing}</ToggleButtonText>
               </ToggleButton>
             ))}
           </View>
-        </View>
+        </Section>
 
         {/* 1회 복용량 */}
-        <View>
-          <SectionTitle>1회 복용량</SectionTitle>
-          <StyledInput
+        <Section>
+          <SectionHeader title="1회 복용량" />
+          <InputWithDelete
             placeholder="복용량을 입력하세요"
             value={dosage}
             onChangeText={setDosage}
             keyboardType="numeric"
           />
-        </View>
+        </Section>
 
         {/* 총 개수 */}
-        <View>
-          <SectionTitle>총 개수</SectionTitle>
-          <StyledInput
+        <Section>
+          <SectionHeader title="총 개수" />
+          <InputWithDelete
             placeholder="총 개수를 입력하세요"
             value={totalCount}
             onChangeText={setTotalCount}
             keyboardType="numeric"
           />
-        </View>
+        </Section>
       </ScrollView>
 
       <View
@@ -111,36 +136,110 @@ const SetMedicineRoutine = () => {
   );
 };
 
+// 섹션 헤더 컴포넌트
+const SectionHeader = ({ title, buttonText, onButtonPress }) => {
+    return (
+      <View style={{ 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        alignItems: 'center'
+      }}>
+        <SectionTitle>{title}</SectionTitle>
+        {buttonText && (
+          <HeaderButton onPress={onButtonPress}>
+            <HeaderButtonText>{buttonText}</HeaderButtonText>
+            {/* > Icon */}
+          </HeaderButton>
+        )}
+      </View>
+    );
+  };
+  
+  // 입력 필드 컴포넌트
+  const InputWithDelete = ({ 
+    value, 
+    onChangeText, 
+    placeholder, 
+    keyboardType = 'default' 
+  }) => {
+    return (
+      <InputContainer>
+        <StyledInput
+          placeholder={placeholder}
+          value={value}
+          onChangeText={onChangeText}
+          keyboardType={keyboardType}
+        />
+        {value.length > 0 && (
+          <DeleteButton onPress={() => onChangeText('')}>
+            <DeleteCircleIcon 
+              width={15} 
+              height={15} 
+              style={{color: themes.light.textColor.Primary20}} 
+            />
+          </DeleteButton>
+        )}
+      </InputContainer>
+    );
+  };
+
 const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
+const Section = styled.View`
+  gap: 15px;
+`;
+
 const SectionTitle = styled.Text`
-  font-size: 16px;
-  font-weight: bold;
-  color: ${themes.light.textColor.primary};
-  margin-bottom: 10px;
+  font-family: 'Pretendard-Bold';
+  font-size: ${FontSizes.heading.default};
+  color: ${themes.light.textColor.textPrimary};
+`;
+
+const HeaderButton = styled.TouchableOpacity`
+`;
+
+const HeaderButtonText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.Primary30};
+`;
+
+const InputContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  background-color: ${themes.light.boxColor.inputPrimary};
+  border-radius: 10px;
+  padding-horizontal: 15px;
 `;
 
 const StyledInput = styled.TextInput`
-  background-color: ${themes.light.bgColor.bgSecondary};
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 14px;
+  flex: 1;
+  padding-vertical: 18px;
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.textPrimary};
+`;
+
+const DeleteButton = styled.TouchableOpacity`
+  padding: 5px;
 `;
 
 const ToggleButton = styled.TouchableOpacity`
   background-color: ${(props) =>
-    props.selected ? themes.light.accentColor.primary : themes.light.bgColor.bgSecondary};
-  border-radius: 8px;
-  padding: 10px;
-  margin: 5px;
+    props.selected ? themes.light.pointColor.Primary : themes.light.boxColor.inputPrimary};
+  border-radius: 5px;
+  padding-vertical: ${(props) => props.paddingVertical || '8px'};
+  padding-horizontal: ${(props) => props.paddingHorizontal || '10px'};
 `;
 
 const ToggleButtonText = styled.Text`
   color: ${(props) =>
-    props.selected ? themes.light.textColor.onAccent : themes.light.textColor.secondary};
+    props.selected ? themes.light.textColor.buttonText : themes.light.textColor.Primary50};
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${FontSizes.body.default};
   text-align: center;
 `;
 
