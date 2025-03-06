@@ -85,9 +85,7 @@ const SetMedicineRoutine = () => {
                 key={timing} 
                 selected={selectedTimings.includes(timing)} 
                 onPress={() => toggleTiming(timing)}
-                style={{  
-                    paddingHorizontal: '15',
-                }}
+                paddingHorizontal={15}
               >
                 <ToggleButtonText selected={selectedTimings.includes(timing)}>{timing}</ToggleButtonText>
               </ToggleButton>
@@ -212,12 +210,12 @@ const InputContainer = styled.View`
   align-items: center;
   background-color: ${themes.light.boxColor.inputPrimary};
   border-radius: 10px;
-  padding-horizontal: 15px;
+  padding: 0 15px;
 `;
 
 const StyledInput = styled.TextInput`
   flex: 1;
-  padding-vertical: 18px;
+  padding: 18px 0;
   font-family: 'Pretendard-SemiBold';
   font-size: ${FontSizes.body.default};
   color: ${themes.light.textColor.textPrimary};
@@ -231,8 +229,8 @@ const ToggleButton = styled.TouchableOpacity`
   background-color: ${(props) =>
     props.selected ? themes.light.pointColor.Primary : themes.light.boxColor.inputPrimary};
   border-radius: 5px;
-  padding-vertical: ${(props) => props.paddingVertical || '8px'};
-  padding-horizontal: ${(props) => props.paddingHorizontal || '10px'};
+  padding: ${(props) => `${props.paddingVertical || 8}px 
+                         ${props.paddingHorizontal || 10}px`};
 `;
 
 const ToggleButtonText = styled.Text`
