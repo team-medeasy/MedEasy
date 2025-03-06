@@ -4,8 +4,16 @@ import {themes} from '../../styles';
 import {Tag, Button, Header, MedicineAppearance} from './../../components';
 import { FlatList, View } from 'react-native';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useNavigation } from '@react-navigation/native';
 
 const MedicineItem = ({ item }) => {
+  const navigation = useNavigation();
+  
+  // 임시로 id 값 넘김
+  const handleMedicineConfirm = medicineId => {
+    navigation.navigate('MedicineDetail', {id: medicineId});
+  };
+
   return (
     <ItemContainer>
       <ImageContainer>
@@ -53,7 +61,7 @@ const MedicineItem = ({ item }) => {
             title='이 약이 맞아요' 
             fontSize='15' 
             height='40'
-            onPress={() => {}} />
+            onPress={() => handleMedicineConfirm(item.id)} />
         </View>
       </InfoContainer>
     </ItemContainer>
