@@ -261,8 +261,13 @@ const Routine = () => {
             {/* 모든 루틴을 시간순으로 렌더링 */}
             {allRoutines.map((routine, index) => (
               <RoutineBoxContainer key={routine.id}>
-                {/* 타임라인 포인트 (원) - 아이콘 없이 원으로만 표시 */}
+                {/* 타임라인 포인트 */}
                 <TimelinePoint 
+                  type={routine.type} 
+                  isFirst={index === 0} 
+                  isLast={index === allRoutines.length - 1}
+                />
+                <TimelineBigPoint 
                   type={routine.type} 
                   isFirst={index === 0} 
                   isLast={index === allRoutines.length - 1}
@@ -457,7 +462,17 @@ const TimelineLine = styled.View`
   background-color: ${themes.light.pointColor.Primary};
 `;
 
-// 아이콘을 제거하고 원형 포인트만 표시하도록 수정
+const TimelineBigPoint = styled.View`
+  position: absolute;
+  left: -16px;
+  top: 15px;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: ${themes.light.pointColor.primary30};
+  z-index: 2;
+`;
+
 const TimelinePoint = styled.View`
   position: absolute;
   left: -12px;
