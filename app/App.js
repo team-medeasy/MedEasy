@@ -18,6 +18,7 @@ import NotificationScreen from './screens/Notification';
 import AddMedicineRoutineScreen from './screens/Routine/AddMedicineRoutine';
 import AddHospitalVisitScreen from './screens/Routine/AddHospitalVisit';
 import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
+import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
 
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
@@ -102,6 +103,11 @@ const App = () => {
             <RootStack.Screen
               name="SetMedicineRoutine"
               component={SetMedicineRoutineScreen}
+              options={{presentation: 'modal'}}
+            />
+            <RootStack.Screen
+              name="SetRoutineTime"
+              component={SetRoutineTimeScreen}
               options={{presentation: 'modal'}}
             />
           </RootStack.Navigator>
