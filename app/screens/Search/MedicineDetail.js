@@ -1,19 +1,20 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {
-  ImageBackground,
-  TouchableOpacity,
   View,
   Text,
   Image,
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
-import {RoutineIcons} from './../../../assets/icons';
-import {Footer, Tag, Header, MedicineAppearance, Button} from './../../components';
+import {
+  Footer, 
+  Tag, 
+  Header, 
+  MedicineOverview,
+  MedicineAppearance,
+  Button} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
-
-const {heartOff: HeartOffIcon, heartOn: HeartOnIcon} = RoutineIcons;
 
 const MedicineDetailScreen = ({navigation}) => {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -23,8 +24,9 @@ const MedicineDetailScreen = ({navigation}) => {
     navigation.navigate('MedicineImageDetail', {itemSeq});
   };
 
+  // 임시로 medicine 데이터 넘김
   const handleSetMedicineRoutine = () => {
-    navigation.navigate('SetMedicineRoutine');
+    navigation.navigate('SetMedicineRoutine', { medicine });
   };
 
   // 임시 데이터
@@ -119,73 +121,12 @@ const MedicineDetailScreen = ({navigation}) => {
       <Header>{medicine.item_name}</Header>
 
       <ScrollView>
-        <MedicineInfoContainer
-          source={{uri: medicine.item_image}}
-          blurRadius={15}>
-          <Overlay />
-
-          <View style={{position: 'relative'}}>
-            <MedicineImage source={{uri: medicine.item_image}} />
-            <TouchableOpacity
-              onPress={() => handlePressEnlarge(medicine.item_seq)}
-              style={{
-                position: 'absolute',
-                bottom: 14,
-                right: 14,
-              }}>
-              <Tag bgColor={themes.light.boxColor.tagResultSecondary}>
-                {/* 크게 보기 아이콘 */}
-                크게 보기
-              </Tag>
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              alignItems: 'flex-start',
-              flex: 1,
-              marginTop: 19,
-              marginHorizontal: 7,
-              gap: 10,
-            }}>
-            <MedicineInfoSub>{medicine.entp_name}</MedicineInfoSub>
-            <MedicineInfoName>{medicine.item_name}</MedicineInfoName>
-            <MedicineInfoSub>{medicine.chart}</MedicineInfoSub>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}>
-              <View style={{flexDirection: 'row', gap: 11}}>
-                <Tag sizeType="large" colorType="detailPrimary">
-                  {medicine.etc_otc_name}
-                </Tag>
-                <Tag sizeType="large" colorType="detailSecondary">
-                  {medicine.class_name}
-                </Tag>
-              </View>
-
-              <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
-                {isFavorite ? (
-                  <HeartOnIcon
-                    width={24}
-                    height={24}
-                    style={{color: themes.light.textColor.buttonText}}
-                  />
-                ) : (
-                  <HeartOffIcon
-                    width={24}
-                    height={24}
-                    style={{color: themes.light.textColor.buttonText}}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </MedicineInfoContainer>
+        <MedicineOverview
+          medicine={medicine}
+          isFavorite={isFavorite}
+          setIsFavorite={setIsFavorite}
+          onPressEnlarge={handlePressEnlarge}
+        />
 
         <MedicineDetailContainer>
           <MedicineAppearanceContainer>
@@ -264,20 +205,6 @@ const Container = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-const MedicineInfoContainer = styled(ImageBackground)`
-  align-items: flex-start;
-  padding: 38px 25px 25px 25px;
-`;
-
-const Overlay = styled.View`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-`;
-
 const MedicineDetailContainer = styled.View`
   padding: 20px 0;
 `;
@@ -351,28 +278,6 @@ const HeadingText = styled.Text`
   color: ${themes.light.textColor.Primary};
   font-family: 'Pretendard-Bold';
   font-size: ${FontSizes.heading.default};
-`;
-
-const MedicineImage = styled.Image`
-  width: 344px;
-  height: 188px;
-  border-radius: 10px;
-`;
-
-const MedicineInfoSub = styled.Text`
-  flex: 1;
-  text-align: center;
-  font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.buttonText70};
-`;
-
-const MedicineInfoName = styled.Text`
-  flex: 1;
-  text-align: center;
-  font-family: 'Pretendard-Bold';
-  font-size: ${FontSizes.title.default};
-  color: ${themes.light.textColor.buttonText};
 `;
 
 export default MedicineDetailScreen;
