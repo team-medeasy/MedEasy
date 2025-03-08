@@ -26,7 +26,7 @@ const ModalHeader = ({children, onBackPress, showDelete = false, onDeletePress})
             <HeaderIcons.trash
               width={17}
               height={17}
-              style={{color: themes.light.textColor.textPrimary}}
+              style={{color: themes.light.textColor.Primary30}}
             />
           </TouchableOpacity>
         ) : (
