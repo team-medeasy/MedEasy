@@ -181,7 +181,7 @@ const RoutineButton = styled(TouchableOpacity)`
 `;
 
 const RoutineButtonText = styled.Text`
-  font-size: 16px;
+  font-size: ${FontSizes.body.medium};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.pointColor.Primary};
   margin-top: 10px;
@@ -211,7 +211,7 @@ const ButtonInfo = styled.View`
 `;
 
 const ButtonText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${FontSizes.body.medium};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
