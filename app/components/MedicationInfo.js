@@ -68,7 +68,7 @@ const IconWrapper = styled.View`
 
 const WithMedeasy = styled.Text`
   font-size: 12px;
-  font-family: 'Pretendard-Regular';
+  font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.buttonText};
   padding-bottom: 10px;
 `;

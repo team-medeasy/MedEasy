@@ -191,7 +191,7 @@ const SettingItem = styled.TouchableOpacity`
 
 const SettingText = styled.Text`
   font-size: 16px;
-  font-family: 'Pretendard-Regular';
+  font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
   margin-left: 20px;
 `;

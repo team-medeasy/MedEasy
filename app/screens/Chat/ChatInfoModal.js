@@ -70,7 +70,7 @@ const Title = styled.Text`
 
 const CautionText = styled.Text`
   font-size: 15px;
-  font-family: 'Pretendard-Regular';
+  font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
   padding: 30px 20px;
   line-height: 25px;
