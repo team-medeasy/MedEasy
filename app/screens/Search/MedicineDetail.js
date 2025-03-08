@@ -130,7 +130,7 @@ const MedicineDetailScreen = ({navigation}) => {
 
         <MedicineDetailContainer>
           <MedicineAppearanceContainer>
-              <MedicineAppearance item={medicine}/>
+              <MedicineAppearance item={medicine} size='large'/>
           </MedicineAppearanceContainer>
 
           <MedicineUsageContainer>
