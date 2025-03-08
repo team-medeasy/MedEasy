@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {TextInput, TouchableOpacity} from 'react-native';
+import {TextInput, TouchableOpacity, View} from 'react-native';
 import {themes} from '../../styles';
 import {ChatIcons} from '../../../assets/icons';
 
@@ -49,7 +49,6 @@ const InputContainer = styled.View`
   align-items: center;
   width: 100%;
   padding: 10px 10px;
-  padding-bottom: 30px;
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
@@ -92,7 +91,7 @@ const Input = styled(TextInput)`
   font-size: 15px;
   max-height: 100px;
   font-family: 'Pretendard-semiBold';
-  padding-top: 5px; 
+  padding-top: 5px;
   padding-bottom: 5px;
 `;
 
