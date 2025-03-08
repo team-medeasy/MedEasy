@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import {pointColor, themes} from '../styles';
 import KarteIcon from '../../assets/icons/karte.svg';
 import LogoIcon from '../../assets/icons/logo/logo.svg';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 const MedicationInfo = ({days, medicationCount}) => {
   return (
@@ -79,20 +80,20 @@ const IconWrapper = styled.View`
 `;
 
 const WithMedeasy = styled.Text`
-  font-size: 12px;
+  font-size: ${FontSizes.caption.default};
   font-family: 'Pretendard-Regular';
   color: ${themes.light.textColor.buttonText};
   padding-bottom: 10px;
 `;
 
 const InfoText = styled.Text`
-  font-size: 18px;
+  font-size: ${FontSizes.heading.default};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText70};
 `;
 
 const InfoNum = styled.Text`
-  font-size: 18px;
+  font-size: ${FontSizes.heading.default};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
 `;
