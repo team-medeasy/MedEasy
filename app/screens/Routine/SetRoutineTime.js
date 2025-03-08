@@ -23,7 +23,7 @@ const TimeSettingItem = ({icon, title, time, onPress}) => {
         <TimeSettingText>{title}</TimeSettingText>
       </IconTextContainer>
       <TimeButton onPress={onPress}>
-        <TimeButtonText>{time || '시간을 선택해주세요'}</TimeButtonText>
+        <TimeButtonText>{time}</TimeButtonText>
       </TimeButton>
     </View>
   );
@@ -35,11 +35,6 @@ const SetRoutineTime = () => {
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [currentSettingType, setCurrentSettingType] = useState('');
 
-  const [breakfastTime, setBreakfastTime] = useState('');
-  const [lunchTime, setLunchTime] = useState('');
-  const [dinnerTime, setDinnerTime] = useState('');
-  const [bedTime, setBedTime] = useState('');
-
   const formatTime = date => {
     if (!date) return '';
     const hours = date.getHours();
@@ -49,6 +44,26 @@ const SetRoutineTime = () => {
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
   };
+
+  // 디폴트 시간 설정
+  const defaultBreakfastTime = new Date();
+  defaultBreakfastTime.setHours(8, 0, 0, 0);
+
+  const defaultLunchTime = new Date();
+  defaultLunchTime.setHours(12, 0, 0, 0);
+
+  const defaultDinnerTime = new Date();
+  defaultDinnerTime.setHours(18, 0, 0, 0);
+
+  const defaultBedTime = new Date();
+  defaultBedTime.setHours(22, 0, 0, 0);
+
+  const [breakfastTime, setBreakfastTime] = useState(
+    formatTime(defaultBreakfastTime),
+  );
+  const [lunchTime, setLunchTime] = useState(formatTime(defaultLunchTime));
+  const [dinnerTime, setDinnerTime] = useState(formatTime(defaultDinnerTime));
+  const [bedTime, setBedTime] = useState(formatTime(defaultBedTime));
 
   const onTimeChange = (event, selectedTime) => {
     const currentTime = selectedTime || new Date();
