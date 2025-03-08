@@ -3,10 +3,12 @@ import styled from 'styled-components/native';
 import {pointColor, themes} from '../styles';
 import KarteIcon from '../../assets/icons/karte.svg';
 import LogoIcon from '../../assets/icons/logo/logo.svg';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 const MedicationInfo = ({days, medicationCount}) => {
   return (
     <Container>
+      <BGStyle />
       <DaysSinceMedication>
         <WithMedeasy>메디지와 함께</WithMedeasy>
         <InfoText>약 챙겨먹은지 </InfoText>
@@ -32,13 +34,24 @@ const MedicationInfo = ({days, medicationCount}) => {
 };
 
 const Container = styled.View`
-  width: 100%;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   padding: 0px 20px;
-  background-color: ${themes.light.boxColor.buttonPrimary};
+  background-color: ${themes.light.bgColor.bgPrimary};
   gap: 10px;
 `;
+
+const BGStyle = styled.View`
+  position: absolute;
+  height: 80%;
+  top: -20px;
+  right: -28px;
+  left: -28px;
+  border-radius: 448px;
+  background-color: ${themes.light.boxColor.buttonPrimary};
+  overflow: hidden;
+`;
+
 
 const DaysSinceMedication = styled.View`
   background-color: ${pointColor.pointPrimary};
@@ -67,20 +80,20 @@ const IconWrapper = styled.View`
 `;
 
 const WithMedeasy = styled.Text`
-  font-size: 12px;
+  font-size: ${FontSizes.caption.default};
   font-family: 'Pretendard-Regular';
   color: ${themes.light.textColor.buttonText};
   padding-bottom: 10px;
 `;
 
 const InfoText = styled.Text`
-  font-size: 18px;
+  font-size: ${FontSizes.heading.default};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText70};
 `;
 
 const InfoNum = styled.Text`
-  font-size: 18px;
+  font-size: ${FontSizes.heading.default};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
 `;
