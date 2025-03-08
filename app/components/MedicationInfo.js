@@ -7,6 +7,7 @@ import LogoIcon from '../../assets/icons/logo/logo.svg';
 const MedicationInfo = ({days, medicationCount}) => {
   return (
     <Container>
+      <BGStyle />
       <DaysSinceMedication>
         <WithMedeasy>메디지와 함께</WithMedeasy>
         <InfoText>약 챙겨먹은지 </InfoText>
@@ -32,13 +33,24 @@ const MedicationInfo = ({days, medicationCount}) => {
 };
 
 const Container = styled.View`
-  width: 100%;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   padding: 0px 20px;
-  background-color: ${themes.light.boxColor.buttonPrimary};
+  background-color: ${themes.light.bgColor.bgPrimary};
   gap: 10px;
 `;
+
+const BGStyle = styled.View`
+  position: absolute;
+  height: 80%;
+  top: -20px;
+  right: -28px;
+  left: -28px;
+  border-radius: 448px;
+  background-color: ${themes.light.boxColor.buttonPrimary};
+  overflow: hidden;
+`;
+
 
 const DaysSinceMedication = styled.View`
   background-color: ${pointColor.pointPrimary};
