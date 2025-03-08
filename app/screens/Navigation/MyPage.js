@@ -43,7 +43,9 @@ const MyPage = () => {
         {/* 약 챙겨먹은 일수 */}
         <MedicationInfo days={32} medicationCount={5} />
         {/* 설정 리스트 */}
+        <VSpacer height={24} />
         <SettingList />
+        <VSpacer height={48} />
         {/* Footer */}
         <Footer />
       </ScrollContent>
@@ -59,12 +61,8 @@ const Container = styled.View`
 const HeaderContainer = styled.View`
   justify-content: flex-end;
   background-color: ${themes.light.boxColor.buttonPrimary};
-  ${Platform.OS === 'ios' && `
-        padding-top: 50px;
-      `}
-      ${Platform.OS === 'android' && `
-        padding-top: 20px;
-      `}
+  ${Platform.OS === 'ios' && `padding-top: 50px;`}
+  ${Platform.OS === 'android' && `padding-top: 20px;`}
   padding-left: 20px;
 `;
 
@@ -86,6 +84,7 @@ const ProfileContainer = styled.View`
   background-color: ${themes.light.boxColor.buttonPrimary};
   flex-direction: row;
 `;
+
 const TextContainer = styled.View`
   justify-content: center;
   padding: 20px;
@@ -132,5 +131,7 @@ const EditButton = styled.TouchableOpacity`
   border-width: 1px;
   border-color: ${themes.light.boxColor.tagDetailSecondary};
 `;
-
+const VSpacer = styled.View`
+  height: ${({height}) => height || 16}px;
+`;
 export default MyPage;

@@ -43,7 +43,7 @@ const Container = styled.View`
 
 const BGStyle = styled.View`
   position: absolute;
-  height: 80%;
+  height: 60%;
   top: -20px;
   right: -28px;
   left: -28px;
@@ -51,7 +51,6 @@ const BGStyle = styled.View`
   background-color: ${themes.light.boxColor.buttonPrimary};
   overflow: hidden;
 `;
-
 
 const DaysSinceMedication = styled.View`
   background-color: ${pointColor.pointPrimary};
