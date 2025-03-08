@@ -1,150 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
-import {themes, pointColor} from './../../styles';
+import {themes} from './../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {SearchBar} from './../../components';
 import {OtherIcons, HeaderIcons} from '../../../assets/icons';
-
-const Container = styled.View`
-  flex: 1;
-  background-color: ${themes.light.bgColor.bgPrimary};
-`;
-
-const HeaderContainer = styled.View`
-  padding-top: 70px;
-  padding-bottom: 7px;
-  background-color: ${themes.light.bgColor.headerBG};
-`;
-
-const ChevronAndSearchContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  padding-right: 15px;
-  padding-left: 12px;
-`;
-
-const ChevronIconButton = styled(TouchableOpacity)`
-  margin-right: 12px;
-`;
-
-const SearchesContainer = styled.View`
-  margin-top: 25px;
-`;
-
-const RecentSearchesContainer = styled.View``;
-
-const PopularSearchContainer = styled.View``;
-
-const SearchSectionHeader = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 25px;
-  padding-right: 25px;
-`;
-
-const SearchTitle = styled.Text`
-  font-size: 16px;
-  font-family: 'Pretendard-Semibold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const ClearAllButton = styled(TouchableOpacity)``;
-
-const ClearAllText = styled.Text`
-  font-size: 14px;
-  font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.Primary30};
-`;
-
-const NoRecentSearchesText = styled.Text`
-  font-size: 14px;
-  font-family: 'Pretendard-Semibold';
-  color: ${themes.light.textColor.Primary30};
-  text-align: center;
-  margin-top: 50px;
-  margin-bottom: 50px;
-`;
-
-const RecentSearchListContainer = styled.ScrollView`
-  padding-left: 20px;
-  padding-top: 20px;
-  padding-bottom: 40px;
-`;
-
-const PopularSearchListContainer = styled.View`
-  margin-top: 20px;
-  gap: 18px;
-`;
-
-const RecentSearchItemButton = styled(TouchableOpacity)`
-  flex-direction: row;
-  align-items: center;
-  border: 1px;
-  border-color: ${themes.light.borderColor.borderPrimary};
-  padding: 8px 15px 7px 14px;
-  border-radius: 20px;
-  margin-right: 10px;
-`;
-
-const RecentSearchItemText = styled.Text`
-  font-size: 14px;
-  font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const DeleteIconButton = styled(TouchableOpacity)`
-  margin-left: 10px;
-`;
-
-const PopularSearchItemButton = styled(TouchableOpacity)`
-  flex-direction: row;
-  align-items: center;
-  padding: 0 25px 0 25px;
-`;
-
-const RankingText = styled.Text`
-  font-size: 14px;
-  font-family: 'Pretendard-Bold';
-  font-weight: bold;
-  color: ${pointColor.pointPrimary};
-  margin-right: 20px;
-`;
-
-const PopularSearchText = styled.Text`
-  font-size: 14px;
-  font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.textPrimary};
-  flex: 1;
-`;
-
-const IconContainer = styled.View`
-  width: 9.14px;
-  height: 17px;
-  justify-content: center;
-  align-items: center;
-`;
-
-const RankingStayText = styled.Text`
-  font-size: 14px;
-  text-align: center;
-  color: ${themes.light.textColor.Primary30};
-`;
-
-const UpdateDateContainer = styled.View`
-  font-family: 'Pretendard-Medium';
-  align-self: flex-end;
-  margin-top: 10px;
-`;
-
-const UpdateDateText = styled.Text`
-  font-size: 12px;
-  font-family: 'Pretendard-Medium';
-  margin-right: 20px;
-  color: ${themes.light.textColor.Primary30};
-`;
 
 // AsyncStorage 키 상수 정의
 const RECENT_SEARCHES_STORAGE_KEY = '@mediapp:recent_searches';
@@ -152,6 +14,14 @@ const RECENT_SEARCHES_STORAGE_KEY = '@mediapp:recent_searches';
 const SearchMedicineScreen = ({navigation, route}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState([]);
+  const [currentDate, setCurrentDate] = useState('');
+
+  // 현재 날짜 설정
+  useEffect(() => {
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    setCurrentDate(formattedDate);
+  }, []);
 
   // 인기 검색어 (임시)데이터
   const popularSearches = [
@@ -250,6 +120,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
 
   return (
     <Container>
+
       <HeaderContainer>
         <ChevronAndSearchContainer>
           <ChevronIconButton onPress={() => navigation.goBack()}>
@@ -262,13 +133,14 @@ const SearchMedicineScreen = ({navigation, route}) => {
           />
         </ChevronAndSearchContainer>
       </HeaderContainer>
+
       <SearchesContainer>
-        <RecentSearchesContainer>
+        <View>
           <SearchSectionHeader>
             <SearchTitle>최근 검색어</SearchTitle>
-            <ClearAllButton onPress={handleClearAll}>
+            <TouchableOpacity onPress={handleClearAll}>
               <ClearAllText>전체 삭제</ClearAllText>
-            </ClearAllButton>
+            </TouchableOpacity>
           </SearchSectionHeader>
           {recentSearches.length > 0 ? (
             <RecentSearchListContainer
@@ -292,8 +164,9 @@ const SearchMedicineScreen = ({navigation, route}) => {
           ) : (
             <NoRecentSearchesText>검색 기록이 없습니다.</NoRecentSearchesText>
           )}
-        </RecentSearchesContainer>
-        <PopularSearchContainer>
+        </View>
+
+        <View>
           <SearchSectionHeader>
             <SearchTitle>인기 검색어</SearchTitle>
           </SearchSectionHeader>
@@ -310,13 +183,144 @@ const SearchMedicineScreen = ({navigation, route}) => {
               </PopularSearchItemButton>
             ))}
           </PopularSearchListContainer>
-          <UpdateDateContainer>
-            <UpdateDateText>업데이트 2025-02-13</UpdateDateText>
-          </UpdateDateContainer>
-        </PopularSearchContainer>
+        </View>
+
+        <View style={{
+          alignSelf: 'flex-end',
+          marginTop: 10
+        }}>
+          <UpdateDateText>업데이트 {currentDate}</UpdateDateText>
+        </View>
       </SearchesContainer>
     </Container>
   );
 };
+
+const Container = styled.View`
+  flex: 1;
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
+
+const HeaderContainer = styled.View`
+  padding-top: 70px;
+  padding-bottom: 7px;
+  background-color: ${themes.light.bgColor.headerBG};
+`;
+
+const ChevronAndSearchContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  padding-right: 15px;
+  padding-left: 12px;
+`;
+
+const ChevronIconButton = styled(TouchableOpacity)`
+  margin-right: 12px;
+`;
+
+const SearchesContainer = styled.View`
+  margin-top: 25px;
+`;
+
+const SearchSectionHeader = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 25px;
+  padding-right: 25px;
+`;
+
+const SearchTitle = styled.Text`
+  font-size: 16px;
+  font-family: 'Pretendard-Semibold';
+  color: ${themes.light.textColor.textPrimary};
+`;
+
+const ClearAllText = styled.Text`
+  font-size: ${FontSizes.body.default};
+  font-family: 'Pretendard-Medium';
+  color: ${themes.light.textColor.Primary30};
+`;
+
+const NoRecentSearchesText = styled.Text`
+  font-size: 14px;
+  font-family: 'Pretendard-Semibold';
+  color: ${themes.light.textColor.Primary30};
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+`;
+
+const RecentSearchListContainer = styled.ScrollView`
+  padding-left: 20px;
+  padding-top: 20px;
+  padding-bottom: 40px;
+`;
+
+const PopularSearchListContainer = styled.View`
+  margin-top: 20px;
+  gap: 18px;
+`;
+
+const RecentSearchItemButton = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  border: 1px;
+  border-color: ${themes.light.borderColor.borderPrimary};
+  padding: 8px 15px 7px 14px;
+  border-radius: 20px;
+  margin-right: 10px;
+`;
+
+const RecentSearchItemText = styled.Text`
+  font-size: 14px;
+  font-family: 'Pretendard-Medium';
+  color: ${themes.light.textColor.textPrimary};
+`;
+
+const DeleteIconButton = styled(TouchableOpacity)`
+  margin-left: 10px;
+`;
+
+const PopularSearchItemButton = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  padding: 0 25px 0 25px;
+`;
+
+const RankingText = styled.Text`
+  font-size: ${FontSizes.caption.large};
+  font-family: 'Pretendard-Bold';
+  font-weight: bold;
+  color: ${themes.light.pointColor.Primary};
+  margin-right: 20px;
+`;
+
+const PopularSearchText = styled.Text`
+  font-size: ${FontSizes.body.default};
+  font-family: 'Pretendard-Medium';
+  color: ${themes.light.textColor.textPrimary};
+  flex: 1;
+`;
+
+const IconContainer = styled.View`
+  width: 9.14px;
+  height: 17px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const RankingStayText = styled.Text`
+  font-size: 14px;
+  text-align: center;
+  color: ${themes.light.textColor.Primary30};
+`;
+
+const UpdateDateText = styled.Text`
+  font-size: ${FontSizes.caption.default};
+  font-family: 'Pretendard-Medium';
+  margin-right: 20px;
+  color: ${themes.light.textColor.Primary30};
+`;
 
 export default SearchMedicineScreen;
