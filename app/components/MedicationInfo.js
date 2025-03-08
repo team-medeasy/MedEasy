@@ -80,8 +80,8 @@ const IconWrapper = styled.View`
 `;
 
 const WithMedeasy = styled.Text`
+  font-family: 'Pretendard-Medium';
   font-size: ${FontSizes.caption.default};
-  font-family: 'Pretendard-Regular';
   color: ${themes.light.textColor.buttonText};
   padding-bottom: 10px;
 `;
