@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import {FlatList} from 'react-native';
+import {FlatList, KeyboardAvoidingView, View} from 'react-native';
 import ChatInfoModal from './ChatInfoModal';
 import {Header} from './../../components/\bHeader/Header';
 import {themes} from '../../styles';
@@ -58,36 +58,45 @@ const Chat = () => {
   };
 
   return (
-    <Container>
-      <Header>AI 챗봇 메디씨</Header>
+    <Container
+      style={{flex: 1, backgroundColor: themes.light.bgColor.bgSecondary}}>
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <Header>AI 챗봇 메디씨</Header>
 
-      {/* 채팅 이용 안내 모달 */}
-      <ChatInfoModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-      />
+        {/* 채팅 이용 안내 모달 */}
+        <ChatInfoModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+        />
 
-      {/* 채팅 메시지 목록 */}
-      <FlatList
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={{padding: 16}}
-      />
+        {/* 채팅 메시지 목록 */}
+        <FlatList
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={{padding: 16}}
+        />
 
-      {/* 메시지 입력 컴포넌트 */}
-      <MessageInput
-        inputText={inputText}
-        setInputText={setInputText}
-        sendMessage={sendMessage}
+        {/* 메시지 입력 컴포넌트 */}
+        <MessageInput
+          inputText={inputText}
+          setInputText={setInputText}
+          sendMessage={sendMessage}
+        />
+      </KeyboardAvoidingView>
+      <View
+        style={{
+          width: '100%',
+          height: 30,
+          backgroundColor: themes.light.bgColor.bgPrimary,
+        }}
       />
     </Container>
   );
 };
 
-const Container = styled.View`
-  flex: 1;
-  background-color: ${themes.light.bgColor.bgSecondary};
-`;
+const Container = styled.View``;
 
 export default Chat;

@@ -1,27 +1,29 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import { View, TouchableOpacity, Modal } from 'react-native';
-import { themes } from './../../styles';
-import { ModalHeader, Button } from '../../components';
+import {View, TouchableOpacity, Modal} from 'react-native';
+import {themes} from './../../styles';
+import {ModalHeader, Button} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { RoutineIcons, TabIcons } from '../../../assets/icons';
-import { useNavigation } from '@react-navigation/native';
+import {RoutineIcons} from '../../../assets/icons';
+import {useNavigation} from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const { moon: MoonIcon, sun: SunIcon, cup: CupIcon, } = RoutineIcons;
-const { home: HomeIcon } = TabIcons;
+const {
+  moon: MoonIcon,
+  sun: SunIcon,
+  cup: CupIcon,
+  homeRoutine: HomeRoutineIcon,
+} = RoutineIcons;
 
-const TimeSettingItem = ({ icon, title, time, onPress }) => {
+const TimeSettingItem = ({icon, title, time, onPress}) => {
   return (
-    <View style={{ gap: 15 }}>
+    <View style={{gap: 15}}>
       <IconTextContainer>
         {icon}
         <TimeSettingText>{title}</TimeSettingText>
       </IconTextContainer>
       <TimeButton onPress={onPress}>
-        <TimeButtonText>
-          {time || '시간을 선택해주세요'}
-        </TimeButtonText>
+        <TimeButtonText>{time}</TimeButtonText>
       </TimeButton>
     </View>
   );
@@ -32,13 +34,8 @@ const SetRoutineTime = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [currentSettingType, setCurrentSettingType] = useState('');
-  
-  const [breakfastTime, setBreakfastTime] = useState('');
-  const [lunchTime, setLunchTime] = useState('');
-  const [dinnerTime, setDinnerTime] = useState('');
-  const [bedTime, setBedTime] = useState('');
 
-  const formatTime = (date) => {
+  const formatTime = date => {
     if (!date) return '';
     const hours = date.getHours();
     const minutes = date.getMinutes();
@@ -48,19 +45,39 @@ const SetRoutineTime = () => {
     return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
   };
 
+  // 디폴트 시간 설정
+  const defaultBreakfastTime = new Date();
+  defaultBreakfastTime.setHours(8, 0, 0, 0);
+
+  const defaultLunchTime = new Date();
+  defaultLunchTime.setHours(12, 0, 0, 0);
+
+  const defaultDinnerTime = new Date();
+  defaultDinnerTime.setHours(18, 0, 0, 0);
+
+  const defaultBedTime = new Date();
+  defaultBedTime.setHours(22, 0, 0, 0);
+
+  const [breakfastTime, setBreakfastTime] = useState(
+    formatTime(defaultBreakfastTime),
+  );
+  const [lunchTime, setLunchTime] = useState(formatTime(defaultLunchTime));
+  const [dinnerTime, setDinnerTime] = useState(formatTime(defaultDinnerTime));
+  const [bedTime, setBedTime] = useState(formatTime(defaultBedTime));
+
   const onTimeChange = (event, selectedTime) => {
     const currentTime = selectedTime || new Date();
     setSelectedTime(currentTime);
   };
 
-  const openTimePicker = (type) => {
+  const openTimePicker = type => {
     setCurrentSettingType(type);
     setShowTimePicker(true);
   };
 
   const handleConfirm = () => {
     const formattedTime = formatTime(selectedTime);
-    
+
     // 현재 설정 중인 타입에 따라 시간 설정
     switch (currentSettingType) {
       case '아침식사':
@@ -76,7 +93,7 @@ const SetRoutineTime = () => {
         setBedTime(formattedTime);
         break;
     }
-    
+
     setShowTimePicker(false);
   };
 
@@ -98,45 +115,51 @@ const SetRoutineTime = () => {
 
   return (
     <Container>
-      <ModalHeader
-        showDelete='true'
-        onDeletePress={() => {}}
-      >루틴 설정</ModalHeader>
+      <ModalHeader showDelete="true" onDeletePress={() => {}}>
+        루틴 설정
+      </ModalHeader>
 
-      <View style={{
-        paddingTop: 39,
-        paddingLeft: 30,
-        paddingBottom: 53,
-        gap: 7,
-      }}>
+      <View
+        style={{
+          paddingTop: 39,
+          paddingLeft: 30,
+          paddingBottom: 53,
+          gap: 7,
+        }}>
         <Title>한성님의 하루 일과를 알려주세요.</Title>
         <Subtitle>메디지가 일정에 맞춰 복약 알림을 보내드릴게요!</Subtitle>
       </View>
 
-      <View style={{ paddingHorizontal: 20, gap: 20 }}>
-        <TimeSettingItem 
-          icon={<CupIcon width={20} height={20} style={{color: '#A0CC88'}}/>}
+      <View style={{paddingHorizontal: 20, gap: 20}}>
+        <TimeSettingItem
+          icon={<CupIcon width={20} height={20} style={{color: '#A0CC88'}} />}
           title="아침 식사"
           time={breakfastTime}
           onPress={() => openTimePicker('아침식사')}
         />
-        
-        <TimeSettingItem 
-          icon={<SunIcon width={20} height={20} style={{color: '#FF8B25'}}/>}
+
+        <TimeSettingItem
+          icon={<SunIcon width={20} height={20} style={{color: '#FF8B25'}} />}
           title="점심 식사"
           time={lunchTime}
           onPress={() => openTimePicker('점심식사')}
         />
-        
-        <TimeSettingItem 
-          icon={<HomeIcon width={20} height={20} style={{color: '#A5BEF0'}}/>}
+
+        <TimeSettingItem
+          icon={
+            <HomeRoutineIcon
+              width={20}
+              height={20}
+              style={{color: '#A5BEF0'}}
+            />
+          }
           title="저녁 식사"
           time={dinnerTime}
           onPress={() => openTimePicker('저녁식사')}
         />
-        
-        <TimeSettingItem 
-          icon={<MoonIcon width={20} height={20} style={{color: '#FED359'}}/>}
+
+        <TimeSettingItem
+          icon={<MoonIcon width={20} height={20} style={{color: '#FED359'}} />}
           title="취침 시간"
           time={bedTime}
           onPress={() => openTimePicker('취침시간')}
@@ -147,15 +170,15 @@ const SetRoutineTime = () => {
         animationType="slide"
         transparent={true}
         visible={showTimePicker}
-        onRequestClose={() => setShowTimePicker(false)}
-      >
+        onRequestClose={() => setShowTimePicker(false)}>
         <ModalContainer>
           <ModalContent>
             <TopBar />
             <ModalTitle>{getModalTitleText()}</ModalTitle>
-            <View style={{
-              margin: 30
-            }}>
+            <View
+              style={{
+                margin: 30,
+              }}>
               <DateTimePicker
                 value={selectedTime}
                 mode="time"
@@ -164,7 +187,7 @@ const SetRoutineTime = () => {
                 locale="ko"
               />
             </View>
-            <Button title="확인" onPress={handleConfirm}/>
+            <Button title="확인" onPress={handleConfirm} />
           </ModalContent>
         </ModalContainer>
       </Modal>
@@ -179,8 +202,7 @@ const SetRoutineTime = () => {
           paddingRight: 20,
           paddingBottom: 30,
           alignItems: 'center',
-        }}
-      >
+        }}>
         <Button title="닫기" onPress={() => navigation.goBack()} />
       </View>
     </Container>
@@ -207,7 +229,7 @@ const Subtitle = styled.Text`
 const IconTextContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 10
+  gap: 10;
 `;
 
 const TimeSettingText = styled.Text`
