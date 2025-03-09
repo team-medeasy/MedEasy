@@ -2,7 +2,7 @@ import axios from 'axios';
 import {refreshToken} from './auth';
 import {getAccessToken, getRefreshToken, setAccessToken} from './storage';
 
-const API_BASE_URL = 'https://your-api-url.com';
+const API_BASE_URL = 'http://35.216.7.36:8080';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
