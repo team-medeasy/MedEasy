@@ -1,16 +1,31 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {Header} from '../../components/\bHeader/Header';
 import {themes} from '../../styles';
 
-const MedicineImageDetailScreen = () => {
-  const medicine = {
-    item_name: '지엘타이밍정(카페인무수물)',
-    item_seq: '196500051',
-    item_image:
-      'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1NAT_bwbZd9',
-  };
+import { dummyMedicineData } from '../../../assets/data/data';
 
+const MedicineImageDetailScreen = ({route}) => {
+  const { itemSeq } = route.params;
+  const [medicine, setMedicine] = useState(null);
+
+  // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
+  useEffect(() => {
+    const foundMedicine = dummyMedicineData.find(
+      item => item.item_seq === itemSeq
+    );
+    if (foundMedicine) {
+      setMedicine(foundMedicine);
+    }
+  }, [itemSeq]);
+
+  if (!medicine) { // 렌더링 전 error 방지
+    return (
+      <Container>
+        <Header>약 정보를 불러오는 중...</Header>
+      </Container>
+    );
+  }
   return (
     <Container>
       <Header>{medicine.item_name}</Header>
