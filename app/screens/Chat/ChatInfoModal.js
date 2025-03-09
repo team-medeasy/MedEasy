@@ -1,19 +1,57 @@
-import React from 'react';
-import {Modal} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Modal, Animated } from 'react-native';
 import styled from 'styled-components/native';
-import {Button} from './../../components';
-import {themes} from '../../styles';
-import {LogoIcons} from '../../../assets/icons';
+import { Button } from './../../components';
+import { themes } from '../../styles';
+import { LogoIcons } from '../../../assets/icons';
 
-const ChatInfoModal = ({visible, onClose}) => {
+const ChatInfoModal = ({ visible, onClose }) => {
+  // 배경 투명도
+  const [fadeAnim] = useState(new Animated.Value(0));
+  // 모달 위치
+  const [slideAnim] = useState(new Animated.Value(300));
+
+  useEffect(() => {
+    if (visible) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+      
+      // 위로 슬라이드
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      // 닫힐 때 아래로 슬라이드
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+      
+      Animated.timing(slideAnim, {
+        toValue: 300,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [visible, fadeAnim, slideAnim]);
+
   return (
     <Modal
       visible={visible}
       transparent={true}
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}>
-      <ModalContainer>
-        <ModalContent>
+      <AnimatedModalContainer style={{ opacity: fadeAnim }}>
+        <AnimatedModalContent
+          style={{
+            transform: [{ translateY: slideAnim }],
+          }}>
           <TopBar />
           <CautionContainer>
             <Title>AI 채팅 이용 안내</Title>
@@ -25,15 +63,26 @@ const ChatInfoModal = ({visible, onClose}) => {
             </CautionText>
           </CautionContainer>
           <Button title="확인" onPress={onClose}></Button>
-        </ModalContent>
-      </ModalContainer>
+        </AnimatedModalContent>
+      </AnimatedModalContainer>
     </Modal>
   );
 };
 
-const ModalContainer = styled.View`
+const AnimatedModalContainer = styled(Animated.View)`
   flex: 1;
   background-color: ${themes.light.bgColor.modalBG};
+  justify-content: flex-end;
+`;
+
+const AnimatedModalContent = styled(Animated.View)`
+  width: 100%;
+  height: 60%;
+  background-color: ${themes.light.bgColor.bgPrimary};
+  border-radius: 40px;
+  justify-content: baseline;
+  align-items: center;
+  padding: 20px;
 `;
 
 const TopBar = styled.View`
@@ -43,17 +92,6 @@ const TopBar = styled.View`
   height: 5px;
   background-color: ${themes.light.textColor.Primary30};
   border-radius: 4px;
-`;
-
-const ModalContent = styled.View`
-  width: 100%;
-  height: 60%;
-  margin-top: auto;
-  background-color: ${themes.light.bgColor.bgPrimary};
-  border-radius: 40px;
-  justify-content: baseline;
-  align-items: center;
-  padding: 20px;
 `;
 
 const CautionContainer = styled.View`

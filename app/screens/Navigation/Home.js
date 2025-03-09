@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {SafeAreaView, TouchableOpacity} from 'react-native';
-import {themes} from './../../styles';
+import { SafeAreaView, TouchableOpacity } from 'react-native';
+import { themes } from './../../styles';
 
-import {HeaderIcons, RoutineIcons, LogoIcons} from './../../../assets/icons';
+import { HeaderIcons, RoutineIcons, LogoIcons } from './../../../assets/icons';
 import CalendarWidget from '../../components/CalendarWidget';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Home = () => {
@@ -23,27 +23,27 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <ScrollContainer>
         <Header>
           <LogoContainer>
             <LogoIcons.logo
               height={20}
               width={13}
-              style={{color: themes.light.pointColor.Primary}}
+              style={{ color: themes.light.pointColor.Primary }}
               marginRight={10}
             />
             <LogoIcons.logoKr
               height={19}
               width={54}
-              style={{color: themes.light.pointColor.Primary}}
+              style={{ color: themes.light.pointColor.Primary }}
             />
           </LogoContainer>
           <TouchableOpacity onPress={handleNotificationPress}>
             <HeaderIcons.notification
               height={20}
               width={22}
-              style={{color: themes.light.textColor.textPrimary}}
+              style={{ color: themes.light.textColor.textPrimary }}
             />
           </TouchableOpacity>
         </Header>
@@ -57,7 +57,7 @@ const Home = () => {
               height={112}
               style={{
                 color: themes.light.pointColor.Primary10,
-                transform: [{rotate: '10deg'}],
+                transform: [{ rotate: '10deg' }],
                 position: 'absolute',
                 bottom: -20,
                 right: 20,
@@ -69,7 +69,7 @@ const Home = () => {
             <RoutineButton onPress={() => console.log('루틴 추가')}>
               <LogoIcons.logoAdd
                 height={115}
-                style={{color: themes.light.pointColor.primary30}}
+                style={{ color: themes.light.pointColor.primary30 }}
               />
               <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
             </RoutineButton>
@@ -92,7 +92,7 @@ const Home = () => {
                   height={16}
                   style={{
                     color: themes.light.textColor.Primary20,
-                    transform: [{rotate: '180deg'}],
+                    transform: [{ rotate: '180deg' }],
                   }}
                 />
               </ButtonContent>
@@ -114,7 +114,7 @@ const Home = () => {
                   height={16}
                   style={{
                     color: themes.light.textColor.Primary20,
-                    transform: [{rotate: '180deg'}],
+                    transform: [{ rotate: '180deg' }],
                   }}
                 />
               </ButtonContent>
@@ -124,6 +124,14 @@ const Home = () => {
 
         {/* 달력 */}
         <CalendarWidget />
+        <EventIcons>
+          <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.pointColor.Primary }} />
+          <EventText>복용 완료</EventText>
+          <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.textColor.Primary20 }}/>
+          <EventText>미복용</EventText>
+          <RoutineIcons.hospital width={16} height={16} style={{ color: themes.light.pointColor.Secondary }}/>
+          <EventText>병원 진료</EventText>
+        </EventIcons>
       </ScrollContainer>
     </SafeAreaView>
   );
@@ -214,6 +222,19 @@ const ButtonText = styled.Text`
   font-size: ${FontSizes.body.medium};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
+`;
+
+const EventIcons = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding-left: 34px;
+`;
+
+const EventText = styled.Text`
+  font-size: ${FontSizes.caption.medium};
+  color: ${themes.light.textColor.Primary50};
+  padding-right: 10px;
 `;
 
 export default Home;
