@@ -3,8 +3,7 @@ import styled from 'styled-components/native';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import {themes} from '../styles';
 import {HeaderIcons} from '../../assets/icons';
-
-const {chevron: ChevronIcon} = HeaderIcons;
+import { initialMedicineRoutines, initialHospitalRoutines, weekDays } from '../../assets/data/data';
 
 // 요일을 한글로 설정
 LocaleConfig.locales['ko'] = {
@@ -89,7 +88,7 @@ const StyledCalendar = styled(Calendar).attrs({
   },
   monthFormat: 'yyyy.MM',
   renderArrow: direction => (
-    <ChevronIcon
+    <HeaderIcons.chevron
       style={{
         transform: [{rotate: direction === 'left' ? '0deg' : '180deg'}],
         marginHorizontal: 40,
