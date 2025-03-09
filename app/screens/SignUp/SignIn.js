@@ -17,18 +17,15 @@ const Container1 = styled.View`
 `;
 
 const Container2 = styled.View`
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
   margin-left: 25px;
   margin-right: 25px;
   margin-top: 37px;
 `;
 
 const InputContainer = styled.View`
-  flex: 1;
-  margin-left: ${props => props.marginLeft || '0px'};
-  margin-right: ${props => props.marginRight || '0px'};
+  width: 100%;
+  margin-top: ${props => props.marginTop || '0px'};
+  margin-bottom: ${props => props.marginBottom || '0px'};
 `;
 
 const BtnContainer = styled.View`
@@ -39,31 +36,37 @@ const BtnContainer = styled.View`
 
 const TextInput = styled.TextInput`
   height: 60px;
-  border-radius: 8px;
+  border-radius: 10px;
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 20px;
   font-size: 16px;
 `;
 
-const SignUpNameScreen = ({navigation}) => {
-  const {signUpData, updateSignUpData} = useSignUp();
-  const [firstName, setFirstName] = useState(signUpData.firstName || '');
-  const [lastName, setLastName] = useState(signUpData.lastName || '');
-  const progress = '25%';
+const TxtLabel = styled.Text`
+  height: 60px;
+  border-radius: 10px;
+  background-color: ${themes.light.boxColor.inputPrimary};
+  padding: 20px;
+  font-size: 16px;
+`;
+
+const SignInScreen = ({navigation, route}) => {
+  const {updateSignUpData} = useSignUp();
+  const [email, setEmail] = useState('');
+  const progress = '50%';
 
   const handleNext = () => {
-    if (firstName && lastName) {
-      // Context에 상태 저장
-      updateSignUpData({firstName, lastName});
-      navigation.navigate('SignUpEmail');
+    if (email) {
+      updateSignUpData({email});
+      // 다음 페이지로 이동
+      navigation.navigate('SignUpPassword');
     } else {
-      alert('성을 포함한 이름을 모두 입력하세요.');
+      alert('이메일을 입력하세요.');
     }
   };
 
   return (
     <Container>
-      <ProgressBar progress={progress} />
       <Container1>
         <Text
           style={{
@@ -79,25 +82,28 @@ const SignUpNameScreen = ({navigation}) => {
             marginTop: 7,
             color: themes.light.textColor.Primary50,
           }}>
-          이름을 입력해주세요.
+          로그인 후 다양한 서비스를 이용해 보세요!
         </Text>
       </Container1>
+
       <Container2>
-        <InputContainer marginRight="5px">
+        <InputContainer marginBottom="5px">
           <TextInput
-            placeholder="성"
-            value={lastName}
-            onChangeText={setLastName}
+            placeholder="이메일 입력"
+            value={email}
+            onChangeText={setEmail}
           />
         </InputContainer>
-        <InputContainer marginLeft="5px">
+        <InputContainer marginBottom="5px">
           <TextInput
-            placeholder="이름"
-            value={firstName}
-            onChangeText={setFirstName}
+            placeholder="이메일 입력"
+            value={email}
+            onChangeText={setEmail}
+            secureTextEntry={true}
           />
         </InputContainer>
       </Container2>
+
       <BtnContainer>
         <BackAndNextButtons
           onPressPrev={() => navigation.goBack()}
@@ -107,4 +113,5 @@ const SignUpNameScreen = ({navigation}) => {
     </Container>
   );
 };
-export default SignUpNameScreen;
+
+export default SignInScreen;

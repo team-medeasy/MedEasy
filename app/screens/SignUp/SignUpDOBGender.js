@@ -4,13 +4,15 @@ import styled from 'styled-components/native';
 import {themes, pointColor, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
 import {LogoIcons} from './../../../assets/icons';
+import {useSignUp} from '../../api/context/SignUpContext';
+import {handleSignUp} from '../../api/services/authService';
+
 const {logo: LogoIcon} = LogoIcons;
 
-
-const SignUpDOBGenderScreen = ({navigation, route}) => {
-  const {firstName} = route.params;
-  const [birthDate, setBirthDate] = useState('');
-  const [gender, setGender] = useState('');
+const SignUpDOBGenderScreen = ({navigation}) => {
+  const {signUpData, updateSignUpData} = useSignUp();
+  const [birthday, setBirthday] = useState(signUpData.birthday || '');
+  const [gender, setGender] = useState(signUpData.gender || '');
   const [dateError, setDateError] = useState('');
   const progress = '100%';
 
@@ -94,7 +96,7 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
 
   const handleBirthDateChange = text => {
     // 현재 입력된 모든 문자(하이픈 포함)의 길이가 이전보다 짧으면 삭제 중
-    const isDeleting = text.length < birthDate.length;
+    const isDeleting = text.length < birthday.length;
 
     // 숫자만 추출
     let numbers = text.replace(/[^0-9]/g, '');
@@ -108,7 +110,7 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
 
     // 삭제 중일 때는 이전 값에서 마지막 숫자 하나만 제거
     if (isDeleting) {
-      const prevNumbers = birthDate.replace(/[^0-9]/g, '');
+      const prevNumbers = birthday.replace(/[^0-9]/g, '');
       numbers = prevNumbers.slice(0, -1);
     }
 
@@ -130,11 +132,11 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
       )}-${numbers.slice(6)}`;
     }
 
-    setBirthDate(formattedText);
+    setBirthday(formattedText);
   };
 
-  const handleNext = () => {
-    if (!birthDate || !gender) {
+  const handleNext = async () => {
+    if (!birthday || !gender) {
       alert('생년월일과 성별을 입력하세요.');
       return;
     }
@@ -145,13 +147,23 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
     }
 
     // 날짜가 완전히 입력되었는지 확인
-    const numbers = birthDate.replace(/[^0-9]/g, '');
+    const numbers = birthday.replace(/[^0-9]/g, '');
     if (numbers.length !== 8) {
       alert('생년월일을 완전히 입력하세요.');
       return;
     }
 
-    navigation.navigate('NavigationBar');
+    try {
+      updateSignUpData({birthday: birthday, gender});
+
+      await handleSignUp(signUpData); // API 호출
+
+      // 홈화면 이동
+      navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
+    } catch (error) {
+      console.error('회원가입 실패:', error);
+      alert('회원가입 실패');
+    }
   };
 
   return (
@@ -164,7 +176,7 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
             fontFamily: fonts.title.fontFamily,
             fontSize: fonts.title.fontSize,
           }}>
-          {firstName}님, 반가워요!
+          {signUpData.firstName}님, 반가워요!
         </Text>
         <Text
           style={{
@@ -181,7 +193,7 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
         <InputContainer marginBottom="5px">
           <TextInput
             placeholder="생년월일 (YYYY-MM-DD)"
-            value={birthDate}
+            value={birthday}
             onChangeText={handleBirthDateChange}
             keyboardType="numeric"
             maxLength={10}
@@ -201,12 +213,12 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
       </Container2>
 
       <Container3>
-        <GenderOption 
+        <GenderOption
           type="male"
           selected={gender === 'male'}
           onSelect={setGender}
         />
-        <GenderOption 
+        <GenderOption
           type="female"
           selected={gender === 'female'}
           onSelect={setGender}
@@ -224,25 +236,25 @@ const SignUpDOBGenderScreen = ({navigation, route}) => {
   );
 };
 
-const GenderOption = ({ type, selected, onSelect }) => (
-    <GenderBtn selected={selected} onPress={() => onSelect(type)}>
-      <GenderText selected={selected}>
-        {type === 'male' ? '남자' : '여자'}
-      </GenderText>
-      <LogoIcon   
-        height={87}
-        width={59}
-        style={{
-          color: selected 
+const GenderOption = ({type, selected, onSelect}) => (
+  <GenderBtn selected={selected} onPress={() => onSelect(type)}>
+    <GenderText selected={selected}>
+      {type === 'male' ? '남자' : '여자'}
+    </GenderText>
+    <LogoIcon
+      height={87}
+      width={59}
+      style={{
+        color: selected
           ? themes.light.textColor.buttonText10
           : themes.light.textColor.Primary6,
-          transform: [{rotate: '10deg'}],
-          position: 'absolute',
-          bottom: -5,
-          right: 25,
-        }}
-      />
-    </GenderBtn>
+        transform: [{rotate: '10deg'}],
+        position: 'absolute',
+        bottom: -5,
+        right: 25,
+      }}
+    />
+  </GenderBtn>
 );
 
 const Container = styled(SafeAreaView)`
@@ -305,9 +317,10 @@ const GenderBtn = styled.TouchableOpacity`
 `;
 
 const GenderText = styled.Text`
-  color: ${props => props.selected 
-    ? themes.light.textColor.buttonText 
-    : themes.light.textColor.textPrimary};
+  color: ${props =>
+    props.selected
+      ? themes.light.textColor.buttonText
+      : themes.light.textColor.textPrimary};
   font-size: 22px;
   font-weight: bold;
 `;
