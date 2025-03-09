@@ -3,6 +3,7 @@ import {SafeAreaView, Text} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
+import {useSignUp} from '../../api/context/SignUpContext';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -45,15 +46,16 @@ const TextInput = styled.TextInput`
 `;
 
 const SignUpNameScreen = ({navigation}) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const {signUpData, updateSignUpData} = useSignUp();
+  const [firstName, setFirstName] = useState(signUpData.firstName || '');
+  const [lastName, setLastName] = useState(signUpData.lastName || '');
   const progress = '25%';
 
   const handleNext = () => {
     if (firstName && lastName) {
-      console.log('이름:', firstName, '성:', lastName);
-      // 다음 페이지로 이동
-      navigation.navigate('SignUpEmail', {lastName, firstName});
+      // Context에 상태 저장
+      updateSignUpData({firstName, lastName});
+      navigation.navigate('SignUpEmail');
     } else {
       alert('성을 포함한 이름을 모두 입력하세요.');
     }

@@ -3,6 +3,7 @@ import {SafeAreaView, Text} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
+import {useSignUp} from '../../api/context/SignUpContext';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -50,15 +51,15 @@ const TxtLabel = styled.Text`
 `;
 
 const SignUpEmailScreen = ({navigation, route}) => {
-  const {lastName, firstName} = route.params;
-  const [email, setEmail] = useState('');
+  const {signUpData, updateSignUpData} = useSignUp();
+  const [email, setEmail] = useState(signUpData.email || '');
   const progress = '50%';
 
   const handleNext = () => {
     if (email) {
-      console.log('이메일:', email);
+      updateSignUpData({email});
       // 다음 페이지로 이동
-      navigation.navigate('SignUpPassword', {lastName, firstName, email});
+      navigation.navigate('SignUpPassword');
     } else {
       alert('이메일을 입력하세요.');
     }
@@ -73,7 +74,7 @@ const SignUpEmailScreen = ({navigation, route}) => {
             fontFamily: fonts.title.fontFamily,
             fontSize: fonts.title.fontSize,
           }}>
-          {firstName}님, 반가워요!
+          {signUpData.firstName}님, 반가워요!
         </Text>
         <Text
           style={{
@@ -94,7 +95,7 @@ const SignUpEmailScreen = ({navigation, route}) => {
           />
         </InputContainer>
         <InputContainer marginTop="5px">
-          <TxtLabel>{lastName + firstName}</TxtLabel>
+          <TxtLabel>{signUpData.lastName + signUpData.firstName}</TxtLabel>
         </InputContainer>
       </Container2>
       <BtnContainer>
