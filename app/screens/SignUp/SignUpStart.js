@@ -1,5 +1,5 @@
 import React from 'react';
-import {SafeAreaView, Image, TouchableOpacity, Text} from 'react-native';
+import {SafeAreaView, Image, TouchableOpacity, Text, View} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {themes, fonts} from './../../styles';
@@ -25,7 +25,7 @@ const Container2 = styled.View`
   margin-bottom: 100px;
 `;
 
-const Container3 = styled.View`
+const ButtonContainer = styled.View`
   align-items: center;
   height: 152px;
 `;
@@ -80,7 +80,7 @@ const SignUpStartScreen = ({navigation}) => {
       <Container2>
         <LogoSvg width={250} height={250} />
       </Container2>
-      <Container3>
+      <ButtonContainer>
         <SignUpBtn onPress={() => navigation.navigate('NavigationBar')}>
           <KakaoIcon
             height={18}
@@ -93,10 +93,15 @@ const SignUpStartScreen = ({navigation}) => {
           <FontAwesome name="google" size={20} color="#ffffff" />
           <BtnText>Google로 시작하기</BtnText>
         </SignUpBtn>
-        <EmailBtn onPress={() => navigation.navigate('SignUpName')}>
-          <EmailBtnText>이메일로 시작하기</EmailBtnText>
-        </EmailBtn>
-      </Container3>
+        <View style={{flexDirection: 'row', gap: 20}}>
+          <EmailBtn onPress={() => navigation.navigate('SignUpName')}>
+            <EmailBtnText>회원가입</EmailBtnText>
+          </EmailBtn>
+          <EmailBtn onPress={() => navigation.navigate('SignIn')}>
+            <EmailBtnText>이메일 로그인</EmailBtnText>
+          </EmailBtn>
+        </View>
+      </ButtonContainer>
     </Container>
   );
 };
