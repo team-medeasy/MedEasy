@@ -8,6 +8,7 @@ import SignUpNameScreen from './screens/SignUp/SignUpName';
 import SignUpEmailScreen from './screens/SignUp/SignUpEmail';
 import SignUpPasswordScreen from './screens/SignUp/SignUpPassword';
 import SignUpDOBGenderScreen from './screens/SignUp/SignUpDOBGender';
+import SignInScreen from './screens/SignUp/SignIn';
 import NavigationBar from './components/NavigationBar';
 import SearchMedicineScreen from './screens/Search/SearchMedicine';
 import SearchMedicineResultsScreen from './screens/Search/SearchMedicineResults';
@@ -19,7 +20,7 @@ import AddMedicineRoutineScreen from './screens/Routine/AddMedicineRoutine';
 import AddHospitalVisitScreen from './screens/Routine/AddHospitalVisit';
 import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
 import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
-
+import {SignUpProvider} from './api/context/SignUpContext';
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
 const RootStack = createStackNavigator();
@@ -29,6 +30,7 @@ const AuthNavigator = () => {
   return (
     <AuthStack.Navigator screenOptions={{headerShown: false}}>
       <AuthStack.Screen name="SignUpStart" component={SignUpStartScreen} />
+      <AuthStack.Screen name="SignIn" component={SignInScreen} />
       <AuthStack.Screen name="SignUpName" component={SignUpNameScreen} />
       <AuthStack.Screen name="SignUpEmail" component={SignUpEmailScreen} />
       <AuthStack.Screen
@@ -56,64 +58,69 @@ const App = () => {
   }, []);
 
   return (
-    <FontSizeProvider>
-      <NavigationContainer>
-        {isLoading ? (
-          <Splash />
-        ) : (
-          <RootStack.Navigator screenOptions={{headerShown: false}}>
-            {/* 👥 회원가입 네비게이터 */}
-            <RootStack.Screen name="Auth" component={AuthNavigator} />
-            {/* 🔎 메인 네비게이션 */}
-            <RootStack.Screen name="NavigationBar" component={NavigationBar} />
+    <SignUpProvider>
+      <FontSizeProvider>
+        <NavigationContainer>
+          {isLoading ? (
+            <Splash />
+          ) : (
+            <RootStack.Navigator screenOptions={{headerShown: false}}>
+              {/* 👥 회원가입 네비게이터 */}
+              <RootStack.Screen name="Auth" component={AuthNavigator} />
+              {/* 🔎 메인 네비게이션 */}
+              <RootStack.Screen
+                name="NavigationBar"
+                component={NavigationBar}
+              />
 
-            {/* ⚙️ 설정 네비게이션 */}
-            <RootStack.Screen name="SettingStack" component={SettingStack} />
+              {/* ⚙️ 설정 네비게이션 */}
+              <RootStack.Screen name="SettingStack" component={SettingStack} />
 
-            {/* 🖥️ 네비게이션바 없는 화면들 */}
-            <RootStack.Screen
-              name="SearchMedicine"
-              component={SearchMedicineScreen}
-            />
-            <RootStack.Screen
-              name="SearchMedicineResults"
-              component={SearchMedicineResultsScreen}
-            />
-            <RootStack.Screen
-              name="MedicineDetail"
-              component={MedicineDetailScreen}
-            />
-            <RootStack.Screen
-              name="MedicineImageDetail"
-              component={MedicineImageDetailScreen}
-            />
-            <RootStack.Screen
-              name="Notification"
-              component={NotificationScreen}
-            />
-            <RootStack.Screen
-              name="AddMedicineRoutine"
-              component={AddMedicineRoutineScreen}
-            />
-            <RootStack.Screen
-              name="AddHospitalVisit"
-              component={AddHospitalVisitScreen}
-              options={{presentation: 'modal'}}
-            />
-            <RootStack.Screen
-              name="SetMedicineRoutine"
-              component={SetMedicineRoutineScreen}
-              options={{presentation: 'modal'}}
-            />
-            <RootStack.Screen
-              name="SetRoutineTime"
-              component={SetRoutineTimeScreen}
-              options={{presentation: 'modal'}}
-            />
-          </RootStack.Navigator>
-        )}
-      </NavigationContainer>
-    </FontSizeProvider>
+              {/* 🖥️ 네비게이션바 없는 화면들 */}
+              <RootStack.Screen
+                name="SearchMedicine"
+                component={SearchMedicineScreen}
+              />
+              <RootStack.Screen
+                name="SearchMedicineResults"
+                component={SearchMedicineResultsScreen}
+              />
+              <RootStack.Screen
+                name="MedicineDetail"
+                component={MedicineDetailScreen}
+              />
+              <RootStack.Screen
+                name="MedicineImageDetail"
+                component={MedicineImageDetailScreen}
+              />
+              <RootStack.Screen
+                name="Notification"
+                component={NotificationScreen}
+              />
+              <RootStack.Screen
+                name="AddMedicineRoutine"
+                component={AddMedicineRoutineScreen}
+              />
+              <RootStack.Screen
+                name="AddHospitalVisit"
+                component={AddHospitalVisitScreen}
+                options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="SetMedicineRoutine"
+                component={SetMedicineRoutineScreen}
+                options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="SetRoutineTime"
+                component={SetRoutineTimeScreen}
+                options={{presentation: 'modal'}}
+              />
+            </RootStack.Navigator>
+          )}
+        </NavigationContainer>
+      </FontSizeProvider>
+    </SignUpProvider>
   );
 };
 
