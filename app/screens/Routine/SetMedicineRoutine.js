@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {View, ScrollView} from 'react-native';
 import {themes} from './../../styles';
@@ -7,8 +7,11 @@ import {ModalHeader, Button, MedicineOverview} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 const {deleteCircle: DeleteCircleIcon} = OtherIcons;
 
+import { dummyMedicineData } from '../../../assets/data/data';
+
 const SetMedicineRoutine = ({route, navigation}) => {
-  const {medicine} = route.params;
+  const { itemSeq } = route.params;
+  const [medicine, setMedicine] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicineName, setMedicineName] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
@@ -18,6 +21,16 @@ const SetMedicineRoutine = ({route, navigation}) => {
 
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   const timings = ['아침', '점심', '저녁', '자기 전'];
+
+  // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
+  useEffect(() => {
+    const foundMedicine = dummyMedicineData.find(
+      item => item.item_seq === itemSeq
+    );
+    if (foundMedicine) {
+      setMedicine(foundMedicine);
+    }
+  }, [itemSeq]);
 
   // 임시로 item_seq값 넘김
   const handlePressEnlarge = itemSeq => {
@@ -42,6 +55,13 @@ const SetMedicineRoutine = ({route, navigation}) => {
     navigation.navigate('SetRoutineTime');
   };
 
+  if (!medicine) { // 렌더링 전 error 방지
+    return (
+      <Container>
+        <ModalHeader>약 정보를 불러오는 중...</ModalHeader>
+      </Container>
+    );
+  }
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ModalHeader showDelete="true" onDeletePress={() => {}}>
