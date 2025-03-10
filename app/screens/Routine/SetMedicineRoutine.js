@@ -32,9 +32,9 @@ const SetMedicineRoutine = ({route, navigation}) => {
     }
   }, [itemSeq]);
 
-  // 임시로 item_seq값 넘김
+  // 임시로 item_seq값 넘김 + Modal화면 띄우기 요청
   const handlePressEnlarge = itemSeq => {
-    navigation.navigate('MedicineImageDetail', {itemSeq});
+    navigation.navigate('MedicineImageDetail', {itemSeq, isModal: true});
   };
 
   const toggleDay = day => {

@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import {Header} from '../../components/\bHeader/Header';
+import {Header, ModalHeader} from '../../components';
 import {themes} from '../../styles';
 
 import { dummyMedicineData } from '../../../assets/data/data';
 
 const MedicineImageDetailScreen = ({route}) => {
-  const { itemSeq } = route.params;
+  const { itemSeq, isModal = false } = route.params;
   const [medicine, setMedicine] = useState(null);
 
   // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
@@ -19,16 +19,29 @@ const MedicineImageDetailScreen = ({route}) => {
     }
   }, [itemSeq]);
 
+  const HeaderComponent = ({ isModal = false, ...props }) => {
+    if (isModal) {
+      return <ModalHeader {...props} />;
+    }
+    return <Header {...props} />;
+  };
+
   if (!medicine) { // 렌더링 전 error 방지
     return (
       <Container>
-        <Header>약 정보를 불러오는 중...</Header>
+        <HeaderComponent
+          isModal={isModal}
+        >약 정보를 불러오는 중...
+        </HeaderComponent>
       </Container>
     );
   }
   return (
     <Container>
-      <Header>{medicine.item_name}</Header>
+      <HeaderComponent
+        isModal={isModal}
+      >{medicine.item_name}
+      </HeaderComponent>
 
       <ImageContainer>
         <MedicineImage source={{uri: medicine.item_image}} />
