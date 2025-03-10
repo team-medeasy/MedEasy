@@ -1,12 +1,12 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {useFocusEffect} from '@react-navigation/native';
-import {ScrollView, Dimensions, FlatList} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { ScrollView, Dimensions, FlatList } from 'react-native';
 import styled from 'styled-components/native';
-import {Platform} from 'react-native';
-import {OtherIcons} from '../../../assets/icons';
-import {themes} from '../../styles';
+import { Platform } from 'react-native';
+import { OtherIcons } from '../../../assets/icons';
+import { themes } from '../../styles';
 import dayjs from 'dayjs';
-import {RoutineIcons} from '../../../assets/icons';
+import { RoutineIcons } from '../../../assets/icons';
 
 // data.js에서 데이터 import
 import {
@@ -20,7 +20,7 @@ import {
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
 
 const Routine = () => {
@@ -118,7 +118,7 @@ const Routine = () => {
       );
 
     // 해당 시간대의 모든 약물 체크 상태를 변경
-    const updatedChecks = {...checkedItems};
+    const updatedChecks = { ...checkedItems };
     medicinesForTime.forEach(medicine => {
       updatedChecks[`medicine-${medicine.medicine_id}-${time}`] = !allChecked;
     });
@@ -187,7 +187,7 @@ const Routine = () => {
   };
 
   // 페이지 변경 감지
-  const onViewableItemsChanged = useRef(({viewableItems}) => {
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       setCurrentPage(viewableItems[0].index);
     }
@@ -202,13 +202,13 @@ const Routine = () => {
     const wait = new Promise(resolve => setTimeout(resolve, 500));
     wait.then(() => {
       if (flatListRef.current) {
-        flatListRef.current.scrollToIndex({index: info.index, animated: true});
+        flatListRef.current.scrollToIndex({ index: info.index, animated: true });
       }
     });
   };
 
   // 각 주차를 렌더링하는 함수
-  const renderWeek = ({item, index}) => (
+  const renderWeek = ({ item, index }) => (
     <WeekContainer>
       {item.map((dayInfo, dayIndex) => (
         <DayBox
@@ -235,7 +235,7 @@ const Routine = () => {
           <OtherIcons.return
             width={11}
             height={9}
-            style={{color: themes.light.textColor.Primary50}}
+            style={{ color: themes.light.textColor.Primary50 }}
           />
           <ButtonText>돌아가기</ButtonText>
         </ReturnButton>
@@ -260,7 +260,7 @@ const Routine = () => {
             offset: width * index,
             index,
           })}
-          // initialScrollIndex 제거
+        // initialScrollIndex 제거
         />
       </DayContainerWrapper>
 
@@ -299,7 +299,7 @@ const Routine = () => {
                         <RoutineIcons.medicine
                           width={22}
                           height={22}
-                          style={{color: themes.light.pointColor.Primary}}
+                          style={{ color: themes.light.pointColor.Primary }}
                         />
                       </IconContainer>
                       <TextContainer>
@@ -311,13 +311,13 @@ const Routine = () => {
                         {routine.medicines.every(
                           medicine =>
                             checkedItems[
-                              `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                            `medicine-${medicine.medicine_id}-${routine.timeKey}`
                             ],
                         ) ? (
                           <RoutineIcons.checkOn
                             width={26}
                             height={26}
-                            style={{color: themes.light.pointColor.Primary}}
+                            style={{ color: themes.light.pointColor.Primary }}
                           />
                         ) : (
                           <RoutineIcons.checkOff
@@ -336,7 +336,7 @@ const Routine = () => {
                         <RoutineIcons.hospital
                           width={22}
                           height={22}
-                          style={{color: themes.light.pointColor.Secondary}}
+                          style={{ color: themes.light.pointColor.Secondary }}
                         />
                       </IconContainer>
                       <TextContainer>
@@ -353,7 +353,7 @@ const Routine = () => {
                           <RoutineIcons.checkOn
                             width={26}
                             height={26}
-                            style={{color: themes.light.pointColor.Primary}}
+                            style={{ color: themes.light.pointColor.Primary }}
                           />
                         ) : (
                           <RoutineIcons.checkOff
@@ -377,11 +377,18 @@ const Routine = () => {
                             <MedicineText
                               isChecked={
                                 checkedItems[
-                                  `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                                `medicine-${medicine.medicine_id}-${routine.timeKey}`
                                 ]
                               }>
-                              {`${medicine.nickname} (${medicine.dose}정)`}
+                              {`${medicine.nickname}`}
                             </MedicineText>
+                            <MedicineCount isChecked={
+                              checkedItems[
+                              `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                              ]
+                            }>
+                              {`${medicine.dose}개`}
+                            </MedicineCount>
                             <CheckBox
                               onPress={() =>
                                 toggleCheck(
@@ -434,8 +441,8 @@ const Header = styled.View`
   flex-direction: row;
   padding: 0px 20px;
 
-  ${Platform.OS === 'ios' &&`margin-top: 70px;`}
-  ${Platform.OS === 'android' &&`margin-top: 30px;`}
+  ${Platform.OS === 'ios' && `margin-top: 70px;`}
+  ${Platform.OS === 'android' && `margin-top: 30px;`}
   justify-content: space-between;
 `;
 
@@ -479,7 +486,7 @@ const DayBox = styled.TouchableOpacity`
   display: flex;
   padding: 10px 4px;
   border-radius: 7px;
-  background-color: ${({isToday, isSelected}) =>
+  background-color: ${({ isToday, isSelected }) =>
     isSelected ? themes.light.pointColor.Primary20 : 'transparent'};
 `;
 
@@ -624,9 +631,22 @@ const MedicineText = styled.Text`
   font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Medium';
   padding: 20px;
-  text-decoration-line: ${({isChecked}) =>
+  text-decoration-line: ${({ isChecked }) =>
     isChecked ? 'line-through' : 'none'};
-  color: ${({isChecked}) =>
+  color: ${({ isChecked }) =>
+    isChecked
+      ? themes.light.textColor.Primary50
+      : themes.light.textColor.textPrimary};
+`;
+
+const MedicineCount = styled.Text`
+  position: absolute;
+  font-size: ${FontSizes.body.default};
+  font-family: 'Pretendard-Medium';
+  right: 45px;
+  text-decoration-line: ${({ isChecked }) =>
+    isChecked ? 'line-through' : 'none'};
+  color: ${({ isChecked }) =>
     isChecked
       ? themes.light.textColor.Primary50
       : themes.light.textColor.textPrimary};
