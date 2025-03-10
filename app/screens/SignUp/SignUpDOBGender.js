@@ -156,10 +156,8 @@ const SignUpDOBGenderScreen = ({navigation}) => {
     try {
       updateSignUpData({birthday: birthday, gender});
 
-      await handleSignUp(signUpData); // API 호출
-
-      // 홈화면 이동
-      navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
+      await handleSignUp(signUpData, navigation); // API 호출
+      console.log('회원가입 성공!');
     } catch (error) {
       console.error('회원가입 실패:', error);
       alert('회원가입 실패');
