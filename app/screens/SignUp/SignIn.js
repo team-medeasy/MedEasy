@@ -53,16 +53,21 @@ const TxtLabel = styled.Text`
 const SignInScreen = ({navigation, route}) => {
   const {updateSignUpData} = useSignUp();
   const [email, setEmail] = useState('');
-  const progress = '50%';
+  const [password, setPassword] = useState('');
 
   const handleNext = () => {
-    if (email) {
-      updateSignUpData({email});
-      // 다음 페이지로 이동
-      navigation.navigate('SignUpPassword');
-    } else {
+    if (!email) {
       alert('이메일을 입력하세요.');
+      return;
     }
+
+    if (!password) {
+      alert('비밀번호를 입력하세요.');
+      return;
+    }
+
+    updateSignUpData({email, password});
+    navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
   };
 
   return (
@@ -96,9 +101,9 @@ const SignInScreen = ({navigation, route}) => {
         </InputContainer>
         <InputContainer marginBottom="5px">
           <TextInput
-            placeholder="이메일 입력"
-            value={email}
-            onChangeText={setEmail}
+            placeholder="비밀번호 입력"
+            value={password}
+            onChangeText={setPassword}
             secureTextEntry={true}
           />
         </InputContainer>
