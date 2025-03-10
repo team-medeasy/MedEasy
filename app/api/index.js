@@ -1,9 +1,8 @@
 import axios from 'axios';
+import {API_BASE_URL} from '@env';
 import {refreshToken} from './auth';
 import {getAccessToken, getRefreshToken, setAccessToken} from './storage';
 import {Platform} from 'react-native';
-
-const API_BASE_URL = 'http://35.216.7.36:8080';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
