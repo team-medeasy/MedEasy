@@ -106,7 +106,6 @@ const MedicineImage = styled.Image`
 
 const MedicineInfoSub = styled.Text`
   flex: 1;
-  text-align: center;
   font-family: 'Pretendard-SemiBold';
   font-size: ${FontSizes.body.default};
   color: ${themes.light.textColor.buttonText70};
@@ -114,7 +113,6 @@ const MedicineInfoSub = styled.Text`
 
 const MedicineInfoName = styled.Text`
   flex: 1;
-  text-align: center;
   font-family: 'Pretendard-Bold';
   font-size: ${FontSizes.title.default};
   color: ${themes.light.textColor.buttonText};

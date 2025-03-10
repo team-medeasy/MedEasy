@@ -5,13 +5,18 @@ import {themes} from './../../styles';
 
 const SearchResultItem = ({item, onPress}) => {
   return (
-    <ItemContainer onPress={() => onPress(item.id)}>
+    <ItemContainer onPress={() => onPress(item.item_seq)}>
       <ImageContainer>
         <MedicineImage source={{uri: item.item_image}} resizeMode="stretch" />
       </ImageContainer>
       <InfoContainer>
         <ManufacturerText>{item.entp_name}</ManufacturerText>
-        <MedicineNameText>{item.item_name}</MedicineNameText>
+        <MedicineNameText
+          numberOfLines={1} // 한 줄로 제한
+          ellipsizeMode="tail" 
+        >
+          {item.item_name}
+        </MedicineNameText>
         <TypeContainer>
           <Tag sizeType="small" colorType="resultPrimary">
             {item.etc_otc_name}
@@ -46,6 +51,7 @@ const MedicineImage = styled.Image`
 `;
 
 const InfoContainer = styled.View`
+  flex: 1;
   height: 100%;
   gap: 7px;
   justify-content: center;

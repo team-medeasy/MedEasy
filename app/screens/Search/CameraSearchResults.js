@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import {Tag, Button, Header, MedicineAppearance} from './../../components';
@@ -6,12 +6,14 @@ import { FlatList, View } from 'react-native';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { useNavigation } from '@react-navigation/native';
 
+import { dummyMedicineData } from '../../../assets/data/data';
+
 const MedicineItem = ({ item }) => {
   const navigation = useNavigation();
-  
-  // 임시로 id 값 넘김
-  const handleMedicineConfirm = medicineId => {
-    navigation.navigate('MedicineDetail', {id: medicineId});
+
+  // 임시로 item_seq 값 넘김
+  const handleMedicineConfirm = itemSeq => {
+    navigation.navigate('MedicineDetail', {itemSeq});
   };
 
   return (
@@ -47,7 +49,7 @@ const MedicineItem = ({ item }) => {
           <View style={{
             gap: 5
           }}>
-            <MedicineName numberOfLines={2} ellipsizeMode="tail">
+            <MedicineName numberOfLines={1} ellipsizeMode="tail">
               {item.item_name}
             </MedicineName>    
             <Description numberOfLines={2} ellipsizeMode="tail">
@@ -61,84 +63,34 @@ const MedicineItem = ({ item }) => {
             title='이 약이 맞아요' 
             fontSize='15' 
             height='40'
-            onPress={() => handleMedicineConfirm(item.id)} />
+            onPress={() => handleMedicineConfirm(item.item_seq)} />
         </View>
       </InfoContainer>
     </ItemContainer>
   );
 };
 
-const CameraSearchResultsScreen = ({route}) => {
-  const dummyData = [
-    {
-      id: '1',
-      item_name: '지엘타이밍정(카페인무수물)',
-      item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1NAT_bwbZd9',
-      etc_otc_name: '일반의약품',
-      class_name: '각성제',
-      chart: '노란색의 팔각형 정제',
-      print_front: '마크',
-      print_back: 'T1E',
-      drug_shape: '팔각형',
-      color_class1: '노랑',
-      leng_long: '7.9',
-      leng_short: '7.9',
-      thick: '3.9',
-    },
-    {
-      id: '2',
-      item_name: '베스타제당의정',
-      item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1MoApPycZgS',
-      etc_otc_name: '일반의약품',
-      class_name: '건위소화제',
-      chart: '분홍색의 원형 당의정이다.',
-      print_front: 'BSS',
-      print_back: '',
-      drug_shape: '원형',
-      color_class1: '분홍',
-      leng_long: '11.6',
-      leng_short: '11.6',
-      thick: '4.9',
-    },
-    {
-      id: '3',
-      item_name: '아네모정',
-      item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/152035092098000085',
-      etc_otc_name: '일반의약품',
-      class_name: '제산제',
-      chart: '백색의 원형필름제피정',
-      print_front: '',
-      print_back: 'SJA',
-      drug_shape: '원형',
-      color_class1: '하양',
-      leng_long: '11',
-      leng_short: '11',
-      thick: '4.9',
-    },
-    {
-      id: '4',
-      item_name: '에바치온캡슐',
-      item_image: 'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/151577167067000087',
-      etc_otc_name: '일반의약품',
-      class_name: '해독제',
-      chart: '흰색～회백색의 가루가 든 상 농황색 하 농황색의 경질캡슐제',
-      print_front: '마크',
-      print_back: 'T1E',
-      drug_shape: '팔각형',
-      color_class1: '노랑',
-      leng_long: '19.10',
-      leng_short: '6.63',
-      thick: '6.91',
-    },
-  ];
+const CameraSearchResultsScreen = () => {
+  const [medicine, setMedicine] = useState(null);
   
+  useEffect(() => {
+    setMedicine(dummyMedicineData);
+  });
+
+  if (!medicine) { // 렌더링 전 error 방지
+    return (
+      <Container>
+        <Header>약 정보를 불러오는 중...</Header>
+      </Container>
+    );
+  }
   return (
     <Container>
       <Header>약 검색 결과</Header>
       
       <ResultsContainer>
         <FlatList
-          data={dummyData}
+          data={medicine}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <MedicineItem item={item} />}
           showsVerticalScrollIndicator={false}
