@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import Logo from './../../assets/icons/logo/logo.svg';
 import Logo_kr from './../../assets/icons/logo/logo_kr.svg';
 import { pointColor, themes } from './../styles';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 const Splash = () => {
   return (
@@ -55,7 +56,7 @@ const BigLine = styled.Text`
   color: ${themes.light.textColor.buttonText};
   font-family: 'KimjungchulGothic-Bold';
   font-weight: bold;
-  font-size: ${32}px;
+  font-size: ${FontSizes.display.default};
   margin-left: 50px;
 `;
 
