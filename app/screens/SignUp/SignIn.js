@@ -2,8 +2,9 @@ import React, {useState} from 'react';
 import {SafeAreaView, Text} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
-import {ProgressBar, BackAndNextButtons} from './../../components';
+import {BackAndNextButtons} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
+import {handleLogin} from '../../api/services/authService';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -55,7 +56,7 @@ const SignInScreen = ({navigation, route}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!email) {
       alert('이메일을 입력하세요.');
       return;
@@ -66,8 +67,20 @@ const SignInScreen = ({navigation, route}) => {
       return;
     }
 
-    updateSignUpData({email, password});
-    navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
+    try {
+      const response = await handleLogin({email, password});
+
+      console.log('로그인 성공:', response);
+
+      // 상태 업데이트
+      updateSignUpData({email, password});
+
+      // 홈 화면 이동
+      navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
+    } catch (error) {
+      console.error('로그인 실패:', error);
+      alert(error.message || '로그인에 실패했습니다.');
+    }
   };
 
   return (
