@@ -91,6 +91,7 @@ const SignUpPasswordScreen = ({navigation}) => {
           <TextInput
             value={password}
             onChangeText={setPassword}
+            placeholder="비밀번호 입력"
             secureTextEntry={true}
           />
         </InputContainer>
