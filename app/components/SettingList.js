@@ -1,4 +1,5 @@
 import React from 'react';
+import {Alert} from 'react-native';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 import {SettingsIcons} from './../../assets/icons';
@@ -6,6 +7,49 @@ import {themes} from './../styles';
 
 const SettingList = () => {
   const navigation = useNavigation();
+
+  const handlePress = name => {
+    switch (name) {
+      case 'Profile':
+      case 'Notification':
+      case 'FontSize':
+      case 'Favorites':
+      case 'Announcements':
+      case 'FAQ':
+        navigation.navigate('SettingStack', {screen: name});
+        break;
+      case 'Feedback':
+        Alert.alert('의견 남기기', '의견을 남길 수 있는 화면이 준비 중입니다.');
+        break;
+      case 'AppVersion':
+        // 기능 없음
+        break;
+      case 'Logout':
+        Alert.alert(
+          '로그아웃',
+          '정말 로그아웃하시겠습니까?',
+          [
+            {text: '취소', style: 'cancel'},
+            {text: '확인', onPress: () => console.log('로그아웃 수행')},
+          ],
+          {cancelable: false},
+        );
+        break;
+      case 'DeleteAccount':
+        Alert.alert(
+          '계정 삭제',
+          '정말 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+          [
+            {text: '취소', style: 'cancel'},
+            {text: '삭제', onPress: () => console.log('계정 삭제 수행')},
+          ],
+          {cancelable: false},
+        );
+        break;
+      default:
+        break;
+    }
+  };
 
   const profileSettings = [
     {
@@ -130,12 +174,8 @@ const SettingList = () => {
     <Container>
       {/* 프로필 설정 그룹 */}
       <SettingCategory lastItem={false}>
-        {profileSettings.map((item, index) => (
-          <SettingItem
-            key={item.name}
-            onPress={() => {
-              navigation.navigate('SettingStack', {screen: item.name});
-            }}>
+        {profileSettings.map(item => (
+          <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}
             <SettingText>{item.label}</SettingText>
           </SettingItem>
@@ -144,12 +184,8 @@ const SettingList = () => {
 
       {/* 일반 설정 그룹 */}
       <SettingCategory lastItem={false}>
-        {generalSettings.map((item, index) => (
-          <SettingItem
-            key={item.name}
-            onPress={() => {
-              navigation.navigate('SettingStack', {screen: item.name});
-            }}>
+        {generalSettings.map(item => (
+          <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}
             <SettingText>{item.label}</SettingText>
           </SettingItem>
@@ -158,12 +194,8 @@ const SettingList = () => {
 
       {/* 계정 설정 그룹 */}
       <SettingCategory lastItem={true}>
-        {accountSettings.map((item, index) => (
-          <SettingItem
-            key={item.name}
-            onPress={() => {
-              navigation.navigate('SettingStack', {screen: item.name});
-            }}>
+        {accountSettings.map(item => (
+          <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}
             <SettingText>{item.label}</SettingText>
           </SettingItem>
@@ -191,7 +223,7 @@ const SettingItem = styled.TouchableOpacity`
 
 const SettingText = styled.Text`
   font-size: 16px;
-  font-family: 'Pretendard-Regular';
+  font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
   margin-left: 20px;
 `;

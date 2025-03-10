@@ -3,6 +3,7 @@ import {SafeAreaView, Text} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
+import {useSignUp} from '../../api/context/SignUpContext';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -49,16 +50,16 @@ const TxtLabel = styled.Text`
   font-size: 16px;
 `;
 
-const SignUpPasswordScreen = ({navigation, route}) => {
-  const {lastName, firstName, email} = route.params;
-  const [password, setPassword] = useState('');
+const SignUpPasswordScreen = ({navigation}) => {
+  const {signUpData, updateSignUpData} = useSignUp();
+  const [password, setPassword] = useState(signUpData.password || '');
   const progress = '75%';
 
   const handleNext = () => {
     if (password) {
-      console.log('비밀번호:', password);
+      updateSignUpData({password});
       // 다음 페이지로 이동
-      navigation.navigate('SignUpDOBGender', {firstName});
+      navigation.navigate('SignUpDOBGender');
     } else {
       alert('비밀번호를 입력하세요.');
     }
@@ -73,7 +74,7 @@ const SignUpPasswordScreen = ({navigation, route}) => {
             fontFamily: fonts.title.fontFamily,
             fontSize: fonts.title.fontSize,
           }}>
-          {firstName}님, 반가워요!
+          {signUpData.firstName}님, 반가워요!
         </Text>
         <Text
           style={{
@@ -90,14 +91,15 @@ const SignUpPasswordScreen = ({navigation, route}) => {
           <TextInput
             value={password}
             onChangeText={setPassword}
+            placeholder="비밀번호 입력"
             secureTextEntry={true}
           />
         </InputContainer>
         <InputContainer marginTop="5px" marginBottom="5px">
-          <TxtLabel>{email}</TxtLabel>
+          <TxtLabel>{signUpData.email}</TxtLabel>
         </InputContainer>
         <InputContainer marginTop="5px">
-          <TxtLabel>{lastName + firstName}</TxtLabel>
+          <TxtLabel>{signUpData.lastName + signUpData.firstName}</TxtLabel>
         </InputContainer>
       </Container2>
       <BtnContainer>

@@ -78,3 +78,11 @@ link-assets-manifest.json
 
 # iOS Xcode workspace & build artifacts
 ios/MedEasy.xcworkspace/
+
+# env
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.staging

@@ -1,191 +1,80 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {
-  ImageBackground,
-  TouchableOpacity,
   View,
   Text,
   Image,
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
-import {RoutineIcons} from './../../../assets/icons';
-import {Footer, Tag, Header, MedicineAppearance, Button} from './../../components';
+import {
+  Footer, 
+  Tag, 
+  Header, 
+  MedicineOverview,
+  MedicineAppearance,
+  Button} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
-const {heartOff: HeartOffIcon, heartOn: HeartOnIcon} = RoutineIcons;
+import { dummyMedicineData } from '../../../assets/data/data';
 
-const MedicineDetailScreen = ({navigation}) => {
+const MedicineDetailScreen = ({route, navigation}) => {
+  const { itemSeq } = route.params;
   const [isFavorite, setIsFavorite] = useState(false);
+  const [medicine, setMedicine] = useState(null);
+  const [similarMedicines, setSimilarMedicines] = useState([]);
+
+  // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
+  useEffect(() => {
+    const foundMedicine = dummyMedicineData.find(
+      item => item.item_seq === itemSeq
+    );
+    if (foundMedicine) {
+      setMedicine(foundMedicine);
+    }
+  }, [itemSeq]);
+
+  // 임시로 비슷한 약은 class_name가 같은 것 
+  useEffect(() => {
+    if (medicine) {
+      const foundSimilarMedicines = dummyMedicineData.filter(
+        item => item.class_name === medicine.class_name
+      );
+      setSimilarMedicines(foundSimilarMedicines);
+    }
+  }, [medicine]);
 
   // 임시로 item_seq 값 넘김
   const handlePressEnlarge = itemSeq => {
     navigation.navigate('MedicineImageDetail', {itemSeq});
   };
 
-  // 임시 데이터
-  const medicine = {
-    item_name: '지엘타이밍정(카페인무수물)',
-    item_seq: '196500051',
-    entp_name: '지엘파마(주)',
-    entp_seq: '19650018',
-    item_image:
-      'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1NAT_bwbZd9',
-    class_name: '각성제',
-    etc_otc_name: '일반의약품',
-    chart: '노란색의 팔각형 정제',
-    print_front: '마크',
-    print_back: 'T1E',
-    drug_shape: '팔각형',
-    color_class1: '노랑',
-    leng_long: '7.9',
-    leng_short: '7.9',
-    thick: '3.9',
-    color_class2: '',
-    efcy_qesitm: '졸음',
-    use_method_qesitm:
-      '성인은 1회 2~6정(100~300 mg)씩, 1일 1~3회 복용합니다.연령, 증상에 따라 적절히 증감할 수 있습니다.',
-    atpn_qesitm:
-      '갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 고령자, 위궤양 환자 또는 경험자, 심질환, 녹내장 환자는 의사 또는 약사와 상의하십시오.',
-    se_qesitm:
-      '만성 녹내장을 악화시킬 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.',
-    deposit_method_qesitm:
-      '실온에서 보관하십시오.어린이의 손이 닿지 않는 곳에 보관하십시오.',
+  const handleSetMedicineRoutine = () => {
+    navigation.navigate('SetMedicineRoutine', {itemSeq});
   };
 
-  const similarMedicines = [
-    {
-      id: '1',
-      item_name: '베스타제당의정',
-      item_image:
-        'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1MoApPycZgS',
-      entp_name: '동야제약(주)',
-      etc_otc_name: '일반의약품',
-      class_name: '건위소화제',
-    },
-    {
-      id: '2',
-      item_name: '아네모정',
-      item_image:
-        'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/152035092098000085',
-      entp_name: '삼진제약(주)',
-      etc_otc_name: '일반의약품',
-      class_name: '제산제',
-    },
-    {
-      id: '3',
-      item_name: '에바치온캡슐',
-      item_image:
-        'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/151577167067000087',
-      entp_name: '조아제약(주)',
-      etc_otc_name: '일반의약품',
-      class_name: '해독제',
-    },
-    {
-      id: '4',
-      item_name: '삐콤정',
-      item_image:
-        'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/153495248483300010',
-      entp_name: '(주)유한양행',
-      etc_otc_name: '일반의약품',
-      class_name: '혼합비타민제',
-    },
-    {
-      id: '5',
-      item_name: '게루삼정',
-      item_image:
-        'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/154307400984500104',
-      entp_name: '삼남제약(주)',
-      etc_otc_name: '일반의약품',
-      class_name: '제산제',
-    },
-    {
-      id: '6',
-      item_name: '페니라민정(클로르페니라민)',
-      item_image:
-        'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1Orz9gcUHnw',
-      entp_name: '지엘파마(주)',
-      etc_otc_name: '일반의약품',
-      class_name: '항히스타민제',
-    },
-  ];
-
+  if (!medicine) { // 렌더링 전 error 방지
+    return (
+      <Container>
+        <Header>약 정보를 불러오는 중...</Header>
+      </Container>
+    );
+  }
   return (
     <Container>
       <Header>{medicine.item_name}</Header>
 
       <ScrollView>
-        <MedicineInfoContainer
-          source={{uri: medicine.item_image}}
-          blurRadius={15}>
-          <Overlay />
-
-          <View style={{position: 'relative'}}>
-            <MedicineImage source={{uri: medicine.item_image}} />
-            <TouchableOpacity
-              onPress={() => handlePressEnlarge(medicine.item_seq)}
-              style={{
-                position: 'absolute',
-                bottom: 14,
-                right: 14,
-              }}>
-              <Tag bgColor={themes.light.boxColor.tagResultSecondary}>
-                {/* 크게 보기 아이콘 */}
-                크게 보기
-              </Tag>
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              alignItems: 'flex-start',
-              flex: 1,
-              marginTop: 19,
-              marginHorizontal: 7,
-              gap: 10,
-            }}>
-            <MedicineInfoSub>{medicine.entp_name}</MedicineInfoSub>
-            <MedicineInfoName>{medicine.item_name}</MedicineInfoName>
-            <MedicineInfoSub>{medicine.chart}</MedicineInfoSub>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}>
-              <View style={{flexDirection: 'row', gap: 11}}>
-                <Tag sizeType="large" colorType="detailPrimary">
-                  {medicine.etc_otc_name}
-                </Tag>
-                <Tag sizeType="large" colorType="detailSecondary">
-                  {medicine.class_name}
-                </Tag>
-              </View>
-
-              <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
-                {isFavorite ? (
-                  <HeartOnIcon
-                    width={24}
-                    height={24}
-                    style={{color: themes.light.textColor.buttonText}}
-                  />
-                ) : (
-                  <HeartOffIcon
-                    width={24}
-                    height={24}
-                    style={{color: themes.light.textColor.buttonText}}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </MedicineInfoContainer>
+        <MedicineOverview
+          medicine={medicine}
+          isFavorite={isFavorite}
+          setIsFavorite={setIsFavorite}
+          onPressEnlarge={handlePressEnlarge}
+        />
 
         <MedicineDetailContainer>
           <MedicineAppearanceContainer>
-              <MedicineAppearance item={medicine}/>
+              <MedicineAppearance item={medicine} size='large'/>
           </MedicineAppearanceContainer>
 
           <MedicineUsageContainer>
@@ -229,8 +118,8 @@ const MedicineDetailScreen = ({navigation}) => {
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 paddingHorizontal={20}
-                keyExtractor={item => item.id}
-                renderItem={({item}) => <SimilarMedicineItem item={item} />} // MedicineItem 컴포넌트 사용
+                keyExtractor={item => item.item_seq}
+                renderItem={({item}) => <SimilarMedicineItem item={item} />}
               />
             ) : (
               <Text>비슷한 약이 존재하지 않아요.</Text>
@@ -248,7 +137,7 @@ const MedicineDetailScreen = ({navigation}) => {
         paddingBottom: 30,
         alignItems: 'center',
       }}>
-        <Button title='루틴 추가하기' onPress={() => {}}></Button>
+        <Button title='루틴 추가하기' onPress={handleSetMedicineRoutine} ></Button>
       </View>
 
     </Container>
@@ -258,20 +147,6 @@ const MedicineDetailScreen = ({navigation}) => {
 const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
-`;
-
-const MedicineInfoContainer = styled(ImageBackground)`
-  align-items: flex-start;
-  padding: 38px 25px 25px 25px;
-`;
-
-const Overlay = styled.View`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
 `;
 
 const MedicineDetailContainer = styled.View`
@@ -347,28 +222,6 @@ const HeadingText = styled.Text`
   color: ${themes.light.textColor.Primary};
   font-family: 'Pretendard-Bold';
   font-size: ${FontSizes.heading.default};
-`;
-
-const MedicineImage = styled.Image`
-  width: 344px;
-  height: 188px;
-  border-radius: 10px;
-`;
-
-const MedicineInfoSub = styled.Text`
-  flex: 1;
-  text-align: center;
-  font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.buttonText70};
-`;
-
-const MedicineInfoName = styled.Text`
-  flex: 1;
-  text-align: center;
-  font-family: 'Pretendard-Bold';
-  font-size: ${FontSizes.title.default};
-  color: ${themes.light.textColor.buttonText};
 `;
 
 export default MedicineDetailScreen;

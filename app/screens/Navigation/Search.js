@@ -139,7 +139,7 @@ const UpdateDateContainer = styled.View`
 
 const UpdateDateText = styled.Text`
   font-size: 11px;
-  font-family: 'Pretendard-Regular';
+  font-family: 'Pretendard-Medium';
   margin-right: 20px;
   color: ${themes.light.textColor.Primary30};
 `;

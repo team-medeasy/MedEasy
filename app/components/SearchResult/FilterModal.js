@@ -117,7 +117,7 @@ const ModalContent = styled.View`
   border-top-right-radius: 40px;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
+  padding: 10px 20px 0px 20px;
   padding-bottom: 40px;
 `;
 

@@ -36,6 +36,7 @@ import HospitalIcon from './icons/routine/hospital.svg';
 import MedicineIcon from './icons/routine/medicine.svg';
 import CupIcon from './icons/routine/cup.svg';
 import MoonIcon from './icons/routine/moon.svg';
+import HomeRoutineIcon from './icons/routine/home_routine.svg';
 import SunIcon from './icons/routine/sun.svg';
 import HeartOffIcon from './icons/routine/heartOff.svg';
 import HeartOnIcon from './icons/routine/heartOn.svg';
@@ -116,8 +117,10 @@ export const RoutineIcons = {
   kakao: KakaoIcon,
   moon: MoonIcon,
   sun: SunIcon,
+  homeRoutine: HomeRoutineIcon,
   heartOff: HeartOffIcon,
   heartOn: HeartOnIcon,
+  homeRoutine: HomeRoutineIcon,
 };
 
 export const SettingsIcons = {

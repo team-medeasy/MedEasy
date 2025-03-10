@@ -9,6 +9,8 @@ import NoSearchResults from '../../components/SearchResult/NoSearchResults';
 import SearchScreenHeader from '../../components/SearchResult/SearchScreenHeader';
 import FilterModal from '../../components/SearchResult/FilterModal';
 
+import { dummyMedicineData } from '../../../assets/data/data';
+
 const SearchMedicineResultsScreen = ({route, navigation}) => {
   const {searchQuery} = route.params; // MedicineSearchScreen에서 전달된 검색어
   const [searchResults, setSearchResults] = useState([]);
@@ -28,73 +30,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   });
 
   useEffect(() => {
-    // 임시 데이터
-    const dummyData = [
-      {
-        id: '1',
-        item_name: '지엘타이밍정(카페인무수물)',
-        item_image:
-          'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1NAT_bwbZd9',
-        entp_name: '지엘파마(주)',
-        etc_otc_name: '일반의약품',
-        class_name: '각성제',
-      },
-      {
-        id: '2',
-        item_name: '베스타제당의정',
-        item_image:
-          'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1MoApPycZgS',
-        entp_name: '동야제약(주)',
-        etc_otc_name: '일반의약품',
-        class_name: '건위소화제',
-      },
-      {
-        id: '3',
-        item_name: '아네모정',
-        item_image:
-          'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/152035092098000085',
-        entp_name: '삼진제약(주)',
-        etc_otc_name: '일반의약품',
-        class_name: '제산제',
-      },
-      {
-        id: '4',
-        item_name: '에바치온캡슐',
-        item_image:
-          'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/151577167067000087',
-        entp_name: '조아제약(주)',
-        etc_otc_name: '일반의약품',
-        class_name: '해독제',
-      },
-      {
-        id: '5',
-        item_name: '삐콤정',
-        item_image:
-          'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/153495248483300010',
-        entp_name: '(주)유한양행',
-        etc_otc_name: '일반의약품',
-        class_name: '혼합비타민제',
-      },
-      {
-        id: '6',
-        item_name: '게루삼정',
-        item_image:
-          'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/154307400984500104',
-        entp_name: '삼남제약(주)',
-        etc_otc_name: '일반의약품',
-        class_name: '제산제',
-      },
-      {
-        id: '7',
-        item_name: '페니라민정(클로르페니라민)',
-        item_image:
-          'https://nedrug.mfds.go.kr/pbp/cmn/itemImageDownload/1Orz9gcUHnw',
-        entp_name: '지엘파마(주)',
-        etc_otc_name: '일반의약품',
-        class_name: '항히스타민제',
-      },
-    ];
-    setSearchResults(dummyData);
+    setSearchResults(dummyMedicineData);
   }, [searchQuery]);
 
   // 필터 옵션들
@@ -246,8 +182,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   };
 
   // 임시로 id 값 넘김
-  const handleSearchResultPress = medicineId => {
-    navigation.navigate('MedicineDetail', {id: medicineId});
+  const handleSearchResultPress = itemSeq => {
+    navigation.navigate('MedicineDetail', {itemSeq});
   };
 
   return (

@@ -201,8 +201,8 @@ const ChatContainer = styled.View``;
 const ChatBuble = styled.View`
   position: absolute;
   background-color: ${themes.light.boxColor.buttonPrimary};
-  width: 100px;
-  height: 50px;
+  width: 110px;
+  height: 60px;
   right: 20px;
   ${Platform.OS === 'ios' && `
       bottom: 170px;
@@ -228,7 +228,7 @@ const BubbleTail = styled.View`
 const BubbleText = styled.Text`
   color: ${themes.light.textColor.buttonText};
   font-family: 'KimjungchulGothic-Bold';
-  font-size: ${FontSizes.caption.default};
+  font-size: ${FontSizes.caption.large};
 `;
 
 const ChatButton = styled.TouchableOpacity`
