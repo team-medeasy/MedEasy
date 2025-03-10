@@ -1,5 +1,4 @@
 import {login, signUp} from '../auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   setAccessToken,
@@ -80,9 +79,6 @@ export const handleSignUp = async (data, navigation) => {
       console.warn('REFRESH_TOKEN is undefined. Removing key from storage.');
       await removeRefreshToken();
     }
-
-    // 회원가입 성공 후 사용자 이름 저장
-    await AsyncStorage.setItem('userName', requestData.name);
 
     console.log('회원가입 성공!');
 
