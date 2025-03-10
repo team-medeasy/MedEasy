@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { SafeAreaView, TouchableOpacity } from 'react-native';
 import { themes } from './../../styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { HeaderIcons, RoutineIcons, LogoIcons } from './../../../assets/icons';
 import CalendarWidget from '../../components/CalendarWidget';
@@ -10,6 +11,23 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Home = () => {
   const navigation = useNavigation();
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const storedName = await AsyncStorage.getItem('userName');
+        if (storedName) {
+          setUserName(storedName);
+        }
+      } catch (error) {
+        console.error('사용자 이름 불러오기 실패:', error);
+      }
+    };
+
+    fetchUserName();
+  }, []);
+
   const handleNotificationPress = () => {
     navigation.navigate('Notification');
   };
@@ -51,7 +69,7 @@ const Home = () => {
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
-            <ReminderText>한성님, {'\n'}까먹은 약이 있어요.</ReminderText>
+            <ReminderText>{userName ? `${userName}님,` : '사용자님,'} {'\n'}까먹은 약이 있어요.</ReminderText>
             <LogoIcons.logo
               width={70}
               height={112}
@@ -127,9 +145,9 @@ const Home = () => {
         <EventIcons>
           <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.pointColor.Primary }} />
           <EventText>복용 완료</EventText>
-          <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.textColor.Primary20 }}/>
+          <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.textColor.Primary20 }} />
           <EventText>미복용</EventText>
-          <RoutineIcons.hospital width={16} height={16} style={{ color: themes.light.pointColor.Secondary }}/>
+          <RoutineIcons.hospital width={16} height={16} style={{ color: themes.light.pointColor.Secondary }} />
           <EventText>병원 진료</EventText>
         </EventIcons>
       </ScrollContainer>

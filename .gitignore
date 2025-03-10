@@ -82,7 +82,7 @@ ios/MedEasy.xcworkspace/
 # env
 .env
 .env.local
-.env.development
+.env.dev
 .env.production
 .env.test
 .env.staging
