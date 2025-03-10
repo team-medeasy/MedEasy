@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {refreshToken} from './auth';
 import {getAccessToken, getRefreshToken, setAccessToken} from './storage';
+import {Platform} from 'react-native';
 
 const API_BASE_URL = 'http://35.216.7.36:8080';
 
@@ -8,6 +9,11 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
 });
+
+if (Platform.OS === 'ios') {
+  require('node-libs-react-native/globals'); // iOS에서 SSL 문제 해결
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
 
 // accessToken을 Axios 전역 헤더에 저장
 export const setAuthToken = token => {

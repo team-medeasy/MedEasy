@@ -22,11 +22,16 @@ export const login = async data => {
   try {
     const response = await api.post('/open-api/auth/login', data);
 
-    if (!response.data?.accessToken || !response.data?.refreshToken) {
+    const {access_token, refresh_token} = response.data.body || {};
+
+    if (!access_token || !refresh_token) {
       throw new Error('로그인 응답에 토큰이 없습니다.');
     }
 
-    return response.data;
+    return {
+      accessToken: access_token,
+      refreshToken: refresh_token,
+    };
   } catch (error) {
     console.error('로그인 실패:', error.response?.data || error.message);
 

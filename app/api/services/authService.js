@@ -9,11 +9,9 @@ import {setAuthToken} from '..';
 
 export const handleLogin = async credentials => {
   try {
-    const response = await login(credentials);
+    const {accessToken, refreshToken} = await login(credentials);
 
-    console.log('로그인 응답:', response.data);
-
-    const {accessToken, refreshToken} = response.data;
+    console.log('로그인 응답:', {accessToken, refreshToken});
 
     if (accessToken) {
       await setAccessToken(accessToken);
@@ -48,12 +46,12 @@ export const handleLogin = async credentials => {
   }
 };
 
-export const handleSignUp = async data => {
+export const handleSignUp = async (data, navigation) => {
   try {
     const requestData = {
       email: data.email,
       password: data.password,
-      name: `${data.firstName} ${data.lastName}`,
+      name: `${data.firstName}${data.lastName}`,
       birthday: data.birthday || null,
       gender: data.gender || null,
     };
@@ -64,18 +62,18 @@ export const handleSignUp = async data => {
 
     console.log('회원가입 응답:', response.data);
 
-    const {accessToken, refreshToken} = response.data;
+    const {access_token, refresh_token} = response.data.body || {};
 
-    if (accessToken) {
-      await setAccessToken(accessToken);
-      setAuthToken(accessToken);
+    if (access_token) {
+      await setAccessToken(access_token);
+      setAuthToken(access_token);
     } else {
       console.warn('ACCESS_TOKEN is undefined. Removing key from storage.');
       await removeAccessToken();
     }
 
-    if (refreshToken) {
-      await setRefreshToken(refreshToken);
+    if (refresh_token) {
+      await setRefreshToken(refresh_token);
     } else {
       console.warn('REFRESH_TOKEN is undefined. Removing key from storage.');
       await removeRefreshToken();
@@ -83,20 +81,30 @@ export const handleSignUp = async data => {
 
     console.log('회원가입 성공!');
 
-    // 서버에서 실제 저장되었는지 확인
+    // 회원가입 성공 후 자동 로그인 실행
     await handleLogin({email: data.email, password: data.password});
+
+    // 홈화면으로 이동
+    navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
 
     return response.data;
   } catch (error) {
+    console.error(
+      '회원가입 실패:',
+      JSON.stringify(error.response?.data, null, 2),
+    );
+
     if (error.response?.status === 409) {
       alert('이미 가입된 이메일입니다. 로그인해주세요.');
+    } else if (error.response?.data?.message) {
+      alert(`회원가입 실패: ${error.response.data.message}`);
+    } else if (error.response?.data?.result_message) {
+      // 서버에서 다른 키로 오류 메시지 반환할 경우 처리
+      alert(`회원가입 실패: ${error.response.data.result_message}`);
     } else {
-      alert(
-        '회원가입 실패: ' + (error.response?.data.message || '알 수 없는 오류'),
-      );
+      alert('회원가입 실패: 알 수 없는 오류');
     }
 
-    console.error('회원가입 실패:', error.response?.data || error.message);
     throw error;
   }
 };

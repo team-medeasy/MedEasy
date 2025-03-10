@@ -7,49 +7,44 @@ import {OtherIcons} from './../../../assets/icons';
 const {kakao: KakaoIcon} = OtherIcons;
 
 import LogoSvg from './../../../assets/images/logo.svg';
+import FontSizes from '../../../assets/fonts/fontSizes';
 const currentTheme = themes.light;
 
 const Container = styled(SafeAreaView)`
   flex: 1;
   background-color: #fff;
+  justify-content: space-between;
 `;
 
-const Container1 = styled.View`
+const TitleContainer = styled.View`
   margin-top: 70px;
   margin-left: 40px;
 `;
 
-const Container2 = styled.View`
+const LogoContainer = styled.View`
   align-items: center;
-  margin-top: 100px;
-  margin-bottom: 100px;
 `;
 
 const ButtonContainer = styled.View`
   align-items: center;
-  height: 152px;
-`;
-
-const LogoImage = styled(Image)`
-  width: 250px;
-  height: 250px;
+  padding: 0 20px;
 `;
 
 const SignUpBtn = styled(TouchableOpacity)`
-  width: 90%;
-  height: 53px;
+  padding: 16px 0;
+  width: 100%;
   background-color: ${themes.light.boxColor.buttonPrimary};
   justify-content: center;
   align-items: center;
   border-radius: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   flex-direction: row;
   gap: 20px;
 `;
 
 const BtnText = styled(Text)`
   color: ${themes.light.textColor.buttonText};
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
 `;
 
@@ -60,15 +55,21 @@ const EmailBtn = styled(TouchableOpacity)`
 `;
 
 const EmailBtnText = styled.Text`
-  font-size: 12px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
   color: #0006;
+`;
+const SignUpContainer = styled.View`
+  flex-direction: row;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  gap: 20px;
 `;
 
 const SignUpStartScreen = ({navigation}) => {
   return (
     <Container>
-      <Container1>
+      <TitleContainer>
         <Text
           style={{
             fontFamily: fonts.title.fontFamily,
@@ -76,10 +77,10 @@ const SignUpStartScreen = ({navigation}) => {
           }}>
           메디지와 함께{'\n'}규칙적인 복약 습관{'\n'}만들어 가요!
         </Text>
-      </Container1>
-      <Container2>
+      </TitleContainer>
+      <LogoContainer>
         <LogoSvg width={250} height={250} />
-      </Container2>
+      </LogoContainer>
       <ButtonContainer>
         <SignUpBtn onPress={() => navigation.navigate('NavigationBar')}>
           <KakaoIcon
@@ -93,14 +94,14 @@ const SignUpStartScreen = ({navigation}) => {
           <FontAwesome name="google" size={20} color="#ffffff" />
           <BtnText>Google로 시작하기</BtnText>
         </SignUpBtn>
-        <View style={{flexDirection: 'row', gap: 20}}>
+        <SignUpContainer>
           <EmailBtn onPress={() => navigation.navigate('SignUpName')}>
             <EmailBtnText>회원가입</EmailBtnText>
           </EmailBtn>
           <EmailBtn onPress={() => navigation.navigate('SignIn')}>
             <EmailBtnText>이메일 로그인</EmailBtnText>
           </EmailBtn>
-        </View>
+        </SignUpContainer>
       </ButtonContainer>
     </Container>
   );
