@@ -434,14 +434,8 @@ const Header = styled.View`
   flex-direction: row;
   padding: 0px 20px;
 
-  ${Platform.OS === 'ios' &&
-  `
-        margin-top: 70px;
-      `}
-  ${Platform.OS === 'android' &&
-  `
-        margin-top: 40px;
-      `}
+  ${Platform.OS === 'ios' &&`margin-top: 70px;`}
+  ${Platform.OS === 'android' &&`margin-top: 30px;`}
   justify-content: space-between;
 `;
 

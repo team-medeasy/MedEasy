@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity, Platform} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -202,7 +202,8 @@ const Container = styled.View`
 `;
 
 const HeaderContainer = styled.View`
-  padding-top: 70px;
+  ${Platform.OS === 'ios' && `padding-top: 70px;`}
+  ${Platform.OS === 'android' && `padding-top: 30px;`}
   padding-bottom: 7px;
   background-color: ${themes.light.bgColor.headerBG};
 `;
