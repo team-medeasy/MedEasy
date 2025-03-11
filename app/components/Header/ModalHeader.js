@@ -41,7 +41,7 @@ const HeaderContainer = styled.View`
   justify-content: flex-end;   
   padding: 15px 0px;   
   background-color: ${themes.light.bgColor.bgPrimary};   
-  border-bottom-width: 1;   
+  border-bottom-width: 1px;   
   border-bottom-color: ${themes.light.borderColor.borderPrimary}; 
 `;  
 

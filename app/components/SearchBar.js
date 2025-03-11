@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
 import {themes} from './../styles';
 import {OtherIcons} from './../../assets/icons';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 const SearchBarContainer = styled.View`
   height: 44px;
@@ -16,7 +17,7 @@ const SearchBarContainer = styled.View`
 `;
 
 const SearchInput = styled.TextInput`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
   flex: 1;
 `;
