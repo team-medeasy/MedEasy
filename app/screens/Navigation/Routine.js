@@ -231,14 +231,31 @@ const Routine = () => {
     <Container>
       <Header>
         <HeaderText>루틴</HeaderText>
-        <ReturnButton>
-          <OtherIcons.return
-            width={11}
-            height={9}
-            style={{ color: themes.light.textColor.Primary50 }}
-          />
-          <ButtonText>돌아가기</ButtonText>
-        </ReturnButton>
+          <ReturnButton onPress={() => {
+            // 오늘 날짜로 선택 날짜 변경
+            setSelectedDate({
+              day: weekDays[today.day()],
+              date: today.date(),
+              month: today.month() + 1,
+              year: today.year(),
+              fullDate: today,
+            });
+            
+            // 오늘 날짜가 있는 페이지(4번 인덱스)로 스크롤
+            if (flatListRef.current) {
+              flatListRef.current.scrollToIndex({
+                index: 4,
+                animated: true,
+              });
+            }
+          }}>
+            <OtherIcons.return
+              width={11}
+              height={9}
+              style={{ color: themes.light.textColor.Primary50 }}
+            />
+            <ButtonText>돌아가기</ButtonText>
+          </ReturnButton>
       </Header>
 
       {/* 페이징 가능한 DayContainer */}
