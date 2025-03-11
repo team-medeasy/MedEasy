@@ -67,10 +67,10 @@ const SettingList = () => {
     <Container>
       <SettingCategory lastItem={false}>
         {[
-          { name: 'Profile', label: '프로필 설정', icon: <SettingsIcons.profileSettings width={20} height={20} /> },
-          { name: 'Notification', label: '알림 설정', icon: <SettingsIcons.notifications width={20} height={20} /> },
-          { name: 'FontSize', label: '글자 크기 설정', icon: <SettingsIcons.textSize width={20} height={20} /> },
-          { name: 'Favorites', label: '관심 목록', icon: <SettingsIcons.favorites width={20} height={20} /> },
+          { name: 'Profile', label: '프로필 설정', icon: <SettingsIcons.profileSettings width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'Notification', label: '알림 설정', icon: <SettingsIcons.notifications width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'FontSize', label: '글자 크기 설정', icon: <SettingsIcons.textSize width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'Favorites', label: '관심 목록', icon: <SettingsIcons.favorites width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
         ].map(item => (
           <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}
@@ -81,10 +81,10 @@ const SettingList = () => {
 
       <SettingCategory lastItem={false}>
         {[
-          { name: 'Announcements', label: '공지사항', icon: <SettingsIcons.announcement width={20} height={20} /> },
-          { name: 'Feedback', label: '의견 남기기', icon: <SettingsIcons.feedback width={20} height={20} /> },
-          { name: 'FAQ', label: '자주 하는 질문', icon: <SettingsIcons.faq width={20} height={20} /> },
-          { name: 'AppVersion', label: '앱 버전', icon: <SettingsIcons.appVersion width={20} height={20} /> },
+          { name: 'Announcements', label: '공지사항', icon: <SettingsIcons.announcement width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'Feedback', label: '의견 남기기', icon: <SettingsIcons.feedback width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'FAQ', label: '자주 하는 질문', icon: <SettingsIcons.faq width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'AppVersion', label: '앱 버전', icon: <SettingsIcons.appVersion width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
         ].map(item => (
           <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}
@@ -95,8 +95,8 @@ const SettingList = () => {
 
       <SettingCategory lastItem={true}>
         {[
-          { name: 'Logout', label: '로그아웃', icon: <SettingsIcons.logout width={20} height={20} /> },
-          { name: 'DeleteAccount', label: '계정 삭제', icon: <SettingsIcons.trashcan width={20} height={20} /> },
+          { name: 'Logout', label: '로그아웃', icon: <SettingsIcons.logout width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'DeleteAccount', label: '계정 삭제', icon: <SettingsIcons.trashcan width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
         ].map(item => (
           <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}

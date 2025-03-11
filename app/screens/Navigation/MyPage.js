@@ -8,7 +8,11 @@ import MedicationInfo from '../../components/MedicationInfo';
 import SettingList from '../../components/SettingList';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
+import { useSignUp } from '../../api/context/SignUpContext';
+
 const MyPage = () => {
+  const {signUpData} = useSignUp();
+
   return (
     <Container>
       <ScrollContent>
@@ -19,7 +23,7 @@ const MyPage = () => {
         {/* 웰컴 메시지, 프로필 설정 */}
         <ProfileContainer>
           <TextContainer>
-            <UserText>안녕하세요, 김한성님🩵</UserText>
+            <UserText>안녕하세요, {signUpData.lastName + signUpData.firstName}님🩵</UserText>
             <SmallText>오늘도 건강한 하루 되세요!</SmallText>
           </TextContainer>
           <EditProfile>
