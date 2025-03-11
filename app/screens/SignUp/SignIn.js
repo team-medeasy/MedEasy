@@ -43,14 +43,6 @@ const TextInput = styled.TextInput`
   font-size: 16px;
 `;
 
-const TxtLabel = styled.Text`
-  height: 60px;
-  border-radius: 10px;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  padding: 20px;
-  font-size: 16px;
-`;
-
 const SignInScreen = ({navigation, route}) => {
   const {updateSignUpData} = useSignUp();
   const [email, setEmail] = useState('');
@@ -61,27 +53,50 @@ const SignInScreen = ({navigation, route}) => {
       alert('이메일을 입력하세요.');
       return;
     }
-
+  
     if (!password) {
       alert('비밀번호를 입력하세요.');
       return;
     }
-
+  
     try {
-      const response = await handleLogin({email, password});
-
+      // 로그인 시도 및 사용자 정보 가져오기
+      const response = await handleLogin({ email, password });
+  
       console.log('로그인 성공:', response);
-
-      // 상태 업데이트
-      updateSignUpData({email, password});
-
+  
+      const userData = response?.body;
+  
+      if (!userData) {
+        throw new Error('사용자 데이터를 가져올 수 없습니다.');
+      }
+  
+      // * name값만 들어오므로 임시로 name을 firstName으로 지정 (추후 수정)
+      const firstName = userData.name || '';
+  
+      updateSignUpData({
+        email,
+        password,
+        firstName, 
+        gender: userData.gender,
+        birthday: userData.birthday,
+      });
+  
+      console.log('최종 저장된 SignUp Data:', {
+        email,
+        password,
+        firstName,
+        gender: userData.gender,
+        birthday: userData.birthday,
+      });
+  
       // 홈 화면 이동
-      navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
+      navigation.reset({ index: 0, routes: [{ name: 'NavigationBar' }] });
     } catch (error) {
       console.error('로그인 실패:', error);
       alert(error.message || '로그인에 실패했습니다.');
     }
-  };
+  };  
 
   return (
     <Container>
