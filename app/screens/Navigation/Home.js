@@ -8,8 +8,11 @@ import CalendarWidget from '../../components/CalendarWidget';
 import { useNavigation } from '@react-navigation/native';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
+import { useSignUp } from '../../api/context/SignUpContext';
+
 const Home = () => {
   const navigation = useNavigation();
+  const {signUpData} = useSignUp();
 
   const handleNotificationPress = () => {
     navigation.navigate('Notification');
@@ -52,7 +55,7 @@ const Home = () => {
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
-            <ReminderText>한성님, {'\n'}까먹은 약이 있어요.</ReminderText>
+            <ReminderText>{signUpData.firstName}님, {'\n'}까먹은 약이 있어요.</ReminderText>
             <LogoIcons.logo
               width={70}
               height={112}
