@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import {TextInput, TouchableOpacity, View} from 'react-native';
 import {themes} from '../../styles';
 import {ChatIcons} from '../../../assets/icons';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {add: AddIcon, mike: MikeIcon, send: SendIcon} = ChatIcons;
 
@@ -88,7 +89,7 @@ const Input = styled(TextInput)`
   flex: 1;
   padding-left: 15px;
   padding-right: 10px;
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   max-height: 100px;
   font-family: 'Pretendard-semiBold';
   padding-top: 5px;

@@ -46,7 +46,7 @@ const TextContainer = styled.View`
 const SmallLine = styled.Text`
   color: white;
   font-family: 'KimjungchulGothic-Regular';
-  font-size: ${15}px;
+  font-size: ${FontSizes.body.default};
   margin-bottom: 10px;
   margin-top: 100px;
   margin-left: 50px;
