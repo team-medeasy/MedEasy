@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, TouchableOpacity, Modal, View } from 'react-native';
+import { TouchableOpacity, Modal, View } from 'react-native';
 import { themes } from './../../styles';
 import { ModalHeader } from '../../components';
 import { RoutineIcons } from '../../../assets/icons';
 import { Button } from '../../components/Button';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const { hospital: HospitalIcon } = RoutineIcons;
 
@@ -13,8 +14,8 @@ const AddHospitalVisit = () => {
   const [hospitalName, setHospitalName] = useState('');
   const [time, setTime] = useState('');
   const [date, setDate] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [pickerMode, setPickerMode] = useState('date'); // 'date' 또는 'time'
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const handleAdd = () => {
@@ -41,16 +42,30 @@ const AddHospitalVisit = () => {
 
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || new Date();
-    setShowDatePicker(false);
     setSelectedDate(currentDate);
-    setDate(formatDate(currentDate));
   };
 
-  const onTimeChange = (event, selectedTime) => {
-    const currentTime = selectedTime || new Date();
-    setShowTimePicker(false);
-    setSelectedDate(currentTime);
-    setTime(formatTime(currentTime));
+  const getModalTitleText = () => {
+    return pickerMode === 'date' ? '방문할 날짜를 선택해주세요.' : '방문할 시간을 선택해주세요.';
+  };
+
+  const handleConfirm = () => {
+    if (pickerMode === 'date') {
+      setDate(formatDate(selectedDate));
+    } else {
+      setTime(formatTime(selectedDate));
+    }
+    setShowModal(false);
+  };
+
+  const openDatePicker = () => {
+    setPickerMode('date');
+    setShowModal(true);
+  };
+
+  const openTimePicker = () => {
+    setPickerMode('time');
+    setShowModal(true);
   };
 
   return (
@@ -72,7 +87,7 @@ const AddHospitalVisit = () => {
         </InputContainer>
         <SchedulePickerContainer>
           <PickerTitle>날짜</PickerTitle>
-          <SchedulePicker onPress={() => setShowDatePicker(true)}>
+          <SchedulePicker onPress={openDatePicker}>
             <PickerPlaceHolder>
               {date || '날짜를 선택해주세요.'}
             </PickerPlaceHolder>
@@ -80,7 +95,7 @@ const AddHospitalVisit = () => {
         </SchedulePickerContainer>
         <SchedulePickerContainer>
           <PickerTitle>시각</PickerTitle>
-          <SchedulePicker onPress={() => setShowTimePicker(true)}>
+          <SchedulePicker onPress={openTimePicker}>
             <PickerPlaceHolder>
               {time || '시각을 선택해주세요.'}
             </PickerPlaceHolder>
@@ -91,57 +106,25 @@ const AddHospitalVisit = () => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={showDatePicker}
-        onRequestClose={() => setShowDatePicker(false)}
-      >
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}>
         <ModalContainer>
           <ModalContent>
             <TopBar />
-            <ModalCloseBar>
-              <ModalTitle>방문할 날짜를 선택해주세요.</ModalTitle>
-            </ModalCloseBar>
-            <DateTimePicker
-              value={selectedDate}
-              mode="date"
-              display="spinner"
-              onChange={onDateChange}
-              locale="ko"
-            />
-            <ConfirmButton onPress={() => {
-              setDate(formatDate(selectedDate));
-              setShowDatePicker(false);
-            }}>
-              <ConfirmButtonText>확인</ConfirmButtonText>
-            </ConfirmButton>
-          </ModalContent>
-        </ModalContainer>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showTimePicker}
-        onRequestClose={() => setShowTimePicker(false)}
-      >
-        <ModalContainer>
-          <ModalContent>
-            <TopBar />
-            <ModalCloseBar>
-              <ModalTitle>방문할 시간을 선택해주세요.</ModalTitle>
-            </ModalCloseBar>
-            <DateTimePicker
-              value={selectedDate}
-              mode="time"
-              display="spinner"
-              onChange={onTimeChange}
-              locale="ko"
-            />
-            <ConfirmButton onPress={() => {
-              setTime(formatTime(selectedDate));
-              setShowTimePicker(false);
-            }}>
-              <ConfirmButtonText>확인</ConfirmButtonText>
-            </ConfirmButton>
+            <ModalTitle>{getModalTitleText()}</ModalTitle>
+            <View
+              style={{
+                margin: 30,
+              }}>
+              <DateTimePicker
+                value={selectedDate}
+                mode={pickerMode}
+                display="spinner"
+                onChange={onDateChange}
+                locale="ko"
+              />
+            </View>
+            <Button title="확인" onPress={handleConfirm} />
           </ModalContent>
         </ModalContainer>
       </Modal>
@@ -207,54 +190,36 @@ const BtnContainer = styled.View`
   padding-bottom: 30px;
 `;
 
+// 새로운 모달 스타일 적용
 const ModalContainer = styled.View`
   flex: 1;
-  justify-content: flex-end;
   background-color: ${themes.light.bgColor.modalBG};
 `;
 
 const ModalContent = styled.View`
+  width: 100%;
+  margin-top: auto;
   background-color: ${themes.light.bgColor.bgPrimary};
-  border-radius: 40px;
-  padding: 40px 20px;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
   align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px 0px 20px;
+  padding-bottom: 40px;
 `;
 
 const TopBar = styled.View`
-  position: absolute;
-  top: 10px;
   width: 40px;
   height: 5px;
-  background-color: ${themes.light.textColor.Primary30};
   border-radius: 4px;
-`;
-
-const ModalCloseBar = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
+  background-color: ${themes.light.boxColor.modalBar};
+  margin-bottom: 25px;
 `;
 
 const ModalTitle = styled.Text`
-  font-size: 22px;
-  font-family: 'Pretendard-Bold';
-  color: ${themes.light.textColor.Primary};
-`;
-
-const ConfirmButton = styled.TouchableOpacity`
-  background-color: ${themes.light.boxColor.buttonPrimary};
-  padding: 15px;
-  border-radius: 10px;
-  width: 100%;
-  align-items: center;
-  margin-top: 15px;
-`;
-
-const ConfirmButtonText = styled.Text`
-  font-size: 18px;
-  font-family: 'Pretendard-Bold';
-  color: ${themes.light.textColor.buttonText};
+  font-family: 'KimjungchulGothic-Bold';
+  font-size: ${FontSizes.title.default};
+  color: ${themes.light.textColor.textPrimary};
 `;
 
 export default AddHospitalVisit;
