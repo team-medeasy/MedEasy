@@ -44,7 +44,7 @@ const Container = styled.View`
 const BGStyle = styled.View`
   position: absolute;
   height: 60%;
-  top: -20px;
+  top: -10px;
   right: -28px;
   left: -28px;
   border-radius: 448px;

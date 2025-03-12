@@ -109,6 +109,8 @@ const SmallText = styled.Text`
 `;
 
 const EditProfile = styled.View`
+  position: absolute;
+  right: 0;
   padding: 25px;
 `;
 
