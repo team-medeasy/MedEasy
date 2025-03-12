@@ -13,7 +13,7 @@ const pillIcons = {
   '그 외': PillsIcon.etc,
 };
 
-const FilterModal = ({
+export const FilterModal = ({
   visible,
   onClose,
   filterType,
@@ -161,5 +161,3 @@ const FilterOptionText = styled.Text`
       : themes.light.textColor.Primary50};
   font-family: 'Pretendard-SemiBold';
 `;
-
-export default FilterModal;

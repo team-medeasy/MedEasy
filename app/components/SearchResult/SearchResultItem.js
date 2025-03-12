@@ -4,7 +4,7 @@ import {Tag} from './../index';
 import {themes} from './../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
-const SearchResultItem = ({item, onPress}) => {
+export const SearchResultItem = ({item, onPress}) => {
   return (
     <ItemContainer onPress={() => onPress(item.item_seq)}>
       <ImageContainer>
@@ -74,5 +74,3 @@ const TypeContainer = styled.View`
   flex-direction: row;
   gap: 11px;
 `;
-
-export default SearchResultItem;

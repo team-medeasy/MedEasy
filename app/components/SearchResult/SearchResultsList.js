@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import SearchResultItem from './SearchResultItem';
+import {SearchResultItem} from './SearchResultItem';
 import {Footer} from './../index';
 import {FlatList} from 'react-native';
 
-const SearchResultsList = ({searchResults, handleSearchResultPress}) => {
+export const SearchResultsList = ({searchResults, handleSearchResultPress}) => {
   return (
     <Container>
       {searchResults.length > 0 && (
@@ -24,5 +24,3 @@ const SearchResultsList = ({searchResults, handleSearchResultPress}) => {
 const Container = styled.View`
   flex: 1;
 `;
-
-export default SearchResultsList;

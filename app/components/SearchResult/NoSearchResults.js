@@ -34,4 +34,4 @@ const NoResultsSubText = styled.Text`
   text-align: center;
 `;
 
-export default NoSearchResults;
+export {NoSearchResults};

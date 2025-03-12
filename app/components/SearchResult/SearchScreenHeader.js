@@ -3,12 +3,12 @@ import {TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
-import FilterButton from './FilterButton';
+import {FilterButton} from './FilterButton';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {chevron: ChevronIcon} = HeaderIcons;
 
-const SearchScreenHeader = ({
+export const SearchScreenHeader = ({
   searchQuery,
   onBackPress,
   onSearchPress,
@@ -130,5 +130,3 @@ const FeatureSearchText = styled.Text`
 const ScrollableFilterContainer = styled.ScrollView`
   flex-direction: row;
 `;
-
-export default SearchScreenHeader;

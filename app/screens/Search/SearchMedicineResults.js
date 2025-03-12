@@ -1,13 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {View} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
-import { ColorShapeView} from '../../components';
-
-import SearchResultsList from './../../components/SearchResult/SearchResultsList'; // Import SearchResultsList
-import NoSearchResults from '../../components/SearchResult/NoSearchResults';
-import SearchScreenHeader from '../../components/SearchResult/SearchScreenHeader';
-import FilterModal from '../../components/SearchResult/FilterModal';
+import { 
+  ColorShapeView,
+  SearchScreenHeader,
+  SearchResultsList,
+  NoSearchResults,
+  FilterModal
+} from '../../components';
 
 import { dummyMedicineData } from '../../../assets/data/data';
 

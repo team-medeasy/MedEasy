@@ -27,11 +27,11 @@ const SearchButton = styled(TouchableOpacity)`
   align-items: center;
 `;
 
-const SearchBar = ({searchQuery, setSearchQuery, onSearch}) => {
+const SearchBar = ({searchQuery, setSearchQuery, onSearch, placeholder}) => {
   return (
     <SearchBarContainer>
       <SearchInput
-        placeholder="약 이름, 증상을 입력하세요"
+        placeholder={placeholder}
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
