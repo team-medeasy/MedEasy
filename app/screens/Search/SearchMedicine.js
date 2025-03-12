@@ -130,6 +130,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSearch={() => handleSearch(searchQuery)}
+            placeholder={"약 이름, 증상을 입력하세요"}
           />
         </ChevronAndSearchContainer>
       </HeaderContainer>
