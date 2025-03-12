@@ -7,7 +7,7 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {chevronDown: ChevronDownIcon, delete: Delete} = OtherIcons;
 
-const FilterButton = ({
+export const FilterButton = ({
   type,
   selectedItems,
   onFilterPress,
@@ -59,5 +59,3 @@ const FilterButtonText = styled.Text`
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
-
-export default FilterButton;

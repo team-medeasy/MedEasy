@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import {View, TouchableOpacity, Modal} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {themes} from './../../styles';
-import {ModalHeader, Button} from '../../components';
+import {ModalHeader, Button, DateTimePickerModal} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {RoutineIcons} from '../../../assets/icons';
 import {useNavigation} from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 const {
   moon: MoonIcon,
@@ -166,31 +165,15 @@ const SetRoutineTime = () => {
         />
       </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
+      <DateTimePickerModal
         visible={showTimePicker}
-        onRequestClose={() => setShowTimePicker(false)}>
-        <ModalContainer>
-          <ModalContent>
-            <TopBar />
-            <ModalTitle>{getModalTitleText()}</ModalTitle>
-            <View
-              style={{
-                margin: 30,
-              }}>
-              <DateTimePicker
-                value={selectedTime}
-                mode="time"
-                display="spinner"
-                onChange={onTimeChange}
-                locale="ko"
-              />
-            </View>
-            <Button title="확인" onPress={handleConfirm} />
-          </ModalContent>
-        </ModalContainer>
-      </Modal>
+        onClose={() => setShowTimePicker(false)}
+        onConfirm={handleConfirm}
+        mode="time"
+        date={selectedTime}
+        onChange={onTimeChange}
+        title={getModalTitleText()}
+      />
 
       <View
         style={{
@@ -248,37 +231,6 @@ const TimeButton = styled(TouchableOpacity)`
 const TimeButtonText = styled.Text`
   font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const ModalContainer = styled.View`
-  flex: 1;
-  background-color: ${themes.light.bgColor.modalBG};
-`;
-
-const ModalContent = styled.View`
-  width: 100%;
-  margin-top: auto;
-  background-color: ${themes.light.bgColor.bgPrimary};
-  border-top-left-radius: 40px;
-  border-top-right-radius: 40px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px 0px 20px;
-  padding-bottom: 40px;
-`;
-
-const TopBar = styled.View`
-  width: 40px;
-  height: 5px;
-  border-radius: 4px;
-  background-color: ${themes.light.boxColor.modalBar};
-  margin-bottom: 25px;
-`;
-
-const ModalTitle = styled.Text`
-  font-family: 'KimjungchulGothic-Bold';
-  font-size: ${FontSizes.title.default};
   color: ${themes.light.textColor.textPrimary};
 `;
 
