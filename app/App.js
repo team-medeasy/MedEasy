@@ -100,6 +100,7 @@ const App = () => {
               <RootStack.Screen
                 name="AddMedicineRoutine"
                 component={AddMedicineRoutineScreen}
+                options={{presentation: 'modal'}}
               />
               <RootStack.Screen
                 name="AddHospitalVisit"
