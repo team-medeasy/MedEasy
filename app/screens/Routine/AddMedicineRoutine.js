@@ -13,6 +13,63 @@ import { dummyMedicineData } from '../../../assets/data/data';
 
 const { logo: LogoIcon } = LogoIcons;
 
+const AddMedicineRoutine = ({navigation}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  // 검색어에 따라 필터링하는 함수
+  const handleSearch = (query) => {
+    if (!query.trim()) {
+      setSearchResults(dummyMedicineData);
+    } else {
+      const filteredResults = dummyMedicineData.filter(medicine =>
+        medicine.item_name?.toLowerCase().includes(query.toLowerCase())
+      );
+      setSearchResults(filteredResults);
+    }
+  };  
+
+  // 검색어가 바뀔 때마다 검색 실행
+  useEffect(() => {
+    handleSearch(searchQuery);
+  }, [searchQuery]);
+
+  // 임시로 item_seq 값 넘김 + Modal화면 띄우기 요청 + title 지정
+  const handleSearchResultPress = itemSeq => {
+    navigation.navigate('MedicineDetail', {itemSeq, isModal: true, title: '루틴 추가'});
+  };
+
+  return (
+    <Container>
+      <ModalHeader>루틴 추가</ModalHeader>
+      <HeaderContainer>
+        <LogoAndSearchContainer>
+          <LogoIconContainer>
+            <LogoIcon width={14} height={22} style={{ color: themes.light.pointColor.Primary }} />
+          </LogoIconContainer>
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={() => handleSearch(searchQuery)}
+            placeholder={"복용 중인 약을 입력하세요"}
+          />
+        </LogoAndSearchContainer>
+      </HeaderContainer>
+
+      <SearchResultContainer>
+        {searchResults.length > 0 ? (
+          <SearchResultsList
+            searchResults={searchResults}
+            handleSearchResultPress={handleSearchResultPress}
+          />
+        ) : (
+          <NoSearchResults />
+        )}
+      </SearchResultContainer>
+    </Container>
+  );
+};
+
 const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
@@ -24,74 +81,21 @@ const HeaderContainer = styled.View`
   background-color: ${themes.light.bgColor.headerBG};
 `;
 
-const ChevronAndSearchContainer = styled.View`
+const LogoAndSearchContainer = styled.View`
   flex-direction: row;
   align-items: center;
   padding-right: 16px;
   padding-left: 12px;
 `;
 
-const ChevronIconContainer = styled.View`
+const LogoIconContainer = styled.View`
   margin-right: 12px;
 `;
 
 const SearchResultContainer = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
+  margin-top: 16px;
 `;
-
-const AddMedicineRoutine = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-
-  // 검색어에 따라 필터링하는 함수
-  const handleSearch = (query) => {
-    if (!query.trim()) {
-      // 검색어가 비어있으면 모든 데이터 표시
-      setSearchResults(dummyMedicineData);
-    } else {
-      // 검색어에 맞는 데이터만 필터링
-      const filteredResults = dummyMedicineData.filter(item =>
-        item.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setSearchResults(filteredResults);
-    }
-  };
-
-  // 검색어가 바뀔 때마다 검색 실행
-  useEffect(() => {
-    handleSearch(searchQuery);
-  }, [searchQuery]);
-
-  return (
-    <Container>
-      <ModalHeader>루틴 추가</ModalHeader>
-      <HeaderContainer>
-        <ChevronAndSearchContainer>
-          <ChevronIconContainer>
-            <LogoIcon width={14} height={22} style={{ color: themes.light.pointColor.Primary }} />
-          </ChevronIconContainer>
-          <SearchBar
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onSearch={() => handleSearch(searchQuery)}
-            placeholder={"복용 중인 약을 입력하세요"}
-          />
-        </ChevronAndSearchContainer>
-      </HeaderContainer>
-
-      <SearchResultContainer>
-        {searchResults.length > 0 ? (
-          <SearchResultsList
-            searchResults={searchResults}
-            handleSearchResultPress={() => {}}
-          />
-        ) : (
-          <NoSearchResults />
-        )}
-      </SearchResultContainer>
-    </Container>
-  );
-};
 
 export default AddMedicineRoutine;
