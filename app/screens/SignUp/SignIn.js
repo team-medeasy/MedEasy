@@ -53,50 +53,49 @@ const SignInScreen = ({navigation, route}) => {
       alert('이메일을 입력하세요.');
       return;
     }
-  
     if (!password) {
       alert('비밀번호를 입력하세요.');
       return;
     }
-  
+    
     try {
-      // 로그인 시도 및 사용자 정보 가져오기
-      const response = await handleLogin({ email, password });
-  
-      console.log('로그인 성공:', response);
-  
-      const userData = response?.body;
-  
-      if (!userData) {
+      const userData = await handleLogin({ email, password });
+      console.log('로그인 성공:', userData);
+      
+      if (userData) {
+        // 이름 분리 (성-이름 형태로)
+        let firstName = ''; // 성
+        let lastName = '';  // 이름
+        
+        if (userData.name && userData.name !== "undefinedundefined") {
+          if (userData.name.length >= 2) {
+            firstName = userData.name.substring(0, 1); // 첫 글자는 성
+            lastName = userData.name.substring(1);     // 나머지는 이름
+          } else {
+            firstName = userData.name; // 한 글자만 있으면 성으로 처리
+          }
+        }
+        
+        updateSignUpData({
+          email,
+          password,
+          firstName, // 성
+          lastName,  // 이름
+          gender: userData.gender || '',
+          birthday: userData.birthday || '',
+        });
+        
+        // 홈 화면 이동
+        navigation.reset({ index: 0, routes: [{ name: 'NavigationBar' }] });
+      } else {
+        // userData가 없는 경우 (사용자 정보 로드 실패)
         throw new Error('사용자 데이터를 가져올 수 없습니다.');
       }
-  
-      // * name값만 들어오므로 임시로 name을 firstName으로 지정 (추후 수정)
-      const firstName = userData.name || '';
-  
-      updateSignUpData({
-        email,
-        password,
-        firstName, 
-        gender: userData.gender,
-        birthday: userData.birthday,
-      });
-  
-      console.log('최종 저장된 SignUp Data:', {
-        email,
-        password,
-        firstName,
-        gender: userData.gender,
-        birthday: userData.birthday,
-      });
-  
-      // 홈 화면 이동
-      navigation.reset({ index: 0, routes: [{ name: 'NavigationBar' }] });
     } catch (error) {
       console.error('로그인 실패:', error);
       alert(error.message || '로그인에 실패했습니다.');
     }
-  };  
+  };
 
   return (
     <Container>
