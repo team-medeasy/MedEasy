@@ -450,7 +450,7 @@ const Routine = () => {
 
 const Container = styled.View`
   flex: 1;
-  background-color: ${themes.light.bgColor.bgPrimary};
+  background-color: ${themes.light.bgColor.bgSecondary};
 `;
 
 const Header = styled.View`
@@ -458,8 +458,8 @@ const Header = styled.View`
   flex-direction: row;
   padding: 0px 20px;
 
-  ${Platform.OS === 'ios' && `margin-top: 70px;`}
-  ${Platform.OS === 'android' && `margin-top: 30px;`}
+  ${Platform.OS === 'ios' && `padding-top: 70px;`}
+  ${Platform.OS === 'android' && `padding-top: 30px;`}
   justify-content: space-between;
 `;
 
@@ -487,7 +487,9 @@ const ButtonText = styled.Text`
 `;
 
 // 페이징을 위한 컨테이너
-const DayContainerWrapper = styled.View``;
+const DayContainerWrapper = styled.View`
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
 
 // 주차 단위 컨테이너
 const WeekContainer = styled.View`
@@ -521,6 +523,7 @@ const DateText = styled.Text`
 
 const ScheduleContainer = styled.View`
   background-color: ${themes.light.bgColor.bgSecondary};
+  padding-bottom: 150px;
 `;
 
 const TodayContainer = styled.View`
