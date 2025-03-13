@@ -5,7 +5,7 @@ export const updateUserSchedule = data =>
 
 export const getUser = () => api.get('/user');
 
-export const deleteUser = (password) => api.post('/user', { data: { password } });
+export const deleteUser = (password) => api.post('/user', { password });
 
 export const getUserUsageDays = () => api.get('/user/usage-days');
 
