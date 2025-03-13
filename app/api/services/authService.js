@@ -23,18 +23,20 @@ export const handleLogin = async credentials => {
       // 토큰 설정 후 사용자 정보 가져오기
       try {
         const userResponse = await getUser();
-        const userData = userResponse.data;
+        console.log('getUser API 전체 응답:', userResponse);
+
+        const userData = userResponse.data?.data || userResponse.data?.body || userResponse.data;
         
         console.log('사용자 정보 로드 완료:', userData);
         
         // 사용자 정보 저장
         await setUserInfo({
-          name: userData.name,
-          gender: userData.gender,
-          birthday: userData.birthday,
+          name: userData.name || '',
+          gender: userData.gender || '',
+          birthday: userData.birthday || '',
         });
-        
         return userData; // 컴포넌트에서 사용할 수 있도록 반환
+
       } catch (userError) {
         console.error('사용자 정보 로드 실패:', userError);
         // 사용자 정보 로드 실패해도 로그인은 성공으로 처리
@@ -71,16 +73,17 @@ export const handleLogin = async credentials => {
 
 export const handleSignUp = async (data, navigation) => {
   try {
+    const name = `${data.lastName || ''}${data.firstName || ''}`;
+    
     const requestData = {
       email: data.email,
       password: data.password,
-      name: `${data.firstName}${data.lastName}`,
+      name, // 성+이름 형태로 서버에 전송
       birthday: data.birthday || null,
       gender: data.gender || null,
     };
-
+    
     console.log('회원가입 요청 데이터:', requestData);
-
     const response = await signUp(requestData);
 
     console.log('회원가입 응답:', response.data);
