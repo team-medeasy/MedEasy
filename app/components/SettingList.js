@@ -7,7 +7,6 @@ import { SettingsIcons } from './../../assets/icons';
 import { themes } from './../styles';
 import { deleteUser } from '../api/user';
 import FontSizes from '../../assets/fonts/fontSizes';
-
 import { 
   removeAccessToken,
   removeRefreshToken, 
@@ -36,6 +35,10 @@ const SettingList = () => {
         break;
       case 'AppVersion':
         // 기능 없음
+        break;
+      case 'DeleteAccount':
+        // 회원 탈퇴 다이얼로그 표시
+        setDialogVisible(true);
         break;
       case 'Logout':
         Alert.alert(
@@ -73,11 +76,6 @@ const SettingList = () => {
           { cancelable: false }
         );
         break;
-      case 'DeleteAccount':
-        setDialogVisible(true);
-        break;
-      default:
-        break;
     }
   };
 
@@ -88,11 +86,31 @@ const SettingList = () => {
     }
     try {
       await deleteUser(password);
-      Alert.alert('완료', '계정이 삭제되었습니다.');
-      setDialogVisible(false);
-      // 로그아웃 후 초기 화면으로 이동하는 로직 추가 가능
+      Alert.alert('완료', '계정이 삭제되었습니다.', [
+        {
+          text: '확인',
+          onPress: async () => {
+            setDialogVisible(false);
+            setPassword('');
+            // 토큰 제거
+            await removeAccessToken();
+            await removeRefreshToken();
+            // 로그인 화면으로 이동
+            navigation.reset({
+              index: 0,
+              routes: [{
+                name: 'Auth',
+                state: {
+                  routes: [{ name: 'SignUpStart' }]
+                }
+              }]
+            });
+          }
+        }
+      ]);
     } catch (error) {
-      Alert.alert('오류', error.response?.data?.message || '계정 삭제 실패');
+      console.error('계정 삭제 오류:', error);
+      Alert.alert('오류', error.response?.data?.message || '계정 삭제에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -100,10 +118,10 @@ const SettingList = () => {
     <Container>
       <SettingCategory lastItem={false}>
         {[
-          { name: 'Profile', label: '프로필 설정', icon: <SettingsIcons.profileSettings width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
-          { name: 'Notification', label: '알림 설정', icon: <SettingsIcons.notifications width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
-          { name: 'FontSize', label: '글자 크기 설정', icon: <SettingsIcons.textSize width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
-          { name: 'Favorites', label: '관심 목록', icon: <SettingsIcons.favorites width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'Profile', label: '프로필 설정', icon: <SettingsIcons.profileSettings width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
+          { name: 'Notification', label: '알림 설정', icon: <SettingsIcons.notifications width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
+          { name: 'FontSize', label: '글자 크기 설정', icon: <SettingsIcons.textSize width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
+          { name: 'Favorites', label: '관심 목록', icon: <SettingsIcons.favorites width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
         ].map(item => (
           <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}
@@ -114,10 +132,10 @@ const SettingList = () => {
 
       <SettingCategory lastItem={false}>
         {[
-          { name: 'Announcements', label: '공지사항', icon: <SettingsIcons.announcement width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
-          { name: 'Feedback', label: '의견 남기기', icon: <SettingsIcons.feedback width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
-          { name: 'FAQ', label: '자주 하는 질문', icon: <SettingsIcons.faq width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
-          { name: 'AppVersion', label: '앱 버전', icon: <SettingsIcons.appVersion width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'Announcements', label: '공지사항', icon: <SettingsIcons.announcement width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
+          { name: 'Feedback', label: '의견 남기기', icon: <SettingsIcons.feedback width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
+          { name: 'FAQ', label: '자주 하는 질문', icon: <SettingsIcons.faq width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
+          { name: 'AppVersion', label: '앱 버전', icon: <SettingsIcons.appVersion width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
         ].map(item => (
           <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}
@@ -128,8 +146,8 @@ const SettingList = () => {
 
       <SettingCategory lastItem={true}>
         {[
-          { name: 'Logout', label: '로그아웃', icon: <SettingsIcons.logout width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
-          { name: 'DeleteAccount', label: '계정 삭제', icon: <SettingsIcons.trashcan width={20} height={20} style={{color: themes.light.textColor.Primary30}}/> },
+          { name: 'Logout', label: '로그아웃', icon: <SettingsIcons.logout width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
+          { name: 'DeleteAccount', label: '계정 삭제', icon: <SettingsIcons.trashcan width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
         ].map(item => (
           <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
             {item.icon}
