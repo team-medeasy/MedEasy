@@ -7,8 +7,6 @@ import { SettingsIcons } from './../../assets/icons';
 import { themes } from './../styles';
 import { deleteUser } from '../api/user';
 import FontSizes from '../../assets/fonts/fontSizes';
-import { removeAccessToken, removeRefreshToken } from '../api/storage';
-
 import { 
   removeAccessToken,
   removeRefreshToken, 
@@ -48,31 +46,6 @@ const SettingList = () => {
           '정말 로그아웃하시겠습니까?',
           [
             { text: '취소', style: 'cancel' },
-<<<<<<< HEAD
-            {
-              text: '확인',
-              onPress: async () => {
-                try {
-                  // 로컬 스토리지에서 토큰 제거
-                  await removeAccessToken();
-                  await removeRefreshToken();
-                  // 유저 정보 제거 후 홈 화면으로 이동
-                  navigation.reset({
-                    index: 0,
-                    routes: [{
-                      name: 'Auth',
-                      state: {
-                        routes: [{ name: 'SignUpStart' }]
-                      }
-                    }]
-                  });
-                } catch (error) {
-                  console.error('로그아웃 실패:', error);
-                  Alert.alert('오류', '로그아웃 중 문제가 발생했습니다.');
-                }
-              }
-            },
-=======
             { text: '확인', 
               onPress: async () => {
                 try {
@@ -99,7 +72,6 @@ const SettingList = () => {
                   Alert.alert('오류', '로그아웃 중 문제가 발생했습니다. 다시 시도해주세요.');
                 }
               }},
->>>>>>> upstream/dev
           ],
           { cancelable: false }
         );
