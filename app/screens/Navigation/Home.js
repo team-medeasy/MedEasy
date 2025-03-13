@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { themes } from './../../styles';
 
 import { HeaderIcons, RoutineIcons, LogoIcons } from './../../../assets/icons';
@@ -27,7 +27,7 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 68 }}>
       <ScrollContainer>
         <Header>
           <LogoContainer>
@@ -137,7 +137,7 @@ const Home = () => {
           <EventText>병원 진료</EventText>
         </EventIcons>
       </ScrollContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 

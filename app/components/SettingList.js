@@ -9,6 +9,14 @@ import { deleteUser } from '../api/user';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { removeAccessToken, removeRefreshToken } from '../api/storage';
 
+import { 
+  removeAccessToken,
+  removeRefreshToken, 
+  removeUserInfo,
+  clearAuthData } from '../api/storage';
+
+import { useSignUp } from '../api/context/SignUpContext';
+
 const SettingList = () => {
   const navigation = useNavigation();
   const [isDialogVisible, setDialogVisible] = useState(false);
@@ -40,6 +48,7 @@ const SettingList = () => {
           '정말 로그아웃하시겠습니까?',
           [
             { text: '취소', style: 'cancel' },
+<<<<<<< HEAD
             {
               text: '확인',
               onPress: async () => {
@@ -63,6 +72,34 @@ const SettingList = () => {
                 }
               }
             },
+=======
+            { text: '확인', 
+              onPress: async () => {
+                try {
+                  console.log('로그아웃 시작');
+
+                  // AsyncStorage 데이터 삭제
+                  await removeAccessToken();
+                  await removeRefreshToken();
+                  await removeUserInfo();
+                  await clearAuthData();
+                  
+                  // // SignUpContext 데이터 초기화
+                  // const { resetSignUpData } = useSignUp();
+                  // resetSignUpData();
+                  // console.log('SignUpContext 데이터 초기화 완료');
+                  
+                  // 스택을 모두 비우고 새로운 화면으로 이동 (뒤로가기 방지)
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Auth' }],
+                  });
+                } catch (error) {
+                  console.error('로그아웃 중 오류 발생:', error);
+                  Alert.alert('오류', '로그아웃 중 문제가 발생했습니다. 다시 시도해주세요.');
+                }
+              }},
+>>>>>>> upstream/dev
           ],
           { cancelable: false }
         );
