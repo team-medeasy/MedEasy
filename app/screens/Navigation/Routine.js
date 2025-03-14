@@ -231,14 +231,31 @@ const Routine = () => {
     <Container>
       <Header>
         <HeaderText>루틴</HeaderText>
-        <ReturnButton>
-          <OtherIcons.return
-            width={11}
-            height={9}
-            style={{ color: themes.light.textColor.Primary50 }}
-          />
-          <ButtonText>돌아가기</ButtonText>
-        </ReturnButton>
+          <ReturnButton onPress={() => {
+            // 오늘 날짜로 선택 날짜 변경
+            setSelectedDate({
+              day: weekDays[today.day()],
+              date: today.date(),
+              month: today.month() + 1,
+              year: today.year(),
+              fullDate: today,
+            });
+            
+            // 오늘 날짜가 있는 페이지(4번 인덱스)로 스크롤
+            if (flatListRef.current) {
+              flatListRef.current.scrollToIndex({
+                index: 4,
+                animated: true,
+              });
+            }
+          }}>
+            <OtherIcons.return
+              width={11}
+              height={9}
+              style={{ color: themes.light.textColor.Primary50 }}
+            />
+            <ButtonText>돌아가기</ButtonText>
+          </ReturnButton>
       </Header>
 
       {/* 페이징 가능한 DayContainer */}
@@ -433,7 +450,7 @@ const Routine = () => {
 
 const Container = styled.View`
   flex: 1;
-  background-color: ${themes.light.bgColor.bgPrimary};
+  background-color: ${themes.light.bgColor.bgSecondary};
 `;
 
 const Header = styled.View`
@@ -441,8 +458,8 @@ const Header = styled.View`
   flex-direction: row;
   padding: 0px 20px;
 
-  ${Platform.OS === 'ios' && `margin-top: 70px;`}
-  ${Platform.OS === 'android' && `margin-top: 30px;`}
+  ${Platform.OS === 'ios' && `padding-top: 70px;`}
+  ${Platform.OS === 'android' && `padding-top: 30px;`}
   justify-content: space-between;
 `;
 
@@ -470,7 +487,9 @@ const ButtonText = styled.Text`
 `;
 
 // 페이징을 위한 컨테이너
-const DayContainerWrapper = styled.View``;
+const DayContainerWrapper = styled.View`
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
 
 // 주차 단위 컨테이너
 const WeekContainer = styled.View`
@@ -504,6 +523,7 @@ const DateText = styled.Text`
 
 const ScheduleContainer = styled.View`
   background-color: ${themes.light.bgColor.bgSecondary};
+  padding-bottom: 150px;
 `;
 
 const TodayContainer = styled.View`

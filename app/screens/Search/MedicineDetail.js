@@ -11,6 +11,7 @@ import {
   Footer, 
   Tag, 
   Header, 
+  ModalHeader,
   MedicineOverview,
   MedicineAppearance,
   Button} from './../../components';
@@ -19,7 +20,7 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import { dummyMedicineData } from '../../../assets/data/data';
 
 const MedicineDetailScreen = ({route, navigation}) => {
-  const { itemSeq } = route.params;
+  const { itemSeq, isModal, title } = route.params;
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicine, setMedicine] = useState(null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
@@ -44,9 +45,17 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   }, [medicine]);
 
-  // 임시로 item_seq 값 넘김
+  const HeaderComponent = ({ isModal = false, ...props }) => {
+    console.log('isModal:', isModal);
+    if (isModal) {
+      return <ModalHeader {...props} />;
+    }
+    return <Header {...props} />;
+  };
+
+  // 임시로 item_seq 값 넘김 + isModal 값 넘김
   const handlePressEnlarge = itemSeq => {
-    navigation.navigate('MedicineImageDetail', {itemSeq});
+    navigation.navigate('MedicineImageDetail', {itemSeq, isModal: isModal});
   };
 
   const handleSetMedicineRoutine = () => {
@@ -56,13 +65,21 @@ const MedicineDetailScreen = ({route, navigation}) => {
   if (!medicine) { // 렌더링 전 error 방지
     return (
       <Container>
-        <Header>약 정보를 불러오는 중...</Header>
+        <HeaderComponent
+          isModal={isModal}
+        >약 정보를 불러오는 중...
+        </HeaderComponent>
       </Container>
     );
   }
+
+  const headerTitle = title || medicine.item_name;
   return (
     <Container>
-      <Header>{medicine.item_name}</Header>
+      <HeaderComponent
+        isModal={isModal}
+      >{headerTitle}
+      </HeaderComponent>
 
       <ScrollView>
         <MedicineOverview

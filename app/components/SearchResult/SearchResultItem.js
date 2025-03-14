@@ -2,8 +2,9 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {Tag} from './../index';
 import {themes} from './../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
-const SearchResultItem = ({item, onPress}) => {
+export const SearchResultItem = ({item, onPress}) => {
   return (
     <ItemContainer onPress={() => onPress(item.item_seq)}>
       <ImageContainer>
@@ -58,13 +59,13 @@ const InfoContainer = styled.View`
 `;
 
 const ManufacturerText = styled.Text`
-  font-size: 13px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary50};
 `;
 
 const MedicineNameText = styled.Text`
-  font-size: 17px;
+  font-size: ${FontSizes.heading.default};
   font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -73,5 +74,3 @@ const TypeContainer = styled.View`
   flex-direction: row;
   gap: 11px;
 `;
-
-export default SearchResultItem;

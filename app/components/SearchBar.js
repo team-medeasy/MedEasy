@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import {TouchableOpacity} from 'react-native';
 import {themes} from './../styles';
 import {OtherIcons} from './../../assets/icons';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 const SearchBarContainer = styled.View`
   height: 44px;
@@ -16,7 +17,7 @@ const SearchBarContainer = styled.View`
 `;
 
 const SearchInput = styled.TextInput`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
   flex: 1;
 `;
@@ -26,11 +27,11 @@ const SearchButton = styled(TouchableOpacity)`
   align-items: center;
 `;
 
-const SearchBar = ({searchQuery, setSearchQuery, onSearch}) => {
+const SearchBar = ({searchQuery, setSearchQuery, onSearch, placeholder}) => {
   return (
     <SearchBarContainer>
       <SearchInput
-        placeholder="약 이름, 증상을 입력하세요"
+        placeholder={placeholder}
         value={searchQuery}
         onChangeText={setSearchQuery}
       />

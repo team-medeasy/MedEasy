@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ACCESS_TOKEN_KEY = 'ACCESS_TOKEN';
 const REFRESH_TOKEN_KEY = 'REFRESH_TOKEN';
+const USER_INFO_KEY = 'user_info';
 
 // AccessToken 저장
 export const setAccessToken = async token => {
@@ -31,4 +32,41 @@ export const removeAccessToken = async () => {
 // RefreshToken 삭제
 export const removeRefreshToken = async () => {
   await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
+};
+
+// 사용자 정보 관리 함수
+export const setUserInfo = async userInfo => {
+  try {
+    const userInfoString = JSON.stringify(userInfo);
+    await AsyncStorage.setItem(USER_INFO_KEY, userInfoString);
+  } catch (error) {
+    console.error('사용자 정보 저장 실패', error);
+  }
+};
+
+export const getUserInfo = async () => {
+  try {
+    const userInfoString = await AsyncStorage.getItem(USER_INFO_KEY);
+    return userInfoString ? JSON.parse(userInfoString) : null;
+  } catch (error) {
+    console.error('사용자 정보 가져오기 실패', error);
+    return null;
+  }
+};
+
+export const removeUserInfo = async () => {
+  try {
+    await AsyncStorage.removeItem(USER_INFO_KEY);
+  } catch (error) {
+    console.error('사용자 정보 삭제 실패', error);
+  }
+};
+
+// 로그아웃 시 모든 인증 데이터 삭제
+export const clearAuthData = async () => {
+  try {
+    await AsyncStorage.multiRemove([ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_INFO_KEY]);
+  } catch (error) {
+    console.error('인증 데이터 삭제 실패', error);
+  }
 };

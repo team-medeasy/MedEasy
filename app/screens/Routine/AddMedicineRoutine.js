@@ -1,96 +1,71 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
+import { Platform } from 'react-native';
+import { themes } from './../../styles';
 import {
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
-import {themes} from './../../styles';
-import {Header} from '../../components/\bHeader/Header';
-import {RoutineIcons} from '../../../assets/icons';
+  ModalHeader,
+  SearchBar,
+  NoSearchResults,
+  SearchResultsList,
+} from '../../components';
+import { LogoIcons } from '../../../assets/icons';
+import { dummyMedicineData } from '../../../assets/data/data';
 
-const {medicine: MediIcon} = RoutineIcons;
+const { logo: LogoIcon } = LogoIcons;
 
-const AddMedicineRoutine = () => {
-  const [medicineName, setMedicineName] = useState('');
-  const [time, setTime] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+const AddMedicineRoutine = ({navigation}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
-  const handleSave = () => {
-    // 저장 로직 구현
-    console.log('약 이름:', medicineName);
-    console.log('시간:', time);
-    console.log('시작 날짜:', startDate);
-    console.log('종료 날짜:', endDate);
+  // 검색어에 따라 필터링하는 함수
+  const handleSearch = (query) => {
+    if (!query.trim()) {
+      setSearchResults(dummyMedicineData);
+    } else {
+      const filteredResults = dummyMedicineData.filter(medicine =>
+        medicine.item_name?.toLowerCase().includes(query.toLowerCase())
+      );
+      setSearchResults(filteredResults);
+    }
+  };  
+
+  // 검색어가 바뀔 때마다 검색 실행
+  useEffect(() => {
+    handleSearch(searchQuery);
+  }, [searchQuery]);
+
+  // 임시로 item_seq 값 넘김 + Modal화면 띄우기 요청 + title 지정
+  const handleSearchResultPress = itemSeq => {
+    navigation.navigate('MedicineDetail', {itemSeq, isModal: true, title: '루틴 추가'});
   };
 
   return (
     <Container>
-      <Header>복용 루틴 추가</Header>
-      <ScrollView contentContainerStyle={{padding: 20}}>
-        <InputContainer>
-          <MediIcon
-            width={20}
-            height={20}
-            style={{marginRight: 10, color: themes.light.pointColor.Primary}}
+      <ModalHeader>루틴 추가</ModalHeader>
+      <HeaderContainer>
+        <LogoAndSearchContainer>
+          <LogoIconContainer>
+            <LogoIcon width={14} height={22} style={{ color: themes.light.pointColor.Primary }} />
+          </LogoIconContainer>
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={() => handleSearch(searchQuery)}
+            placeholder={"복용 중인 약을 입력하세요"}
           />
-          <TextInput
-            style={{
-              flex: 1,
-              paddingVertical: 10,
-              fontSize: 16,
-              color: themes.light.textColor.textPrimary,
-            }}
-            placeholder="약 이름"
-            value={medicineName}
-            onChangeText={setMedicineName}
+        </LogoAndSearchContainer>
+      </HeaderContainer>
+
+      <SearchResultContainer>
+        {searchResults.length > 0 ? (
+          <SearchResultsList
+            searchResults={searchResults}
+            handleSearchResultPress={handleSearchResultPress}
           />
-        </InputContainer>
-        <InputContainer>
-          <TextInput
-            style={{
-              flex: 1,
-              paddingVertical: 10,
-              fontSize: 16,
-              color: themes.light.textColor.textPrimary,
-            }}
-            placeholder="시간 (예: 오전 8시)"
-            value={time}
-            onChangeText={setTime}
-          />
-        </InputContainer>
-        <InputContainer>
-          <TextInput
-            style={{
-              flex: 1,
-              paddingVertical: 10,
-              fontSize: 16,
-              color: themes.light.textColor.textPrimary,
-            }}
-            placeholder="시작 날짜 (YYYY-MM-DD)"
-            value={startDate}
-            onChangeText={setStartDate}
-          />
-        </InputContainer>
-        <InputContainer>
-          <TextInput
-            style={{
-              flex: 1,
-              paddingVertical: 10,
-              fontSize: 16,
-              color: themes.light.textColor.textPrimary,
-            }}
-            placeholder="종료 날짜 (YYYY-MM-DD)"
-            value={endDate}
-            onChangeText={setEndDate}
-          />
-        </InputContainer>
-        <SaveButton onPress={handleSave}>
-          <SaveButtonText>저장</SaveButtonText>
-        </SaveButton>
-      </ScrollView>
+        ) : (
+          <NoSearchResults />
+        )}
+      </SearchResultContainer>
     </Container>
   );
 };
@@ -100,26 +75,27 @@ const Container = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-const InputContainer = styled.View`
+const HeaderContainer = styled.View`
+  ${Platform.OS === 'ios' && `padding-top: 10px;`}
+  padding-bottom: 10px;
+  background-color: ${themes.light.bgColor.headerBG};
+`;
+
+const LogoAndSearchContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  margin-bottom: 15px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${themes.light.borderColor.primary};
+  padding-right: 16px;
+  padding-left: 12px;
 `;
 
-const SaveButton = styled(TouchableOpacity)`
-  background-color: ${themes.light.pointColor.Primary};
-  padding: 15px;
-  border-radius: 10px;
-  align-items: center;
-  margin-top: 20px;
+const LogoIconContainer = styled.View`
+  margin-right: 12px;
 `;
 
-const SaveButtonText = styled.Text`
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
+const SearchResultContainer = styled.View`
+  flex: 1;
+  background-color: ${themes.light.bgColor.bgPrimary};
+  margin-top: 16px;
 `;
 
 export default AddMedicineRoutine;

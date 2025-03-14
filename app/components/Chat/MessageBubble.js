@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import {ChatIcons} from '../../../assets/icons';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {robot: RobotIcon} = ChatIcons;
 
@@ -76,7 +77,7 @@ const BotMessageBubble = styled.View`
 `;
 
 const BotText = styled.Text`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   line-height: 24px;
   color: ${themes.light.textColor.Primary};
   font-family: 'Pretendard-Medium';
@@ -100,7 +101,7 @@ const OptionButton = styled.TouchableOpacity`
 
 const OptionText = styled.Text`
   color: ${themes.light.pointColor.Primary};
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Semibold';
 `;
 
@@ -112,14 +113,14 @@ const UserMessageContainer = styled.View`
 `;
 
 const UserText = styled.Text`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-SemiBold';
 `;
 
 const MessageTime = styled.Text`
-  font-size: 12px;
+  font-size: ${FontSizes.caption.default};
   margin: 0px 10px;
   align-self: flex-end;
   color: ${themes.light.textColor.Primary30};

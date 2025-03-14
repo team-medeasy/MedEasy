@@ -17,6 +17,18 @@ export const SignUpProvider = ({children}) => {
     setSignUpData(prev => ({...prev, ...newData}));
   };
 
+  const resetSignUpData = () => {
+    console.log('Resetting SignUp Data');
+    setSignUpData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      birthday: '',
+      gender: '',
+    });
+  };
+
   console.log('Current SignUp Data:', signUpData);
 
   return (
