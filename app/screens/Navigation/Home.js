@@ -55,7 +55,7 @@ const Home = () => {
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
-            <ReminderText>{signUpData.lastName}님, {'\n'}까먹은 약이 있어요.</ReminderText>
+            <ReminderText>{signUpData.firstName}님, {'\n'}까먹은 약이 있어요.</ReminderText>
             <LogoIcons.logo
               width={70}
               height={112}

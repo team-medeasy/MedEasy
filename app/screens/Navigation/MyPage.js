@@ -22,7 +22,7 @@ const MyPage = () => {
         {/* 웰컴 메시지, 프로필 설정 */}
         <ProfileContainer>
           <TextContainer>
-            <UserText>안녕하세요, {signUpData.firstName + signUpData.lastName}님🩵</UserText>
+            <UserText>안녕하세요, {signUpData.lastName + signUpData.firstName}님🩵</UserText>
             <SmallText>오늘도 건강한 하루 되세요!</SmallText>
           </TextContainer>
         </ProfileContainer>

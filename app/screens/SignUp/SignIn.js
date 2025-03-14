@@ -64,23 +64,23 @@ const SignInScreen = ({navigation, route}) => {
       
       if (userData) {
         // 이름 분리 (성-이름 형태로)
-        let firstName = ''; // 성
-        let lastName = '';  // 이름
+        let lastName = ''; // 성
+        let firstName = '';  // 이름
         
         if (userData.name && userData.name !== "undefinedundefined") {
           if (userData.name.length >= 2) {
-            firstName = userData.name.substring(0, 1); // 첫 글자는 성
-            lastName = userData.name.substring(1);     // 나머지는 이름
+            lastName = userData.name.substring(0, 1); // 첫 글자는 성
+            firstName = userData.name.substring(1);     // 나머지는 이름
           } else {
-            firstName = userData.name; // 한 글자만 있으면 성으로 처리
+            lastName = userData.name; // 한 글자만 있으면 성으로 처리
           }
         }
         
         updateSignUpData({
           email,
           password,
-          firstName, // 성
-          lastName,  // 이름
+          lastName, // 성
+          firstName,  // 이름
           gender: userData.gender || '',
           birthday: userData.birthday || '',
         });
