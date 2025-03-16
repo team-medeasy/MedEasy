@@ -20,6 +20,8 @@ const SettingList = () => {
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [password, setPassword] = useState('');
 
+  const { resetSignUpData } = useSignUp();
+
   const handlePress = name => {
     switch (name) {
       case 'Profile':
@@ -58,9 +60,8 @@ const SettingList = () => {
                   await clearAuthData();
                   
                   // // SignUpContext 데이터 초기화
-                  // const { resetSignUpData } = useSignUp();
-                  // resetSignUpData();
-                  // console.log('SignUpContext 데이터 초기화 완료');
+                  resetSignUpData();
+                  console.log('SignUpContext 데이터 초기화 완료');
                   
                   // 스택을 모두 비우고 새로운 화면으로 이동 (뒤로가기 방지)
                   navigation.reset({
