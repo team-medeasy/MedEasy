@@ -4,6 +4,7 @@ import {
   View,
   Text,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
@@ -16,6 +17,7 @@ import {
   MedicineAppearance,
   Button} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {OtherIcons} from '../../../assets/icons';
 
 import { dummyMedicineData } from '../../../assets/data/data';
 
@@ -181,27 +183,53 @@ const SimilarMedicinesContainer = styled.View`
   gap: 30px;
 `;
 
-const Usage = ({label, value, borderBottomWidth = 1}) => (
-  <View
-    style={{
-      paddingVertical: 25,
-      paddingHorizontal: 20,
-      gap: 18,
-      borderBottomWidth: borderBottomWidth,
-      borderBottomColor: themes.light.borderColor.borderSecondary,
-    }}>
-    <HeadingText>{label}</HeadingText>
-    <Text
+const Usage = ({label, value, borderBottomWidth = 1}) => {
+  const [expanded, setExpanded] = useState(false);
+  const textLengthThreshold = 150; // 토글 기능 활성화 길이
+  const isLongText = value && value.length > textLengthThreshold;
+  
+  // 축소된 텍스트는 처음 70자만 보여주고 '...' 추가
+  const shortenedText = isLongText && !expanded 
+    ? value.substring(0, 100) + '...' 
+    : value;
+
+  return (
+    <View
       style={{
-        color: themes.light.textColor.Primary70,
-        fontFamily: 'Pretendard-Medium',
-        fontSize: FontSizes.body.default,
-        lineHeight: 30,
+        paddingVertical: 25,
+        paddingHorizontal: 20,
+        gap: 18,
+        borderBottomWidth: borderBottomWidth,
+        borderBottomColor: themes.light.borderColor.borderSecondary,
       }}>
-      {value}
-    </Text>
-  </View>
-);
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <HeadingText>{label}</HeadingText>
+        
+        {isLongText && (
+          <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+            {expanded 
+              ? <OtherIcons.chevronDown width={17} height={17} style={{color: themes.light.textColor.Primary30, transform: [{ rotate: '180deg' }]}}/> 
+              : <OtherIcons.chevronDown width={17} height={17} style={{color: themes.light.textColor.Primary30}}/>}
+          </TouchableOpacity>
+        )}
+      </View>
+      
+      <Text
+        style={{
+          color: themes.light.textColor.Primary70,
+          fontFamily: 'Pretendard-Medium',
+          fontSize: FontSizes.body.default,
+          lineHeight: 30,
+        }}>
+        {shortenedText}
+      </Text>
+    </View>
+  );
+};
 
 const SimilarMedicineItem = ({item}) => (
   <View style={{marginRight: 15, width: 138.75}}>
@@ -236,7 +264,7 @@ const SimilarMedicineItem = ({item}) => (
 );
 
 const HeadingText = styled.Text`
-  color: ${themes.light.textColor.Primary};
+  color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
   font-size: ${FontSizes.heading.default};
 `;
