@@ -6,9 +6,9 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 
 export const SearchResultItem = ({item, onPress}) => {
   return (
-    <ItemContainer onPress={() => onPress(item.item_seq)}>
+    <ItemContainer onPress={() => onPress(item)}>
       <ImageContainer>
-        <MedicineImage source={{uri: item.item_image}} resizeMode="stretch" />
+        <MedicineImage source={{uri: item.image_url}} resizeMode="stretch" />
       </ImageContainer>
       <InfoContainer>
         <ManufacturerText>{item.entp_name}</ManufacturerText>
@@ -20,10 +20,10 @@ export const SearchResultItem = ({item, onPress}) => {
         </MedicineNameText>
         <TypeContainer>
           <Tag sizeType="small" colorType="resultPrimary">
-            {item.etc_otc_name}
+            {item.etc_otc_name || '정보 없음'}
           </Tag>
           <Tag sizeType="small" colorType="resultSecondary">
-            {item.class_name}
+            {item.class_name || '정보 없음'}
           </Tag>
         </TypeContainer>
       </InfoContainer>
