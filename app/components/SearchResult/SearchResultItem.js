@@ -8,22 +8,22 @@ export const SearchResultItem = ({item, onPress}) => {
   return (
     <ItemContainer onPress={() => onPress(item)}>
       <ImageContainer>
-        <MedicineImage source={{uri: item.image_url}} resizeMode="stretch" />
+        <MedicineImage source={{uri: item.item_image}} resizeMode="stretch" />
       </ImageContainer>
       <InfoContainer>
-        <ManufacturerText>{item.entp_name}</ManufacturerText>
+        <ManufacturerText>{item.entp_name || '회사명'}</ManufacturerText>
         <MedicineNameText
           numberOfLines={1} // 한 줄로 제한
           ellipsizeMode="tail" 
         >
-          {item.item_name}
+          {item.item_name || '정보가 없습니다.'}
         </MedicineNameText>
         <TypeContainer>
           <Tag sizeType="small" colorType="resultPrimary">
-            {item.etc_otc_name || '정보 없음'}
+            {item.etc_otc_name || '약품 구분'}
           </Tag>
           <Tag sizeType="small" colorType="resultSecondary">
-            {item.class_name || '정보 없음'}
+            {item.class_name || '약품 구분'}
           </Tag>
         </TypeContainer>
       </InfoContainer>
