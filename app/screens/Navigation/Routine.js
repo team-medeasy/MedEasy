@@ -231,31 +231,31 @@ const Routine = () => {
     <Container>
       <Header>
         <HeaderText>루틴</HeaderText>
-          <ReturnButton onPress={() => {
-            // 오늘 날짜로 선택 날짜 변경
-            setSelectedDate({
-              day: weekDays[today.day()],
-              date: today.date(),
-              month: today.month() + 1,
-              year: today.year(),
-              fullDate: today,
+        <ReturnButton onPress={() => {
+          // 오늘 날짜로 선택 날짜 변경
+          setSelectedDate({
+            day: weekDays[today.day()],
+            date: today.date(),
+            month: today.month() + 1,
+            year: today.year(),
+            fullDate: today,
+          });
+
+          // 오늘 날짜가 있는 페이지(4번 인덱스)로 스크롤
+          if (flatListRef.current) {
+            flatListRef.current.scrollToIndex({
+              index: 4,
+              animated: true,
             });
-            
-            // 오늘 날짜가 있는 페이지(4번 인덱스)로 스크롤
-            if (flatListRef.current) {
-              flatListRef.current.scrollToIndex({
-                index: 4,
-                animated: true,
-              });
-            }
-          }}>
-            <OtherIcons.return
-              width={11}
-              height={9}
-              style={{ color: themes.light.textColor.Primary50 }}
-            />
-            <ButtonText>돌아가기</ButtonText>
-          </ReturnButton>
+          }
+        }}>
+          <OtherIcons.return
+            width={11}
+            height={9}
+            style={{ color: themes.light.pointColor.Primary10 }}
+          />
+          <ButtonText>돌아가기</ButtonText>
+        </ReturnButton>
       </Header>
 
       {/* 페이징 가능한 DayContainer */}
@@ -280,14 +280,15 @@ const Routine = () => {
         // initialScrollIndex 제거
         />
       </DayContainerWrapper>
+      <TodayBackColor>
+        <TodayContainer>
+          <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
+          <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
+        </TodayContainer>
+      </TodayBackColor>
 
       <ScrollView>
         <ScheduleContainer>
-          <TodayContainer>
-            <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
-            <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
-          </TodayContainer>
-
           {/* 타임라인 컨테이너 추가 */}
           <TimelineContainer>
             {/* 타임라인 세로줄 */}
@@ -454,7 +455,7 @@ const Container = styled.View`
 `;
 
 const Header = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
+  background-color: ${themes.light.pointColor.Primary};
   flex-direction: row;
   padding: 0px 20px;
 
@@ -466,7 +467,7 @@ const Header = styled.View`
 const HeaderText = styled.Text`
   font-size: ${FontSizes.title.default};
   font-family: 'KimjungchulGothic-Bold';
-  color: ${themes.light.textColor.textPrimary};
+  color: ${themes.light.textColor.buttonText};
   padding-left: 10px;
 `;
 
@@ -476,19 +477,19 @@ const ReturnButton = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   gap: 7px;
-  border: 1px solid ${themes.light.textColor.Primary20};
+  border: 1px solid ${themes.light.pointColor.Primary20};
   border-radius: 20px;
 `;
 
 const ButtonText = styled.Text`
   font-size: ${FontSizes.caption.default};
   font-family: 'Pretendart-Regular';
-  color: ${themes.light.textColor.Primary50};
+  color: ${themes.light.pointColor.Primary10};
 `;
 
 // 페이징을 위한 컨테이너
 const DayContainerWrapper = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
+  background-color: ${themes.light.pointColor.Primary};
 `;
 
 // 주차 단위 컨테이너
@@ -506,19 +507,19 @@ const DayBox = styled.TouchableOpacity`
   padding: 10px 4px;
   border-radius: 7px;
   background-color: ${({ isToday, isSelected }) =>
-    isSelected ? themes.light.pointColor.Primary20 : 'transparent'};
+    isSelected ? themes.light.pointColor.PrimaryDark : 'transparent'};
 `;
 
 const DayText = styled.Text`
   font-size: ${FontSizes.caption.default};
   font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.textPrimary};
+  color: ${themes.light.textColor.buttonText};
 `;
 
 const DateText = styled.Text`
   font-size: ${FontSizes.heading.default};
   font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.textPrimary};
+  color: ${themes.light.textColor.buttonText};
 `;
 
 const ScheduleContainer = styled.View`
@@ -526,11 +527,18 @@ const ScheduleContainer = styled.View`
   padding-bottom: 150px;
 `;
 
+const TodayBackColor = styled.View`
+  background-color: ${themes.light.pointColor.Primary};
+`;
+
 const TodayContainer = styled.View`
   flex-direction: row;
   align-items: center;
   gap: 10px;
   padding: 20px;
+  background-color: ${themes.light.bgColor.bgSecondary};
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
 `;
 
 const TodayText = styled.Text`
