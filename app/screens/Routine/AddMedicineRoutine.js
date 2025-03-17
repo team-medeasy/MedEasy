@@ -11,8 +11,6 @@ import {
 import { LogoIcons } from '../../../assets/icons';
 import { dummyMedicineData } from '../../../assets/data/data';
 
-const { logo: LogoIcon } = LogoIcons;
-
 const AddMedicineRoutine = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -45,7 +43,7 @@ const AddMedicineRoutine = ({navigation}) => {
       <HeaderContainer>
         <LogoAndSearchContainer>
           <LogoIconContainer>
-            <LogoIcon width={14} height={22} style={{ color: themes.light.pointColor.Primary }} />
+            <LogoIcons.logo width={14} height={22} style={{ color: themes.light.pointColor.Primary }} />
           </LogoIconContainer>
           <SearchBar
             searchQuery={searchQuery}
