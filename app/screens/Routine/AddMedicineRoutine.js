@@ -9,33 +9,98 @@ import {
   SearchResultsList,
 } from '../../components';
 import { LogoIcons } from '../../../assets/icons';
-import { dummyMedicineData } from '../../../assets/data/data';
+import { searchMedicine } from '../../api/medicine';
 
 const AddMedicineRoutine = ({navigation}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [originalResponseData, setOriginalResponseData] = useState([]);
 
-  // 검색어에 따라 필터링하는 함수
-  const handleSearch = (query) => {
-    if (!query.trim()) {
-      setSearchResults(dummyMedicineData);
-    } else {
-      const filteredResults = dummyMedicineData.filter(medicine =>
-        medicine.item_name?.toLowerCase().includes(query.toLowerCase())
-      );
-      setSearchResults(filteredResults);
-    }
-  };  
+    // 검색 결과 가져오기
+    const fetchSearchResults = async () => {
+      setLoading(true);
+      setError(null);
+  
+      console.log('검색 요청 파라미터:', {
+        searchQuery,
+      });
+  
+      try {
+        // 기본 검색만 수행
+        const response = await searchMedicine(searchQuery);
+        console.log('API 응답 전체:', response);
+  
+        // API 응답에서 데이터 추출
+        if (response.data && response.data.result && response.data.result.result_code === 200) {
+          console.log('API 응답 데이터:', response.data.body);
+  
+          // 원본 응답 데이터 저장
+          setOriginalResponseData(response.data.body);
+  
+          // API 응답 데이터를 기존 앱 구조에 맞게 변환
+          const formattedResults = response.data.body.map(item => {
+            const formatted = {
+              item_name: item.item_name,
+              entp_name: item.entp_name,
+              item_image: item.item_image,
+              class_name: item.class_name,
+              etc_otc_name: item.etc_otc_name,
+              original_id: item.id
+            };
+            return formatted;
+          });
+  
+          console.log('변환된 검색 결과:', formattedResults);
+          setSearchResults(formattedResults);
+        } else {
+          console.error('API 에러 응답:', response);
+          setError('검색 결과를 가져오는데 실패했습니다.');
+        }
+      } catch (err) {
+        console.error('검색 중 오류:', err);
+        if (err.response) {
+          console.error('에러 응답:', err.response.data);
+          console.error('에러 상태:', err.response.status);
+        } else if (err.request) {
+          console.error('요청 에러:', err.request);
+        } else {
+          console.error('에러 메시지:', err.message);
+        }
+        setError('검색 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
   // 검색어가 바뀔 때마다 검색 실행
   useEffect(() => {
-    handleSearch(searchQuery);
+    if (searchQuery) {
+      fetchSearchResults();
+    } else {
+      // 검색어가 비어있으면 결과 초기화
+      setSearchResults([]);
+    }
   }, [searchQuery]);
 
-  // 임시로 item_seq 값 넘김 + Modal화면 띄우기 요청 + title 지정
-  const handleSearchResultPress = itemSeq => {
-    navigation.navigate('MedicineDetail', {itemSeq, isModal: true, title: '루틴 추가'});
+  const handleSearch = (query) => {
+    setSearchQuery(query);
   };
+
+  const handleSearchResultPress = item => {
+    // API 원본 데이터 찾기
+    const originalItem = originalResponseData.find(
+      originalItem => originalItem.id === item.original_id
+    );
+    
+    // 원본 데이터 전달
+    navigation.navigate('MedicineDetail', { 
+      item: originalItem,
+      isModal: true, 
+      title: '루틴 추가'
+    });
+};
 
   return (
     <Container>

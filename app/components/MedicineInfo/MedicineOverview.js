@@ -43,9 +43,9 @@ const MedicineOverview = ({
           marginHorizontal: 7,
           gap: 10,
         }}>
-        <MedicineInfoSub>{medicine.entp_name}</MedicineInfoSub>
-        <MedicineInfoName>{medicine.item_name}</MedicineInfoName>
-        <MedicineInfoSub>{medicine.chart}</MedicineInfoSub>
+        <MedicineInfoSub>{medicine.entp_name || '회사명'}</MedicineInfoSub>
+        <MedicineInfoName>{medicine.item_name || '정보가 없습니다.'}</MedicineInfoName>
+        <MedicineInfoSub>{medicine.chart || '주요 특징'}</MedicineInfoSub>
 
         <View
           style={{

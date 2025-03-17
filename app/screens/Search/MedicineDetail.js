@@ -22,55 +22,43 @@ import {OtherIcons} from '../../../assets/icons';
 import { dummyMedicineData } from '../../../assets/data/data';
 
 const MedicineDetailScreen = ({route, navigation}) => {
-  const {medicineData, itemSeq, isModal, title} = route.params;
-  console.log('전달된 데이터값: ',medicineData); // 전체 데이터 확인
+  const {item, isModal, title} = route.params;
+  console.log('전달된 데이터값: ',item); // 전체 데이터 확인
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicine, setMedicine] = useState(null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
 
   useEffect(() => {
-    if (medicineData) {
+    if (item) {
       // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
       const mappedMedicine = {
-        item_seq: medicineData.item_seq,
-        item_name: medicineData.item_name,
-        entp_name: medicineData.entp_name,
-        class_name: medicineData.class_name,
-        item_image: medicineData.item_image,
+        item_seq: item.item_seq,
+        item_name: item.item_name,
+        entp_name: item.entp_name,
+        class_name: item.class_name,
+        etc_otc_name : item.etc_otc_name,
+        item_image: item.item_image,
         // 외관 정보
-        shape: medicineData.drug_shape,
-        color: medicineData.color_classes,
-        print_front: medicineData.print_front,
-        print_back: medicineData.print_back,
-        line_front: medicineData.line_front,
-        line_back: medicineData.line_back,
-        leng_long: medicineData.leng_long,
-        leng_short: medicineData.leng_short,
-        thick: medicineData.thick,
+        drug_shape: item.drug_shape,
+        color_class1: item.color_classes,
+        print_front: item.print_front,
+        print_back: item.print_back,
+        line_front: item.line_front,
+        line_back: item.line_back,
+        leng_long: item.leng_long,
+        leng_short: item.leng_short,
+        thick: item.thick,
         // 사용 정보
-        efcy_qesitm: medicineData.indications, // 효능
-        use_method_qesitm: medicineData.dosage, // 복용법
-        deposit_method_qesitm: medicineData.storage_method, // 보관법
-        atpn_qesitm: medicineData.precautions, // 주의사항
-        se_qesitm: medicineData.side_effects, // 부작용
-        // 원본 데이터 전체도 보존
-        originalData: medicineData
+        efcy_qesitm: item.indications, // 효능
+        use_method_qesitm: item.dosage, // 복용법
+        deposit_method_qesitm: item.storage_method, // 보관법
+        atpn_qesitm: item.precautions, // 주의사항
+        se_qesitm: item.side_effects, // 부작용
       };
       
       setMedicine(mappedMedicine);
     } 
-  }, [medicineData, itemSeq]);
-
-
-  // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
-  // useEffect(() => {
-  //   const foundMedicine = dummyMedicineData.find(
-  //     item => item.item_seq === itemSeq
-  //   );
-  //   if (foundMedicine) {
-  //     setMedicine(foundMedicine);
-  //   }
-  // }, [itemSeq]);
+  }, [item]);
 
   // 임시로 비슷한 약은 class_name가 같은 것 
   useEffect(() => {
@@ -90,15 +78,13 @@ const MedicineDetailScreen = ({route, navigation}) => {
     return <Header {...props} />;
   };
 
-  // 임시로 item_seq 값 넘김 + isModal 값 넘김
-  const handlePressEnlarge = itemSeq => {
-    navigation.navigate('MedicineImageDetail', {itemSeq, isModal: isModal});
+  const handlePressEnlarge = item => {
+    navigation.navigate('MedicineImageDetail', {item: medicine, isModal: isModal});
   };
 
   const handleSetMedicineRoutine = () => {
     navigation.navigate('SetMedicineRoutine', { 
-      //itemSeq: medicineData.item_seq,
-      medicineData: medicineData 
+      item: item
     });
   };
 
