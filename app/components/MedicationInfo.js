@@ -25,7 +25,7 @@ const MedicationInfo = ({ medicationCount }) => {
           // 날짜 차이 계산 (밀리초 단위)
           const diffTime = Math.abs(today - registeredDate);
           // 일 단위로 변환 (소수점 버림)
-          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))+1;
           
           setDaysSinceJoin(diffDays);
           

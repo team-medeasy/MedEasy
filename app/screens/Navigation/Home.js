@@ -70,7 +70,7 @@ const Home = () => {
           </TextContainer>
           {/* 버튼 추가 */}
           <RoutineContainer>
-            <RoutineButton onPress={() => console.log('루틴 추가')}>
+            <RoutineButton onPress={handleAddMedicineRoutine}>
               <LogoIcons.logoAdd
                 height={115}
                 style={{ color: themes.light.pointColor.primary30 }}
