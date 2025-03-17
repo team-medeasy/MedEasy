@@ -9,9 +9,9 @@ import {
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
 import {
-  Footer, 
-  Tag, 
-  Header, 
+  Footer,
+  Tag,
+  Header,
   ModalHeader,
   MedicineOverview,
   MedicineAppearance,
@@ -22,20 +22,55 @@ import {OtherIcons} from '../../../assets/icons';
 import { dummyMedicineData } from '../../../assets/data/data';
 
 const MedicineDetailScreen = ({route, navigation}) => {
-  const { itemSeq, isModal, title } = route.params;
+  const {medicineData, itemSeq, isModal, title} = route.params;
+  console.log('전달된 데이터값: ',medicineData); // 전체 데이터 확인
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicine, setMedicine] = useState(null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
 
-  // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
   useEffect(() => {
-    const foundMedicine = dummyMedicineData.find(
-      item => item.item_seq === itemSeq
-    );
-    if (foundMedicine) {
-      setMedicine(foundMedicine);
-    }
-  }, [itemSeq]);
+    if (medicineData) {
+      // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
+      const mappedMedicine = {
+        item_seq: medicineData.item_seq,
+        item_name: medicineData.item_name,
+        entp_name: medicineData.entp_name,
+        class_name: medicineData.class_name,
+        item_image: medicineData.item_image,
+        // 외관 정보
+        shape: medicineData.drug_shape,
+        color: medicineData.color_classes,
+        print_front: medicineData.print_front,
+        print_back: medicineData.print_back,
+        line_front: medicineData.line_front,
+        line_back: medicineData.line_back,
+        leng_long: medicineData.leng_long,
+        leng_short: medicineData.leng_short,
+        thick: medicineData.thick,
+        // 사용 정보
+        efcy_qesitm: medicineData.indications, // 효능
+        use_method_qesitm: medicineData.dosage, // 복용법
+        deposit_method_qesitm: medicineData.storage_method, // 보관법
+        atpn_qesitm: medicineData.precautions, // 주의사항
+        se_qesitm: medicineData.side_effects, // 부작용
+        // 원본 데이터 전체도 보존
+        originalData: medicineData
+      };
+      
+      setMedicine(mappedMedicine);
+    } 
+  }, [medicineData, itemSeq]);
+
+
+  // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
+  // useEffect(() => {
+  //   const foundMedicine = dummyMedicineData.find(
+  //     item => item.item_seq === itemSeq
+  //   );
+  //   if (foundMedicine) {
+  //     setMedicine(foundMedicine);
+  //   }
+  // }, [itemSeq]);
 
   // 임시로 비슷한 약은 class_name가 같은 것 
   useEffect(() => {
@@ -93,7 +128,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
 
         <MedicineDetailContainer>
           <MedicineAppearanceContainer>
-              <MedicineAppearance item={medicine} size='large'/>
+            <MedicineAppearance item={medicine} size='large'/>
           </MedicineAppearanceContainer>
 
           <MedicineUsageContainer>
@@ -187,10 +222,10 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
   const [expanded, setExpanded] = useState(false);
   const textLengthThreshold = 150; // 토글 기능 활성화 길이
   const isLongText = value && value.length > textLengthThreshold;
-  
+
   // 축소된 텍스트는 처음 70자만 보여주고 '...' 추가
-  const shortenedText = isLongText && !expanded 
-    ? value.substring(0, 100) + '...' 
+  const shortenedText = isLongText && !expanded
+    ? value.substring(0, 100) + '...'
     : value;
 
   return (
@@ -208,16 +243,16 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
         alignItems: 'center',
       }}>
         <HeadingText>{label}</HeadingText>
-        
+
         {isLongText && (
           <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-            {expanded 
-              ? <OtherIcons.chevronDown width={17} height={17} style={{color: themes.light.textColor.Primary30, transform: [{ rotate: '180deg' }]}}/> 
+            {expanded
+              ? <OtherIcons.chevronDown width={17} height={17} style={{color: themes.light.textColor.Primary30, transform: [{ rotate: '180deg' }]}}/>
               : <OtherIcons.chevronDown width={17} height={17} style={{color: themes.light.textColor.Primary30}}/>}
           </TouchableOpacity>
         )}
       </View>
-      
+
       <Text
         style={{
           color: themes.light.textColor.Primary70,
