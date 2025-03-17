@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
-import { 
+import {
   ColorShapeView,
   SearchScreenHeader,
   SearchResultsList,
@@ -16,7 +16,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   const {searchQuery} = route.params; // MedicineSearchScreen에서 전달된 검색어
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
 
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedShapes, setSelectedShapes] = useState([]);
@@ -24,6 +24,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   const [selectedSplits, setSelectedSplits] = useState([]);
 
   const [filterModalVisible, setFilterModalVisible] = useState(false);
+  // API 응답 데이터를 저장할 상태 변수 추가
+  const [originalResponseData, setOriginalResponseData] = useState([]);
 
   const [tempFilters, setTempFilters] = useState({
     color: [],
@@ -38,91 +40,95 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   //     setSearchResults(dummyMedicineData);
   //     return;
   //   }
-    
+
   //   const query = String(searchQuery).toLowerCase();
-    
+
   //   // 필터링된 결과 생성
   //   const filteredResults = dummyMedicineData.filter(function(medicine) {
   //     const medicineName = medicine.item_name ? String(medicine.item_name).toLowerCase() : '';
   //     return medicineName.includes(query);
   //   });
-    
+
   //   setSearchResults(filteredResults);
   // }, [searchQuery]);
 
-// 검색 결과 가져오기
-const fetchSearchResults = async () => {
-  setLoading(true);
-  setError(null);
+  // 검색 결과 가져오기
+  const fetchSearchResults = async () => {
+    setLoading(true);
+    setError(null);
 
-  console.log('검색 요청 파라미터:', {
-    searchQuery,
-    selectedColors,
-    selectedShapes
-  });
-  
-  try {
-    let response;
-    let requestParams;
-    
-    if (selectedColors.length > 0 || selectedShapes.length > 0) {
-      // 필터가 적용된 검색
-      requestParams = {
-        name: searchQuery,
-        colors: selectedColors,
-        shape: selectedShapes,
-        size: 20
-      };
-      console.log('필터 적용 검색 요청:', requestParams);
-      response = await searchMedicineWithFilters(requestParams);
-    } else {
-      // 기본 검색
-      console.log('기본 검색 요청:', searchQuery);
-      response = await searchMedicine(searchQuery);
-    }
-    
-    console.log('API 응답 전체:', response);
-    
-    // API 응답에서 데이터 추출
-    if (response.data && response.data.result && response.data.result.result_code === 200) {
-      console.log('API 응답 데이터:', response.data.body);
-      
-      // API 응답 데이터를 기존 앱 구조에 맞게 변환
-      const formattedResults = response.data.body.map(item => {
-        const formatted = {
-          item_seq: item.id.toString(),
-          item_name: item.item_name,
-          entp_name: item.entp_name,
-          shape: item.shape,
-          color: item.color,
-          image_url: item.image_url,
-          // 필요한 다른 필드가 있다면 여기에 추가
+    console.log('검색 요청 파라미터:', {
+      searchQuery,
+      selectedColors,
+      selectedShapes
+    });
+
+    try {
+      let response;
+      let requestParams;
+
+      if (selectedColors.length > 0 || selectedShapes.length > 0) {
+        // 필터가 적용된 검색
+        requestParams = {
+          name: searchQuery,
+          colors: selectedColors,
+          shape: selectedShapes,
+          size: 20
         };
-        return formatted;
-      });
-      
-      console.log('변환된 검색 결과:', formattedResults);
-      
-      setSearchResults(formattedResults);
-    } else {
-      console.error('API 에러 응답:', response);
-      setError('검색 결과를 가져오는데 실패했습니다.');
+        console.log('필터 적용 검색 요청:', requestParams);
+        response = await searchMedicineWithFilters(requestParams);
+      } else {
+        // 기본 검색
+        console.log('기본 검색 요청:', searchQuery);
+        response = await searchMedicine(searchQuery);
+      }
+
+      console.log('API 응답 전체:', response);
+
+      // API 응답에서 데이터 추출
+      if (response.data && response.data.result && response.data.result.result_code === 200) {
+        console.log('API 응답 데이터:', response.data.body);
+
+        // 원본 응답 데이터 저장
+        setOriginalResponseData(response.data.body);
+
+        // API 응답 데이터를 기존 앱 구조에 맞게 변환
+        const formattedResults = response.data.body.map(item => {
+          const formatted = {
+            item_seq: item.id.toString(),
+            item_name: item.item_name,
+            entp_name: item.entp_name,
+            shape: item.shape,
+            color: item.color,
+            image_url: item.image_url,
+            // 필요한 다른 필드가 있다면 여기에 추가
+            original_id: item.id
+          };
+          return formatted;
+        });
+
+        console.log('변환된 검색 결과:', formattedResults);
+
+        setSearchResults(formattedResults);
+      } else {
+        console.error('API 에러 응답:', response);
+        setError('검색 결과를 가져오는데 실패했습니다.');
+      }
+    } catch (err) {
+      console.error('검색 중 오류:', err);
+      if (err.response) {
+        console.error('에러 응답:', err.response.data);
+        console.error('에러 상태:', err.response.status);
+      } else if (err.request) {
+        console.error('요청 에러:', err.request);
+      } else {
+        console.error('에러 메시지:', err.message);
+      }
+      setError('검색 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('검색 중 오류:', err);
-    if (err.response) {
-      console.error('에러 응답:', err.response.data);
-      console.error('에러 상태:', err.response.status);
-    } else if (err.request) {
-      console.error('요청 에러:', err.request);
-    } else {
-      console.error('에러 메시지:', err.message);
-    }
-    setError('검색 중 오류가 발생했습니다.');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   // 검색어나 필터가 변경될 때마다 API 호출
   useEffect(() => {
@@ -175,10 +181,10 @@ const fetchSearchResults = async () => {
         ...(type === 'color'
           ? selectedColors
           : type === 'shape'
-          ? selectedShapes
-          : type === 'dosageForm'
-          ? selectedDosageForms
-          : selectedSplits),
+            ? selectedShapes
+            : type === 'dosageForm'
+              ? selectedDosageForms
+              : selectedSplits),
       ],
     }));
   };
@@ -217,10 +223,10 @@ const fetchSearchResults = async () => {
       return type === 'color'
         ? '색상'
         : type === 'shape'
-        ? '모양'
-        : type === 'dosageForm'
-        ? '제형'
-        : '분할선';
+          ? '모양'
+          : type === 'dosageForm'
+            ? '제형'
+            : '분할선';
     } else if (selectedItems.length === 1) {
       // 하나만 선택되었을 때
       return selectedItems[0];
@@ -281,7 +287,16 @@ const fetchSearchResults = async () => {
 
   // 임시로 id 값 넘김
   const handleSearchResultPress = item => {
-    navigation.navigate('MedicineDetail', {itemSeq: item.id});
+    // API 원본 데이터 찾기
+    const originalItem = originalResponseData.find(
+      originalItem => originalItem.id === item.original_id
+    );
+    
+    // 원본 데이터 전달
+    navigation.navigate('MedicineDetail', { 
+      medicineData: originalItem,
+      itemSeq: originalItem.item_seq
+    });
   };
 
   return (
