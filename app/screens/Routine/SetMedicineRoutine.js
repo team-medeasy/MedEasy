@@ -2,10 +2,11 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {View, ScrollView} from 'react-native';
 import {themes} from './../../styles';
-import {OtherIcons} from '../../../assets/icons';
+import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import {ModalHeader, Button, MedicineOverview} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 const {deleteCircle: DeleteCircleIcon} = OtherIcons;
+const {chevron: ChevronIcon} = HeaderIcons;
 
 import { dummyMedicineData } from '../../../assets/data/data';
 
@@ -187,9 +188,15 @@ const SectionHeader = ({title, buttonText, onButtonPress}) => {
       }}>
       <SectionTitle>{title}</SectionTitle>
       {buttonText && (
-        <HeaderButton onPress={onButtonPress}>
+        <HeaderButton 
+          onPress={onButtonPress} 
+          style={{
+            flexDirection: 'row', 
+            alignItems: 'center',
+            gap: 5,
+          }}>
           <HeaderButtonText>{buttonText}</HeaderButtonText>
-          {/* > Icon */}
+          <ChevronIcon width={15} height={15} style={{color: themes.light.textColor.Primary20, transform: [{ rotate: '180deg' }]}}/>
         </HeaderButton>
       )}
     </View>
