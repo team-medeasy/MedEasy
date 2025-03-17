@@ -10,7 +10,6 @@ import {
 } from '../../components';
 
 import { searchMedicine, searchMedicineWithFilters } from '../../api/medicine';
-import { dummyMedicineData } from '../../../assets/data/data';
 
 const SearchMedicineResultsScreen = ({route, navigation}) => {
   const {searchQuery} = route.params; // MedicineSearchScreen에서 전달된 검색어
@@ -33,24 +32,6 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     dosageForm: [],
     split: [],
   });
-
-  // useEffect(() => {
-  //   // searchQuery가 존재하는지 확인하고 문자열인지 확인
-  //   if (!searchQuery) {
-  //     setSearchResults(dummyMedicineData);
-  //     return;
-  //   }
-
-  //   const query = String(searchQuery).toLowerCase();
-
-  //   // 필터링된 결과 생성
-  //   const filteredResults = dummyMedicineData.filter(function(medicine) {
-  //     const medicineName = medicine.item_name ? String(medicine.item_name).toLowerCase() : '';
-  //     return medicineName.includes(query);
-  //   });
-
-  //   setSearchResults(filteredResults);
-  // }, [searchQuery]);
 
   // 검색 결과 가져오기
   const fetchSearchResults = async () => {
@@ -95,13 +76,11 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         // API 응답 데이터를 기존 앱 구조에 맞게 변환
         const formattedResults = response.data.body.map(item => {
           const formatted = {
-            item_seq: item.id.toString(),
             item_name: item.item_name,
             entp_name: item.entp_name,
-            shape: item.shape,
-            color: item.color,
-            image_url: item.image_url,
-            // 필요한 다른 필드가 있다면 여기에 추가
+            item_image: item.item_image,
+            class_name: item.class_name,
+            etc_otc_name : item.etc_otc_name,
             original_id: item.id
           };
           return formatted;
@@ -285,7 +264,6 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     navigation.navigate('SearchMedicine');
   };
 
-  // 임시로 id 값 넘김
   const handleSearchResultPress = item => {
     // API 원본 데이터 찾기
     const originalItem = originalResponseData.find(
@@ -294,8 +272,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     
     // 원본 데이터 전달
     navigation.navigate('MedicineDetail', { 
-      medicineData: originalItem,
-      itemSeq: originalItem.item_seq
+      item: originalItem,
     });
   };
 

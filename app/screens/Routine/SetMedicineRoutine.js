@@ -8,11 +8,9 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 const {deleteCircle: DeleteCircleIcon} = OtherIcons;
 const {chevron: ChevronIcon} = HeaderIcons;
 
-import { dummyMedicineData } from '../../../assets/data/data';
-
 const SetMedicineRoutine = ({route, navigation}) => {
   console.log('SetMedicineRoutine에서 받은 route.params:', route.params);
-  const { itemSeq, medicineData } = route.params;
+  const { item } = route.params;
   const [medicine, setMedicine] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicineName, setMedicineName] = useState('');
@@ -25,48 +23,27 @@ const SetMedicineRoutine = ({route, navigation}) => {
   const timings = ['아침', '점심', '저녁', '자기 전'];
 
   useEffect(() => {
-    if (medicineData) {
+    if (item) {
       // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
       const mappedMedicine = {
-        item_seq: medicineData.item_seq,
-        item_name: medicineData.item_name,
-        entp_name: medicineData.entp_name,
-        class_name: medicineData.class_name,
-        item_image: medicineData.item_image,
-        // 외관 정보
-        shape: medicineData.drug_shape,
-        color: medicineData.color_classes,
-        // 원본 데이터 전체도 보존
-        originalData: medicineData
+        item_seq: item.item_seq,
+        item_name: item.item_name,
+        entp_name: item.entp_name,
+        class_name: item.class_name,
+        item_image: item.item_image,
+        etc_otc_name : item.etc_otc_name,
       };
       
       setMedicine(mappedMedicine);
       // 약 이름으로 기본 별명 설정
-      setMedicineName(medicineData.item_name);
+      setMedicineName(item.item_name);
     } else {
-      // medicineData가 없는 경우 기존 방식으로 검색
-      const foundMedicine = dummyMedicineData.find(
-        item => item.item_seq === itemSeq
-      );
-      if (foundMedicine) {
-        setMedicine(foundMedicine);
-      }
+      console.error('약 정보를 찾을 수 없습니다.');
     }
-  }, [medicineData, itemSeq]);
+  }, [item]);
 
-  // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
-  useEffect(() => {
-    const foundMedicine = dummyMedicineData.find(
-      item => item.item_seq === itemSeq
-    );
-    if (foundMedicine) {
-      setMedicine(foundMedicine);
-    }
-  }, [itemSeq]);
-
-  // 임시로 item_seq값 넘김 + Modal화면 띄우기 요청
-  const handlePressEnlarge = itemSeq => {
-    navigation.navigate('MedicineImageDetail', {itemSeq, isModal: true});
+  const handlePressEnlarge = () => {
+    navigation.navigate('MedicineImageDetail', {item: medicine, isModal: true});
   };
 
   const toggleDay = day => {
