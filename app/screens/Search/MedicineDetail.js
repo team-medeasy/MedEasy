@@ -96,7 +96,10 @@ const MedicineDetailScreen = ({route, navigation}) => {
   };
 
   const handleSetMedicineRoutine = () => {
-    navigation.navigate('SetMedicineRoutine', {itemSeq});
+    navigation.navigate('SetMedicineRoutine', { 
+      //itemSeq: medicineData.item_seq,
+      medicineData: medicineData 
+    });
   };
 
   if (!medicine) { // 렌더링 전 error 방지

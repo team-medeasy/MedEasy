@@ -11,7 +11,8 @@ const {chevron: ChevronIcon} = HeaderIcons;
 import { dummyMedicineData } from '../../../assets/data/data';
 
 const SetMedicineRoutine = ({route, navigation}) => {
-  const { itemSeq } = route.params;
+  console.log('SetMedicineRoutine에서 받은 route.params:', route.params);
+  const { itemSeq, medicineData } = route.params;
   const [medicine, setMedicine] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicineName, setMedicineName] = useState('');
@@ -22,6 +23,36 @@ const SetMedicineRoutine = ({route, navigation}) => {
 
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   const timings = ['아침', '점심', '저녁', '자기 전'];
+
+  useEffect(() => {
+    if (medicineData) {
+      // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
+      const mappedMedicine = {
+        item_seq: medicineData.item_seq,
+        item_name: medicineData.item_name,
+        entp_name: medicineData.entp_name,
+        class_name: medicineData.class_name,
+        item_image: medicineData.item_image,
+        // 외관 정보
+        shape: medicineData.drug_shape,
+        color: medicineData.color_classes,
+        // 원본 데이터 전체도 보존
+        originalData: medicineData
+      };
+      
+      setMedicine(mappedMedicine);
+      // 약 이름으로 기본 별명 설정
+      setMedicineName(medicineData.item_name);
+    } else {
+      // medicineData가 없는 경우 기존 방식으로 검색
+      const foundMedicine = dummyMedicineData.find(
+        item => item.item_seq === itemSeq
+      );
+      if (foundMedicine) {
+        setMedicine(foundMedicine);
+      }
+    }
+  }, [medicineData, itemSeq]);
 
   // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
   useEffect(() => {
