@@ -56,10 +56,10 @@ const MedicineOverview = ({
           }}>
           <View style={{ flexDirection: 'row', gap: 11 }}>
             <Tag sizeType="large" colorType="detailPrimary">
-              {medicine.etc_otc_name}
+              {medicine.etc_otc_name || '약품 구분'}
             </Tag>
             <Tag sizeType="large" colorType="detailSecondary">
-              {medicine.class_name}
+              {medicine.class_name || '약품 구분'}
             </Tag>
           </View>
 
