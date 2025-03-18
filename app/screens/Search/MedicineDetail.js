@@ -43,8 +43,6 @@ const MedicineDetailScreen = ({route, navigation}) => {
         color_class1: item.color_classes,
         print_front: item.print_front,
         print_back: item.print_back,
-        line_front: item.line_front,
-        line_back: item.line_back,
         leng_long: item.leng_long,
         leng_short: item.leng_short,
         thick: item.thick,
@@ -281,7 +279,7 @@ const SimilarMedicineItem = ({item}) => (
         {item.item_name}
       </Text>
       <Tag sizeType="small" colorType="resultPrimary">
-        {item.class_name}
+        {item.class_name || '약품 구분'}
       </Tag>
     </View>
   </View>

@@ -9,7 +9,6 @@ const {deleteCircle: DeleteCircleIcon} = OtherIcons;
 const {chevron: ChevronIcon} = HeaderIcons;
 
 const SetMedicineRoutine = ({route, navigation}) => {
-  console.log('SetMedicineRoutine에서 받은 route.params:', route.params);
   const { item } = route.params;
   const [medicine, setMedicine] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -24,9 +23,10 @@ const SetMedicineRoutine = ({route, navigation}) => {
 
   useEffect(() => {
     if (item) {
+      console.log('item값:', item);
       // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
       const mappedMedicine = {
-        item_seq: item.item_seq,
+        item_id: item.item_id,
         item_name: item.item_name,
         entp_name: item.entp_name,
         class_name: item.class_name,

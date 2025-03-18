@@ -12,14 +12,18 @@ export const searchMedicine = query =>
 export const searchMedicineWithFilters = (params) => {
   const { name, colors, shape, size } = params;
   
-  let queryParams = `query=${encodeURIComponent(name || '')}`;
+  let queryParams = `name=${encodeURIComponent(name || '')}`;
   
   if (colors && colors.length > 0) {
-    queryParams += `&colors=${encodeURIComponent(colors.join(','))}`;
+    colors.forEach(color => {
+      queryParams += `&colors=${encodeURIComponent(color)}`;
+    });
   }
   
   if (shape && shape.length > 0) {
-    queryParams += `&shape=${encodeURIComponent(shape.join(','))}`;
+    shape.forEach(s => {
+      queryParams += `&shape=${encodeURIComponent(s)}`;
+    });
   }
   
   if (size) {

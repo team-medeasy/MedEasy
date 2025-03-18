@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
+import { Text } from 'react-native-gesture-handler';
+import { View, ActivityIndicator } from 'react-native';
 import {themes} from './../../styles';
 import {
   ColorShapeView,
@@ -16,6 +18,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [noResults, setNoResults] = useState(false);
 
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedShapes, setSelectedShapes] = useState([]);
@@ -32,6 +35,45 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     dosageForm: [],
     split: [],
   });
+
+  function mapColorToApiValue(koreanColor) {
+    const colorMap = {
+      '하양': 'WHITE',
+      '노랑': 'YELLOW',
+      '주황': 'ORANGE',
+      '분홍': 'PINK',
+      '빨강': 'RED',
+      '갈색': 'BROWN',
+      '초록': 'GREEN',
+      '청록': 'CYAN',
+      '연두': 'LIGHT_GREEN',
+      '파랑': 'BLUE',
+      '남색': 'NAVY',
+      '보라': 'PURPLE',
+      '자홍': 'MAGENTA',
+      '회색': 'GRAY',
+      '검정': 'BLACK',
+      '투명': 'TRANSPARENT'
+    };
+    return colorMap[koreanColor] || koreanColor;
+  }
+  
+  function mapShapeToApiValue(koreanShape) {
+    const shapeMap = {
+      '원형': 'CIRCLE',
+      '타원형': 'OVAL',
+      '장방형': 'OBLONG',
+      '삼각형': 'TRIANGLE',
+      '사각형': 'RECTANGLE',
+      '마름모형': 'DIAMOND',
+      '오각형': 'PENTAGON',
+      '육각형': 'HEXAGON',
+      '캡슐형': 'CAPSULE',
+      '반원형': 'HALF_MOON',
+      '기타': 'OTHER'
+    };
+    return shapeMap[koreanShape] || koreanShape;
+  }
 
   // 검색 결과 가져오기
   const fetchSearchResults = async () => {
@@ -50,11 +92,14 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
       if (selectedColors.length > 0 || selectedShapes.length > 0) {
         // 필터가 적용된 검색
+        const mappedColors = selectedColors.map(color => mapColorToApiValue(color));
+        const mappedShapes = selectedShapes.map(shape => mapShapeToApiValue(shape));
+ 
         requestParams = {
           name: searchQuery,
-          colors: selectedColors,
-          shape: selectedShapes,
-          size: 20
+          colors: mappedColors,
+          shape: mappedShapes,
+          size: 10
         };
         console.log('필터 적용 검색 요청:', requestParams);
         response = await searchMedicineWithFilters(requestParams);
@@ -89,9 +134,11 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         console.log('변환된 검색 결과:', formattedResults);
 
         setSearchResults(formattedResults);
+        setNoResults(false);
       } else {
         console.error('API 에러 응답:', response);
         setError('검색 결과를 가져오는데 실패했습니다.');
+        setNoResults(true);
       }
     } catch (err) {
       console.error('검색 중 오류:', err);
@@ -104,6 +151,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         console.error('에러 메시지:', err.message);
       }
       setError('검색 중 오류가 발생했습니다.');
+      setNoResults(true);
     } finally {
       setLoading(false);
     }
@@ -127,10 +175,11 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       '갈색',
       '초록',
       '청록',
+      '연두',
       '파랑',
       '남색',
-      '자주',
       '보라',
+      '자홍',
       '회색',
       '검정',
       '투명',
@@ -144,7 +193,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       '마름모형',
       '오각형',
       '육각형',
-      '팔각형',
+      '캡슐형',
       '반원형',
       '기타',
     ],
@@ -305,13 +354,18 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         />
       ))}
       <SearchResultContainer>
-        {searchResults.length > 0 ? (
+      {loading ? (
+          <View style={{flex: 1 ,alignItems: 'center', justifyContent: 'center'}}>
+            <ActivityIndicator size="large" color={themes.light.pointColor.Primary} />
+            <Text>검색 중...</Text>
+          </View>
+        ) : noResults || searchResults.length === 0 ? (
+          <NoSearchResults />
+        ) : (
           <SearchResultsList
             searchResults={searchResults}
             handleSearchResultPress={handleSearchResultPress}
           />
-        ) : (
-          <NoSearchResults />
         )}
       </SearchResultContainer>
     </Container>
