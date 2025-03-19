@@ -5,9 +5,12 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import {ColorShapeView} from '../ColorShapeView';
 
 const MedicineAppearance = ({ item, size = 'small' }) => {
-  if (!item.print_front && !item.print_back && !item.drug_shape && !item.color_class1 && !(item.leng_long && item.leng_short && item.thick)) {
+  if (!item.print_front && !item.print_back && !item.drug_shape && !item.color_classes && !(item.leng_long && item.leng_short && item.thick)) {
     return null; // 값이 하나도 없으면 렌더링하지 않음
   }
+  
+  // 색상 분리 처리
+  const colors = item.color_classes ? item.color_classes.split(',').map(color => color.trim()) : [];
   
   return (
     <View
@@ -27,11 +30,11 @@ const MedicineAppearance = ({ item, size = 'small' }) => {
           size={size}
         />
       )}
-      {item.color_class1 && (
+      {item.color_classes && (
         <Appearance
           label={'색상       '}
-          value={item.color_class1}
-          icon={<ColorShapeView type="color" value={item.color_class1} width={10} height={10}/>}
+          value={colors}
+          isColorArray={true}
           size={size}
         />
       )}
@@ -46,7 +49,7 @@ const MedicineAppearance = ({ item, size = 'small' }) => {
   );
 };
 
-const Appearance = ({ label, value, icon, size = 'large' }) => {
+const Appearance = ({ label, value, icon, isColorArray = false, size = 'large' }) => {
   // 폰트 사이즈 결정 로직
   const fontSize = size === 'large' ? FontSizes.body.default : FontSizes.caption.default;
   
@@ -60,17 +63,35 @@ const Appearance = ({ label, value, icon, size = 'large' }) => {
         }}>
         {label}
       </Text>
-      <View style={{flexDirection: 'row', alignItems: 'center' }}>
-        {icon && <View>{icon}</View>}
-        <Text
-          style={{
-            color: themes.light.pointColor.Primary,
-            fontFamily: 'Pretendard-Bold',
-            fontSize: fontSize,
-          }}>
-          {value}
-        </Text>
-      </View>
+      {isColorArray ? (
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          {value.map((color, index) => (
+            <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <ColorShapeView type="color" value={color} width={10} height={10}/>
+              <Text
+                style={{
+                  color: themes.light.pointColor.Primary,
+                  fontFamily: 'Pretendard-Bold',
+                  fontSize: fontSize,
+                }}>
+                {color}
+              </Text>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <View style={{flexDirection: 'row', alignItems: 'center' }}>
+          {icon && <View>{icon}</View>}
+          <Text
+            style={{
+              color: themes.light.pointColor.Primary,
+              fontFamily: 'Pretendard-Bold',
+              fontSize: fontSize,
+            }}>
+            {value}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

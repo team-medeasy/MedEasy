@@ -40,7 +40,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
         item_image: item.item_image,
         // 외관 정보
         drug_shape: item.drug_shape,
-        color_class1: item.color_classes,
+        color_classes: item.color_classes,
         print_front: item.print_front,
         print_back: item.print_back,
         leng_long: item.leng_long,
