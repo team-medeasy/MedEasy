@@ -11,19 +11,19 @@ export const SearchResultItem = ({item, onPress}) => {
         <MedicineImage source={{uri: item.item_image}} resizeMode="stretch" />
       </ImageContainer>
       <InfoContainer>
-        <ManufacturerText>{item.entp_name || '회사명'}</ManufacturerText>
+        <ManufacturerText>{item.entp_name || '정보 없음'}</ManufacturerText>
         <MedicineNameText
           numberOfLines={1} // 한 줄로 제한
           ellipsizeMode="tail" 
         >
-          {item.item_name || '정보가 없습니다.'}
+          {item.item_name || '정보 없음'}
         </MedicineNameText>
         <TypeContainer>
-          <Tag sizeType="small" colorType="resultPrimary">
-            {item.etc_otc_name || '약품 구분'}
+          <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis'>
+            {item.etc_otc_name || '정보 없음'}
           </Tag>
-          <Tag sizeType="small" colorType="resultSecondary">
-            {item.class_name || '약품 구분'}
+          <Tag sizeType="small" colorType="resultSecondary" overflowMode='ellipsis'>
+            {item.class_name || '정보 없음'}
           </Tag>
         </TypeContainer>
       </InfoContainer>
