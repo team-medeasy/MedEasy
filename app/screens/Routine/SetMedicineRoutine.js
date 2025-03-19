@@ -5,8 +5,7 @@ import {themes} from './../../styles';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import {ModalHeader, Button, MedicineOverview} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
-const {deleteCircle: DeleteCircleIcon} = OtherIcons;
-const {chevron: ChevronIcon} = HeaderIcons;
+import { createRoutine } from '../../api/routine';
 
 const SetMedicineRoutine = ({route, navigation}) => {
   const { item } = route.params;
@@ -18,29 +17,72 @@ const SetMedicineRoutine = ({route, navigation}) => {
   const [dosage, setDosage] = useState('');
   const [totalCount, setTotalCount] = useState('');
 
-  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const days = ['월', '화', '수', '목', '금', '토', '일'];
   const timings = ['아침', '점심', '저녁', '자기 전'];
 
-  useEffect(() => {
-    if (item) {
-      console.log('item값:', item);
-      // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
-      const mappedMedicine = {
-        item_id: item.item_id,
-        item_name: item.item_name,
-        entp_name: item.entp_name,
-        class_name: item.class_name,
-        item_image: item.item_image,
-        etc_otc_name : item.etc_otc_name,
-      };
-      
-      setMedicine(mappedMedicine);
-      // 약 이름으로 기본 별명 설정
-      setMedicineName(item.item_name);
-    } else {
-      console.error('약 정보를 찾을 수 없습니다.');
-    }
-  }, [item]);
+  const convertDaysToNumbers = selectedDays.map(day => days.indexOf(day)+1);
+  const convertTimingsToIds = selectedTimings.map(timing => timings.indexOf(timing) + 1);
+
+  // 저장 버튼 클릭 시 실행할 함수
+const handleSaveRoutine = async () => {
+  // 필수 입력값 검증
+  if (!medicineName || selectedDays.length === 0 || selectedTimings.length === 0 || !dosage || !totalCount) {
+    // 여기에 적절한 오류 메시지 표시 로직 추가
+    console.error('모든 필드를 채워주세요');
+    return;
+  }
+
+  try {
+    // API 요청에 맞게 데이터 형식 변환
+    const routineData = {
+      medicine_id: medicine.item_id,
+      nickname: medicineName,
+      dose: parseInt(dosage, 10),
+      total_quantity: parseInt(totalCount, 10),
+      day_of_weeks: convertDaysToNumbers,
+      user_schedule_ids: convertTimingsToIds
+    };
+
+    console.log('전송 데이터:', routineData);
+    
+    // API 호출
+    const response = await createRoutine(routineData);
+    console.log('루틴 저장 성공:', response);
+    
+    // 성공 시 이전 화면으로 이동
+    navigation.goBack();
+    
+    // 성공 메시지 표시 (필요시 추가)
+  } catch (error) {
+    console.error('루틴 저장 실패:', error);
+    // 오류 처리 (사용자에게 오류 메시지 표시)
+  }
+};
+
+
+useEffect(() => {
+  if (item) {
+    console.log('약 데이터:', item);
+    // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
+    const mappedMedicine = {
+      item_id: item.id,                // id를 item_id로 매핑
+      item_name: item.item_name,       // 약 이름
+      entp_name: item.entp_name,       // 제조사 이름
+      class_name: item.class_name,     // 약 분류
+      item_image: item.item_image,     // 약 이미지 URL
+      etc_otc_name: item.etc_otc_name, // 일반/전문 구분
+      dosage: item.dosage,             // 복용 지침
+      indications: item.indications,   // 효능 효과
+      precautions: item.precautions,   // 주의사항
+    };
+    
+    setMedicine(mappedMedicine);
+    // 약 이름으로 기본 별명 설정
+    setMedicineName(item.item_name);
+  } else {
+    console.error('약 정보를 찾을 수 없습니다.');
+  }
+}, [item]);
 
   const handlePressEnlarge = () => {
     navigation.navigate('MedicineImageDetail', {item: medicine, isModal: true});
@@ -179,7 +221,7 @@ const SetMedicineRoutine = ({route, navigation}) => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-        <Button title="저장하기" onPress={() => {}} />
+        <Button title="저장하기" onPress={handleSaveRoutine} />
       </View>
     </Container>
   );
@@ -204,7 +246,7 @@ const SectionHeader = ({title, buttonText, onButtonPress}) => {
             gap: 5,
           }}>
           <HeaderButtonText>{buttonText}</HeaderButtonText>
-          <ChevronIcon width={15} height={15} style={{color: themes.light.textColor.Primary20, transform: [{ rotate: '180deg' }]}}/>
+          <HeaderIcons.chevron width={15} height={15} style={{color: themes.light.textColor.Primary20, transform: [{ rotate: '180deg' }]}}/>
         </HeaderButton>
       )}
     </View>
@@ -228,7 +270,7 @@ const InputWithDelete = ({
       />
       {value.length > 0 && (
         <DeleteButton onPress={() => onChangeText('')}>
-          <DeleteCircleIcon
+          <OtherIcons.deleteCircle
             width={15}
             height={15}
             style={{color: themes.light.textColor.Primary20}}
