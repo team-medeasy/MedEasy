@@ -6,11 +6,15 @@ import { HeaderIcons, OtherIcons } from '../../../assets/icons';
 import { ModalHeader, ProgressBar } from '../../components';
 import { SelectTimeButton, Button } from '../../components/Button';
 import FontSizes from '../../../assets/fonts/fontSizes';
+
+import { getUserSchedule } from '../../api/user';
 import { createRoutine } from '../../api/routine';
+
 
 const SetMedicineTime = ({ route, navigation }) => {
     const progress = '60%';
     const [selectedOption, setSelectedOption] = useState(null);
+    const [scheduleData, setScheduleData] = useState([]);
 
     const handleSelect = (option) => {
         setSelectedOption((prev) => (prev === option ? null : option));
@@ -24,6 +28,34 @@ const SetMedicineTime = ({ route, navigation }) => {
     const handleSetTimings = () => {
         navigation.navigate('SetRoutineTime');
     };
+
+    // 시간 변환 함수
+    const formatTime = (timeString) => {
+        const [hour, minute] = timeString.split(':').map(Number);
+        const period = hour < 12 ? '오전' : '오후';
+        const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+        return `${period} ${formattedHour}시 ${minute}분`;
+    };
+
+    useEffect(() => {
+        async function fetchUserSchedule() {
+            try {
+                const getData = await getUserSchedule();
+                const formattedSchedule = {};
+
+                getData.data.body.forEach((item) => {
+                    formattedSchedule[item.name] = formatTime(item.take_time);
+                });
+
+                setScheduleData(formattedSchedule);
+            } catch (error) {
+                console.error('스케줄 데이터 가져오기 실패:', error);
+            }
+        }
+
+        fetchUserSchedule();
+    }, []);
+
 
     return (
         <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -41,7 +73,7 @@ const SetMedicineTime = ({ route, navigation }) => {
                     <SelectTime>
                         <SelectTimeButton
                             title={'🐥️ 아침'}
-                            timeText={'오전 7시'}
+                            timeText={scheduleData['아침 식사 후'] || '오전 7시'}
                             onPress={() => handleSelect('🐥️ 아침')}
                             fontFamily={'Pretendard-SemiBold'}
                             bgColor={selectedOption === '🐥️ 아침' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
@@ -50,7 +82,7 @@ const SetMedicineTime = ({ route, navigation }) => {
                         />
                         <SelectTimeButton
                             title={'🥪️ 점심'}
-                            timeText={'오후 12시'}
+                            timeText={scheduleData['점심 식사 후'] || '오후 12시'}
                             onPress={() => handleSelect('🥪️ 점심')}
                             fontFamily={'Pretendard-SemiBold'}
                             bgColor={selectedOption === '🥪️ 점심' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
@@ -59,7 +91,7 @@ const SetMedicineTime = ({ route, navigation }) => {
                         />
                         <SelectTimeButton
                             title={'🌙️ 저녁'}
-                            timeText={'오후 7시'}
+                            timeText={scheduleData['저녁 식사 후'] || '오후 7시'}
                             onPress={() => handleSelect('🌙️ 저녁')}
                             fontFamily={'Pretendard-SemiBold'}
                             bgColor={selectedOption === '🌙️ 저녁' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
@@ -105,7 +137,7 @@ const SetMedicineTime = ({ route, navigation }) => {
                 }}>
                 <Button title="다음" onPress={handleNext} />
             </View>
-        </Container>
+        </Container >
     );
 };
 
