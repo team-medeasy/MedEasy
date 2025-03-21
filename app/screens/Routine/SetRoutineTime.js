@@ -7,6 +7,9 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import {RoutineIcons} from '../../../assets/icons';
 import {useNavigation} from '@react-navigation/native';
 
+import { useSignUp } from '../../api/context/SignUpContext';
+import { updateUserSchedule } from '../../api/user';
+
 const {
   moon: MoonIcon,
   sun: SunIcon,
@@ -29,11 +32,70 @@ const TimeSettingItem = ({icon, title, time, onPress}) => {
 };
 
 const SetRoutineTime = () => {
+  const {signUpData} = useSignUp();
   const navigation = useNavigation();
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [currentSettingType, setCurrentSettingType] = useState('');
 
+  // 시간 설정 후 서버로 보내는 함수
+  const sendDataToServer = async () => {
+    const scheduleUpdates = [];
+    
+    // 시간 문자열 변환 함수 (오전 8시 30분 -> 08:30:00 형식으로)
+    const convertTimeFormat = (timeString) => {
+      // 예: "오전 8시 30분" -> "08:30:00"
+      const isPM = timeString.includes('오후');
+      const match = timeString.match(/(\d+)시\s+(\d+)분/);
+      
+      if (match) {
+        let hours = parseInt(match[1]);
+        const minutes = parseInt(match[2]);
+        
+        if (isPM && hours < 12) hours += 12;
+        if (!isPM && hours === 12) hours = 0;
+        
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+      }
+      return "00:00:00"; // 기본값
+    };
+  
+    scheduleUpdates.push({
+      user_schedule_id: 1,
+      schedule_name: "아침 식사 후",
+      take_time: convertTimeFormat(breakfastTime)
+    });
+  
+    scheduleUpdates.push({
+      user_schedule_id: 2,
+      schedule_name: "점심 식사 후",
+      take_time: convertTimeFormat(lunchTime)
+    });
+  
+    scheduleUpdates.push({
+      user_schedule_id: 3,
+      schedule_name: "저녁 식사 후",
+      take_time: convertTimeFormat(dinnerTime)
+    });
+  
+    scheduleUpdates.push({
+      user_schedule_id: 4,
+      schedule_name: "취침 시간",
+      take_time: convertTimeFormat(bedTime)
+    });
+  
+    try {
+      for (const update of scheduleUpdates) {
+        console.log('스케줄 업데이트 요청:', update);
+        await updateUserSchedule(update);
+      }
+      alert('스케줄이 성공적으로 업데이트되었습니다.');
+      navigation.goBack();
+    } catch (error) {
+      console.error('스케줄 업데이트 실패', error);
+      alert('스케줄 업데이트에 실패했습니다.');
+    }
+  };
   const formatTime = date => {
     if (!date) return '';
     const hours = date.getHours();
@@ -125,7 +187,7 @@ const SetRoutineTime = () => {
           paddingBottom: 53,
           gap: 7,
         }}>
-        <Title>한성님의 하루 일과를 알려주세요.</Title>
+        <Title>{signUpData.firstName}님의 하루 일과를 알려주세요.</Title>
         <Subtitle>메디지가 일정에 맞춰 복약 알림을 보내드릴게요!</Subtitle>
       </View>
 
@@ -186,7 +248,7 @@ const SetRoutineTime = () => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-        <Button title="닫기" onPress={() => navigation.goBack()} />
+        <Button title="저장" onPress={sendDataToServer} />
       </View>
     </Container>
   );
