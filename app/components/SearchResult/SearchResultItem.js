@@ -19,10 +19,10 @@ export const SearchResultItem = ({item, onPress}) => {
           {item.item_name || '정보 없음'}
         </MedicineNameText>
         <TypeContainer>
-          <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis'>
+          <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis' maxWidth='66'>
             {item.etc_otc_name || '정보 없음'}
           </Tag>
-          <Tag sizeType="small" colorType="resultSecondary" overflowMode='ellipsis'>
+          <Tag sizeType="small" colorType="resultSecondary" overflowMode='ellipsis' maxWidth='128'>
             {item.class_name || '정보 없음'}
           </Tag>
         </TypeContainer>

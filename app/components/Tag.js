@@ -65,10 +65,6 @@ const TagText = styled.Text`
     props.sizeType === 'small' ? size.small.fontFamily : size.large.fontFamily};
 `;
 
-const ScrollableTagText = styled(ScrollView)`
-  max-width: 150;
-`;
-
 const Tag = ({
   children,
   sizeType = 'large',
@@ -78,7 +74,7 @@ const Tag = ({
   style,
   overflowMode = 'scroll', // 'ellipsis' or 'scroll'
   maxWidth = '130',
-  maxLength = 9, // 최대 글자 수
+  maxLength = 16, // 최대 글자 수
   ...rest
 }) => {
   const [isOverflow, setIsOverflow] = useState(false);
@@ -130,7 +126,7 @@ const Tag = ({
             {children}
           </TagText>
         ) : (
-          <ScrollableTagText
+          <ScrollView
             horizontal={true}
             showsHorizontalScrollIndicator={false}
           >
@@ -142,7 +138,7 @@ const Tag = ({
             >
               {children}
             </TagText>
-          </ScrollableTagText>
+          </ScrollView>
         )
       ) : (
         <TagText
