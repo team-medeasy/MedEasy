@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import {View, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity, Alert} from 'react-native';
 import {themes} from './../../styles';
 import {ModalHeader, Button, DateTimePickerModal} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -9,6 +9,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import { useSignUp } from '../../api/context/SignUpContext';
 import { getUserSchedule } from '../../api/user';
+import { updateUserSchedule } from '../../api/user';
 
 const {
   moon: MoonIcon,
@@ -44,6 +45,12 @@ const SetRoutineTime = () => {
   const [dinnerTime, setDinnerTime] = useState('');
   const [bedTime, setBedTime] = useState('');
   
+  // 날짜 객체 저장 (API 요청을 위한 원본 시간 값)
+  const [breakfastDate, setBreakfastDate] = useState(null);
+  const [lunchDate, setLunchDate] = useState(null);
+  const [dinnerDate, setDinnerDate] = useState(null);
+  const [bedDate, setBedDate] = useState(null);
+  
   // scheduleIds 저장
   const [scheduleIds, setScheduleIds] = useState({
     breakfast: null,
@@ -60,6 +67,15 @@ const SetRoutineTime = () => {
     const date = new Date();
     date.setHours(hours, minutes, 0, 0);
     return date;
+  };
+
+  // API 요청을 위한 시간 포맷 (HH:MM:SS)
+  const formatTimeForApi = (date) => {
+    if (!date) return null;
+    
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}:00`;
   };
 
   // 컴포넌트 마운트 시 사용자 일정 가져오기
@@ -89,23 +105,26 @@ const SetRoutineTime = () => {
           
           // 시간 설정
           if (breakfastSchedule) {
-            const breakfastDate = parseApiTime(breakfastSchedule.take_time);
-            if (breakfastDate) {
-              setBreakfastTime(formatTime(breakfastDate));
+            const parsedDate = parseApiTime(breakfastSchedule.take_time);
+            if (parsedDate) {
+              setBreakfastDate(parsedDate);
+              setBreakfastTime(formatTime(parsedDate));
             }
           }
           
           if (lunchSchedule) {
-            const lunchDate = parseApiTime(lunchSchedule.take_time);
-            if (lunchDate) {
-              setLunchTime(formatTime(lunchDate));
+            const parsedDate = parseApiTime(lunchSchedule.take_time);
+            if (parsedDate) {
+              setLunchDate(parsedDate);
+              setLunchTime(formatTime(parsedDate));
             }
           }
           
           if (dinnerSchedule) {
-            const dinnerDate = parseApiTime(dinnerSchedule.take_time);
-            if (dinnerDate) {
-              setDinnerTime(formatTime(dinnerDate));
+            const parsedDate = parseApiTime(dinnerSchedule.take_time);
+            if (parsedDate) {
+              setDinnerDate(parsedDate);
+              setDinnerTime(formatTime(parsedDate));
             }
           }
         }
@@ -122,16 +141,55 @@ const SetRoutineTime = () => {
   // 시간 설정 후 서버로 보내는 함수
   const sendDataToServer = async () => {
     try {
-      // getUserSchedule을 다시 호출하여 최신 데이터 확인
-      const latestSchedule = await getUserSchedule();
-      console.log('저장 전 최신 사용자 일정:', latestSchedule);
+      const updatePromises = [];
       
-      // 여기에 저장 로직 추가
+      // 아침 식사 업데이트
+      if (scheduleIds.breakfast && breakfastDate) {
+        const breakfastData = {
+          user_schedule_id: scheduleIds.breakfast,
+          schedule_name: "아침 식사 후",
+          take_time: formatTimeForApi(breakfastDate)
+        };
+        updatePromises.push(updateUserSchedule(breakfastData));
+      }
+      
+      // 점심 식사 업데이트
+      if (scheduleIds.lunch && lunchDate) {
+        const lunchData = {
+          user_schedule_id: scheduleIds.lunch,
+          schedule_name: "점심 식사 후",
+          take_time: formatTimeForApi(lunchDate)
+        };
+        updatePromises.push(updateUserSchedule(lunchData));
+      }
+      
+      // 저녁 식사 업데이트
+      if (scheduleIds.dinner && dinnerDate) {
+        const dinnerData = {
+          user_schedule_id: scheduleIds.dinner,
+          schedule_name: "저녁 식사 후",
+          take_time: formatTimeForApi(dinnerDate)
+        };
+        updatePromises.push(updateUserSchedule(dinnerData));
+      }
+      
+      // Promise.all을 사용하여 모든 업데이트 요청을 병렬로 처리
+      if (updatePromises.length > 0) {
+        const results = await Promise.all(updatePromises);
+        console.log('업데이트 결과:', results);
+        Alert.alert('알림', '루틴 시간이 저장되었습니다.');
+        
+        // 필요한 경우 화면 이동
+        // navigation.navigate('Home');
+      } else {
+        Alert.alert('알림', '업데이트할 루틴이 없습니다.');
+      }
       
     } catch (error) {
       console.error('데이터 저장 중 오류:', error);
+      Alert.alert('오류', '루틴 시간 저장에 실패했습니다.');
     }
-  }
+  };
     
   const formatTime = date => {
     if (!date) return '';
@@ -157,16 +215,16 @@ const SetRoutineTime = () => {
     const defaultBedTime = new Date();
     defaultBedTime.setHours(22, 0, 0, 0);
 
+    setBreakfastDate(defaultBreakfastTime);
+    setLunchDate(defaultLunchTime);
+    setDinnerDate(defaultDinnerTime);
+    setBedDate(defaultBedTime);
+
     setBreakfastTime(formatTime(defaultBreakfastTime));
     setLunchTime(formatTime(defaultLunchTime));
     setDinnerTime(formatTime(defaultDinnerTime));
     setBedTime(formatTime(defaultBedTime));
   };
-  
-  // 컴포넌트 마운트 시 기본값 설정
-  useEffect(() => {
-    setDefaultTimes();
-  }, []);
 
   const onTimeChange = (event, selectedTime) => {
     const currentTime = selectedTime || new Date();
@@ -174,6 +232,31 @@ const SetRoutineTime = () => {
   };
 
   const openTimePicker = type => {
+    // 시간 선택기를 열 때 현재 설정된 시간으로 초기화
+    let initialTime;
+    
+    switch (type) {
+      case '아침식사':
+        initialTime = breakfastDate || new Date();
+        initialTime.setHours(8, 0, 0, 0);
+        break;
+      case '점심식사':
+        initialTime = lunchDate || new Date();
+        initialTime.setHours(12, 0, 0, 0);
+        break;
+      case '저녁식사':
+        initialTime = dinnerDate || new Date();
+        initialTime.setHours(18, 0, 0, 0);
+        break;
+      case '취침시간':
+        initialTime = bedDate || new Date();
+        initialTime.setHours(22, 0, 0, 0);
+        break;
+      default:
+        initialTime = new Date();
+    }
+    
+    setSelectedTime(initialTime);
     setCurrentSettingType(type);
     setShowTimePicker(true);
   };
@@ -185,15 +268,19 @@ const SetRoutineTime = () => {
     switch (currentSettingType) {
       case '아침식사':
         setBreakfastTime(formattedTime);
+        setBreakfastDate(new Date(selectedTime));
         break;
       case '점심식사':
         setLunchTime(formattedTime);
+        setLunchDate(new Date(selectedTime));
         break;
       case '저녁식사':
         setDinnerTime(formattedTime);
+        setDinnerDate(new Date(selectedTime));
         break;
       case '취침시간':
         setBedTime(formattedTime);
+        setBedDate(new Date(selectedTime));
         break;
     }
 
