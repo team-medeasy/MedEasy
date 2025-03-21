@@ -177,10 +177,9 @@ const SetRoutineTime = () => {
       if (updatePromises.length > 0) {
         const results = await Promise.all(updatePromises);
         console.log('업데이트 결과:', results);
-        Alert.alert('알림', '루틴 시간이 저장되었습니다.');
+        //Alert.alert('알림', '루틴 시간이 저장되었습니다.');
         
-        // 필요한 경우 화면 이동
-        // navigation.navigate('Home');
+        navigation.goBack();
       } else {
         Alert.alert('알림', '업데이트할 루틴이 없습니다.');
       }
