@@ -18,7 +18,12 @@ import SettingStack from './screens/Settings/SettingStack';
 import NotificationScreen from './screens/Notification';
 import AddMedicineRoutineScreen from './screens/Routine/AddMedicineRoutine';
 import AddHospitalVisitScreen from './screens/Routine/AddHospitalVisit';
-import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
+//import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
+import SetMedicineNameScreen from './screens/Routine/SetMedicineName';
+import SetMedicineDayScreen from './screens/Routine/SetMedicineDay';
+import SetMedicineTimeScreen from './screens/Routine/SetMedicineTime';
+import SetMedicineDoseScreen from './screens/Routine/SetMedicineDose';
+import SetMedicineTotalScreen from './screens/Routine/SetMedicineTotal';
 import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
 import {SignUpProvider} from './api/context/SignUpContext';
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
@@ -107,9 +112,34 @@ const App = () => {
                 component={AddHospitalVisitScreen}
                 options={{presentation: 'modal'}}
               />
-              <RootStack.Screen
+              {/* <RootStack.Screen
                 name="SetMedicineRoutine"
                 component={SetMedicineRoutineScreen}
+                options={{presentation: 'modal'}}
+              /> */}
+              <RootStack.Screen
+                name="SetMedicineName"
+                component={SetMedicineNameScreen}
+                options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="SetMedicineDay"
+                component={SetMedicineDayScreen}
+                options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="SetMedicineTime"
+                component={SetMedicineTimeScreen}
+                options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="SetMedicineDose"
+                component={SetMedicineDoseScreen}
+                options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="SetMedicineTotal"
+                component={SetMedicineTotalScreen}
                 options={{presentation: 'modal'}}
               />
               <RootStack.Screen
