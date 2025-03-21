@@ -81,7 +81,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
   };
 
   const handleSetMedicineRoutine = () => {
-    navigation.navigate('SetMedicineRoutine', { 
+    navigation.navigate('SetMedicineName', { 
       item: item
     });
   };
