@@ -55,10 +55,10 @@ const MedicineOverview = ({
             width: '100%',
           }}>
           <View style={{ flexDirection: 'row', gap: 11 }}>
-            <Tag sizeType="large" colorType="detailPrimary">
+            <Tag sizeType="large" colorType="detailPrimary" maxWidth='85'>
               {medicine.etc_otc_name || '정보 없음'}
             </Tag>
-            <Tag sizeType="large" colorType="detailSecondary">
+            <Tag sizeType="large" colorType="detailSecondary" maxWidth='185'>
               {medicine.class_name || '정보 없음'}
             </Tag>
           </View>
