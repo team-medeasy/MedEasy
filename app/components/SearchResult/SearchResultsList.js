@@ -10,7 +10,7 @@ export const SearchResultsList = ({searchResults, handleSearchResultPress}) => {
       {searchResults.length > 0 && (
         <FlatList
           data={searchResults}
-          keyExtractor={item => item.item_seq}
+          keyExtractor={item => item.original_id}
           renderItem={({item}) => (
             <SearchResultItem item={item} onPress={handleSearchResultPress} />
           )}
