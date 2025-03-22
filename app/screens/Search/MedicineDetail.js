@@ -18,8 +18,7 @@ import {
   Button} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {OtherIcons} from '../../../assets/icons';
-
-import { dummyMedicineData } from '../../../assets/data/data';
+import { getSimilarMedicines } from '../../api/medicine';
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {item, isModal, title} = route.params;
@@ -30,9 +29,9 @@ const MedicineDetailScreen = ({route, navigation}) => {
 
   useEffect(() => {
     if (item) {
-      // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
       const mappedMedicine = {
-        item_seq: item.item_seq,
+        // 기본 정보
+        item_id: item.id,
         item_name: item.item_name,
         entp_name: item.entp_name,
         class_name: item.class_name,
@@ -58,13 +57,30 @@ const MedicineDetailScreen = ({route, navigation}) => {
     } 
   }, [item]);
 
-  // 임시로 비슷한 약은 class_name가 같은 것 
+  // 비슷한 약 
   useEffect(() => {
     if (medicine) {
-      const foundSimilarMedicines = dummyMedicineData.filter(
-        item => item.class_name === medicine.class_name
-      );
-      setSimilarMedicines(foundSimilarMedicines);
+      getSimilarMedicines({ 
+        medicine_id: medicine.item_id, 
+        page: 1, 
+        size: 10 
+      })
+        .then(response => {
+          if (response.data && response.data.body) {
+            const mappedSimilarMedicines = response.data.body.map(item => ({
+              item_id: item.medicine_id,
+              entp_name: item.entp_name,
+              item_name: item.medicine_name,
+              class_name: item.class_name,
+              item_image: '', /* 추가 필요 */
+            }));
+            setSimilarMedicines(mappedSimilarMedicines);
+          }
+        })
+        .catch(error => {
+          console.error('비슷한 약 정보 가져오기 실패:', error);
+          setSimilarMedicines([]);
+        });
     }
   }, [medicine]);
 
@@ -159,11 +175,16 @@ const MedicineDetailScreen = ({route, navigation}) => {
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 paddingHorizontal={20}
-                keyExtractor={item => item.item_seq}
+                keyExtractor={item => item.item_id}
                 renderItem={({item}) => <SimilarMedicineItem item={item} />}
               />
             ) : (
-              <Text>비슷한 약이 존재하지 않아요.</Text>
+              <Text style={{
+                color: themes.light.textColor.Primary30,
+                fontFamily: 'Pretendard-semiBold',
+                fontSize: FontSizes.caption.large,
+                paddingHorizontal: 20
+              }}>비슷한 약이 존재하지 않아요.</Text>
             )}
           </SimilarMedicinesContainer>
         </MedicineDetailContainer>

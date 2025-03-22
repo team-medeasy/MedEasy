@@ -41,3 +41,19 @@ export const searchMedicineWithFilters = (params) => {
   
   return api.get(`/medicine/search?${queryParams}`);
 };
+
+export const getSimilarMedicines = (params) => {
+  const { medicine_id, page, size } = params;
+
+  let queryParams = `medicine_id=${encodeURIComponent(medicine_id)}`;
+
+  if (page) {
+    queryParams += `&page=${page}`;
+  }
+
+  if (size) {
+    queryParams += `&size=${size}`;
+  }
+
+  return api.get(`/medicine/similar?${queryParams}`);
+};
