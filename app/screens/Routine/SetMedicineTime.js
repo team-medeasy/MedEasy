@@ -34,8 +34,12 @@ const SetMedicineTime = ({ route, navigation }) => {
         const [hour, minute] = timeString.split(':').map(Number);
         const period = hour < 12 ? '오전' : '오후';
         const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-        return `${period} ${formattedHour}시 ${minute}분`;
+        
+        return minute === 0 
+            ? `${period} ${formattedHour}시`
+            : `${period} ${formattedHour}시 ${minute}분`;
     };
+    
 
     useEffect(() => {
         async function fetchUserSchedule() {
