@@ -5,18 +5,42 @@ import { themes } from './../../styles';
 import { OtherIcons } from '../../../assets/icons';
 import { ModalHeader, Button, ProgressBar, BackAndNextButtons } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { createRoutine } from '../../api/routine';
 
 const SetMedicineDay = ({ route, navigation }) => {
+    const { medicine_id, nickname } = route.params;
+    console.log("medicine_id:", medicine_id);
+    console.log("nickname:", nickname);
     const progress = '40%';
+
     const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedDays, setSelectedDays] = useState([]);
 
     const handleSelect = (option) => {
         setSelectedOption((prev) => (prev === option ? null : option));
     };
 
     const handleNext = () => {
-        navigation.navigate('SetMedicineTime');
+        let day_of_weeks = [];
+        
+        // 선택된 옵션에 따라 day_of_weeks 설정
+        if (selectedOption === '매일') {
+            // 매일: 월화수목금토일 (1,2,3,4,5,6,7)
+            day_of_weeks = [1, 2, 3, 4, 5, 6, 7];
+        } else if (selectedOption === '특정 요일') {
+            // 특정 요일: 화,목,토 (2,4,6) 예시
+            day_of_weeks = [2, 4, 6];
+
+        } else if (selectedOption === '주기 설정') {
+            // 2일 간격: 월수금일 (1,3,5,7) 예시
+            day_of_weeks = [1, 3, 5, 7];
+        }
+        
+        // 다음 화면으로 필요한 데이터 전달
+        navigation.navigate('SetMedicineTime', {
+            medicine_id: medicine_id,
+            nickname: nickname,
+            day_of_weeks: day_of_weeks,
+        });
     };
 
     return (
@@ -42,7 +66,7 @@ const SetMedicineDay = ({ route, navigation }) => {
                                 fontSize={FontSizes.body.default} 
                             />
                             <Button 
-                                title={'특정 요일마다 (예: 월, 수, 금)'} 
+                                title={'특정 요일마다 (예: 화, 목, 토)'} 
                                 onPress={() => handleSelect('특정 요일')} 
                                 fontFamily={'Pretendard-SemiBold'}
                                 bgColor={selectedOption === '특정 요일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
@@ -78,34 +102,6 @@ const SetMedicineDay = ({ route, navigation }) => {
     );
 };
 
-// 입력 필드 컴포넌트
-const InputWithDelete = ({
-    value,
-    onChangeText,
-    placeholder,
-    keyboardType = 'default',
-}) => {
-    return (
-        <InputContainer>
-            <StyledInput
-                placeholder={placeholder}
-                value={value}
-                onChangeText={onChangeText}
-                keyboardType={keyboardType}
-            />
-            {value.length > 0 && (
-                <DeleteButton onPress={() => onChangeText('')}>
-                    <OtherIcons.deleteCircle
-                        width={15}
-                        height={15}
-                        style={{ color: themes.light.textColor.Primary20 }}
-                    />
-                </DeleteButton>
-            )}
-        </InputContainer>
-    );
-};
-
 const Container = styled.KeyboardAvoidingView`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
@@ -130,25 +126,5 @@ const SmallText = styled.Text`
 const SelectDay = styled.TouchableOpacity`
     padding: 0 20px;
     gap: 10px;
-`;
-
-const InputContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  border-radius: 10px;
-  padding: 0 15px;
-`;
-
-const StyledInput = styled.TextInput`
-  flex: 1;
-  padding: 18px 0;
-  font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const DeleteButton = styled.TouchableOpacity`
-  padding: 5px;
 `;
 export default SetMedicineDay;
