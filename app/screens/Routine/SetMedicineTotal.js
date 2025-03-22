@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import {View, ScrollView} from 'react-native';
+import {View, ScrollView, Platform} from 'react-native';
 import {themes} from './../../styles';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import {ModalHeader, ProgressBar, Button} from '../../components';
@@ -8,11 +8,36 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import { createRoutine } from '../../api/routine';
 
 const SetMedicineTotal = ({route, navigation}) => {
+    const { medicine_id, nickname, day_of_weeks, user_schedule_ids, dose } = route.params;
+    console.log("dose:", dose);
+    
     const [total, setTotal] = useState('');
     const progress = '100%';
 
     const handleSaveRoutine = () => {
-      };
+        // 전송할 데이터 구성
+        const routineData = {
+            medicine_id,
+            nickname,
+            dose: parseInt(dose),
+            total_quantity: parseInt(total),
+            day_of_weeks,
+            user_schedule_ids
+        };
+        
+        // 데이터 콘솔에 출력
+        console.log("전송 데이터:", JSON.stringify(routineData, null, 2));
+        
+        // API 호출
+        createRoutine(routineData)
+            .then(response => {
+                console.log("루틴 생성 성공:", response);
+            })
+            .catch(error => {
+                console.error("루틴 생성 실패:", error);
+                // 오류 처리
+            });
+    };
 
     return (
         <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -33,10 +58,10 @@ const SetMedicineTotal = ({route, navigation}) => {
                             onChangeText={(text) => {
                                 // 숫자만 입력되도록 처리
                                 if (/^\d*$/.test(text)) {
-                                    setDose(text);
+                                    setTotal(text);
                                 }
                             }}
-                            placeholder="복용량을 입력하세요"
+                            placeholder="약의 총 개수를 입력하세요"
                             keyboardType="numeric"
                         />
                     </Section>
@@ -54,7 +79,11 @@ const SetMedicineTotal = ({route, navigation}) => {
                     paddingBottom: 30,
                     alignItems: 'center',
                 }}>
-                <Button title="저장하기" onPress={handleSaveRoutine} />
+                <Button 
+                    title="저장하기" 
+                    onPress={handleSaveRoutine}
+                    disabled={!total} // 총 개수가 입력되지 않으면 버튼 비활성화
+                />
             </View>
         </Container>
     );
@@ -132,4 +161,5 @@ const StyledInput = styled.TextInput`
 const DeleteButton = styled.TouchableOpacity`
   padding: 5px;
 `;
+
 export default SetMedicineTotal;
