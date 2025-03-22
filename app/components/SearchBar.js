@@ -35,12 +35,17 @@ const SearchBar = ({searchQuery, setSearchQuery, onSearch, placeholder}) => {
         value={searchQuery}
         onChangeText={setSearchQuery}
         onSubmitEditing={onSearch}
+        returnKeyType="search"
       />
       <SearchButton onPress={onSearch}>
-        <OtherIcons.search width={17.5} height={17.5} style={{color: themes.light.textColor.Primary20}}/>
+        <OtherIcons.search
+          width={17.5}
+          height={17.5}
+          style={{color: themes.light.textColor.Primary20}}
+        />
       </SearchButton>
     </SearchBarContainer>
   );
 };
 
-export { SearchBar };
+export {SearchBar};
