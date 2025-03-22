@@ -11,6 +11,7 @@ import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
 import CameraSearchScreen from '../screens/Search/CameraSearch.js';
 import CameraSearchResultsScreen from '../screens/Search/CameraSearchResults.js';
+import PrescriptionSearchResultsScreen from '../screens/Search/PrescriptionSearchResults.js';
 import Chat from '../screens/Chat/Chat.js';
 import {pointColor, themes} from './../styles';
 import {
@@ -155,11 +156,10 @@ const RootNavigator = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen
-        // name="Camera"
-        // component={CameraSearchScreen}
-        // options={{headerShown: false}}
         name="Camera"
-        component={CameraSearchResultsScreen}
+        // component={CameraSearchScreen}
+        // component={CameraSearchResultsScreen}
+        component={PrescriptionSearchResultsScreen}
         options={{headerShown: false}}
       />
       <Stack.Screen
