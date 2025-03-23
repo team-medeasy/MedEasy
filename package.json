@@ -27,6 +27,7 @@
     "react-native-date-picker": "^5.0.10",
     "react-native-dialog": "^9.3.0",
     "react-native-gesture-handler": "^2.23.1",
+    "react-native-image-picker": "^8.2.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-safe-area-context": "^5.2.0",
     "react-native-screens": "^4.6.0",

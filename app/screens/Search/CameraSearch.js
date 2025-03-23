@@ -1,10 +1,5 @@
-import React, {useEffect, useRef} from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {ActivityIndicator, Dimensions, TouchableOpacity} from 'react-native';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -13,6 +8,7 @@ import Svg, {Rect, Mask} from 'react-native-svg';
 import {CameraIcons, HeaderIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 const {width, height} = Dimensions.get('window');
 const PREVIEW_SIZE = width - 60; // 양쪽 30px씩 여백을 제외한 너비 = 높이
@@ -21,6 +17,7 @@ const OPACITY = 0.6;
 const OVERLAY_COLOR = `rgba(0, 0, 0, ${OPACITY})`;
 
 const CameraSearchScreen = () => {
+  const [lastPhoto, setLastPhoto] = useState(null);
   const devices = useCameraDevices();
   const device = devices && devices[0];
   const navigation = useNavigation();
@@ -52,7 +49,49 @@ const CameraSearchScreen = () => {
     };
 
     checkCameraPermission();
+    loadLastPhoto(); // 마지막 사진 불러오기
   }, [navigation, isFocused]);
+
+  const loadLastPhoto = async () => {
+    if (!launchImageLibrary) {
+      console.warn('launchImageLibrary is not defined');
+      return;
+    }
+
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        selectionLimit: 1,
+      });
+
+      if (result && result.assets && result.assets.length > 0) {
+        setLastPhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Failed to load last photo:', error);
+    }
+  };
+
+  const openGallery = async () => {
+    if (!launchImageLibrary) {
+      console.warn('launchImageLibrary is not defined');
+      return;
+    }
+
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        selectionLimit: 1,
+      });
+
+      if (result && result.assets && result.assets.length > 0) {
+        console.log('Selected Photo:', result.assets[0].uri);
+        setLastPhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Failed to open gallery:', error);
+    }
+  };
 
   const handleCapture = async () => {
     if (!cameraRef.current) return;
@@ -143,14 +182,30 @@ const CameraSearchScreen = () => {
 
       {/* 촬영 버튼 */}
       <ButtonContainer>
+        <ButtonItem onPress={openGallery}>
+          {lastPhoto ? (
+            <Image
+              source={{uri: lastPhoto}}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: 8,
+              }}
+            />
+          ) : (
+            <MaterialCommunityIcons name="image" size={24} color="#fff" />
+          )}
+        </ButtonItem>
         <CaptureButton onPress={handleCapture}>
           <CaptureButtonInner />
         </CaptureButton>
-        <CameraIcons.cameraSwitch
-          width={17}
-          height={17}
-          style={{color: themes.light.textColor.textPrimary}}
-        />
+        <ButtonItem>
+          <CameraIcons.cameraSwitch
+            width={24}
+            height={24}
+            style={{color: themes.light.textColor.buttonText}}
+          />
+        </ButtonItem>
       </ButtonContainer>
     </CameraContainer>
   );
@@ -167,6 +222,7 @@ const Header = styled.View`
   justify-content: space-between;
   align-items: center;
 `;
+
 const HeaderButton = styled.View`
   width: 36px;
   height: 36px;
@@ -183,6 +239,7 @@ const Title = styled.Text`
   font-size: ${FontSizes.heading.default};
   color: ${themes.light.textColor.buttonText};
 `;
+
 const LoadingContainer = styled.View`
   flex: 1;
   justify-content: center;
@@ -224,19 +281,26 @@ const CloseButton = styled.TouchableOpacity`
   padding: 10px;
 `;
 
-/* 촬영 버튼 부모 컨테이너 */
 const ButtonContainer = styled.View`
+  padding: 0 32px;
   position: absolute;
   bottom: 50px;
   width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ButtonItem = styled.View`
+  width: 48px;
+  height: 48px;
+  background-color: red;
   justify-content: center;
   align-items: center;
 `;
 
 /* 촬영 버튼 */
 const CaptureButton = styled.TouchableOpacity`
-  position: absolute;
-  bottom: 50px;
   width: 70px;
   height: 70px;
   border-radius: 35px;
@@ -245,6 +309,7 @@ const CaptureButton = styled.TouchableOpacity`
   background-color: transparent;
   justify-content: center;
   align-items: center;
+  align-self: center; /* 중앙 정렬 */
 `;
 
 const CaptureButtonInner = styled.View`
