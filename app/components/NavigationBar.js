@@ -3,7 +3,6 @@ import styled from 'styled-components/native';
 import {Platform} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import {Camera} from 'react-native-vision-camera';
 import {useNavigation} from '@react-navigation/native';
 
 import Home from '../screens/Navigation/Home';
@@ -21,7 +20,6 @@ import {
   HeaderIcons,
 } from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes.js';
-const {chevron: ChevronIcon} = HeaderIcons;
 
 // 카메라 버튼
 const CameraButton = ({onPress}) => {
