@@ -273,14 +273,6 @@ const FocusArea = styled.View`
   background-color: transparent;
 `;
 
-/* 닫기 버튼 */
-const CloseButton = styled.TouchableOpacity`
-  position: absolute;
-  top: 40px;
-  right: 20px;
-  padding: 10px;
-`;
-
 const ButtonContainer = styled.View`
   padding: 0 32px;
   position: absolute;
