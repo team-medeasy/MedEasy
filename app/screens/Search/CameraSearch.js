@@ -24,11 +24,16 @@ const OVERLAY_COLOR = `rgba(0, 0, 0, ${OPACITY})`;
 const TOGGLE_WIDTH = 120;
 const TOGGLE_HEIGHT = 40;
 const TOGGLE_PADDING = 4;
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
 const CameraSearchScreen = () => {
   const [lastPhoto, setLastPhoto] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
+  const focusAreaHeight = useRef(new Animated.Value(PREVIEW_SIZE)).current;
+  const maskRectHeight = useRef(new Animated.Value(PREVIEW_SIZE)).current; // Re-introduced
+  const [isPrescriptionMode, setIsPrescriptionMode] = useState(false);
+  const previewSize = useRef(new Animated.Value(PREVIEW_SIZE)).current;
 
   const devices = useCameraDevices();
   const device = devices && devices[0];
@@ -94,9 +99,26 @@ const CameraSearchScreen = () => {
     }
   };
 
+  // Toggle에서 상태 변경 시 애니메이션 설정
   const handleToggle = index => {
     setActiveIndex(index);
+    setIsPrescriptionMode(index === 1);
 
+    const targetHeight = index === 1 ? (PREVIEW_SIZE * 4) / 3 : PREVIEW_SIZE;
+
+    // FocusArea 높이 애니메이션 적용
+    Animated.spring(focusAreaHeight, {
+      toValue: targetHeight,
+      useNativeDriver: false,
+    }).start();
+
+    // 마스크 Rect 높이 애니메이션 적용
+    Animated.spring(maskRectHeight, {
+      toValue: targetHeight,
+      useNativeDriver: false,
+    }).start();
+
+    // 토글 애니메이션 적용
     Animated.spring(translateX, {
       toValue: index * (TOGGLE_WIDTH + TOGGLE_PADDING),
       useNativeDriver: true,
@@ -111,6 +133,11 @@ const CameraSearchScreen = () => {
       </LoadingContainer>
     );
   }
+
+  const animatedMaskRectY = Animated.divide(
+    Animated.subtract(height, maskRectHeight),
+    2,
+  );
 
   return (
     <CameraContainer>
@@ -180,11 +207,11 @@ const CameraSearchScreen = () => {
         <Svg height="100%" width="100%">
           <Mask id="mask" x="0" y="0" height="100%" width="100%">
             <Rect x="0" y="0" width="100%" height="100%" fill="white" />
-            <Rect
-              x={(width - PREVIEW_SIZE) / 2}
-              y={(height - PREVIEW_SIZE) / 2}
-              width={PREVIEW_SIZE}
-              height={PREVIEW_SIZE}
+            <AnimatedRect
+              x={Animated.divide(Animated.subtract(width, previewSize), 2)}
+              y={Animated.divide(Animated.subtract(height, maskRectHeight), 2)}
+              width={previewSize}
+              height={maskRectHeight}
               rx={BORDER_RADIUS}
               ry={BORDER_RADIUS}
               fill="black"
@@ -204,24 +231,45 @@ const CameraSearchScreen = () => {
       </MaskContainer>
 
       {/* 가운데 정사각형 */}
-      <FocusArea />
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: Animated.divide(Animated.subtract(height, focusAreaHeight), 2),
+          left: (width - PREVIEW_SIZE) / 2,
+          width: PREVIEW_SIZE,
+          height: focusAreaHeight,
+          borderRadius: BORDER_RADIUS,
+          borderWidth: 3,
+          borderColor: 'rgba(255, 255, 255, 0.4)',
+          backgroundColor: 'transparent',
+        }}
+      />
 
       <BottomContainer>
-        <Hint>
-          <HintItem>
-            <CameraIcons.tip
-              width={20}
-              height={20}
-              style={{color: themes.light.textColor.buttonText}}
-            />
-          </HintItem>
-          <HintItem>
-            <HintTitle>인식률을 높이려면?</HintTitle>
-            <HintText>
-              문자가 적힌 면이 위로 가도록 밝은 곳에서 촬영해주세요.
-            </HintText>
-          </HintItem>
-        </Hint>
+        {/* Hint 애니메이션 적용 */}
+        {!isPrescriptionMode && (
+          <Animated.View
+            style={{
+              opacity: isPrescriptionMode ? 0 : 1,
+              height: isPrescriptionMode ? 0 : 'auto',
+            }}>
+            <Hint>
+              <HintItem>
+                <CameraIcons.tip
+                  width={20}
+                  height={20}
+                  style={{color: themes.light.textColor.buttonText}}
+                />
+              </HintItem>
+              <HintItem>
+                <HintTitle>인식률을 높이려면?</HintTitle>
+                <HintText>
+                  문자가 적힌 면이 위로 가도록 밝은 곳에서 촬영해주세요.
+                </HintText>
+              </HintItem>
+            </Hint>
+          </Animated.View>
+        )}
 
         {/* 촬영 버튼 */}
         <ButtonContainer>
