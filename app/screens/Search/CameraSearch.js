@@ -1,5 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, Dimensions, TouchableOpacity} from 'react-native';
+import {
+  ActivityIndicator,
+  Dimensions,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -49,15 +54,9 @@ const CameraSearchScreen = () => {
     };
 
     checkCameraPermission();
-    loadLastPhoto(); // 마지막 사진 불러오기
   }, [navigation, isFocused]);
 
   const loadLastPhoto = async () => {
-    if (!launchImageLibrary) {
-      console.warn('launchImageLibrary is not defined');
-      return;
-    }
-
     try {
       const result = await launchImageLibrary({
         mediaType: 'photo',
@@ -73,11 +72,6 @@ const CameraSearchScreen = () => {
   };
 
   const openGallery = async () => {
-    if (!launchImageLibrary) {
-      console.warn('launchImageLibrary is not defined');
-      return;
-    }
-
     try {
       const result = await launchImageLibrary({
         mediaType: 'photo',
@@ -283,10 +277,10 @@ const ButtonContainer = styled.View`
   align-items: center;
 `;
 
-const ButtonItem = styled.View`
+const ButtonItem = styled.TouchableOpacity`
   width: 48px;
   height: 48px;
-  background-color: red;
+  background-color: transparent;
   justify-content: center;
   align-items: center;
 `;
