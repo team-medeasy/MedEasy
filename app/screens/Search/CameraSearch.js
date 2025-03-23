@@ -7,7 +7,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const CameraSearchScreen = () => {
   const devices = useCameraDevices();
-  const device = devices.back;
+  const device = devices && devices[0];
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const cameraRef = useRef(null);
@@ -32,6 +32,8 @@ const CameraSearchScreen = () => {
           console.log('카메라 권한 획득 성공!');
         }
       }
+      console.log('Devices:', devices);
+      console.log('Device:', device);
     };
 
     checkCameraPermission();
@@ -53,6 +55,7 @@ const CameraSearchScreen = () => {
   };
 
   if (!device) {
+    console.log('Device is null, rendering loading...');
     return (
       <LoadingContainer>
         <ActivityIndicator size="large" color="#007AFF" />
