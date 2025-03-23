@@ -56,21 +56,6 @@ const CameraSearchScreen = () => {
     checkCameraPermission();
   }, [navigation, isFocused]);
 
-  const loadLastPhoto = async () => {
-    try {
-      const result = await launchImageLibrary({
-        mediaType: 'photo',
-        selectionLimit: 1,
-      });
-
-      if (result && result.assets && result.assets.length > 0) {
-        setLastPhoto(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error('Failed to load last photo:', error);
-    }
-  };
-
   const openGallery = async () => {
     try {
       const result = await launchImageLibrary({
