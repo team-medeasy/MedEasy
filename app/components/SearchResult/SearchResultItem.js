@@ -6,24 +6,24 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 
 export const SearchResultItem = ({item, onPress}) => {
   return (
-    <ItemContainer onPress={() => onPress(item.item_seq)}>
+    <ItemContainer onPress={() => onPress(item)}>
       <ImageContainer>
         <MedicineImage source={{uri: item.item_image}} resizeMode="stretch" />
       </ImageContainer>
       <InfoContainer>
-        <ManufacturerText>{item.entp_name}</ManufacturerText>
+        <ManufacturerText>{item.entp_name || '정보 없음'}</ManufacturerText>
         <MedicineNameText
           numberOfLines={1} // 한 줄로 제한
           ellipsizeMode="tail" 
         >
-          {item.item_name}
+          {item.item_name || '정보 없음'}
         </MedicineNameText>
         <TypeContainer>
-          <Tag sizeType="small" colorType="resultPrimary">
-            {item.etc_otc_name}
+          <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis' maxWidth='66'>
+            {item.etc_otc_name || '정보 없음'}
           </Tag>
-          <Tag sizeType="small" colorType="resultSecondary">
-            {item.class_name}
+          <Tag sizeType="small" colorType="resultSecondary" overflowMode='ellipsis' maxWidth='128'>
+            {item.class_name || '정보 없음'}
           </Tag>
         </TypeContainer>
       </InfoContainer>

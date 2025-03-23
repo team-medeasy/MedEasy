@@ -90,19 +90,6 @@ export const getWeekDays = () => {
   });
 };
 
-// 상대적 날짜 텍스트 생성 함수
-export const getRelativeDayText = (selectedDate, today) => {
-  const selectedDateObj = dayjs(`${selectedDate.year}-${selectedDate.month}-${selectedDate.date}`);
-  const todayObj = dayjs(`${today.year()}-${today.month() + 1}-${today.date()}`);
-  const diff = selectedDateObj.diff(todayObj, 'day');
-
-  if (diff === 0) return '오늘';
-  if (diff === -1) return '어제';
-  if (diff === 1) return '내일';
-  if (diff === 2) return '모레';
-  return diff < 0 ? `${Math.abs(diff)}일 전` : `${diff}일 후`;
-};
-
 // 약 dummyData
 export const dummyMedicineData = [
   {

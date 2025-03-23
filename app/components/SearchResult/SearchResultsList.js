@@ -2,19 +2,37 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {SearchResultItem} from './SearchResultItem';
 import {Footer} from './../index';
-import {FlatList} from 'react-native';
+import {FlatList, ActivityIndicator, View} from 'react-native';
+import {themes} from '../../styles';
 
-export const SearchResultsList = ({searchResults, handleSearchResultPress}) => {
+export const SearchResultsList = ({
+  searchResults,
+  handleSearchResultPress,
+  onEndReached,
+  onEndReachedThreshold = 0.5,
+  refreshing
+}) => {
   return (
     <Container>
       {searchResults.length > 0 && (
         <FlatList
           data={searchResults}
-          keyExtractor={item => item.item_seq}
+          keyExtractor={(item, index) => item.uniqueKey || `item_${item.original_id}_${index}`}
           renderItem={({item}) => (
             <SearchResultItem item={item} onPress={handleSearchResultPress} />
           )}
-          ListFooterComponent={() => <Footer />}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={onEndReachedThreshold}
+          ListFooterComponent={() => (
+            <>
+              {refreshing && (
+                <LoadingContainer>
+                  <ActivityIndicator size="small" color={themes.light.pointColor.Primary} />
+                </LoadingContainer>
+              )}
+              <Footer />
+            </>
+          )}
         />
       )}
     </Container>
@@ -23,4 +41,9 @@ export const SearchResultsList = ({searchResults, handleSearchResultPress}) => {
 
 const Container = styled.View`
   flex: 1;
+`;
+
+const LoadingContainer = styled.View`
+  padding: 10px;
+  align-items: center;
 `;

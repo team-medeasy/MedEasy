@@ -4,43 +4,29 @@ import { pointColor, themes } from '../styles';
 import KarteIcon from '../../assets/icons/karte.svg';
 import LogoIcon from '../../assets/icons/logo/logo.svg';
 import FontSizes from '../../assets/fonts/fontSizes';
-import { getUser } from '../api/user'; // API import 추가
+import { getUserUsageDays } from '../api/user';
 
 const MedicationInfo = ({ medicationCount }) => {
-  const [joinDate, setJoinDate] = useState('');
   const [daysSinceJoin, setDaysSinceJoin] = useState(0);
   
   useEffect(() => {
-    // 사용자 정보 가져오기
-    const fetchUserInfo = async () => {
+    // 사용자 사용 일수 가져오기
+    const fetchUserUsageDays = async () => {
       try {
-        const response = await getUser();
-        const userData = response.data?.data || response.data?.body || response.data;
-
-        const registeredAt = userData.registered_at;
-        if (registeredAt) {
-          const registeredDate = new Date(registeredAt);
-          const today = new Date();
-          
-          // 날짜 차이 계산 (밀리초 단위)
-          const diffTime = Math.abs(today - registeredDate);
-          // 일 단위로 변환 (소수점 버림)
-          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-          
-          setDaysSinceJoin(diffDays);
-          
-          // 가입 날짜 포맷팅
-          const formattedDate = `${registeredDate.getFullYear()}.${(registeredDate.getMonth() + 1).toString().padStart(2, '0')}.${registeredDate.getDate().toString().padStart(2, '0')}`;
-          setJoinDate(formattedDate);
+        const response = await getUserUsageDays();
+        const usageData = response.data?.body || response.data;
+        
+        if (usageData && usageData.usage_days !== undefined) {
+          setDaysSinceJoin(usageData.usage_days);
         }
       } catch (error) {
-        console.error('사용자 정보 가져오기 실패:', error);
+        console.error('사용자 사용 일수 가져오기 실패:', error);
       }
     };
     
-    fetchUserInfo();
+    fetchUserUsageDays();
   }, []);
-
+  
   return (
     <Container>
       <BGStyle />

@@ -79,7 +79,6 @@ const SearchMedicineScreen = ({navigation, route}) => {
       
       navigation.replace('SearchMedicineResults', {
         searchQuery: query,
-        recentSearches: updatedSearches,
       });
     }
   };
