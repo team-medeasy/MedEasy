@@ -4,6 +4,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  Animated,
 } from 'react-native';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
@@ -20,9 +21,15 @@ const PREVIEW_SIZE = width - 60; // 양쪽 30px씩 여백을 제외한 너비 = 
 const BORDER_RADIUS = 24;
 const OPACITY = 0.6;
 const OVERLAY_COLOR = `rgba(0, 0, 0, ${OPACITY})`;
+const TOGGLE_WIDTH = 120;
+const TOGGLE_HEIGHT = 40;
+const TOGGLE_PADDING = 4;
 
 const CameraSearchScreen = () => {
   const [lastPhoto, setLastPhoto] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const translateX = useRef(new Animated.Value(0)).current;
+
   const devices = useCameraDevices();
   const device = devices && devices[0];
   const navigation = useNavigation();
@@ -87,6 +94,15 @@ const CameraSearchScreen = () => {
     }
   };
 
+  const handleToggle = index => {
+    setActiveIndex(index);
+
+    Animated.spring(translateX, {
+      toValue: index * (TOGGLE_WIDTH + TOGGLE_PADDING),
+      useNativeDriver: true,
+    }).start();
+  };
+
   if (!device) {
     console.log('Device is null, rendering loading...');
     return (
@@ -99,24 +115,55 @@ const CameraSearchScreen = () => {
   return (
     <CameraContainer>
       <Header>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <HeaderItem>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <HeaderButton>
+              <HeaderIcons.chevron
+                width={20}
+                height={20}
+                style={{color: themes.light.textColor.buttonText}}
+              />
+            </HeaderButton>
+          </TouchableOpacity>
+          <Title>사진으로 검색하기</Title>
           <HeaderButton>
-            <HeaderIcons.chevron
+            <CameraIcons.flash
               width={20}
               height={20}
               style={{color: themes.light.textColor.buttonText}}
             />
           </HeaderButton>
-        </TouchableOpacity>
-        <Title>사진으로 검색하기</Title>
-        <HeaderButton>
-          <CameraIcons.flash
-            width={20}
-            height={20}
-            style={{color: themes.light.textColor.buttonText}}
-          />
-        </HeaderButton>
+        </HeaderItem>
+        <HeaderItem>
+          <Toggle>
+            <Animated.View
+              style={{
+                position: 'absolute',
+                left: TOGGLE_PADDING,
+                top: TOGGLE_PADDING + 1,
+                width: TOGGLE_WIDTH - TOGGLE_PADDING,
+                height: TOGGLE_HEIGHT - TOGGLE_PADDING * 2,
+                backgroundColor: 'white',
+                borderRadius: TOGGLE_HEIGHT / 2,
+                transform: [{translateX}],
+              }}
+            />
+            <TouchableOpacity onPress={() => handleToggle(0)}>
+              <ToggleButton isActive={activeIndex === 0}>
+                <ToggleText isActive={activeIndex === 0}>알약 촬영</ToggleText>
+              </ToggleButton>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleToggle(1)}>
+              <ToggleButton isActive={activeIndex === 1}>
+                <ToggleText isActive={activeIndex === 1}>
+                  처방전 촬영
+                </ToggleText>
+              </ToggleButton>
+            </TouchableOpacity>
+          </Toggle>
+        </HeaderItem>
       </Header>
+
       {/* 카메라 미리보기 */}
       {isFocused && (
         <Camera
@@ -193,12 +240,14 @@ const CameraSearchScreen = () => {
 const Header = styled.View`
   position: absolute;
   top: 60px;
-  left: 0;
   width: 100%;
   padding: 10px 20px;
   z-index: 10;
+`;
+
+const HeaderItem = styled.View`
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 `;
 
@@ -217,6 +266,29 @@ const Title = styled.Text`
   font-family: 'Pretendard-SemiBold';
   font-size: ${FontSizes.heading.default};
   color: ${themes.light.textColor.buttonText};
+`;
+
+const Toggle = styled.View`
+  margin-top: 32px;
+  flex-direction: row;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 40px;
+  padding: 4px;
+`;
+
+const ToggleButton = styled.View`
+  width: 120px;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+  border-radius: 40px;
+`;
+
+const ToggleText = styled.Text`
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${FontSizes.body.default};
+  color: ${({isActive}) => (isActive ? 'black' : 'rgba(255, 255, 255, 0.7)')};
 `;
 
 const LoadingContainer = styled.View`
