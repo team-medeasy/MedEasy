@@ -13,14 +13,29 @@ const CameraSearchScreen = () => {
   const cameraRef = useRef(null);
 
   useEffect(() => {
-    (async () => {
-      const permission = await Camera.requestCameraPermission();
-      if (permission !== 'authorized') {
-        console.warn('카메라 권한이 없습니다.');
-        navigation.goBack();
+    const checkCameraPermission = async () => {
+      console.log('Checking camera permission...');
+      const cameraPermission = await Camera.getCameraPermissionStatus();
+      console.log('Camera permission status:', cameraPermission);
+      console.log('isFocused:', isFocused);
+
+      if (cameraPermission === 'authorized' || cameraPermission === 'granted') {
+        console.log('카메라 권한이 이미 있습니다. 카메라를 시작합니다.');
+      } else {
+        console.warn('카메라 권한이 없습니다. 요청 중...');
+        const requestPermission = await Camera.requestCameraPermission();
+        console.log('Requested Camera Permission:', requestPermission);
+        if (requestPermission !== 'authorized') {
+          console.warn('카메라 권한 요청 거부됨. 이전 화면으로 이동합니다.');
+          navigation.goBack();
+        } else {
+          console.log('카메라 권한 획득 성공!');
+        }
       }
-    })();
-  }, [navigation]);
+    };
+
+    checkCameraPermission();
+  }, [navigation, isFocused]);
 
   const handleCapture = async () => {
     if (!cameraRef.current) return;

@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {Platform} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -41,11 +41,7 @@ const TabNavigator = () => {
   const navigation = useNavigation();
 
   const handleCameraPress = useCallback(async () => {
-    const permission = await Camera.requestCameraPermission();
-    if (permission === 'denied') {
-      console.warn('Camera permission denied');
-      return;
-    }
+    console.log('Camera button pressed');
     navigation.navigate('Camera');
   }, [navigation]);
 
@@ -155,12 +151,12 @@ const RootNavigator = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen
-        // name="Camera"
-        // component={CameraSearchScreen}
-        // options={{headerShown: false}}
         name="Camera"
-        component={CameraSearchResultsScreen}
+        component={CameraSearchScreen}
         options={{headerShown: false}}
+        // name="Camera"
+        // component={CameraSearchResultsScreen}
+        // options={{headerShown: false}}
       />
       <Stack.Screen
         name="Chat"
@@ -181,10 +177,12 @@ const MainContainer = styled.View`
 
 const StyledCameraButton = styled.TouchableOpacity`
   position: absolute;
-  ${Platform.OS === 'ios' && `
+  ${Platform.OS === 'ios' &&
+  `
       bottom: 50px;
     `}
-    ${Platform.OS === 'android' && `
+  ${Platform.OS === 'android' &&
+  `
       bottom: 20px;
     `}
   align-self: center;
@@ -204,10 +202,12 @@ const ChatBuble = styled.View`
   width: 110px;
   height: 60px;
   right: 20px;
-  ${Platform.OS === 'ios' && `
+  ${Platform.OS === 'ios' &&
+  `
       bottom: 170px;
     `}
-    ${Platform.OS === 'android' && `
+  ${Platform.OS === 'android' &&
+  `
       bottom: 140px;
     `}
   border-radius: 15px;
@@ -234,10 +234,12 @@ const BubbleText = styled.Text`
 const ChatButton = styled.TouchableOpacity`
   position: absolute;
   right: 20px;
-  ${Platform.OS === 'ios' && `
+  ${Platform.OS === 'ios' &&
+  `
       bottom: 100px;
     `}
-    ${Platform.OS === 'android' && `
+  ${Platform.OS === 'android' &&
+  `
       bottom: 70px;
     `}
   background-color: ${themes.light.bgColor.bgPrimary};
