@@ -1,10 +1,18 @@
 import React, {useEffect, useRef} from 'react';
-import {ActivityIndicator, Dimensions} from 'react-native';
+import {
+  ActivityIndicator,
+  Dimensions,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Svg, {Rect, Mask} from 'react-native-svg';
+import {CameraIcons, HeaderIcons} from '../../../assets/icons';
+import {themes} from '../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {width, height} = Dimensions.get('window');
 const PREVIEW_SIZE = width - 60; // 양쪽 30px씩 여백을 제외한 너비 = 높이
@@ -72,6 +80,25 @@ const CameraSearchScreen = () => {
 
   return (
     <CameraContainer>
+      <Header>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <HeaderButton>
+            <HeaderIcons.chevron
+              width={20}
+              height={20}
+              style={{color: themes.light.textColor.buttonText}}
+            />
+          </HeaderButton>
+        </TouchableOpacity>
+        <Title>사진으로 검색하기</Title>
+        <HeaderButton>
+          <CameraIcons.flash
+            width={20}
+            height={20}
+            style={{color: themes.light.textColor.buttonText}}
+          />
+        </HeaderButton>
+      </Header>
       {/* 카메라 미리보기 */}
       {isFocused && (
         <Camera
@@ -114,21 +141,48 @@ const CameraSearchScreen = () => {
       {/* 가운데 정사각형 */}
       <FocusArea />
 
-      {/* 닫기 버튼 */}
-      <CloseButton onPress={() => navigation.goBack()}>
-        <MaterialCommunityIcons name="close" size={30} color="#fff" />
-      </CloseButton>
-
       {/* 촬영 버튼 */}
       <ButtonContainer>
         <CaptureButton onPress={handleCapture}>
           <CaptureButtonInner />
         </CaptureButton>
+        <CameraIcons.cameraSwitch
+          width={17}
+          height={17}
+          style={{color: themes.light.textColor.textPrimary}}
+        />
       </ButtonContainer>
     </CameraContainer>
   );
 };
 
+const Header = styled.View`
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  padding: 10px 20px;
+  z-index: 10;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+const HeaderButton = styled.View`
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background-color: rgba(255, 255, 255, 0.1);
+  justify-content: center;
+  align-items: center;
+`;
+
+const Title = styled.Text`
+  flex: 1;
+  text-align: center;
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${FontSizes.heading.default};
+  color: ${themes.light.textColor.buttonText};
+`;
 const LoadingContainer = styled.View`
   flex: 1;
   justify-content: center;
