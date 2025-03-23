@@ -7,6 +7,8 @@ import { SearchResultsList } from './SearchResult/SearchResultsList';
 import { SearchResultItem } from './SearchResult/SearchResultItem';
 import { CameraSearchResultsList } from './CameraSearchResult/CameraSearchResultsList'
 import { CameraSearchResultItem } from './CameraSearchResult/CameraSearchResultItem'
+import { PrescriptionSearchResultsList } from './PrescriptionSearchResult/PrescriptionSearchResultsList';
+import { PrescriptionSearchResultItem } from './PrescriptionSearchResult/PrescriptionSearchResultItem';
 import { Button, BackAndNextButtons } from './Button';
 import { ProgressBar } from './ProgressBar';
 import { SearchBar } from './SearchBar';
@@ -36,6 +38,8 @@ export {
   SearchResultItem,
   CameraSearchResultsList,
   CameraSearchResultItem,
+  PrescriptionSearchResultsList,
+  PrescriptionSearchResultItem,
   FilterModal,
   FilterButton,
   SearchScreenHeader

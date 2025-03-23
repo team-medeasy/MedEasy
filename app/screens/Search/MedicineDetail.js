@@ -72,7 +72,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
               entp_name: item.entp_name,
               item_name: item.medicine_name,
               class_name: item.class_name,
-              item_image: '', /* 추가 필요 */
+              item_image: item.item_image,
             }));
             setSimilarMedicines(mappedSimilarMedicines);
           }
