@@ -206,33 +206,51 @@ const CameraSearchScreen = () => {
       {/* 가운데 정사각형 */}
       <FocusArea />
 
-      {/* 촬영 버튼 */}
-      <ButtonContainer>
-        <ButtonItem onPress={openGallery}>
-          {lastPhoto ? (
-            <Image
-              source={{uri: lastPhoto}}
-              style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: 8,
-              }}
+      <BottomContainer>
+        <Hint>
+          <HintItem>
+            <CameraIcons.tip
+              width={20}
+              height={20}
+              style={{color: themes.light.textColor.buttonText}}
             />
-          ) : (
-            <MaterialCommunityIcons name="image" size={24} color="#fff" />
-          )}
-        </ButtonItem>
-        <CaptureButton onPress={handleCapture}>
-          <CaptureButtonInner />
-        </CaptureButton>
-        <ButtonItem>
-          <CameraIcons.cameraSwitch
-            width={24}
-            height={24}
-            style={{color: themes.light.textColor.buttonText}}
-          />
-        </ButtonItem>
-      </ButtonContainer>
+          </HintItem>
+          <HintItem>
+            <HintTitle>인식률을 높이려면?</HintTitle>
+            <HintText>
+              문자가 적힌 면이 위로 가도록 밝은 곳에서 촬영해주세요.
+            </HintText>
+          </HintItem>
+        </Hint>
+
+        {/* 촬영 버튼 */}
+        <ButtonContainer>
+          <ButtonItem onPress={openGallery}>
+            {lastPhoto ? (
+              <Image
+                source={{uri: lastPhoto}}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 8,
+                }}
+              />
+            ) : (
+              <MaterialCommunityIcons name="image" size={24} color="#fff" />
+            )}
+          </ButtonItem>
+          <CaptureButton onPress={handleCapture}>
+            <CaptureButtonInner />
+          </CaptureButton>
+          <ButtonItem>
+            <CameraIcons.cameraSwitch
+              width={24}
+              height={24}
+              style={{color: themes.light.textColor.buttonText}}
+            />
+          </ButtonItem>
+        </ButtonContainer>
+      </BottomContainer>
     </CameraContainer>
   );
 };
@@ -324,11 +342,17 @@ const FocusArea = styled.View`
   background-color: transparent;
 `;
 
-const ButtonContainer = styled.View`
-  padding: 0 32px;
+const BottomContainer = styled.View`
   position: absolute;
   bottom: 50px;
   width: 100%;
+  gap: 32px;
+  align-items: center;
+`;
+
+const ButtonContainer = styled.View`
+  width: 100%;
+  padding: 0 32px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -360,6 +384,28 @@ const CaptureButtonInner = styled.View`
   height: 52px;
   border-radius: 26px;
   background-color: white;
+`;
+
+const Hint = styled.View`
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+`;
+
+const HintItem = styled.View`
+  gap: 8px;
+`;
+
+const HintTitle = styled.Text`
+  font-family: 'Pretendard-Bold';
+  font-size: ${FontSizes.body.default};
+  color: white;
+`;
+
+const HintText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.caption.default};
+  color: white;
 `;
 
 export default CameraSearchScreen;
