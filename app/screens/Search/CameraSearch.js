@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Dimensions,
   TouchableOpacity,
-  Image,
   Animated,
 } from 'react-native';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
@@ -162,10 +161,10 @@ const CameraSearchScreen = () => {
             </HeaderButton>
           </TouchableOpacity>
           <Title>사진으로 검색하기</Title>
-          <HeaderButton>
+          <HeaderButton type="flash">
             <CameraIcons.flash
-              width={20}
-              height={20}
+              width={24}
+              height={24}
               style={{color: themes.light.textColor.buttonText}}
             />
           </HeaderButton>
@@ -326,7 +325,8 @@ const HeaderButton = styled.View`
   width: 36px;
   height: 36px;
   border-radius: 18px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: ${({type}) =>
+    type === 'flash' ? 'transparent' : 'rgba(255, 255, 255, 0.1)'};
   justify-content: center;
   align-items: center;
 `;
