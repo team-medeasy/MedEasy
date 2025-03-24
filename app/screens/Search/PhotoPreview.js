@@ -1,11 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import {Header, ModalHeader} from '../../components';
+import {Header, ModalHeader, Button} from '../../components';
 import {themes} from '../../styles';
+import {useNavigation} from '@react-navigation/native';
+import {View} from 'react-native';
 
 const PhotoPreviewScreen = ({route}) => {
   const {photoUri, isModal = false} = route.params;
   const [photo, setPhoto] = useState(null);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (photoUri) {
@@ -39,6 +43,22 @@ const PhotoPreviewScreen = ({route}) => {
       <ImageContainer>
         <PreviewImage source={{uri: photo}} resizeMode="contain" />
       </ImageContainer>
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingLeft: 20,
+          paddingRight: 20,
+          paddingBottom: 30,
+          alignItems: 'center',
+        }}>
+        <Button
+          title="검색하기"
+          onPress={() => navigation.navigate('CameraSearchResults')}
+        />
+      </View>
     </Container>
   );
 };
