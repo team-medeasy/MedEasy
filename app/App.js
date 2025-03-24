@@ -30,6 +30,7 @@ import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
+const RoutineModalStack = createStackNavigator();
 
 const AuthNavigator = () => {
   return (
@@ -47,6 +48,18 @@ const AuthNavigator = () => {
         component={SignUpDOBGenderScreen}
       />
     </AuthStack.Navigator>
+  );
+};
+
+const RoutineModalNavigator = () => {
+  return (
+    <RoutineModalStack.Navigator screenOptions={{ headerShown: false }}>
+      <RoutineModalStack.Screen name="SetMedicineName" component={SetMedicineNameScreen} />
+      <RoutineModalStack.Screen name="SetMedicineDay" component={SetMedicineDayScreen} />
+      <RoutineModalStack.Screen name="SetMedicineTime" component={SetMedicineTimeScreen} />
+      <RoutineModalStack.Screen name="SetMedicineDose" component={SetMedicineDoseScreen} />
+      <RoutineModalStack.Screen name="SetMedicineTotal" component={SetMedicineTotalScreen} />
+    </RoutineModalStack.Navigator>
   );
 };
 
@@ -118,33 +131,8 @@ const App = () => {
                 options={{presentation: 'modal'}}
               /> */}
               <RootStack.Screen
-                name="SetMedicineName"
-                component={SetMedicineNameScreen}
-                options={{presentation: 'modal'}}
-              />
-              <RootStack.Screen
-                name="SetMedicineDay"
-                component={SetMedicineDayScreen}
-                options={{presentation: 'modal'}}
-              />
-              <RootStack.Screen
-                name="SetMedicineTime"
-                component={SetMedicineTimeScreen}
-                options={{presentation: 'modal'}}
-              />
-              <RootStack.Screen
-                name="SetMedicineDose"
-                component={SetMedicineDoseScreen}
-                options={{presentation: 'modal'}}
-              />
-              <RootStack.Screen
-                name="SetMedicineTotal"
-                component={SetMedicineTotalScreen}
-                options={{presentation: 'modal'}}
-              />
-              <RootStack.Screen
-                name="SetRoutineTime"
-                component={SetRoutineTimeScreen}
+                name="RoutineModal"
+                component={RoutineModalNavigator}
                 options={{presentation: 'modal'}}
               />
             </RootStack.Navigator>

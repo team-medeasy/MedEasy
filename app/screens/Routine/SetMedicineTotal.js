@@ -32,6 +32,7 @@ const SetMedicineTotal = ({route, navigation}) => {
         createRoutine(routineData)
             .then(response => {
                 console.log("루틴 생성 성공:", response);
+                navigation.getParent().goBack();
             })
             .catch(error => {
                 console.error("루틴 생성 실패:", error);
