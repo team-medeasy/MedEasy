@@ -383,18 +383,6 @@ const MaskContainer = styled.View`
   height: ${height}px;
 `;
 
-/* 촬영 미리보기 (오퍼시티 X) */
-const FocusArea = styled.View`
-  position: absolute;
-  top: ${(height - PREVIEW_SIZE) / 2}px;
-  left: ${(width - PREVIEW_SIZE) / 2}px;
-  width: ${PREVIEW_SIZE}px;
-  height: ${PREVIEW_SIZE}px;
-  border-radius: ${BORDER_RADIUS}px;
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  background-color: transparent;
-`;
-
 const BottomContainer = styled.View`
   position: absolute;
   bottom: 50px;
