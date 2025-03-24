@@ -34,12 +34,16 @@ const CameraSearchScreen = () => {
   const maskRectHeight = useRef(new Animated.Value(PREVIEW_SIZE)).current; // Re-introduced
   const [isPrescriptionMode, setIsPrescriptionMode] = useState(false);
   const previewSize = useRef(new Animated.Value(PREVIEW_SIZE)).current;
+  const [cameraPosition, setCameraPosition] = useState('back');
 
   const devices = useCameraDevices();
   const device = devices && devices[0];
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const cameraRef = useRef(null);
+
+    devices && devices.find(d => d.position === 'back'),
+  ); // 초기값 설정
 
   useEffect(() => {
     const checkCameraPermission = async () => {
@@ -67,6 +71,12 @@ const CameraSearchScreen = () => {
 
     checkCameraPermission();
   }, [navigation, isFocused]);
+
+    if (devices) {
+      const newDevice = devices.find(d => d.position === cameraPosition);
+      setDevice(newDevice);
+    }
+  }, [devices, cameraPosition]);
 
   const openGallery = async () => {
     try {
@@ -291,8 +301,6 @@ const CameraSearchScreen = () => {
             <CaptureButtonInner />
           </CaptureButton>
           <ButtonItem>
-            <CameraIcons.cameraSwitch
-              width={24}
               height={24}
               style={{color: themes.light.textColor.buttonText}}
             />
