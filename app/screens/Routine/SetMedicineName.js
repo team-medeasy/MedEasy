@@ -11,10 +11,7 @@ const SetMedicineName = ({route, navigation}) => {
   const {item} = route.params;
   const [medicine, setMedicine] = useState(null);
   const [medicineName, setMedicineName] = useState('');
-  // const [selectedDays, setSelectedDays] = useState([]);
-  // const [selectedTimings, setSelectedTimings] = useState([]);
-  // const [dosage, setDosage] = useState('');
-  // const [totalCount, setTotalCount] = useState('');
+
   const progress = '20%';
 
   const handleNext = () => {
@@ -28,48 +25,6 @@ const SetMedicineName = ({route, navigation}) => {
       nickname: medicineName, // 사용자 입력 별명
     });
   };
-
-  const days = ['월', '화', '수', '목', '금', '토', '일'];
-  const timings = ['아침', '점심', '저녁', '자기 전'];
-
-  // const convertDaysToNumbers = selectedDays.map(day => days.indexOf(day) + 1);
-  // const convertTimingsToIds = selectedTimings.map(timing => timings.indexOf(timing) + 1);
-
-  // 저장 버튼 클릭 시 실행할 함수
-  // const handleSaveRoutine = async () => {
-  //     // 필수 입력값 검증
-  //     if (!medicineName) {
-  //         // 여기에 적절한 오류 메시지 표시 로직 추가
-  //         console.error('약 별명을 입력해주세요');
-  //         return;
-  //     }
-
-  //     try {
-  //         // API 요청에 맞게 데이터 형식 변환
-  //         const routineData = {
-  //             medicine_id: medicine.item_id,
-  //             nickname: medicineName,
-  //             dose: parseInt(dosage, 10),
-  //             total_quantity: parseInt(totalCount, 10),
-  //             day_of_weeks: convertDaysToNumbers,
-  //             user_schedule_ids: convertTimingsToIds
-  //         };
-
-  //         console.log('전송 데이터:', routineData);
-
-  //         // API 호출
-  //         const response = await createRoutine(routineData);
-  //         console.log('루틴 저장 성공:', response);
-
-  //         // 성공 시 이전 화면으로 이동
-  //         navigation.goBack();
-
-  //         // 성공 메시지 표시 (필요시 추가)
-  //     } catch (error) {
-  //         console.error('루틴 저장 실패:', error);
-  //         // 오류 처리 (사용자에게 오류 메시지 표시)
-  //     }
-  // };
 
   useEffect(() => {
     if (item) {

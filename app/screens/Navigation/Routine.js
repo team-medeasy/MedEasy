@@ -1,21 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { ScrollView, Dimensions, FlatList } from 'react-native';
+import { ScrollView, Dimensions, FlatList, Platform } from 'react-native';
 import styled from 'styled-components/native';
-import { Platform } from 'react-native';
-import { OtherIcons } from '../../../assets/icons';
+import { OtherIcons, RoutineIcons } from '../../../assets/icons';
 import { themes } from '../../styles';
 import dayjs from 'dayjs';
-import { RoutineIcons } from '../../../assets/icons';
+
+import { getRoutineByDate } from '../../api/routine';
 
 // data.js에서 데이터 import
 import {
   timeMapping,
-  getTimeValue,
-  initialMedicineRoutines,
   initialHospitalRoutines,
   weekDays,
-  getWeekDays,
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
@@ -138,13 +135,97 @@ const Routine = () => {
     setCheckedItems(updatedChecks);
   };
 
-  // 임시 데이터 설정
-  const [medicineRoutines, setMedicineRoutines] = useState(
-    initialMedicineRoutines,
-  );
+  const [medicineRoutines, setMedicineRoutines] = useState([]);
+  //임시 데이터 사용
   const [hospitalRoutines, setHospitalRoutines] = useState(
     initialHospitalRoutines,
   );
+
+  // API에서 루틴 데이터 가져오기
+  useEffect(() => {
+    const fetchRoutineData = async () => {
+      try {
+        // 현재 선택된 날짜의 시작일과 종료일 계산 (일주일 범위로 설정)
+        const startDate = selectedDate.fullDate.startOf('week').format('YYYY-MM-DD');
+        const endDate = selectedDate.fullDate.endOf('week').format('YYYY-MM-DD');
+
+        console.log('API 요청 파라미터:', { start_date: startDate, end_date: endDate });
+
+        const response = await getRoutineByDate(startDate, endDate);
+        console.log('루틴 데이터 응답:', response.data.body);
+
+        // 응답 데이터가 response.data.body에 있다고 가정
+        const routineData = response.data.body;
+
+        // 전체 데이터 구조 확인
+        console.log('전체 루틴 데이터:', routineData);
+
+        // 각 날짜별 스케줄 정보 추출 및 출력
+        routineData.forEach(dayData => {
+          console.log(`날짜: ${dayData.take_date}`);
+
+          // 해당 날짜의 스케줄 목록 출력
+          dayData.user_schedule_dtos.forEach(schedule => {
+            console.log(`  스케줄: ${schedule.name}, 시간: ${schedule.take_time}`);
+
+            // 각 스케줄에 포함된 약물 정보 출력
+            if (schedule.routine_medicine_dtos && schedule.routine_medicine_dtos.length > 0) {
+              console.log('  복용 약물 목록:');
+              schedule.routine_medicine_dtos.forEach(medicine => {
+                console.log(`    - 약물: ${medicine.nickname || '이름 없음'} (ID: ${medicine.medicine_id})`);
+                console.log(`      용량: ${medicine.dose}정, 복용 여부: ${medicine.is_taken ? '복용함' : '복용 전'}`);
+                console.log(`      routine_medicine_id: ${medicine.routine_medicine_id}`);
+              });
+            }
+          });
+
+          console.log('------------------------');
+        });
+
+        // 복용하지 않은 약물만 필터링하여 출력
+        console.log('\n복용하지 않은 약물 목록:');
+        routineData.forEach(dayData => {
+          const unTakenMedicines = [];
+
+          dayData.user_schedule_dtos.forEach(schedule => {
+            if (schedule.routine_medicine_dtos) {
+              schedule.routine_medicine_dtos.forEach(med => {
+                if (!med.is_taken) {
+                  unTakenMedicines.push({
+                    date: dayData.take_date,
+                    schedule: schedule.name,
+                    time: schedule.take_time,
+                    medicine: med.nickname,
+                    dose: med.dose
+                  });
+                }
+              });
+            }
+          });
+
+          if (unTakenMedicines.length > 0) {
+            console.log(`${dayData.take_date}에 복용하지 않은 약물:`);
+            unTakenMedicines.forEach(item => {
+              console.log(`  - ${item.time} ${item.schedule}: ${item.medicine} ${item.dose}정`);
+            });
+          }
+        });
+
+        if (response.data && response.data.medicine) {
+          setMedicineRoutines(response.data.medicine);
+        }
+
+        // if (response.data && response.data.hospital) {
+        //   setHospitalRoutines(response.data.hospital);
+        // }
+
+      } catch (error) {
+        console.error('루틴 데이터 가져오기 실패:', error);
+      }
+    };
+
+    fetchRoutineData();
+  }, [selectedDate.fullDate]); // selectedDate가 변경될 때마다 API 호출
 
   // 모든 루틴 (약 복용 + 병원 방문)을 시간순으로 정렬
   const getAllRoutinesByTime = () => {
