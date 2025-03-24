@@ -39,6 +39,9 @@ const SetMedicineTime = ({ route, navigation }) => {
     };
 
     const handleNext = () => {
+        if (selectedOptions.length === 0) {
+            return;
+        }
         // 선택된 시간대를 ID로 변환
         const user_schedule_ids = selectedOptions.map(option => scheduleMapping[option]);
         
