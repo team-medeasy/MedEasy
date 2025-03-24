@@ -8,7 +8,7 @@ export const SearchResultItem = ({item, onPress}) => {
   return (
     <ItemContainer onPress={() => onPress(item)}>
       <ImageContainer>
-        <MedicineImage source={{uri: item.item_image}} resizeMode="stretch" />
+        <MedicineImage source={{uri: item.item_image}} />
       </ImageContainer>
       <InfoContainer>
         <ManufacturerText>{item.entp_name || '정보 없음'}</ManufacturerText>
