@@ -37,11 +37,11 @@ const CameraSearchScreen = () => {
   const [cameraPosition, setCameraPosition] = useState('back');
 
   const devices = useCameraDevices();
-  const device = devices && devices[0];
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const cameraRef = useRef(null);
 
+  const [device, setDevice] = useState(
     devices && devices.find(d => d.position === 'back'),
   ); // 초기값 설정
 
@@ -72,6 +72,7 @@ const CameraSearchScreen = () => {
     checkCameraPermission();
   }, [navigation, isFocused]);
 
+  useEffect(() => {
     if (devices) {
       const newDevice = devices.find(d => d.position === cameraPosition);
       setDevice(newDevice);
@@ -301,9 +302,18 @@ const CameraSearchScreen = () => {
             <CaptureButtonInner />
           </CaptureButton>
           <ButtonItem>
-              height={24}
-              style={{color: themes.light.textColor.buttonText}}
-            />
+            <TouchableOpacity
+              onPress={() => {
+                const newPosition =
+                  cameraPosition === 'back' ? 'front' : 'back';
+                setCameraPosition(newPosition);
+              }}>
+              <CameraIcons.cameraSwitch
+                width={24}
+                height={24}
+                style={{color: themes.light.textColor.buttonText}}
+              />
+            </TouchableOpacity>
           </ButtonItem>
         </ButtonContainer>
       </BottomContainer>
