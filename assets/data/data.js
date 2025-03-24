@@ -21,24 +21,24 @@ export const getTimeValue = (timeString) => {
 };
 
 // 약 복용 루틴 임시 데이터
-export const initialMedicineRoutines = [
-  {
-    medicine_id: 3594,
-    nickname: '아스피린',
-    dose: 1,
-    total_quantity: 30,
-    day_of_weeks: [1, 2, 3],
-    types: ['MORNING', 'LUNCH', 'DINNER', 'BEDTIME']
-  },
-  {
-    medicine_id: 9876,
-    nickname: '타이레놀',
-    dose: 2,
-    total_quantity: 20,
-    day_of_weeks: [2, 4, 6],
-    types: ['MORNING', 'DINNER']
-  }
-];
+// export const initialMedicineRoutines = [
+//   {
+//     medicine_id: 3594,
+//     nickname: '아스피린',
+//     dose: 1,
+//     total_quantity: 30,
+//     day_of_weeks: [1, 2, 3],
+//     types: ['MORNING', 'LUNCH', 'DINNER', 'BEDTIME']
+//   },
+//   {
+//     medicine_id: 9876,
+//     nickname: '타이레놀',
+//     dose: 2,
+//     total_quantity: 20,
+//     day_of_weeks: [2, 4, 6],
+//     types: ['MORNING', 'DINNER']
+//   }
+// ];
 
 // 병원 방문 루틴 임시 데이터
 export const initialHospitalRoutines = [
