@@ -89,6 +89,8 @@ const CameraSearchScreen = () => {
       if (result && result.assets && result.assets.length > 0) {
         console.log('Selected Photo:', result.assets[0].uri);
         setLastPhoto(result.assets[0].uri);
+
+        navigation.navigate('PhotoPreview', {photoUri: result.assets[0].uri});
       }
     } catch (error) {
       console.error('Failed to open gallery:', error);
@@ -104,7 +106,7 @@ const CameraSearchScreen = () => {
         flash: 'off',
       });
       console.log('Photo taken:', photo.path);
-      navigation.goBack();
+      navigation.navigate('PhotoPreview', {photoUri: `file://${photo.path}`});
     } catch (error) {
       console.error('사진 촬영 실패:', error);
     }
