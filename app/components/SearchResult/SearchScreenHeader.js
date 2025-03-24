@@ -3,11 +3,12 @@ import {TouchableOpacity, View} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
-import FilterButton from './FilterButton';
+import {FilterButton} from './FilterButton';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {chevron: ChevronIcon} = HeaderIcons;
 
-const SearchScreenHeader = ({
+export const SearchScreenHeader = ({
   searchQuery,
   onBackPress,
   onSearchPress,
@@ -98,7 +99,7 @@ const SearchBarTouchable = styled(TouchableOpacity)`
 `;
 
 const SearchQueryText = styled.Text`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -121,7 +122,7 @@ const FeatureSearchContainer = styled.View`
 `;
 
 const FeatureSearchText = styled.Text`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
   margin-right: 11px;
 `;
@@ -129,5 +130,3 @@ const FeatureSearchText = styled.Text`
 const ScrollableFilterContainer = styled.ScrollView`
   flex-direction: row;
 `;
-
-export default SearchScreenHeader;

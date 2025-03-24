@@ -18,13 +18,19 @@ import SettingStack from './screens/Settings/SettingStack';
 import NotificationScreen from './screens/Notification';
 import AddMedicineRoutineScreen from './screens/Routine/AddMedicineRoutine';
 import AddHospitalVisitScreen from './screens/Routine/AddHospitalVisit';
-import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
+//import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
+import SetMedicineNameScreen from './screens/Routine/SetMedicineName';
+import SetMedicineDayScreen from './screens/Routine/SetMedicineDay';
+import SetMedicineTimeScreen from './screens/Routine/SetMedicineTime';
+import SetMedicineDoseScreen from './screens/Routine/SetMedicineDose';
+import SetMedicineTotalScreen from './screens/Routine/SetMedicineTotal';
 import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
 import {SignUpProvider} from './api/context/SignUpContext';
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
+const RoutineModalStack = createStackNavigator();
 
 const AuthNavigator = () => {
   return (
@@ -42,6 +48,18 @@ const AuthNavigator = () => {
         component={SignUpDOBGenderScreen}
       />
     </AuthStack.Navigator>
+  );
+};
+
+const RoutineModalNavigator = () => {
+  return (
+    <RoutineModalStack.Navigator screenOptions={{ headerShown: false }}>
+      <RoutineModalStack.Screen name="SetMedicineName" component={SetMedicineNameScreen} />
+      <RoutineModalStack.Screen name="SetMedicineDay" component={SetMedicineDayScreen} />
+      <RoutineModalStack.Screen name="SetMedicineTime" component={SetMedicineTimeScreen} />
+      <RoutineModalStack.Screen name="SetMedicineDose" component={SetMedicineDoseScreen} />
+      <RoutineModalStack.Screen name="SetMedicineTotal" component={SetMedicineTotalScreen} />
+    </RoutineModalStack.Navigator>
   );
 };
 
@@ -100,20 +118,21 @@ const App = () => {
               <RootStack.Screen
                 name="AddMedicineRoutine"
                 component={AddMedicineRoutineScreen}
+                options={{presentation: 'modal'}}
               />
               <RootStack.Screen
                 name="AddHospitalVisit"
                 component={AddHospitalVisitScreen}
                 options={{presentation: 'modal'}}
               />
-              <RootStack.Screen
+              {/* <RootStack.Screen
                 name="SetMedicineRoutine"
                 component={SetMedicineRoutineScreen}
                 options={{presentation: 'modal'}}
-              />
+              /> */}
               <RootStack.Screen
-                name="SetRoutineTime"
-                component={SetRoutineTimeScreen}
+                name="RoutineModal"
+                component={RoutineModalNavigator}
                 options={{presentation: 'modal'}}
               />
             </RootStack.Navigator>

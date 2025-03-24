@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { themes } from './../../styles';
 
 import { HeaderIcons, RoutineIcons, LogoIcons } from './../../../assets/icons';
@@ -8,8 +8,12 @@ import CalendarWidget from '../../components/CalendarWidget';
 import { useNavigation } from '@react-navigation/native';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
+import { useSignUp } from '../../api/context/SignUpContext';
+
 const Home = () => {
   const navigation = useNavigation();
+  const {signUpData} = useSignUp();
+
   const handleNotificationPress = () => {
     navigation.navigate('Notification');
   };
@@ -23,7 +27,7 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 68 }}>
       <ScrollContainer>
         <Header>
           <LogoContainer>
@@ -51,7 +55,7 @@ const Home = () => {
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
-            <ReminderText>한성님, {'\n'}까먹은 약이 있어요.</ReminderText>
+            <ReminderText>{signUpData.firstName}님, {'\n'}까먹은 약이 있어요.</ReminderText>
             <LogoIcons.logo
               width={70}
               height={112}
@@ -66,7 +70,7 @@ const Home = () => {
           </TextContainer>
           {/* 버튼 추가 */}
           <RoutineContainer>
-            <RoutineButton onPress={() => console.log('루틴 추가')}>
+            <RoutineButton onPress={handleAddMedicineRoutine}>
               <LogoIcons.logoAdd
                 height={115}
                 style={{ color: themes.light.pointColor.primary30 }}
@@ -127,13 +131,13 @@ const Home = () => {
         <EventIcons>
           <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.pointColor.Primary }} />
           <EventText>복용 완료</EventText>
-          <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.textColor.Primary20 }}/>
+          <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.textColor.Primary20 }} />
           <EventText>미복용</EventText>
-          <RoutineIcons.hospital width={16} height={16} style={{ color: themes.light.pointColor.Secondary }}/>
+          <RoutineIcons.hospital width={16} height={16} style={{ color: themes.light.pointColor.Secondary }} />
           <EventText>병원 진료</EventText>
         </EventIcons>
       </ScrollContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 

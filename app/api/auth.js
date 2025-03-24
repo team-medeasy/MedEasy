@@ -1,22 +1,15 @@
 import api from './index';
 
-export const signUp = data =>
-  api.post(
-    '/open-api/auth/sign_up',
-    {
-      email: data.email,
-      password: data.password,
-      name: `${data.firstName}${data.lastName}`,
-      birthday: data.birthday || null,
-      gender: data.gender || null,
-    },
-    {
-      headers: {
-        Authorization: undefined,
-        'Content-Type': 'application/json',
-      },
-    },
-  );
+export const signUp = data => api.post('/open-api/auth/sign_up', data, {
+  headers: {
+    Authorization: undefined,
+    'Content-Type': 'application/json',
+  },
+})
+.then(response => {
+  console.log('SignUp 응답:', response.data);
+  return response;
+});
 
 export const login = async data => {
   try {

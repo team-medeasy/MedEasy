@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { themes } from './../../styles';
 import {
   Header,
-  CameraSearchResultsList,
+  PrescriptionSearchResultsList,
   NoSearchResults,
+  Button
 } from '../../components';
 import { searchMedicine } from '../../api/medicine';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
-const CameraSearchResultsScreen = ({ navigation }) => {
-  const testSearchQuery = "지엘타이밍정"; // 테스트용 검색어
+const PrescriptionSearchResultsScreen = ({ navigation }) => {
+  const testSearchQuery = "술"; // 테스트용 검색어
   
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -78,14 +80,6 @@ const CameraSearchResultsScreen = ({ navigation }) => {
             item_image: item.item_image,
             class_name: item.class_name,
             etc_otc_name: item.etc_otc_name,
-            // 외관 정보
-            drug_shape: item.drug_shape,
-            color_classes: item.color_classes,
-            print_front: item.print_front,
-            print_back: item.print_back,
-            leng_long: item.leng_long,
-            leng_short: item.leng_short,
-            thick: item.thick,
             // id
             original_id: item.id,
             uniqueKey: `${item.id}_${index}` // 고유 키 생성
@@ -156,6 +150,24 @@ const CameraSearchResultsScreen = ({ navigation }) => {
       <Header 
         onBackPress={() => navigation.goBack()}
       >약 검색 결과</Header>
+
+      <View style={{
+        paddingHorizontal: 30,
+        paddingTop: 40,
+        gap: 7,
+      }}>
+        <Text style={{
+           fontFamily: 'KimjungchulGothic-Bold', 
+           fontSize: FontSizes.title.default,
+           color: themes.light.textColor.textPrimary
+        }}>이대로 루틴을 등록할까요?</Text>
+        <Text style={{
+            fontFamily: 'Pretendard-Medium',
+            fontSize: FontSizes.body.default,
+            color: themes.light.textColor.Primary50
+        }}>메디지가 일정에 맞춰 복약 알림을 보내드릴게요!</Text>
+      </View>
+
       <SearchResultContainer>
         {loading ? (
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
@@ -165,7 +177,7 @@ const CameraSearchResultsScreen = ({ navigation }) => {
         ) : noResults || searchResults.length === 0 ? (
           <NoSearchResults />
         ) : (
-          <CameraSearchResultsList
+          <PrescriptionSearchResultsList
             searchResults={searchResults}
             handleSearchResultPress={handleSearchResultPress}
             onEndReached={handleLoadMore}
@@ -174,6 +186,23 @@ const CameraSearchResultsScreen = ({ navigation }) => {
           />
         )}
       </SearchResultContainer>
+
+      <View style={{
+        position: 'absolute',
+        bottom: 0, left: 0, right: 0,
+        paddingTop: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingBottom: 30,
+        gap: 20,
+        alignItems: 'center',
+        backgroundColor: themes.light.bgColor.bgPrimary
+      }}>
+        <Button title='확인' onPress={() => {}} />
+        <ModifyButton>
+          <ModifyText>내용을 수정하고 싶어요.</ModifyText>
+        </ModifyButton>
+      </View>
     </Container>
   );
 };
@@ -185,8 +214,20 @@ const Container = styled.View`
 
 const SearchResultContainer = styled.View`
   flex: 1;
-  margin-top: 16px;
+  margin-top: 37px;
+  margin-bottom: 120px;
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-export default CameraSearchResultsScreen;
+const ModifyButton = styled(TouchableOpacity)`
+`;
+
+const ModifyText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.Primary50};
+  text-decoration: underline;
+  text-decoration-color: ${themes.light.textColor.Primary50}; 
+`;
+
+export default PrescriptionSearchResultsScreen;

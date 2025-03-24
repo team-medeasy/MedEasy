@@ -1,9 +1,8 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {Platform} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import {Camera} from 'react-native-vision-camera';
 import {useNavigation} from '@react-navigation/native';
 
 import Home from '../screens/Navigation/Home';
@@ -11,6 +10,7 @@ import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
 import CameraSearchScreen from '../screens/Search/CameraSearch.js';
 import CameraSearchResultsScreen from '../screens/Search/CameraSearchResults.js';
+import PrescriptionSearchResultsScreen from '../screens/Search/PrescriptionSearchResults.js';
 import Chat from '../screens/Chat/Chat.js';
 import {pointColor, themes} from './../styles';
 import {
@@ -20,7 +20,6 @@ import {
   HeaderIcons,
 } from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes.js';
-const {chevron: ChevronIcon} = HeaderIcons;
 
 // 카메라 버튼
 const CameraButton = ({onPress}) => {
@@ -41,11 +40,7 @@ const TabNavigator = () => {
   const navigation = useNavigation();
 
   const handleCameraPress = useCallback(async () => {
-    const permission = await Camera.requestCameraPermission();
-    if (permission === 'denied') {
-      console.warn('Camera permission denied');
-      return;
-    }
+    console.log('Camera button pressed');
     navigation.navigate('Camera');
   }, [navigation]);
 
@@ -155,12 +150,12 @@ const RootNavigator = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen
-        // name="Camera"
-        // component={CameraSearchScreen}
-        // options={{headerShown: false}}
         name="Camera"
-        component={CameraSearchResultsScreen}
+        component={CameraSearchScreen}
         options={{headerShown: false}}
+        // name="Camera"
+        // component={CameraSearchResultsScreen}
+        // options={{headerShown: false}}
       />
       <Stack.Screen
         name="Chat"
@@ -181,10 +176,12 @@ const MainContainer = styled.View`
 
 const StyledCameraButton = styled.TouchableOpacity`
   position: absolute;
-  ${Platform.OS === 'ios' && `
+  ${Platform.OS === 'ios' &&
+  `
       bottom: 50px;
     `}
-    ${Platform.OS === 'android' && `
+  ${Platform.OS === 'android' &&
+  `
       bottom: 20px;
     `}
   align-self: center;
@@ -204,10 +201,12 @@ const ChatBuble = styled.View`
   width: 110px;
   height: 60px;
   right: 20px;
-  ${Platform.OS === 'ios' && `
+  ${Platform.OS === 'ios' &&
+  `
       bottom: 170px;
     `}
-    ${Platform.OS === 'android' && `
+  ${Platform.OS === 'android' &&
+  `
       bottom: 140px;
     `}
   border-radius: 15px;
@@ -234,10 +233,12 @@ const BubbleText = styled.Text`
 const ChatButton = styled.TouchableOpacity`
   position: absolute;
   right: 20px;
-  ${Platform.OS === 'ios' && `
+  ${Platform.OS === 'ios' &&
+  `
       bottom: 100px;
     `}
-    ${Platform.OS === 'android' && `
+  ${Platform.OS === 'android' &&
+  `
       bottom: 70px;
     `}
   background-color: ${themes.light.bgColor.bgPrimary};

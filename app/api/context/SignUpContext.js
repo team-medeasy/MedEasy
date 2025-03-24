@@ -1,6 +1,17 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-const SignUpContext = createContext();
+const SignUpContext = createContext({
+  signUpData: {
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    birthday: '',
+    gender: '',
+  },
+  updateSignUpData: () => {},
+  resetSignUpData: () => {},
+});
 
 export const SignUpProvider = ({children}) => {
   const [signUpData, setSignUpData] = useState({
@@ -11,16 +22,28 @@ export const SignUpProvider = ({children}) => {
     birthday: '',
     gender: '',
   });
-
+  
   const updateSignUpData = newData => {
     console.log('Updating SignUp Data:', newData);
     setSignUpData(prev => ({...prev, ...newData}));
   };
-
+  
+  const resetSignUpData = () => {
+    console.log('Resetting SignUp Data');
+    setSignUpData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      birthday: '',
+      gender: '',
+    });
+  };
+  
   console.log('Current SignUp Data:', signUpData);
-
+  
   return (
-    <SignUpContext.Provider value={{signUpData, updateSignUpData}}>
+    <SignUpContext.Provider value={{signUpData, updateSignUpData, resetSignUpData}}>
       {children}
     </SignUpContext.Provider>
   );

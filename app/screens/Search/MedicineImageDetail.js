@@ -6,18 +6,22 @@ import {themes} from '../../styles';
 import { dummyMedicineData } from '../../../assets/data/data';
 
 const MedicineImageDetailScreen = ({route}) => {
-  const { itemSeq, isModal = false } = route.params;
+  const { item, isModal = false } = route.params;
   const [medicine, setMedicine] = useState(null);
 
-  // 컴포넌트 마운트 시 item_seq에 해당하는 약품 데이터 찾기
   useEffect(() => {
-    const foundMedicine = dummyMedicineData.find(
-      item => item.item_seq === itemSeq
-    );
-    if (foundMedicine) {
-      setMedicine(foundMedicine);
-    }
-  }, [itemSeq]);
+      if (item) {
+        // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
+        const mappedMedicine = {
+          item_name: item.item_name,
+          item_image: item.item_image,
+        };
+        
+        setMedicine(mappedMedicine);
+      } else {
+        console.error('약 정보를 찾을 수 없습니다.');
+      }
+    }, [item]);
 
   const HeaderComponent = ({ isModal = false, ...props }) => {
     if (isModal) {
@@ -64,7 +68,7 @@ const ImageContainer = styled.View`
 
 const MedicineImage = styled.Image`
   width: 718px;
-  height: 393px;
+  height: 403px;
   transform: rotate(-90deg);
   flex-shrink: 0;
 `;

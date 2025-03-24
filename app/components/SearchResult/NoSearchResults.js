@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import {themes} from '../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const NoSearchResults = () => {
   return (
@@ -20,17 +21,17 @@ const Container = styled.View`
 `;
 
 const NoResultsText = styled.Text`
-  font-size: 18px;
+  font-size: ${FontSizes.heading.default};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const NoResultsSubText = styled.Text`
-  font-size: 14px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary30};
   margin-top: 18px;
   text-align: center;
 `;
 
-export default NoSearchResults;
+export {NoSearchResults};

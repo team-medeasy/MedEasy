@@ -43,9 +43,9 @@ const MedicineOverview = ({
           marginHorizontal: 7,
           gap: 10,
         }}>
-        <MedicineInfoSub>{medicine.entp_name}</MedicineInfoSub>
-        <MedicineInfoName>{medicine.item_name}</MedicineInfoName>
-        <MedicineInfoSub>{medicine.chart}</MedicineInfoSub>
+        <MedicineInfoSub>{medicine.entp_name || '정보 없음'}</MedicineInfoSub>
+        <MedicineInfoName>{medicine.item_name || '정보 없음'}</MedicineInfoName>
+        <MedicineInfoSub>{medicine.chart || '정보 없음'}</MedicineInfoSub>
 
         <View
           style={{
@@ -55,11 +55,11 @@ const MedicineOverview = ({
             width: '100%',
           }}>
           <View style={{ flexDirection: 'row', gap: 11 }}>
-            <Tag sizeType="large" colorType="detailPrimary">
-              {medicine.etc_otc_name}
+            <Tag sizeType="large" colorType="detailPrimary" maxWidth='85'>
+              {medicine.etc_otc_name || '정보 없음'}
             </Tag>
-            <Tag sizeType="large" colorType="detailSecondary">
-              {medicine.class_name}
+            <Tag sizeType="large" colorType="detailSecondary" maxWidth='185'>
+              {medicine.class_name || '정보 없음'}
             </Tag>
           </View>
 

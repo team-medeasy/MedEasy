@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {SearchBar} from './../../components';
 import {OtherIcons, HeaderIcons} from '../../../assets/icons';
+import { getSearchPopular } from '../../api/search';
 
 // AsyncStorage 키 상수 정의
 const RECENT_SEARCHES_STORAGE_KEY = '@mediapp:recent_searches';
@@ -23,14 +24,29 @@ const SearchMedicineScreen = ({navigation, route}) => {
     setCurrentDate(formattedDate);
   }, []);
 
-  // 인기 검색어 (임시)데이터
-  const popularSearches = [
-    {rank: 1, term: '소화제', rankChange: 'up'},
-    {rank: 2, term: '베스타제당의정', rankChange: 'stay'},
-    {rank: 3, term: '해열제', rankChange: 'down'},
-    {rank: 4, term: '타이레놀', rankChange: 'up'},
-    {rank: 5, term: '제산제', rankChange: 'stay'},
-  ];
+  const [popularSearches, setPopularSearches] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getSearchPopular();
+        const popularData = response.data.body.slice(0,5);
+        console.log('🔥 인기 검색어:', popularData);
+
+        const transformedData = popularData.map(item => ({
+          rank: item.rank,
+          term: item.keyword,
+          rankChange: item.rank_change > 0 ? 'up' : item.rank_change < 0 ? 'down' : 'stay'
+        }));
+
+        setPopularSearches(transformedData); // 상태 업데이트
+      } catch (error) {
+        console.error('❌ 인기 검색어 가져오기 실패:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // 컴포넌트 마운트 시 AsyncStorage에서 최근 검색어 로드
   useEffect(() => {
@@ -79,7 +95,6 @@ const SearchMedicineScreen = ({navigation, route}) => {
       
       navigation.replace('SearchMedicineResults', {
         searchQuery: query,
-        recentSearches: updatedSearches,
       });
     }
   };
@@ -130,6 +145,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSearch={() => handleSearch(searchQuery)}
+            placeholder={"약 이름, 증상을 입력하세요"}
           />
         </ChevronAndSearchContainer>
       </HeaderContainer>
