@@ -9,17 +9,11 @@ import Home from '../screens/Navigation/Home';
 import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
 import CameraSearchScreen from '../screens/Search/CameraSearch.js';
-import PhotoPreviewScreen from '../screens/Search/PhotoPreviewScreen.js';
 import CameraSearchResultsScreen from '../screens/Search/CameraSearchResults.js';
-import PrescriptionSearchResultsScreen from '../screens/Search/PrescriptionSearchResults.js';
+import PhotoPreviewScreen from '../screens/Search/PhotoPreview.js';
 import Chat from '../screens/Chat/Chat.js';
 import {pointColor, themes} from './../styles';
-import {
-  TabIcons,
-  CameraIcons,
-  OtherIcons,
-  HeaderIcons,
-} from './../../assets/icons';
+import {TabIcons, CameraIcons, OtherIcons} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes.js';
 
 // 카메라 버튼
@@ -163,7 +157,11 @@ const RootNavigator = () => {
         component={PhotoPreviewScreen}
         options={{headerShown: false}}
       />
-
+      <Stack.Screen
+        name="CameraSearchResults"
+        component={CameraSearchResultsScreen}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="Chat"
         component={Chat}

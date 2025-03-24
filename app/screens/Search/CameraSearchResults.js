@@ -1,165 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import { View, ActivityIndicator, Text } from 'react-native';
-import { themes } from './../../styles';
+import {View, ActivityIndicator, Text} from 'react-native';
+import {themes} from './../../styles';
 import {
   Header,
   CameraSearchResultsList,
   NoSearchResults,
 } from '../../components';
-import { searchMedicine } from '../../api/medicine';
 
-const CameraSearchResultsScreen = ({ navigation }) => {
-  const testSearchQuery = "지엘타이밍정"; // 테스트용 검색어
-  
-  const [searchResults, setSearchResults] = useState([]);
+const CameraSearchResultsScreen = ({route, navigation}) => {
+  const {searchResults} = route.params || {};
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
 
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [dataSize, setDataSize] = useState(10);
-  const [allDataLoaded, setAllDataLoaded] = useState(false);
-  
-  // API 응답 데이터를 저장할 상태 변수
-  const [originalResponseData, setOriginalResponseData] = useState([]);
-
-  // 검색 결과 가져오기
-  const fetchSearchResults = async (isLoadMore = false) => {
-    if (!isLoadMore) {
-      setLoading(true);
-      setDataSize(10); // 새 검색시 데이터 크기 초기화
-      setAllDataLoaded(false);
-    } else {
-      setLoadingMore(true);
-    }
-    setError(null);
-  
-    console.log('카메라 검색 요청 파라미터:', {
-      searchQuery: testSearchQuery,
-      size: isLoadMore ? dataSize + 10 : 10 // 데이터 크기 증가
-    });
-  
-    try {
-      // 기본 검색 실행
-      const requestParams = {
-        name: testSearchQuery,
-        size: isLoadMore ? dataSize + 10 : 10 // 로드 시마다 10개씩 증가
-      };
-      
-      console.log('검색 요청:', requestParams);
-      const response = await searchMedicine(requestParams);
-  
-      console.log('API 응답 전체:', response);
-  
-      // API 응답에서 데이터 추출
-      if (response.data && response.data.result && response.data.result.result_code === 200) {
-        console.log('API 응답 데이터:', response.data.body);
-  
-        // 이전 데이터 크기와 새 데이터 크기 비교하여 모든 데이터 로드 여부 확인
-        if (!response.data.body || response.data.body.length === 0) {
-          setNoResults(true);
-          setAllDataLoaded(true);
-          setSearchResults([]);
-        } else if (isLoadMore && response.data.body.length <= dataSize) {
-          // 추가 로드 요청했는데 데이터가 더 안 늘어났으면 모든 데이터 로드 완료
-          setAllDataLoaded(true);
-        }
-  
-        // 원본 응답 데이터 저장
-        setOriginalResponseData(response.data.body);
-  
-        // API 응답 데이터를 기존 앱 구조에 맞게 변환
-        const formattedResults = response.data.body.map((item, index) => {
-          const formatted = {
-            // 기본 정보
-            item_name: item.item_name,
-            entp_name: item.entp_name,
-            item_image: item.item_image,
-            class_name: item.class_name,
-            etc_otc_name: item.etc_otc_name,
-            // 외관 정보
-            drug_shape: item.drug_shape,
-            color_classes: item.color_classes,
-            print_front: item.print_front,
-            print_back: item.print_back,
-            leng_long: item.leng_long,
-            leng_short: item.leng_short,
-            thick: item.thick,
-            // id
-            original_id: item.id,
-            uniqueKey: `${item.id}_${index}` // 고유 키 생성
-          };
-          return formatted;
-        });
-  
-        console.log('변환된 검색 결과:', formattedResults);
-  
-        // 검색 결과 설정
-        setSearchResults(formattedResults);
-        
-        // 데이터 크기 업데이트 (추가 로드인 경우)
-        if (isLoadMore) {
-          setDataSize(dataSize + 10);
-        }
-        
-        setNoResults(false);
-      } else {
-        console.error('API 에러 응답:', response);
-        setError('검색 결과를 가져오는데 실패했습니다.');
-        setNoResults(true);
-      }
-    } catch (err) {
-      console.error('검색 중 오류:', err);
-      if (err.response) {
-        console.error('에러 응답:', err.response.data);
-        console.error('에러 상태:', err.response.status);
-      } else if (err.request) {
-        console.error('요청 에러:', err.request);
-      } else {
-        console.error('에러 메시지:', err.message);
-      }
-      setError('검색 중 오류가 발생했습니다.');
-      setNoResults(true);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  };
-
-  // 스크롤 이벤트 핸들러
-  const handleLoadMore = () => {
-    if (!loading && !loadingMore && !allDataLoaded) {
-      fetchSearchResults(true);
-    }
-  };
-
-  // 컴포넌트 마운트 시 API 호출
   useEffect(() => {
-    fetchSearchResults(false);
-  }, []);
+    if (!searchResults || searchResults.length === 0) {
+      setNoResults(true);
+    }
+  }, [searchResults]);
 
   const handleSearchResultPress = item => {
-    // API 원본 데이터 찾기
-    const originalItem = originalResponseData.find(
-      originalItem => originalItem.id === item.original_id
-    );
-    
-    // 원본 데이터 전달
-    navigation.navigate('MedicineDetail', { 
-      item: originalItem,
-    });
+    navigation.navigate('MedicineDetail', {item});
   };
 
   return (
     <Container>
-      <Header 
-        onBackPress={() => navigation.goBack()}
-      >약 검색 결과</Header>
+      <Header onBackPress={() => navigation.goBack()}>약 검색 결과</Header>
+
       <SearchResultContainer>
         {loading ? (
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <ActivityIndicator size="large" color={themes.light.pointColor.Primary} />
+          <View
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <ActivityIndicator
+              size="large"
+              color={themes.light.pointColor.Primary}
+            />
             <Text>검색 중...</Text>
           </View>
         ) : noResults || searchResults.length === 0 ? (
@@ -168,9 +44,8 @@ const CameraSearchResultsScreen = ({ navigation }) => {
           <CameraSearchResultsList
             searchResults={searchResults}
             handleSearchResultPress={handleSearchResultPress}
-            onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
-            refreshing={loadingMore}
+            refreshing={loading}
           />
         )}
       </SearchResultContainer>
