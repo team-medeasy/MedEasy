@@ -3,12 +3,13 @@ import styled from 'styled-components/native';
 import {Header, ModalHeader, Button} from '../../components';
 import {themes} from '../../styles';
 import {useNavigation} from '@react-navigation/native';
-import {View} from 'react-native';
+import {View, Alert} from 'react-native';
+import {searchPillByImage} from '../../api/pillSearch';
 
 const PhotoPreviewScreen = ({route}) => {
   const {photoUri, isModal = false} = route.params;
   const [photo, setPhoto] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -24,6 +25,27 @@ const PhotoPreviewScreen = ({route}) => {
       return <ModalHeader {...props} />;
     }
     return <Header {...props} />;
+  };
+
+  // 알약 검색 API 호출 및 결과 처리
+  const handleSearch = async () => {
+    if (!photo) return;
+
+    setLoading(true);
+
+    try {
+      console.log('검색 시작...');
+      const results = await searchPillByImage(photo, 5); // top_k 기본값 = 5
+      console.log('검색 결과:', results);
+
+      // 검색 결과 스크린으로 전달
+      navigation.navigate('CameraSearchResults', {searchResults: results});
+    } catch (error) {
+      console.error('검색 실패:', error);
+      Alert.alert('검색 실패', '검색 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!photo) {
@@ -43,6 +65,7 @@ const PhotoPreviewScreen = ({route}) => {
       <ImageContainer>
         <PreviewImage source={{uri: photo}} resizeMode="contain" />
       </ImageContainer>
+
       <View
         style={{
           position: 'absolute',
@@ -55,8 +78,9 @@ const PhotoPreviewScreen = ({route}) => {
           alignItems: 'center',
         }}>
         <Button
-          title="검색하기"
-          onPress={() => navigation.navigate('CameraSearchResults')}
+          title={loading ? '검색 중...' : '검색하기'}
+          onPress={handleSearch}
+          disabled={loading}
         />
       </View>
     </Container>
