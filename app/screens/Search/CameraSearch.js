@@ -27,7 +27,6 @@ const TOGGLE_PADDING = 4;
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
 const CameraSearchScreen = () => {
-  const [lastPhoto, setLastPhoto] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
   const focusAreaHeight = useRef(new Animated.Value(PREVIEW_SIZE)).current;
@@ -87,8 +86,7 @@ const CameraSearchScreen = () => {
       });
 
       if (result && result.assets && result.assets.length > 0) {
-        console.log('Selected Photo:', result.assets[0].uri);
-        setLastPhoto(result.assets[0].uri);
+        navigation.navigate('PhotoPreview', {photoUri: result.assets[0].uri});
       }
     } catch (error) {
       console.error('Failed to open gallery:', error);
@@ -104,7 +102,7 @@ const CameraSearchScreen = () => {
         flash: 'off',
       });
       console.log('Photo taken:', photo.path);
-      navigation.goBack();
+      navigation.navigate('PhotoPreview', {photoUri: `file://${photo.path}`});
     } catch (error) {
       console.error('사진 촬영 실패:', error);
     }
@@ -285,18 +283,7 @@ const CameraSearchScreen = () => {
         {/* 촬영 버튼 */}
         <ButtonContainer>
           <ButtonItem onPress={openGallery}>
-            {lastPhoto ? (
-              <Image
-                source={{uri: lastPhoto}}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 8,
-                }}
-              />
-            ) : (
-              <MaterialCommunityIcons name="image" size={24} color="#fff" />
-            )}
+            <MaterialCommunityIcons name="image" size={24} color="#fff" />
           </ButtonItem>
           <CaptureButton onPress={handleCapture}>
             <CaptureButtonInner />
