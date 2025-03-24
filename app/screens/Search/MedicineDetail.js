@@ -97,8 +97,9 @@ const MedicineDetailScreen = ({route, navigation}) => {
   };
 
   const handleSetMedicineRoutine = () => {
-    navigation.navigate('SetMedicineName', { 
-      item: item
+    navigation.navigate('RoutineModal', { 
+      screen: 'SetMedicineName', 
+      params: { item: item }
     });
   };
 
