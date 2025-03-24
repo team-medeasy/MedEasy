@@ -74,7 +74,7 @@ const Tag = ({
   style,
   overflowMode = 'scroll', // 'ellipsis' or 'scroll'
   maxWidth = '130',
-  maxLength = 16, // 최대 글자 수
+  maxLength = 15, // 최대 글자 수
   ...rest
 }) => {
   const [isOverflow, setIsOverflow] = useState(false);
