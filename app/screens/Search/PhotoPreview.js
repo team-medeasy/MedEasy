@@ -1,12 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, Suspense} from 'react';
 import styled from 'styled-components/native';
+import {ActivityIndicator} from 'react-native';
 import {Header, ModalHeader, Button} from '../../components';
 import {themes} from '../../styles';
 import {useNavigation} from '@react-navigation/native';
 import {View, Alert} from 'react-native';
 import {searchPillByImage} from '../../api/pillSearch';
 
-const PhotoPreviewScreen = ({route}) => {
+const PhotoPreviewContent = ({route}) => {
   const {photoUri, isModal = false} = route.params;
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -27,22 +28,27 @@ const PhotoPreviewScreen = ({route}) => {
     return <Header {...props} />;
   };
 
-  // 알약 검색 API 호출 및 결과 처리
   const handleSearch = async () => {
     if (!photo) return;
 
     setLoading(true);
 
     try {
-      console.log('검색 시작...');
-      const results = await searchPillByImage(photo, 5); // top_k 기본값 = 5
-      console.log('검색 결과:', results);
+      console.log('Searching pill by image...');
+      const response = await searchPillByImage(photo);
+      console.log('Search response:', response);
 
-      // 검색 결과 스크린으로 전달
-      navigation.navigate('CameraSearchResults', {searchResults: results});
+      navigation.navigate('CameraSearchResults', {searchResults: response});
     } catch (error) {
-      console.error('검색 실패:', error);
-      Alert.alert('검색 실패', '검색 중 오류가 발생했습니다.');
+      console.error('Pill search failed:', error);
+      if (error.response) {
+        Alert.alert('검색 실패', '서버 응답 오류입니다. 다시 시도해주세요.');
+      } else {
+        Alert.alert(
+          '검색 실패',
+          '네트워크 오류 또는 기타 오류입니다. 다시 시도해주세요.',
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -84,6 +90,14 @@ const PhotoPreviewScreen = ({route}) => {
         />
       </View>
     </Container>
+  );
+};
+
+const PhotoPreviewScreen = ({route}) => {
+  return (
+    <Suspense fallback={<ActivityIndicator size="large" color="#007AFF" />}>
+      <PhotoPreviewContent route={route} />
+    </Suspense>
   );
 };
 

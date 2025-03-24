@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {API_BASE_URL_PILL} from '@env';
-import {getAccessToken, getRefreshToken, setAccessToken} from './storage';
+import {getAccessToken, getRefreshToken, setAccessToken} from '../api/storage';
 import {refreshToken} from './auth';
 import {Platform} from 'react-native';
 
@@ -64,13 +64,18 @@ pillApi.interceptors.response.use(
 // 알약 검색 API 함수
 export const searchPillByImage = async (imageUri, topK = 5) => {
   const formData = new FormData();
-  const fileType = photoUri.endsWith('.heic') ? 'image/heic' : 'image/jpeg';
+
+  // 파일 타입 자동 설정
+  const cleanUri = imageUri.replace('file://', '');
+  const fileType = cleanUri.endsWith('.heic') ? 'image/heic' : 'image/jpeg';
 
   formData.append('file', {
-    uri: imageUri,
+    uri: cleanUri,
     type: fileType,
     name: `pill_image.${fileType === 'image/heic' ? 'heic' : 'jpg'}`,
   });
+
+  console.log('Uploading file:', cleanUri, fileType);
 
   try {
     const response = await pillApi.post(
@@ -88,7 +93,9 @@ export const searchPillByImage = async (imageUri, topK = 5) => {
       throw new Error('검색 결과 없음');
     }
 
-    // 응답 구조 매핑 (추출된 값만 필터링)
+    console.log('API 응답:', response.data);
+
+    // 응답 구조 매핑
     const searchResults = response.data.results.map(item => ({
       drugShape: item.analysis.drug_shape,
       colorClasses: item.analysis.color_classes,
