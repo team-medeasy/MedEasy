@@ -9,6 +9,7 @@ import Home from '../screens/Navigation/Home';
 import Routine from '../screens/Navigation/Routine';
 import MyPage from '../screens/Navigation/MyPage';
 import CameraSearchScreen from '../screens/Search/CameraSearch.js';
+import CameraSearchResultsScreen from '../screens/Search/CameraSearchResults.js';
 import PhotoPreviewScreen from '../screens/Search/PhotoPreview.js';
 import Chat from '../screens/Chat/Chat.js';
 import {pointColor, themes} from './../styles';
@@ -156,7 +157,11 @@ const RootNavigator = () => {
         component={PhotoPreviewScreen}
         options={{headerShown: false}}
       />
-
+      <Stack.Screen
+        name="CameraSearchResults"
+        component={CameraSearchResultsScreen}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="Chat"
         component={Chat}
