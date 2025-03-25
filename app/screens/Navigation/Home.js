@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { View, TouchableOpacity } from 'react-native';
 import { themes } from './../../styles';
@@ -9,13 +9,16 @@ import { useNavigation } from '@react-navigation/native';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import TodayHeader from '../../components/TodayHeader';
 import dayjs from 'dayjs';
+dayjs.locale('ko');
 
 import { useSignUp } from '../../api/context/SignUpContext';
+import { getRoutineByDate } from '../../api/routine';
 
 const Home = () => {
   const navigation = useNavigation();
   const { signUpData } = useSignUp();
 
+  const [medicineRoutines, setMedicineRoutines] = useState([]);
   // 한국어 요일 매핑
   const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -28,6 +31,54 @@ const Home = () => {
     year: today.year(),
     fullDate: today
   });
+
+  // API에서 루틴 데이터 가져오기
+  useEffect(() => {
+    const fetchRoutineData = async () => {
+      try {
+        const startDate = selectedDate.fullDate.startOf('week').format('YYYY-MM-DD');
+        const endDate = selectedDate.fullDate.endOf('week').format('YYYY-MM-DD');
+        console.log('API 요청 파라미터:', { start_date: startDate, end_date: endDate });
+
+        const response = await getRoutineByDate(startDate, endDate);
+        const routineData = response.data.body;
+        // 선택된 날짜와 동일한 take_date를 가진 루틴만 필터링
+        const todayRoutines = routineData.filter(routine =>
+          dayjs(routine.take_date).format('YYYY-MM-DD') === selectedDate.fullDate.format('YYYY-MM-DD')
+        );
+
+        console.log('오늘 루틴 데이터:', todayRoutines);
+
+        // 시간대별로 정리된 루틴 데이터 처리
+        const processedRoutines = todayRoutines[0].user_schedule_dtos.map(schedule => ({
+          scheduleId: schedule.user_schedule_id,
+          timeName: schedule.name,
+          takeTime: dayjs(`2024-01-01T${schedule.take_time}`).format('A h시 m분'),
+          medicines: schedule.routine_medicine_dtos.map(medicine => ({
+            name: medicine.nickname,
+            dose: medicine.dose,
+            isTaken: medicine.is_taken
+          })),
+          medicineTitle: (() => {
+            const medicineNames = schedule.routine_medicine_dtos.map(med => med.nickname);
+            if (medicineNames.length === 1) {
+              return medicineNames[0];
+            } else if (medicineNames.length > 1) {
+              return `${medicineNames[0]}, ${medicineNames[1]} 외 ${medicineNames.length - 2}개`;
+            }
+            return '';
+          })()
+        })).filter(routine => routine.medicineTitle !== '');
+
+        setMedicineRoutines(processedRoutines);
+
+      } catch (error) {
+        console.error('루틴 데이터 가져오기 실패:', error);
+      }
+    };
+
+    fetchRoutineData();
+  }, [selectedDate.fullDate]);
 
   // 날짜 변경 핸들러 추가
   const handleDateChange = (newSelectedDate) => {
@@ -166,19 +217,30 @@ const Home = () => {
               selectedDate={selectedDate}
             />
           </TodayContainer>
-          <RoutineList>
-            <ListComponent>
-              <RoutineIcons.medicine width={20} height={20} style={{ color: themes.light.pointColor.Primary }} />
-              <ListText>
-                <RoutineTitle>약 이름</RoutineTitle>
-                <RoutineTime>시간</RoutineTime>
-              </ListText>
-            </ListComponent>
-            <OtherIcons.chevronDown style={{
-              color: themes.light.textColor.Primary30,
-              transform: [{ rotate: '-90deg' }]
-            }} />
-          </RoutineList>
+          {medicineRoutines.map((routine) => (
+            <RoutineList
+              key={`routine-${routine.scheduleId}`}
+              onPress={() => { }}
+            >
+              <ListComponent>
+                <RoutineIcons.medicine
+                  width={20}
+                  height={20}
+                  style={{ color: themes.light.pointColor.Primary }}
+                />
+                <ListText>
+                  <RoutineTitle>{routine.medicineTitle}</RoutineTitle>
+                  <RoutineTime>{routine.timeName}•{routine.takeTime}</RoutineTime>
+                </ListText>
+              </ListComponent>
+              <OtherIcons.chevronDown
+                style={{
+                  color: themes.light.textColor.Primary30,
+                  transform: [{ rotate: '-90deg' }]
+                }}
+              />
+            </RoutineList>
+          ))}
         </RoutineListContainer>
       </ScrollContainer>
     </View>
@@ -304,12 +366,14 @@ const RoutineList = styled.TouchableOpacity`
   padding: 15px;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
 `;
 
 const ListComponent = styled.View`
   flex-direction: row;
   gap: 20px;
   align-items: center;
+  overflow: hidden;
 `;
 
 const ListText = styled.View``;
