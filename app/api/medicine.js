@@ -57,3 +57,7 @@ export const getSimilarMedicines = (params) => {
 
   return api.get(`/medicine/similar?${queryParams}`);
 };
+
+export const getMedicineById = (medicine_id) => {
+  return api.get(`/medicine/medicine_id/${medicine_id}`);
+};
