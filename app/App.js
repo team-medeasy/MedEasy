@@ -135,6 +135,11 @@ const App = () => {
                 component={RoutineModalNavigator}
                 options={{presentation: 'modal'}}
               />
+              <RootStack.Screen
+                name="SetRoutineTime"
+                component={SetRoutineTimeScreen}
+                options={{presentation: 'modal'}}
+              />
             </RootStack.Navigator>
           )}
         </NavigationContainer>
