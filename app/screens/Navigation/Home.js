@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { View, TouchableOpacity } from 'react-native';
 import { themes } from './../../styles';
@@ -21,12 +21,17 @@ const Home = () => {
 
   // today와 selectedDate 추가
   const today = dayjs();
-  const selectedDate = {
+  const [selectedDate, setSelectedDate] = useState({
     day: koreanDays[today.day()], // 한국어 요일로 변경
     date: today.date(),
     month: today.month() + 1,
     year: today.year(),
     fullDate: today
+  });
+
+  // 날짜 변경 핸들러 추가
+  const handleDateChange = (newSelectedDate) => {
+    setSelectedDate(newSelectedDate);
   };
 
   const handleNotificationPress = () => {
@@ -142,7 +147,9 @@ const Home = () => {
         </PillReminderContainer>
 
         {/* 달력 */}
-        <CalendarWidget />
+        <CalendarWidget
+          onDateChange={handleDateChange}
+        />
         <EventIcons>
           <RoutineIcons.medicine width={16} height={16} style={{ color: themes.light.pointColor.Primary }} />
           <EventText>복용 완료</EventText>
@@ -160,12 +167,17 @@ const Home = () => {
             />
           </TodayContainer>
           <RoutineList>
-            <RoutineIcons.medicine width={20} height={20} style={{ color: themes.light.pointColor.Primary }} />
-            <ListText>
-              <RoutineTitle>약 이름</RoutineTitle>
-              <RoutineTime>시간</RoutineTime>
-            </ListText>
-            <OtherIcons.chevronDown style={{ color: themes.light.textColor.Primary30 }} />
+            <ListComponent>
+              <RoutineIcons.medicine width={20} height={20} style={{ color: themes.light.pointColor.Primary }} />
+              <ListText>
+                <RoutineTitle>약 이름</RoutineTitle>
+                <RoutineTime>시간</RoutineTime>
+              </ListText>
+            </ListComponent>
+            <OtherIcons.chevronDown style={{
+              color: themes.light.textColor.Primary30,
+              transform: [{ rotate: '-90deg' }]
+            }} />
           </RoutineList>
         </RoutineListContainer>
       </ScrollContainer>
@@ -294,7 +306,13 @@ const RoutineList = styled.TouchableOpacity`
   align-items: center;
 `;
 
-const ListText = styled.View``
+const ListComponent = styled.View`
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+`;
+
+const ListText = styled.View``;
 
 const RoutineTitle = styled.Text`
   font-size: ${FontSizes.body.default};

@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import {themes} from '../styles';
 import {HeaderIcons} from '../../assets/icons';
-import { initialMedicineRoutines, initialHospitalRoutines, weekDays } from '../../assets/data/data';
+import dayjs from 'dayjs';
 
 // 요일을 한글로 설정
 LocaleConfig.locales['ko'] = {
@@ -50,10 +50,29 @@ LocaleConfig.locales['ko'] = {
 
 LocaleConfig.defaultLocale = 'ko';
 
-const CalendarWidget = () => {
+const CalendarWidget = ({ onDateChange }) => {
+
+  const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
+
+  const handleDayPress = (day) => {
+    const selectedDayjs = dayjs(day.dateString);
+    
+    // selectedDate 객체 구조와 동일하게 생성
+    const newSelectedDate = {
+      day: koreanDays[selectedDayjs.day()],
+      date: selectedDayjs.date(),
+      month: selectedDayjs.month() + 1,
+      year: selectedDayjs.year(),
+      fullDate: selectedDayjs
+    };
+
+    // 부모 컴포넌트로 날짜 변경 알림
+    onDateChange(newSelectedDate);
+  };
+
   return (
     <CalendarContainer>
-      <StyledCalendar locale="ko" />
+      <StyledCalendar locale="ko" onDayPress={handleDayPress}/>
     </CalendarContainer>
   );
 };
@@ -91,7 +110,7 @@ const StyledCalendar = styled(Calendar).attrs({
     <HeaderIcons.chevron
       style={{
         transform: [{rotate: direction === 'left' ? '0deg' : '180deg'}],
-        marginHorizontal: 40,
+        marginHorizontal: 30,
         color: themes.light.textColor.textPrimary,
       }}
       height={16}
