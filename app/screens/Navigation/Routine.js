@@ -133,15 +133,17 @@ const Routine = () => {
   useEffect(() => {
     const fetchRoutineData = async () => {
       try {
-        // 선택된 특정 날짜로 조회
-        const selectedDateString = selectedDate.fullDate.format('YYYY-MM-DD');
-        
-        console.log('API 요청 파라미터:', { start_date: selectedDateString, end_date: selectedDateString });
+        // 현재 선택된 날짜의 시작일과 종료일 계산 (일주일 범위로 설정)
+        const startDate = selectedDate.fullDate.startOf('week').format('YYYY-MM-DD');
+        const endDate = selectedDate.fullDate.endOf('week').format('YYYY-MM-DD');
+        console.log('API 요청 파라미터:', { start_date: startDate, end_date: endDate });
 
-        const response = await getRoutineByDate(selectedDateString, selectedDateString);
+        const response = await getRoutineByDate(startDate, endDate);
         console.log('루틴 데이터 응답:', response.data.body);
-        
-        const processedMedicineRoutines = processRoutineData(response.data.body);
+        const routineData = response.data.body;
+
+        // API 응답에서 initialMedicineRoutines 형식으로 데이터 가공
+        const processedMedicineRoutines = processRoutineData(routineData);
         setMedicineRoutines(processedMedicineRoutines);
 
       } catch (error) {
