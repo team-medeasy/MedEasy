@@ -3,16 +3,31 @@ import styled from 'styled-components/native';
 import { View, TouchableOpacity } from 'react-native';
 import { themes } from './../../styles';
 
-import { HeaderIcons, RoutineIcons, LogoIcons } from './../../../assets/icons';
+import { HeaderIcons, RoutineIcons, LogoIcons, OtherIcons } from './../../../assets/icons';
 import CalendarWidget from '../../components/CalendarWidget';
 import { useNavigation } from '@react-navigation/native';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import TodayHeader from '../../components/TodayHeader';
+import dayjs from 'dayjs';
 
 import { useSignUp } from '../../api/context/SignUpContext';
 
 const Home = () => {
   const navigation = useNavigation();
-  const {signUpData} = useSignUp();
+  const { signUpData } = useSignUp();
+
+  // 한국어 요일 매핑
+  const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
+
+  // today와 selectedDate 추가
+  const today = dayjs();
+  const selectedDate = {
+    day: koreanDays[today.day()], // 한국어 요일로 변경
+    date: today.date(),
+    month: today.month() + 1,
+    year: today.year(),
+    fullDate: today
+  };
 
   const handleNotificationPress = () => {
     navigation.navigate('Notification');
@@ -136,6 +151,23 @@ const Home = () => {
           <RoutineIcons.hospital width={16} height={16} style={{ color: themes.light.pointColor.Secondary }} />
           <EventText>병원 진료</EventText>
         </EventIcons>
+
+        <RoutineListContainer>
+          <TodayContainer>
+            <TodayHeader
+              today={today}
+              selectedDate={selectedDate}
+            />
+          </TodayContainer>
+          <RoutineList>
+            <RoutineIcons.medicine width={20} height={20} style={{ color: themes.light.pointColor.Primary }} />
+            <ListText>
+              <RoutineTitle>약 이름</RoutineTitle>
+              <RoutineTime>시간</RoutineTime>
+            </ListText>
+            <OtherIcons.chevronDown style={{ color: themes.light.textColor.Primary30 }} />
+          </RoutineList>
+        </RoutineListContainer>
       </ScrollContainer>
     </View>
   );
@@ -233,12 +265,47 @@ const EventIcons = styled.View`
   align-items: center;
   gap: 6px;
   padding-left: 34px;
+  padding-bottom: 34px;
 `;
 
 const EventText = styled.Text`
   font-size: ${FontSizes.caption.medium};
   color: ${themes.light.textColor.Primary50};
   padding-right: 10px;
+`;
+
+const TodayContainer = styled.View`
+  padding: 10px 0 20px 0;
+`;
+
+const RoutineListContainer = styled.View`
+  background-color: ${themes.light.bgColor.bgSecondary};
+  padding: 20px 20px 200px 20px;
+`;
+
+const RoutineList = styled.TouchableOpacity`
+  flex-direction: row;
+  background-color: ${themes.light.bgColor.bgPrimary};
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  padding: 15px;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ListText = styled.View``
+
+const RoutineTitle = styled.Text`
+  font-size: ${FontSizes.body.default};
+  font-family: 'Pretendard-Medium';
+  color: ${themes.light.textColor.textPrimary};
+`;
+
+const RoutineTime = styled.Text`
+  font-size: ${FontSizes.caption.default};
+  font-family: 'Pretendard-Medium';
+  color: ${themes.light.textColor.Primary50};
 `;
 
 export default Home;
