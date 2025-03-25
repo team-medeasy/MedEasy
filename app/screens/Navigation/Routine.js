@@ -5,6 +5,7 @@ import styled from 'styled-components/native';
 import { OtherIcons, RoutineIcons } from '../../../assets/icons';
 import { themes } from '../../styles';
 import dayjs from 'dayjs';
+import TodayHeader from '../../components/TodayHeader';
 
 import { getRoutineByDate } from '../../api/routine';
 
@@ -405,8 +406,10 @@ const Routine = () => {
       </DayContainerWrapper>
       <TodayBackColor>
         <TodayContainer>
-          <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
-          <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
+          <TodayHeader
+            today={today}
+            selectedDate={selectedDate}
+          />
         </TodayContainer>
       </TodayBackColor>
 
@@ -658,27 +661,14 @@ const TodayContainer = styled.View`
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  padding: 20px;
+  padding: 20px 30px;
   background-color: ${themes.light.bgColor.bgSecondary};
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;
 `;
-
-const TodayText = styled.Text`
-  font-size: ${FontSizes.title.default};
-  font-family: 'Pretendard-ExtraBold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const TodayDate = styled.Text`
-  font-size: ${FontSizes.title.default};
-  font-family: 'Pretendard-ExtraBold';
-  color: ${themes.light.textColor.Primary30};
-`;
-
 // 타임라인 관련 스타일 추가
 const TimelineContainer = styled.View`
-  padding-top: 10px;
+  //padding-top: 10px;
   padding-left: 30px;
   position: relative;
 `;
