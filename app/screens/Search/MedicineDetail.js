@@ -18,7 +18,7 @@ import {
   Button} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {OtherIcons} from '../../../assets/icons';
-import { getSimilarMedicines } from '../../api/medicine';
+import { getSimilarMedicines, getMedicineById } from '../../api/medicine';
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {item, isModal, title} = route.params;
@@ -178,7 +178,12 @@ const MedicineDetailScreen = ({route, navigation}) => {
                 showsHorizontalScrollIndicator={false}
                 paddingHorizontal={20}
                 keyExtractor={item => item.item_id}
-                renderItem={({item}) => <SimilarMedicineItem item={item} />}
+                renderItem={({item}) => (
+                  <SimilarMedicineItem 
+                  item={item} 
+                  navigation={navigation}
+                  />
+                )}
               />
             ) : (
               <Text style={{
@@ -276,37 +281,56 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
   );
 };
 
-const SimilarMedicineItem = ({item}) => (
-  <View style={{marginRight: 15, width: 138.75}}>
-    <Image
-      source={{uri: item.item_image}}
-      style={{width: 138.75, height: 74, borderRadius: 10}}
-    />
-    <View style={{marginTop: 15, gap: 8}}>
-      <Text
-        style={{
-          fontFamily: 'Pretendard-SemiBold',
-          fontSize: FontSizes.caption.default,
-          color: themes.light.textColor.Primary50,
-        }}>
-        {item.entp_name}
-      </Text>
-      <Text
-        style={{
-          fontFamily: 'Pretendard-Bold',
-          fontSize: FontSizes.body.default,
-          color: themes.light.textColor.textPrimary,
-        }}
-        numberOfLines={1} // 한 줄로 제한
-        ellipsizeMode="tail">
-        {item.item_name}
-      </Text>
-      <Tag sizeType="small" colorType="resultPrimary">
-        {item.class_name || '약품 구분'}
-      </Tag>
-    </View>
-  </View>
-);
+const SimilarMedicineItem = ({item, navigation}) => {
+  const handlePressMedicine = async () => {
+    try {
+      const response = await getMedicineById(item.item_id);
+      const medicineData = response.data.body;
+
+      navigation.push('MedicineDetail', {
+        item: medicineData,
+        isModal: false
+      });
+    } catch (error) {
+      console.error('약 정보 불러오기 실패:', error);
+    }
+  };
+
+  return (
+    <TouchableOpacity 
+      style={{marginRight: 15, width: 138.75}}
+      onPress={handlePressMedicine}
+    >
+      <Image
+        source={{uri: item.item_image}}
+        style={{width: 138.75, height: 74, borderRadius: 10}}
+      />
+      <View style={{marginTop: 15, gap: 8}}>
+        <Text
+          style={{
+            fontFamily: 'Pretendard-SemiBold',
+            fontSize: FontSizes.caption.default,
+            color: themes.light.textColor.Primary50,
+          }}>
+          {item.entp_name}
+        </Text>
+        <Text
+          style={{
+            fontFamily: 'Pretendard-Bold',
+            fontSize: FontSizes.body.default,
+            color: themes.light.textColor.textPrimary,
+          }}
+          numberOfLines={1}
+          ellipsizeMode="tail">
+          {item.item_name}
+        </Text>
+        <Tag sizeType="small" colorType="resultPrimary">
+          {item.class_name || '약품 구분'}
+        </Tag>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const HeadingText = styled.Text`
   color: ${themes.light.textColor.textPrimary};
