@@ -62,7 +62,9 @@ const Home = () => {
         const processedRoutines = todayRoutines[0]?.user_schedule_dtos.map(schedule => ({
           scheduleId: schedule.user_schedule_id,
           timeName: schedule.name,
-          takeTime: dayjs(`2024-01-01T${schedule.take_time}`).format('A h시 m분'),
+          takeTime: dayjs(`2024-01-01T${schedule.take_time}`).format('A h시 m분')
+          .replace('AM', '오전')
+          .replace('PM', '오후'),
           medicines: schedule.routine_medicine_dtos.map(medicine => ({
             name: medicine.nickname,
             dose: medicine.dose,
@@ -72,8 +74,10 @@ const Home = () => {
             const medicineNames = schedule.routine_medicine_dtos.map(med => med.nickname);
             if (medicineNames.length === 1) {
               return medicineNames[0];
-            } else if (medicineNames.length > 1) {
-              return `${medicineNames[0]}, ${medicineNames[1]} 외 ${medicineNames.length - 2}개`;
+            } else if (medicineNames.length === 2) {
+              return `${medicineNames[0]}, ${medicineNames[1]}`;
+            } else if (medicineNames.length > 2) {
+              return `${medicineNames[0]}, ${medicineNames[1]} 외 ${medicineNames.length - 2}건`;
             }
             return '';
           })()
@@ -242,7 +246,7 @@ const Home = () => {
                 />
                 <ListText>
                   <RoutineTitle>{routine.medicineTitle}</RoutineTitle>
-                  <RoutineTime>{routine.timeName}•{routine.takeTime}</RoutineTime>
+                  <RoutineTime>{routine.timeName} • {routine.takeTime}</RoutineTime>
                 </ListText>
               </ListComponent>
               <OtherIcons.chevronDown
