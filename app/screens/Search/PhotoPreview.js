@@ -6,6 +6,7 @@ import {themes} from '../../styles';
 import {useNavigation} from '@react-navigation/native';
 import {View, Alert} from 'react-native';
 import {searchPillByImage} from '../../api/pillSearch';
+import {getMedicineDetail} from '../../api/search';
 
 const PhotoPreviewContent = ({route}) => {
   const {photoUri, isModal = false} = route.params;
@@ -38,7 +39,44 @@ const PhotoPreviewContent = ({route}) => {
       const response = await searchPillByImage(photo);
       console.log('Search response:', response);
 
-      navigation.navigate('CameraSearchResults', {searchResults: response});
+      const detailedResults = await Promise.all(
+        response.flatMap(item =>
+          item.searchResults.map(async result => {
+            try {
+              const detail = await getMedicineDetail(result.itemSeq);
+
+              if (detail?.body) {
+                return {
+                  ...result,
+                  detail: detail.body,
+                };
+              } else {
+                console.error(`상세 정보 없음: itemSeq = ${result.itemSeq}`);
+                return result;
+              }
+            } catch (error) {
+              console.error(
+                `상세 정보 가져오기 실패: itemSeq = ${result.itemSeq}`,
+                error,
+              );
+              return result;
+            }
+          }),
+        ),
+      );
+
+      console.log('Detailed search response:', detailedResults);
+
+      const mappedResults = response.map(item => ({
+        ...item,
+        searchResults: detailedResults.filter(
+          result => result.itemSeq === item.searchResults[0]?.itemSeq,
+        ),
+      }));
+
+      navigation.navigate('CameraSearchResults', {
+        searchResults: mappedResults,
+      });
     } catch (error) {
       console.error('Pill search failed:', error);
       if (error.response) {
@@ -53,16 +91,6 @@ const PhotoPreviewContent = ({route}) => {
       setLoading(false);
     }
   };
-
-  if (!photo) {
-    return (
-      <Container>
-        <HeaderComponent isModal={isModal}>
-          사진을 불러오는 중...
-        </HeaderComponent>
-      </Container>
-    );
-  }
 
   return (
     <Container>

@@ -1,44 +1,42 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { View } from 'react-native';
-import { Tag, Button, MedicineAppearance } from './../index';
+import {View} from 'react-native';
+import {Tag, Button, MedicineAppearance} from './../index';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { themes } from '../../styles';
+import {themes} from '../../styles';
 
-export const CameraSearchResultItem = ({ item, onPress }) => {
+export const CameraSearchResultItem = ({item, onPress}) => {
   return (
     <ItemContainer>
       <ImageContainer>
         <TopHalfContainer>
-          <LeftHalfImage source={{ uri: item.item_image }} resizeMode="cover" />
+          <LeftHalfImage source={{uri: item.item_image}} resizeMode="cover" />
         </TopHalfContainer>
         <BottomHalfContainer>
-          <RightHalfImage source={{ uri: item.item_image }} resizeMode="cover" />
+          <RightHalfImage source={{uri: item.item_image}} resizeMode="cover" />
         </BottomHalfContainer>
       </ImageContainer>
 
       <InfoContainer>
-        <View style={{ flexDirection: 'row', gap: 11, marginBottom: 9 }}>
-          <Tag 
-            sizeType="small" 
+        <View style={{flexDirection: 'row', gap: 11, marginBottom: 9}}>
+          <Tag
+            sizeType="small"
             colorType="resultPrimary"
-            overflowMode='ellipsis'
-            maxWidth='66'
-          >
+            overflowMode="ellipsis"
+            maxWidth="66">
             {item.etc_otc_name || '정보 없음'}
           </Tag>
-          <Tag 
-            sizeType="small" 
+          <Tag
+            sizeType="small"
             colorType="resultSecondary"
-            overflowMode='ellipsis'
-            maxWidth='150'
-          >
+            overflowMode="ellipsis"
+            maxWidth="150">
             {item.class_name || '정보 없음'}
           </Tag>
         </View>
 
-        <View style={{ gap: 13 }}>
-          <View style={{ gap: 5 }}>
+        <View style={{gap: 13}}>
+          <View style={{gap: 5}}>
             <MedicineName numberOfLines={1} ellipsizeMode="tail">
               {item.item_name || '정보 없음'}
             </MedicineName>
