@@ -93,9 +93,16 @@ const SettingList = () => {
           onPress: async () => {
             setDialogVisible(false);
             setPassword('');
-            // 토큰 제거
+            
+            // AsyncStorage 데이터 삭제
             await removeAccessToken();
             await removeRefreshToken();
+            await removeUserInfo();
+            await clearAuthData();
+            
+            // // SignUpContext 데이터 초기화
+            resetSignUpData();
+            console.log('SignUpContext 데이터 초기화 완료');
             // 로그인 화면으로 이동
             navigation.reset({
               index: 0,
