@@ -67,12 +67,41 @@ const PhotoPreviewContent = ({route}) => {
 
       console.log('Detailed search response:', detailedResults);
 
-      const mappedResults = response.map(item => ({
-        ...item,
-        searchResults: detailedResults.filter(
-          result => result.itemSeq === item.searchResults[0]?.itemSeq,
-        ),
-      }));
+      const mappedResults = detailedResults.map(result => {
+        // 상세 정보가 있는 경우
+        if(result.detail) {
+          return {
+            uniqueKey: `${result.itemSeq}`,
+            item_image: result.detail.item_image || "",
+            etc_otc_name: result.detail.etc_otc_name || "정보 없음",
+            class_name: result.detail.class_name || "정보 없음",
+            item_name: result.detail.item_name || "정보 없음",
+            chart: result.detail.chart || "정보 없음",
+            drug_shape: result.detail.drug_shape || "",
+            color_classes: result.detail.color_classes || "",
+            original_id: result.itemSeq,
+            // MedicineAppearance 컴포넌트에 필요한 속성들
+            colorClasses: result.colorClasses || result.detail.color_classes || "",
+            colorGroup: result.colorGroup || result.detail.colorGroup || "",
+            drugShape: result.drugShape || result.detail.drug_shape || "",
+            score: result.score || 0,
+          };
+        }
+        // 상세 정보가 없는 경우 기본 값
+        return {
+          uniqueKey: `${result.itemSeq}`,
+          item_image: "",
+          etc_otc_name: "정보 없음",
+          class_name: "정보 없음",
+          item_name: "정보 없음",
+          chart: "정보 없음",
+          original_id: result.itemSeq,
+          colorClasses: result.colorClasses || "",
+          colorGroup: result.colorGroup || "",
+          drugShape: result.drugShape || "",
+          score: result.score || 0,
+        };
+      })
 
       navigation.navigate('CameraSearchResults', {
         searchResults: mappedResults,

@@ -1,5 +1,5 @@
-import { Header } from './\bHeader/Header';
-import { ModalHeader } from './\bHeader/ModalHeader';
+import { Header } from './Header/Header';
+import { ModalHeader } from './Header/ModalHeader';
 import { MedicineAppearance } from './MedicineInfo/MedicineAppearance';
 import { MedicineOverview } from './MedicineInfo/MedicineOverview';
 import { NoSearchResults } from './SearchResult/NoSearchResults';
