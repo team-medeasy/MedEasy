@@ -17,7 +17,8 @@ export const lightTheme = {
     buttonText: 'rgba(255, 255, 255, 1)',
     buttonText70: 'rgba(255, 255, 255, 0.7)',
     buttonText60: 'rgba(255, 255, 255, 0.6)',
-    buttonText10: 'rgba(255, 255, 255, 0.1)'
+    buttonText10: 'rgba(255, 255, 255, 0.1)',
+    placeholder: 'rgba(197, 200, 206, 1)',
   },
   boxColor: {
     buttonPrimary: 'rgba(0, 0, 0, 1)',
