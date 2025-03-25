@@ -133,17 +133,15 @@ const Routine = () => {
   useEffect(() => {
     const fetchRoutineData = async () => {
       try {
-        // 현재 선택된 날짜의 시작일과 종료일 계산 (일주일 범위로 설정)
-        const startDate = selectedDate.fullDate.startOf('week').format('YYYY-MM-DD');
-        const endDate = selectedDate.fullDate.endOf('week').format('YYYY-MM-DD');
-        console.log('API 요청 파라미터:', { start_date: startDate, end_date: endDate });
+        // 선택된 특정 날짜로 조회
+        const selectedDateString = selectedDate.fullDate.format('YYYY-MM-DD');
+        
+        console.log('API 요청 파라미터:', { start_date: selectedDateString, end_date: selectedDateString });
 
-        const response = await getRoutineByDate(startDate, endDate);
+        const response = await getRoutineByDate(selectedDateString, selectedDateString);
         console.log('루틴 데이터 응답:', response.data.body);
-        const routineData = response.data.body;
-
-        // API 응답에서 initialMedicineRoutines 형식으로 데이터 가공
-        const processedMedicineRoutines = processRoutineData(routineData);
+        
+        const processedMedicineRoutines = processRoutineData(response.data.body);
         setMedicineRoutines(processedMedicineRoutines);
 
       } catch (error) {
@@ -163,7 +161,7 @@ const Routine = () => {
     const getDayOfWeek = (dateString) => {
       const date = new Date(dateString);
       // 요일을 0(일)~6(토)에서 1(월)~7(일)로 변환
-      return date.getDay() === 0 ? 7 : date.getDay();
+      return date.getDay() === 0 ? 7 : date.getDay() + 1;
     };
 
     // 스케줄 이름에 따른 시간대 매핑
