@@ -19,24 +19,16 @@ const TodayHeader = ({ today, selectedDate }) => {
   };
 
   return (
-    <TodayBackColor>
-      <TodayContainer>
+  <TodayContainer>
         <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
         <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
       </TodayContainer>
-    </TodayBackColor>
   );
 };
-
-const TodayBackColor = styled.View`
-  background-color: ${themes.light.pointColor.Primary};
-`;
-
 const TodayContainer = styled.View`
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  padding: 20px;
   background-color: ${themes.light.bgColor.bgSecondary};
   border-top-left-radius: 24px;
   border-top-right-radius: 24px;

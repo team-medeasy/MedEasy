@@ -405,10 +405,12 @@ const Routine = () => {
         />
       </DayContainerWrapper>
       <TodayBackColor>
-        <TodayHeader
-          today={today}
-          selectedDate={selectedDate}
-        />
+        <TodayContainer>
+          <TodayHeader
+            today={today}
+            selectedDate={selectedDate}
+          />
+        </TodayContainer>
       </TodayBackColor>
 
       <ScrollView>
@@ -655,9 +657,18 @@ const TodayBackColor = styled.View`
   background-color: ${themes.light.pointColor.Primary};
 `;
 
+const TodayContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 30px;
+  background-color: ${themes.light.bgColor.bgSecondary};
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+`;
 // 타임라인 관련 스타일 추가
 const TimelineContainer = styled.View`
-  padding-top: 10px;
+  //padding-top: 10px;
   padding-left: 30px;
   position: relative;
 `;
