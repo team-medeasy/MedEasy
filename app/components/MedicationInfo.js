@@ -5,9 +5,11 @@ import KarteIcon from '../../assets/icons/karte.svg';
 import LogoIcon from '../../assets/icons/logo/logo.svg';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { getUserUsageDays } from '../api/user';
+import { getUserMedicineCount } from '../api/user';
 
-const MedicationInfo = ({ medicationCount }) => {
+const MedicationInfo = () => {
   const [daysSinceJoin, setDaysSinceJoin] = useState(0);
+  const [medicineCount, setmedicineCount] = useState(0);
   
   useEffect(() => {
     // 사용자 사용 일수 가져오기
@@ -25,6 +27,24 @@ const MedicationInfo = ({ medicationCount }) => {
     };
     
     fetchUserUsageDays();
+  }, []);
+
+  useEffect(() => {
+    // 사용자 약 개수 가져오기
+    const fetchUserMedicineCount = async () => {
+      try {
+        const response = await getUserMedicineCount();
+        const countData = response.data?.body || response.data;
+        
+        if (countData && countData.medicine_count !== undefined) {
+          setmedicineCount(countData.medicine_count);
+        }
+      } catch (error) {
+        console.error('사용자 약 개수 가져오기 실패:', error);
+      }
+    };
+    
+    fetchUserMedicineCount();
   }, []);
   
   return (
@@ -45,7 +65,7 @@ const MedicationInfo = ({ medicationCount }) => {
       <MedicationCount>
         <WithMedeasy>메디지와 함께</WithMedeasy>
         <InfoText>복용중인 약 </InfoText>
-        <InfoNum>{medicationCount}개</InfoNum>
+        <InfoNum>{medicineCount}개</InfoNum>
         <IconWrapper>
           <LogoIcon style={{ color: themes.light.boxColor.tagDetailPrimary }} />
         </IconWrapper>

@@ -148,76 +148,15 @@ const Routine = () => {
         // 현재 선택된 날짜의 시작일과 종료일 계산 (일주일 범위로 설정)
         const startDate = selectedDate.fullDate.startOf('week').format('YYYY-MM-DD');
         const endDate = selectedDate.fullDate.endOf('week').format('YYYY-MM-DD');
-
         console.log('API 요청 파라미터:', { start_date: startDate, end_date: endDate });
 
         const response = await getRoutineByDate(startDate, endDate);
         console.log('루틴 데이터 응답:', response.data.body);
-
-        // 응답 데이터가 response.data.body에 있다고 가정
         const routineData = response.data.body;
 
-        // 전체 데이터 구조 확인
-        console.log('전체 루틴 데이터:', routineData);
-
-        // 각 날짜별 스케줄 정보 추출 및 출력
-        routineData.forEach(dayData => {
-          console.log(`날짜: ${dayData.take_date}`);
-
-          // 해당 날짜의 스케줄 목록 출력
-          dayData.user_schedule_dtos.forEach(schedule => {
-            console.log(`  스케줄: ${schedule.name}, 시간: ${schedule.take_time}`);
-
-            // 각 스케줄에 포함된 약물 정보 출력
-            if (schedule.routine_medicine_dtos && schedule.routine_medicine_dtos.length > 0) {
-              console.log('  복용 약물 목록:');
-              schedule.routine_medicine_dtos.forEach(medicine => {
-                console.log(`    - 약물: ${medicine.nickname || '이름 없음'} (ID: ${medicine.medicine_id})`);
-                console.log(`      용량: ${medicine.dose}정, 복용 여부: ${medicine.is_taken ? '복용함' : '복용 전'}`);
-                console.log(`      routine_medicine_id: ${medicine.routine_medicine_id}`);
-              });
-            }
-          });
-
-          console.log('------------------------');
-        });
-
-        // 복용하지 않은 약물만 필터링하여 출력
-        console.log('\n복용하지 않은 약물 목록:');
-        routineData.forEach(dayData => {
-          const unTakenMedicines = [];
-
-          dayData.user_schedule_dtos.forEach(schedule => {
-            if (schedule.routine_medicine_dtos) {
-              schedule.routine_medicine_dtos.forEach(med => {
-                if (!med.is_taken) {
-                  unTakenMedicines.push({
-                    date: dayData.take_date,
-                    schedule: schedule.name,
-                    time: schedule.take_time,
-                    medicine: med.nickname,
-                    dose: med.dose
-                  });
-                }
-              });
-            }
-          });
-
-          if (unTakenMedicines.length > 0) {
-            console.log(`${dayData.take_date}에 복용하지 않은 약물:`);
-            unTakenMedicines.forEach(item => {
-              console.log(`  - ${item.time} ${item.schedule}: ${item.medicine} ${item.dose}정`);
-            });
-          }
-        });
-
-        if (response.data && response.data.medicine) {
-          setMedicineRoutines(response.data.medicine);
-        }
-
-        // if (response.data && response.data.hospital) {
-        //   setHospitalRoutines(response.data.hospital);
-        // }
+        // API 응답에서 initialMedicineRoutines 형식으로 데이터 가공
+        const processedMedicineRoutines = processRoutineData(routineData);
+        setMedicineRoutines(processedMedicineRoutines);
 
       } catch (error) {
         console.error('루틴 데이터 가져오기 실패:', error);
@@ -225,7 +164,98 @@ const Routine = () => {
     };
 
     fetchRoutineData();
-  }, [selectedDate.fullDate]); // selectedDate가 변경될 때마다 API 호출
+  }, [selectedDate.fullDate]);
+
+  // 루틴 데이터를 원하는 형식으로 가공하는 함수
+  const processRoutineData = (routineData) => {
+    // 약물 ID 기준으로 데이터를 그룹화할 객체
+    const medicineMap = {};
+
+    // 요일 매핑 (API 날짜 -> 요일 숫자로 변환)
+    const getDayOfWeek = (dateString) => {
+      const date = new Date(dateString);
+      // 요일을 0(일)~6(토)에서 1(월)~7(일)로 변환
+      return date.getDay() === 0 ? 7 : date.getDay();
+    };
+
+    // 스케줄 이름에 따른 시간대 매핑
+    const getTimeTypeFromScheduleName = (scheduleName) => {
+      const lowerName = scheduleName.toLowerCase();
+
+      if (lowerName.includes('아침')) return 'MORNING';
+      if (lowerName.includes('점심')) return 'LUNCH';
+      if (lowerName.includes('저녁')) return 'DINNER';
+      if (lowerName.includes('취침') || lowerName.includes('자기 전')) return 'BEDTIME';
+
+      // 이름으로 판단할 수 없는 경우 시간으로 판단
+      return null;
+    };
+
+    // 시간대 매핑 (시간 -> MORNING, LUNCH, DINNER, BEDTIME)
+    const getTimeTypeFromTime = (timeString) => {
+      const hour = parseInt(timeString.split(':')[0]);
+
+      if (hour >= 5 && hour < 10) return 'MORNING';
+      if (hour >= 10 && hour < 14) return 'LUNCH';
+      if (hour >= 14 && hour < 20) return 'DINNER';
+      return 'BEDTIME';
+    };
+
+    // 각 날짜별로 데이터 처리
+    routineData.forEach(dayData => {
+      const dayOfWeek = getDayOfWeek(dayData.take_date);
+
+      // 각 스케줄 처리
+      dayData.user_schedule_dtos.forEach(schedule => {
+        // 스케줄 이름으로 시간대 결정, 없으면 시간으로 판단
+        const timeType = getTimeTypeFromScheduleName(schedule.name) ||
+          getTimeTypeFromTime(schedule.take_time);
+
+        // 해당 스케줄의 약물 정보 처리
+        if (schedule.routine_medicine_dtos && schedule.routine_medicine_dtos.length > 0) {
+          schedule.routine_medicine_dtos.forEach(medicine => {
+            const medicineId = parseInt(medicine.medicine_id);
+
+            // 약물이 맵에 없으면 초기화
+            if (!medicineMap[medicineId]) {
+              medicineMap[medicineId] = {
+                medicine_id: medicineId,
+                nickname: medicine.nickname || `약물 ${medicineId}`,
+                dose: medicine.dose,
+                total_quantity: 0, // API에서 이 정보를 제공하지 않으므로 기본값 설정
+                day_of_weeks: [],
+                types: []
+              };
+            }
+
+            // 해당 요일 추가 (중복 없이)
+            if (!medicineMap[medicineId].day_of_weeks.includes(dayOfWeek)) {
+              medicineMap[medicineId].day_of_weeks.push(dayOfWeek);
+            }
+
+            // 해당 시간대 추가 (중복 없이)
+            if (!medicineMap[medicineId].types.includes(timeType)) {
+              medicineMap[medicineId].types.push(timeType);
+            }
+          });
+        }
+      });
+    });
+
+    // 객체를 배열로 변환하고 요일과 시간대 정렬
+    const processedRoutines = Object.values(medicineMap).map(medicine => {
+      // 요일 정렬 (1,2,3,...)
+      medicine.day_of_weeks.sort((a, b) => a - b);
+
+      // 시간대 정렬 (MORNING, LUNCH, DINNER, BEDTIME 순)
+      const timeOrder = { 'MORNING': 0, 'LUNCH': 1, 'DINNER': 2, 'BEDTIME': 3 };
+      medicine.types.sort((a, b) => timeOrder[a] - timeOrder[b]);
+
+      return medicine;
+    });
+
+    return processedRoutines;
+  };
 
   // 모든 루틴 (약 복용 + 병원 방문)을 시간순으로 정렬
   const getAllRoutinesByTime = () => {
@@ -752,6 +782,8 @@ const MedicineText = styled.Text`
   font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Medium';
   padding: 20px;
+  width: 80%;
+  overflow: hidden;
   text-decoration-line: ${({ isChecked }) =>
     isChecked ? 'line-through' : 'none'};
   color: ${({ isChecked }) =>

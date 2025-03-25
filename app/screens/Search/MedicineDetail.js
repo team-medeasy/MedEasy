@@ -37,6 +37,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
         class_name: item.class_name,
         etc_otc_name : item.etc_otc_name,
         item_image: item.item_image,
+        chart: item.chart,
         // 외관 정보
         drug_shape: item.drug_shape,
         color_classes: item.color_classes,

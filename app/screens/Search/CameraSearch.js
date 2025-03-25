@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Dimensions,
   TouchableOpacity,
-  Image,
   Animated,
 } from 'react-native';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
@@ -27,19 +26,22 @@ const TOGGLE_PADDING = 4;
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
 const CameraSearchScreen = () => {
-  const [lastPhoto, setLastPhoto] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
   const focusAreaHeight = useRef(new Animated.Value(PREVIEW_SIZE)).current;
   const maskRectHeight = useRef(new Animated.Value(PREVIEW_SIZE)).current; // Re-introduced
   const [isPrescriptionMode, setIsPrescriptionMode] = useState(false);
   const previewSize = useRef(new Animated.Value(PREVIEW_SIZE)).current;
+  const [cameraPosition, setCameraPosition] = useState('back');
 
   const devices = useCameraDevices();
-  const device = devices && devices[0];
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const cameraRef = useRef(null);
+
+  const [device, setDevice] = useState(
+    devices && devices.find(d => d.position === 'back'),
+  ); // 초기값 설정
 
   useEffect(() => {
     const checkCameraPermission = async () => {
@@ -68,6 +70,13 @@ const CameraSearchScreen = () => {
     checkCameraPermission();
   }, [navigation, isFocused]);
 
+  useEffect(() => {
+    if (devices) {
+      const newDevice = devices.find(d => d.position === cameraPosition);
+      setDevice(newDevice);
+    }
+  }, [devices, cameraPosition]);
+
   const openGallery = async () => {
     try {
       const result = await launchImageLibrary({
@@ -76,8 +85,7 @@ const CameraSearchScreen = () => {
       });
 
       if (result && result.assets && result.assets.length > 0) {
-        console.log('Selected Photo:', result.assets[0].uri);
-        setLastPhoto(result.assets[0].uri);
+        navigation.navigate('PhotoPreview', {photoUri: result.assets[0].uri});
       }
     } catch (error) {
       console.error('Failed to open gallery:', error);
@@ -93,7 +101,7 @@ const CameraSearchScreen = () => {
         flash: 'off',
       });
       console.log('Photo taken:', photo.path);
-      navigation.goBack();
+      navigation.navigate('PhotoPreview', {photoUri: `file://${photo.path}`});
     } catch (error) {
       console.error('사진 촬영 실패:', error);
     }
@@ -153,10 +161,10 @@ const CameraSearchScreen = () => {
             </HeaderButton>
           </TouchableOpacity>
           <Title>사진으로 검색하기</Title>
-          <HeaderButton>
+          <HeaderButton type="flash">
             <CameraIcons.flash
-              width={20}
-              height={20}
+              width={24}
+              height={24}
               style={{color: themes.light.textColor.buttonText}}
             />
           </HeaderButton>
@@ -274,28 +282,24 @@ const CameraSearchScreen = () => {
         {/* 촬영 버튼 */}
         <ButtonContainer>
           <ButtonItem onPress={openGallery}>
-            {lastPhoto ? (
-              <Image
-                source={{uri: lastPhoto}}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 8,
-                }}
-              />
-            ) : (
-              <MaterialCommunityIcons name="image" size={24} color="#fff" />
-            )}
+            <MaterialCommunityIcons name="image" size={24} color="#fff" />
           </ButtonItem>
           <CaptureButton onPress={handleCapture}>
             <CaptureButtonInner />
           </CaptureButton>
           <ButtonItem>
-            <CameraIcons.cameraSwitch
-              width={24}
-              height={24}
-              style={{color: themes.light.textColor.buttonText}}
-            />
+            <TouchableOpacity
+              onPress={() => {
+                const newPosition =
+                  cameraPosition === 'back' ? 'front' : 'back';
+                setCameraPosition(newPosition);
+              }}>
+              <CameraIcons.cameraSwitch
+                width={24}
+                height={24}
+                style={{color: themes.light.textColor.buttonText}}
+              />
+            </TouchableOpacity>
           </ButtonItem>
         </ButtonContainer>
       </BottomContainer>
@@ -321,7 +325,8 @@ const HeaderButton = styled.View`
   width: 36px;
   height: 36px;
   border-radius: 18px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: ${({type}) =>
+    type === 'flash' ? 'transparent' : 'rgba(255, 255, 255, 0.1)'};
   justify-content: center;
   align-items: center;
 `;
@@ -376,18 +381,6 @@ const MaskContainer = styled.View`
   left: 0;
   width: ${width}px;
   height: ${height}px;
-`;
-
-/* 촬영 미리보기 (오퍼시티 X) */
-const FocusArea = styled.View`
-  position: absolute;
-  top: ${(height - PREVIEW_SIZE) / 2}px;
-  left: ${(width - PREVIEW_SIZE) / 2}px;
-  width: ${PREVIEW_SIZE}px;
-  height: ${PREVIEW_SIZE}px;
-  border-radius: ${BORDER_RADIUS}px;
-  border: 3px solid rgba(255, 255, 255, 0.4);
-  background-color: transparent;
 `;
 
 const BottomContainer = styled.View`
