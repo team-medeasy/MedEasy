@@ -19,6 +19,8 @@ const Home = () => {
   const { signUpData } = useSignUp();
 
   const [medicineRoutines, setMedicineRoutines] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   // 한국어 요일 매핑
   const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -35,25 +37,34 @@ const Home = () => {
   // API에서 루틴 데이터 가져오기
   useEffect(() => {
     const fetchRoutineData = async () => {
-      try {
-        const startDate = selectedDate.fullDate.startOf('week').format('YYYY-MM-DD');
-        const endDate = selectedDate.fullDate.endOf('week').format('YYYY-MM-DD');
-        console.log('API 요청 파라미터:', { start_date: startDate, end_date: endDate });
+      setIsLoading(true);
+      setError(null);
 
-        const response = await getRoutineByDate(startDate, endDate);
+      try {
+        // 선택된 특정 날짜로 조회
+        const selectedDateString = selectedDate.fullDate.format('YYYY-MM-DD');
+        
+        console.log('API 요청 파라미터:', { start_date: selectedDateString, end_date: selectedDateString });
+        
+        const response = await getRoutineByDate(selectedDateString, selectedDateString);
+        console.log('루틴 데이터 응답:', response.data.body);
+        
         const routineData = response.data.body;
+        
         // 선택된 날짜와 동일한 take_date를 가진 루틴만 필터링
         const todayRoutines = routineData.filter(routine =>
-          dayjs(routine.take_date).format('YYYY-MM-DD') === selectedDate.fullDate.format('YYYY-MM-DD')
+          dayjs(routine.take_date).format('YYYY-MM-DD') === selectedDateString
         );
-
+  
         console.log('오늘 루틴 데이터:', todayRoutines);
-
+  
         // 시간대별로 정리된 루틴 데이터 처리
-        const processedRoutines = todayRoutines[0].user_schedule_dtos.map(schedule => ({
+        const processedRoutines = todayRoutines[0]?.user_schedule_dtos.map(schedule => ({
           scheduleId: schedule.user_schedule_id,
           timeName: schedule.name,
-          takeTime: dayjs(`2024-01-01T${schedule.take_time}`).format('A h시 m분'),
+          takeTime: dayjs(`2024-01-01T${schedule.take_time}`).format('A h시 m분')
+          .replace('AM', '오전')
+          .replace('PM', '오후'),
           medicines: schedule.routine_medicine_dtos.map(medicine => ({
             name: medicine.nickname,
             dose: medicine.dose,
@@ -63,20 +74,25 @@ const Home = () => {
             const medicineNames = schedule.routine_medicine_dtos.map(med => med.nickname);
             if (medicineNames.length === 1) {
               return medicineNames[0];
-            } else if (medicineNames.length > 1) {
-              return `${medicineNames[0]}, ${medicineNames[1]} 외 ${medicineNames.length - 2}개`;
+            } else if (medicineNames.length === 2) {
+              return `${medicineNames[0]}, ${medicineNames[1]}`;
+            } else if (medicineNames.length > 2) {
+              return `${medicineNames[0]}, ${medicineNames[1]} 외 ${medicineNames.length - 2}건`;
             }
             return '';
           })()
-        })).filter(routine => routine.medicineTitle !== '');
-
+        })).filter(routine => routine.medicineTitle !== '') || [];
+  
         setMedicineRoutines(processedRoutines);
-
       } catch (error) {
         console.error('루틴 데이터 가져오기 실패:', error);
+        setError(error);
+        setMedicineRoutines([]);
+      } finally {
+        setIsLoading(false);
       }
     };
-
+    
     fetchRoutineData();
   }, [selectedDate.fullDate]);
 
@@ -230,7 +246,7 @@ const Home = () => {
                 />
                 <ListText>
                   <RoutineTitle>{routine.medicineTitle}</RoutineTitle>
-                  <RoutineTime>{routine.timeName}•{routine.takeTime}</RoutineTime>
+                  <RoutineTime>{routine.timeName} • {routine.takeTime}</RoutineTime>
                 </ListText>
               </ListComponent>
               <OtherIcons.chevronDown
