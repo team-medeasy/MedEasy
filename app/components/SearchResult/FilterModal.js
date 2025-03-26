@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Modal, View, Animated, BackHandler } from 'react-native';
+import { Modal, View, Animated, BackHandler, TouchableWithoutFeedback } from 'react-native';
 import styled from 'styled-components/native';
 import {Button, ColorShapeView} from './../../components';
 import {themes} from '../../styles';
@@ -23,6 +23,7 @@ export const FilterModal = ({
   tempFilters,
   handleFilterChange,
   applyFilters,
+  currentFilters,
 }) => {
   if (!filterType) return null;
   
@@ -113,93 +114,111 @@ export const FilterModal = ({
     onClose();
   };
 
+  const handleApplyFilters = () => {
+    // 변경사항이 있는지 확인
+    const hasChanges = 
+      JSON.stringify(tempFilters[filterType]) !== 
+      JSON.stringify(currentFilters[filterType]);
+    
+    if (hasChanges) {
+      applyFilters();
+    } else {
+      // 변경사항 없으면 단순히 모달 닫기
+      onClose();
+    }
+  };
+
   return (
     <Modal
       visible={modalVisible}
       transparent={true}
       animationType="none"
       onRequestClose={handleCloseModal}>
-      <Animated.View
-        style={{
-          flex: 1,
-          backgroundColor: themes.light.bgColor.modalBG,
-          opacity: fadeAnim,
-        }}>
+      <TouchableWithoutFeedback onPress={handleCloseModal}>
         <Animated.View
           style={{
-            width: '100%',
-            marginTop: 'auto',
-            backgroundColor: themes.light.bgColor.bgPrimary,
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: 10,
-            paddingLeft: 20,
-            paddingRight: 20,
-            paddingBottom: 40,
-            transform: [{ translateY: slideAnim }],
+            flex: 1,
+            backgroundColor: themes.light.bgColor.modalBG,
+            opacity: fadeAnim,
           }}>
-          <TopBar />
-          <Title>
-            {filterType === 'color'
-              ? '색상 선택'
-              : filterType === 'shape'
-              ? '모양 선택'
-              : filterType === 'dosageForm'
-              ? '제형 선택'
-              : '분할선 선택'}
-          </Title>
-          
-          <FilterOptionsContainer isDosageForm={filterType === 'dosageForm'}>
-            {filterOptions[filterType].map((option, index) => (
-              <FilterOptionButton
-                key={index}
-                selected={tempFilters[filterType].includes(option)}
-                isDosageForm={filterType === 'dosageForm'}
-                onPress={() => handleFilterChange(filterType, option)}>
-                {filterType === 'dosageForm' ? (
-                  // 제형 선택 시
-                  <>
-                    {pillIcons[option] &&
-                      React.createElement(pillIcons[option], {
-                        width: 77,
-                        height: 50,
-                      })}
+          <TouchableWithoutFeedback>
+            <Animated.View
+              style={{
+                width: '100%',
+                marginTop: 'auto',
+                backgroundColor: themes.light.bgColor.bgPrimary,
+                borderTopLeftRadius: 40,
+                borderTopRightRadius: 40,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 10,
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingBottom: 40,
+                transform: [{ translateY: slideAnim }],
+              }}>
+              <TopBar />
+              <Title>
+                {filterType === 'color'
+                  ? '색상 선택'
+                  : filterType === 'shape'
+                  ? '모양 선택'
+                  : filterType === 'dosageForm'
+                  ? '제형 선택'
+                  : '분할선 선택'}
+              </Title>
+              
+              <FilterOptionsContainer isDosageForm={filterType === 'dosageForm'}>
+                {filterOptions[filterType].map((option, index) => (
+                  <FilterOptionButton
+                    key={index}
+                    selected={tempFilters[filterType].includes(option)}
+                    isDosageForm={filterType === 'dosageForm'}
+                    onPress={() => handleFilterChange(filterType, option)}>
+                    {filterType === 'dosageForm' ? (
+                      // 제형 선택 시
+                      <>
+                        {pillIcons[option] &&
+                          React.createElement(pillIcons[option], {
+                            width: 77,
+                            height: 50,
+                          })}
 
-                    <FilterOptionText
-                      selected={tempFilters[filterType].includes(option)}>
-                      {option}
-                    </FilterOptionText>
-                  </>
-                ) : (
-                  // 색상, 모양, 분할선 선택 시
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    {filterType === 'color' && (
-                      <ColorShapeView
-                        type={filterType}
-                        value={option}
-                      />
+                        <FilterOptionText
+                          selected={tempFilters[filterType].includes(option)}>
+                          {option}
+                        </FilterOptionText>
+                      </>
+                    ) : (
+                      // 색상, 모양, 분할선 선택 시
+                      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        {filterType === 'color' && (
+                          <ColorShapeView
+                            type={filterType}
+                            value={option}
+                          />
+                        )}
+                        {filterType === 'shape' && (
+                          <ColorShapeView
+                            type={filterType}
+                            value={option}
+                          />
+                        )}
+                        <FilterOptionText
+                          selected={tempFilters[filterType].includes(option)}>
+                          {option}
+                        </FilterOptionText>
+                      </View>
                     )}
-                    {filterType === 'shape' && (
-                      <ColorShapeView
-                        type={filterType}
-                        value={option}
-                      />
-                    )}
-                    <FilterOptionText
-                      selected={tempFilters[filterType].includes(option)}>
-                      {option}
-                    </FilterOptionText>
-                  </View>
-                )}
-              </FilterOptionButton>
-            ))}
-          </FilterOptionsContainer>
+                  </FilterOptionButton>
+                ))}
+              </FilterOptionsContainer>
 
-          <Button title="적용하기" onPress={applyFilters} />
+              <Button title="적용하기" onPress={handleApplyFilters} />
+            </Animated.View>
+          </TouchableWithoutFeedback>
         </Animated.View>
-      </Animated.View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
