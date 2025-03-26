@@ -1,8 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
-import {View, ScrollView} from 'react-native';
+import {
+    View, 
+    ScrollView,
+} from 'react-native';
 import {themes} from './../../styles';
-import {HeaderIcons, OtherIcons} from '../../../assets/icons';
+import {OtherIcons} from '../../../assets/icons';
 import {ModalHeader, ProgressBar, Button} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
@@ -74,6 +77,8 @@ const InputWithDelete = ({
     onChangeText,
     placeholder,
     keyboardType = 'default',
+    returnKeyType = 'done',
+    onSubmitEditing
 }) => {
     return (
         <InputContainer>
@@ -82,6 +87,8 @@ const InputWithDelete = ({
                 value={value}
                 onChangeText={onChangeText}
                 keyboardType={keyboardType}
+                returnKeyType={returnKeyType}
+                onSubmitEditing={onSubmitEditing}
             />
             {value.length > 0 && (
                 <DeleteButton onPress={() => onChangeText('')}>
