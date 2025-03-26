@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -39,7 +40,7 @@ const TextInput = styled.TextInput`
   border-radius: 10px;
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 20px;
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
 `;
 
 const TxtLabel = styled.Text`
@@ -47,7 +48,7 @@ const TxtLabel = styled.Text`
   border-radius: 10px;
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 20px;
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
 `;
 
 const SignUpPasswordScreen = ({navigation}) => {

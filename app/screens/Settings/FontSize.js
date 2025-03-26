@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from '../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Profile = () => {
   return (
@@ -19,7 +20,7 @@ const Container = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: 22px;
+  font-size: ${FontSizes.title.default};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
   margin-bottom: 20px;

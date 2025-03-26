@@ -1,9 +1,15 @@
 import React, {useState} from 'react';
-import {SafeAreaView, Text, Keyboard, TouchableWithoutFeedback} from 'react-native';
+import {
+  SafeAreaView,
+  Text,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -42,7 +48,7 @@ const TextInput = styled.TextInput`
   border-radius: 8px;
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 20px;
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
   /* color: ${themes.light.textColor.Primary100 || '#000000'}; */
 `;
 
