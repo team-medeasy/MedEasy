@@ -31,14 +31,16 @@ const Button = ({
   width,
   height,
   flex,
+  disabled
 }) => {
   return (
     <ButtonContainer
-      onPress={onPress}
+      onPress={disabled ? null : onPress}
       bgColor={bgColor}
       width={width}
       height={height}
-      flex={flex}>
+      flex={flex}
+      disabled={disabled}>
       <ButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
         {title}
       </ButtonText>
