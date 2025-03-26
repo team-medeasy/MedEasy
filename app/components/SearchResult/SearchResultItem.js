@@ -22,7 +22,7 @@ export const SearchResultItem = ({item, onPress}) => {
           <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis' maxWidth='66'>
             {item.etc_otc_name || '정보 없음'}
           </Tag>
-          <Tag sizeType="small" colorType="resultSecondary" overflowMode='ellipsis' maxWidth='128'>
+          <Tag sizeType="small" colorType="resultSecondary" overflowMode='ellipsis' maxWidth='128' maxLength='14'>
             {item.class_name || '정보 없음'}
           </Tag>
         </TypeContainer>

@@ -324,7 +324,7 @@ const SimilarMedicineItem = ({item, navigation}) => {
           ellipsizeMode="tail">
           {item.item_name}
         </Text>
-        <Tag sizeType="small" colorType="resultPrimary">
+        <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis' maxLength='14'>
           {item.class_name || '약품 구분'}
         </Tag>
       </View>
