@@ -42,7 +42,7 @@ const ItemContainer = styled.TouchableOpacity`
   height: 74.67px;
   flex-direction: row;
   align-items: center;
-  margin: 5px 15px 20px 15px;
+  margin: 12px 15px 12px 15px;
 `;
 
 const ImageContainer = styled.View`
