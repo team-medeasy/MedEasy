@@ -96,7 +96,13 @@ const SetMedicineDay = ({ route, navigation }) => {
                     paddingBottom: 30,
                     alignItems: 'center',
                 }}>
-                <Button title="다음" onPress={handleNext} />
+                <Button 
+                    title="다음" 
+                    onPress={handleNext} 
+                    disabled={!selectedOption}
+                    bgColor={selectedOption ? themes.light.boxColor.buttonPrimary : themes.light.boxColor.inputSecondary}
+                    textColor={selectedOption ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
+                />
             </View>
         </Container>
     );

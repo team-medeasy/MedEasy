@@ -96,6 +96,8 @@ const InputWithDelete = ({
     onChangeText,
     placeholder,
     keyboardType = 'default',
+    returnKeyType = 'done',
+    onSubmitEditing
 }) => {
     return (
         <InputContainer>
@@ -104,6 +106,8 @@ const InputWithDelete = ({
                 value={value}
                 onChangeText={onChangeText}
                 keyboardType={keyboardType}
+                returnKeyType={returnKeyType}
+                onSubmitEditing={onSubmitEditing}
             />
             {value.length > 0 && (
                 <DeleteButton onPress={() => onChangeText('')}>
