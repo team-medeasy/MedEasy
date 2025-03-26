@@ -14,15 +14,22 @@ export const SearchResultItem = ({item, onPress}) => {
         <ManufacturerText>{item.entp_name || '정보 없음'}</ManufacturerText>
         <MedicineNameText
           numberOfLines={1} // 한 줄로 제한
-          ellipsizeMode="tail" 
-        >
+          ellipsizeMode="tail">
           {item.item_name || '정보 없음'}
         </MedicineNameText>
         <TypeContainer>
-          <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis' maxWidth='66'>
+          <Tag
+            sizeType="small"
+            colorType="resultPrimary"
+            overflowMode="ellipsis"
+            maxWidth="66">
             {item.etc_otc_name || '정보 없음'}
           </Tag>
-          <Tag sizeType="small" colorType="resultSecondary" overflowMode='ellipsis' maxWidth='128'>
+          <Tag
+            sizeType="small"
+            colorType="resultSecondary"
+            overflowMode="ellipsis"
+            maxWidth="128">
             {item.class_name || '정보 없음'}
           </Tag>
         </TypeContainer>
@@ -35,7 +42,7 @@ const ItemContainer = styled.TouchableOpacity`
   height: 74.67px;
   flex-direction: row;
   align-items: center;
-  margin: 0 15px 25px 15px;
+  margin: 5px 15px 20px 15px;
 `;
 
 const ImageContainer = styled.View`
