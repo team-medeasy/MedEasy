@@ -5,6 +5,7 @@ import {themes, fonts} from './../../styles';
 import {BackAndNextButtons} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
 import {handleLogin} from '../../api/services/authService';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -40,7 +41,7 @@ const TextInput = styled.TextInput`
   border-radius: 10px;
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 20px;
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
 `;
 
 const SignInScreen = ({navigation, route}) => {
@@ -57,36 +58,36 @@ const SignInScreen = ({navigation, route}) => {
       alert('비밀번호를 입력하세요.');
       return;
     }
-    
+
     try {
-      const userData = await handleLogin({ email, password });
+      const userData = await handleLogin({email, password});
       console.log('로그인 성공:', userData);
-      
+
       if (userData) {
         // 이름 분리 (성-이름 형태로)
         let lastName = ''; // 성
-        let firstName = '';  // 이름
-        
-        if (userData.name && userData.name !== "undefinedundefined") {
+        let firstName = ''; // 이름
+
+        if (userData.name && userData.name !== 'undefinedundefined') {
           if (userData.name.length >= 2) {
             lastName = userData.name.substring(0, 1); // 첫 글자는 성
-            firstName = userData.name.substring(1);     // 나머지는 이름
+            firstName = userData.name.substring(1); // 나머지는 이름
           } else {
             lastName = userData.name; // 한 글자만 있으면 성으로 처리
           }
         }
-        
+
         updateSignUpData({
           email,
           password,
           lastName, // 성
-          firstName,  // 이름
+          firstName, // 이름
           gender: userData.gender || '',
           birthday: userData.birthday || '',
         });
-        
+
         // 홈 화면 이동
-        navigation.reset({ index: 0, routes: [{ name: 'NavigationBar' }] });
+        navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
       } else {
         // userData가 없는 경우 (사용자 정보 로드 실패)
         throw new Error('사용자 데이터를 가져올 수 없습니다.');

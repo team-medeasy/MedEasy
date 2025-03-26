@@ -4,6 +4,7 @@ import {FlatList} from 'react-native';
 import {themes} from '../styles';
 import {Header} from '../components/Header/Header';
 import {RoutineIcons} from './../../assets/icons';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
@@ -174,20 +175,20 @@ const NotiContainer = styled.View`
 const NotiTextContainer = styled.View``;
 
 const NotificationTitle = styled.Text`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
   margin-bottom: 10px;
 `;
 
 const NotificationMessage = styled.Text`
-  font-size: 12px;
+  font-size: ${FontSizes.caption.default};
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
 `;
 
 const NotiTime = styled.Text`
-  font-size: 12px;
+  font-size: ${FontSizes.caption.default};
   color: ${themes.light.textColor.Primary30};
   font-family: 'Pretendard-SemiBold';
 `;
