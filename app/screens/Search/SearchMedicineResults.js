@@ -380,7 +380,12 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
           tempFilters={tempFilters}
           handleFilterChange={handleFilterChange}
           applyFilters={applyFilters}
-          renderFilterButtonIcon={renderFilterButtonIcon}
+          currentFilters={{
+            color: selectedColors,
+            shape: selectedShapes,
+            dosageForm: selectedDosageForms,
+            split: selectedSplits
+          }}
         />
       ))}
       <SearchResultContainer>
