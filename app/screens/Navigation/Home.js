@@ -10,6 +10,7 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import TodayHeader from '../../components/TodayHeader';
 import dayjs from 'dayjs';
 dayjs.locale('ko');
+import HomeRoutine from '../../components/HomeRouine';
 
 import { useSignUp } from '../../api/context/SignUpContext';
 import { getRoutineByDate } from '../../api/routine';
@@ -43,28 +44,28 @@ const Home = () => {
       try {
         // 선택된 특정 날짜로 조회
         const selectedDateString = selectedDate.fullDate.format('YYYY-MM-DD');
-        
+
         console.log('API 요청 파라미터:', { start_date: selectedDateString, end_date: selectedDateString });
-        
+
         const response = await getRoutineByDate(selectedDateString, selectedDateString);
         console.log('루틴 데이터 응답:', response.data.body);
-        
+
         const routineData = response.data.body;
-        
+
         // 선택된 날짜와 동일한 take_date를 가진 루틴만 필터링
         const todayRoutines = routineData.filter(routine =>
           dayjs(routine.take_date).format('YYYY-MM-DD') === selectedDateString
         );
-  
+
         console.log('오늘 루틴 데이터:', todayRoutines);
-  
+
         // 시간대별로 정리된 루틴 데이터 처리
         const processedRoutines = todayRoutines[0]?.user_schedule_dtos.map(schedule => ({
           scheduleId: schedule.user_schedule_id,
           timeName: schedule.name,
           takeTime: dayjs(`2024-01-01T${schedule.take_time}`).format('A h시 m분')
-          .replace('AM', '오전')
-          .replace('PM', '오후'),
+            .replace('AM', '오전')
+            .replace('PM', '오후'),
           medicines: schedule.routine_medicine_dtos.map(medicine => ({
             name: medicine.nickname,
             dose: medicine.dose,
@@ -82,7 +83,7 @@ const Home = () => {
             return '';
           })()
         })).filter(routine => routine.medicineTitle !== '') || [];
-  
+
         setMedicineRoutines(processedRoutines);
       } catch (error) {
         console.error('루틴 데이터 가져오기 실패:', error);
@@ -92,7 +93,7 @@ const Home = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchRoutineData();
   }, [selectedDate.fullDate]);
 
@@ -157,13 +158,15 @@ const Home = () => {
           </TextContainer>
           {/* 버튼 추가 */}
           <RoutineContainer>
-            <RoutineButton onPress={handleAddMedicineRoutine}>
-              <LogoIcons.logoAdd
-                height={115}
-                style={{ color: themes.light.pointColor.primary30 }}
-              />
-              <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
-            </RoutineButton>
+            {medicineRoutines.length === 0 ? (
+              <RoutineButton onPress={handleAddMedicineRoutine}>
+                <LogoIcons.logoAdd
+                  height={115}
+                  style={{ color: themes.light.pointColor.primary30 }}
+                />
+                <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
+              </RoutineButton>
+            ) : (<HomeRoutine />)}
           </RoutineContainer>
           <ButtonContainer>
             <AddButton onPress={handleAddMedicineRoutine}>
