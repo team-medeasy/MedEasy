@@ -392,7 +392,9 @@ const ListComponent = styled.View`
   overflow: hidden;
 `;
 
-const ListText = styled.View``;
+const ListText = styled.View`
+  width: 80%;
+`;
 
 const RoutineTitle = styled.Text`
   font-size: ${FontSizes.body.default};
