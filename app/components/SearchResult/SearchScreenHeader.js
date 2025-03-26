@@ -118,7 +118,6 @@ const FeatureSearchContainer = styled.View`
   padding-left: 20px;
   flex-direction: row;
   align-items: center;
-  padding-bottom: 7px;
 `;
 
 const FeatureSearchText = styled.Text`
