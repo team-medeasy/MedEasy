@@ -7,21 +7,17 @@ export const updateMedicine = data => api.post('/medicine/update', data);
 export const getMedicineList = () => api.get('/medicine');
 
 export const searchMedicine = (params) => {
-  const { name, size } = params;
+  const { name, page = 0, size = 10 } = params;
   
-  let queryParams = `name=${encodeURIComponent(name || '')}`;
-  
-  if (size) {
-    queryParams += `&size=${size}`;
-  }
+  let queryParams = `name=${encodeURIComponent(name || '')}&page=${page}&size=${size}`;
   
   return api.get(`/medicine/search?${queryParams}`);
 };
 
 export const searchMedicineWithFilters = (params) => {
-  const { name, colors, shape, size } = params;
+  const { name, colors, shape, page = 0, size = 10 } = params;
   
-  let queryParams = `name=${encodeURIComponent(name || '')}`;
+  let queryParams = `name=${encodeURIComponent(name || '')}&page=${page}&size=${size}`;
   
   if (colors && colors.length > 0) {
     colors.forEach(color => {
@@ -33,10 +29,6 @@ export const searchMedicineWithFilters = (params) => {
     shape.forEach(s => {
       queryParams += `&shape=${encodeURIComponent(s)}`;
     });
-  }
-  
-  if (size) {
-    queryParams += `&size=${size}`;
   }
   
   return api.get(`/medicine/search?${queryParams}`);

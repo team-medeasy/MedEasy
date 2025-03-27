@@ -30,8 +30,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   const [originalResponseData, setOriginalResponseData] = useState([]);
 
   const [loadingMore, setLoadingMore] = useState(false);
-  const [dataSize, setDataSize] = useState(10); // 초기 10개, 20개, 30개로 증가
-  const [allDataLoaded, setAllDataLoaded] = useState(false); // 모든 데이터 로드 완료 여부
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
   const [tempFilters, setTempFilters] = useState({
     color: [],
@@ -82,117 +82,97 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   // 검색 결과 가져오기
   const fetchSearchResults = async (isLoadMore = false) => {
     if (!isLoadMore) {
-      setLoading(true);
-      setDataSize(10); // 새 검색시 데이터 크기 초기화
-      setAllDataLoaded(false);
-    } else {
-      setLoadingMore(true);
+      setPage(0);
+      setHasMore(true);
     }
-    setError(null);
-
-    console.log('검색 요청 파라미터:', {
-      searchQuery,
-      selectedColors,
-      selectedShapes,
-      size: isLoadMore ? dataSize + 10 : 10, // 데이터 크기 증가
-    });
-
+  
     try {
       let response;
-      let requestParams;
+      let requestParams = {
+        name: searchQuery,
+        page: isLoadMore ? page + 1 : 0,
+        size: 10
+      };
 
+      console.log('검색 요청 파라미터:', requestParams);
+  
       if (selectedColors.length > 0 || selectedShapes.length > 0) {
-        // 필터가 적용된 검색
-        const mappedColors = selectedColors.map(color =>
-          mapColorToApiValue(color),
-        );
-        const mappedShapes = selectedShapes.map(shape =>
-          mapShapeToApiValue(shape),
-        );
-
+        const mappedColors = selectedColors.map(color => mapColorToApiValue(color));
+        const mappedShapes = selectedShapes.map(shape => mapShapeToApiValue(shape));
+  
         requestParams = {
-          name: searchQuery,
+          ...requestParams,
           colors: mappedColors,
-          shape: mappedShapes,
-          size: isLoadMore ? dataSize + 10 : 10, // 로드 시마다 10개씩 증가
+          shape: mappedShapes
         };
-        console.log('필터 적용 검색 요청:', requestParams);
         response = await searchMedicineWithFilters(requestParams);
       } else {
-        // 기본 검색
-        requestParams = {
-          name: searchQuery,
-          size: isLoadMore ? dataSize + 10 : 10, // 로드 시마다 10개씩 증가
-        };
-        console.log('기본 검색 요청:', requestParams);
         response = await searchMedicine(requestParams);
       }
 
-      console.log('API 응답 전체:', response);
-
-      // API 응답에서 데이터 추출
-      if (
-        response.data &&
-        response.data.result &&
-        response.data.result.result_code === 200
-      ) {
-        console.log('API 응답 데이터:', response.data.body);
-
-        // 이전 데이터 크기와 새 데이터 크기 비교하여 모든 데이터 로드 여부 확인
-        if (!response.data.body || response.data.body.length === 0) {
-          setNoResults(true);
-          setAllDataLoaded(true);
-          setSearchResults([]);
-        } else if (isLoadMore && response.data.body.length <= dataSize) {
-          // 추가 로드 요청했는데 데이터가 더 안 늘어났으면 모든 데이터 로드 완료
-          setAllDataLoaded(true);
-        }
-
-        // 원본 응답 데이터 저장
-        setOriginalResponseData(response.data.body);
-
-        // API 응답 데이터를 기존 앱 구조에 맞게 변환
-        const formattedResults = response.data.body.map((item, index) => {
-          const formatted = {
-            item_name: item.item_name,
-            entp_name: item.entp_name,
-            item_image: item.item_image,
-            class_name: item.class_name,
-            etc_otc_name: item.etc_otc_name,
-            original_id: item.id,
-            uniqueKey: `${item.id}_${index}`, // 고유 키 생성
-          };
-          return formatted;
-        });
-
-        console.log('변환된 검색 결과:', formattedResults);
-
-        // 검색 결과 설정
-        setSearchResults(formattedResults);
-
-        // 데이터 크기 업데이트 (추가 로드인 경우)
+      // 결과 없을 때 처리
+      if (!response.data?.body || response.data.body.length === 0) {
+        // 추가 로딩 시 결과가 없다면
         if (isLoadMore) {
-          setDataSize(dataSize + 10);
+          setHasMore(false);
+          setLoadingMore(false);
+          return;
         }
 
-        setNoResults(false);
-      } else {
-        console.error('API 에러 응답:', response);
-        setError('검색 결과를 가져오는데 실패했습니다.');
+        // 초기 검색 시 결과 없음 처리
         setNoResults(true);
+        setSearchResults([]);
+        setHasMore(false);
+        return;
       }
+
+      // 결과 있을 때 처리
+      setOriginalResponseData(prev => 
+        isLoadMore ? [...prev, ...response.data.body] : response.data.body
+      );
+
+      const formattedResults = response.data.body.map((item, index) => ({
+        item_name: item.item_name,
+        entp_name: item.entp_name,
+        item_image: item.item_image,
+        class_name: item.class_name,
+        etc_otc_name: item.etc_otc_name,
+        original_id: item.id,
+        uniqueKey: `${item.id}_${index}`
+      }));
+
+      console.log('포맷된 결과:', {
+        resultCount: formattedResults.length,
+        results: formattedResults
+      });
+
+      // 첫 페이지면 결과 교체, 추가 로드면 기존 결과에 추가
+      setSearchResults(prev => 
+        isLoadMore ? [...prev, ...formattedResults] : formattedResults
+      );
+
+      // NoResults 상태 초기화
+      setNoResults(false);
+
+      // 페이지 업데이트
+      if (isLoadMore) {
+        setPage(page + 1);
+      }
+
+      // 더 이상 로드할 데이터가 없으면 hasMore 상태 업데이트
+      setHasMore(formattedResults.length === 10);
+      
     } catch (err) {
       console.error('검색 중 오류:', err);
-      if (err.response) {
-        console.error('에러 응답:', err.response.data);
-        console.error('에러 상태:', err.response.status);
-      } else if (err.request) {
-        console.error('요청 에러:', err.request);
+      
+      // 추가 로딩 시 에러 처리
+      if (isLoadMore) {
+        setHasMore(false);
+        setLoadingMore(false);
       } else {
-        console.error('에러 메시지:', err.message);
+        setError('검색 중 오류가 발생했습니다.');
+        setNoResults(true);
       }
-      setError('검색 중 오류가 발생했습니다.');
-      setNoResults(true);
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -201,7 +181,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
   // 스크롤 이벤트 핸들러
   const handleLoadMore = () => {
-    if (!loading && !loadingMore && !allDataLoaded) {
+    if (hasMore && !loadingMore) {
+      setLoadingMore(true);
       fetchSearchResults(true);
     }
   };
