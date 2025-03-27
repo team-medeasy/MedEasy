@@ -98,7 +98,9 @@ const Overlay = styled.View`
   background-color: rgba(0, 0, 0, 0.4);
 `;
 
-const MedicineImage = styled.Image`
+const MedicineImage = styled.Image.attrs({
+  resizeMode: 'contain',
+})`
   width: 344px;
   height: 188px;
   border-radius: 10px;

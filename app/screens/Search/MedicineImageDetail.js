@@ -66,7 +66,9 @@ const ImageContainer = styled.View`
   justify-content: center;
 `;
 
-const MedicineImage = styled.Image`
+const MedicineImage = styled.Image.attrs({
+  resizeMode: 'contain',
+})`
   width: 718px;
   height: 403px;
   transform: rotate(-90deg);
