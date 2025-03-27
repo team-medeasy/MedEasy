@@ -28,6 +28,8 @@ import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
 import {SignUpProvider} from './api/context/SignUpContext';
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
+import MedicineListScreen from './screens/Settings/MedicineList';
+
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
 const RoutineModalStack = createStackNavigator();
@@ -139,6 +141,10 @@ const App = () => {
                 name="SetRoutineTime"
                 component={SetRoutineTimeScreen}
                 options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="MedicineList"
+                component={MedicineListScreen}
               />
             </RootStack.Navigator>
           )}
