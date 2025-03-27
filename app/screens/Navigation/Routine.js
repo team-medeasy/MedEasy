@@ -16,6 +16,7 @@ import {
   weekDays,
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { getUserSchedule } from '../../api/user';
 
 const { width } = Dimensions.get('window');
 const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
@@ -122,6 +123,22 @@ const Routine = () => {
 
     setCheckedItems(updatedChecks);
   };
+
+   // 컴포넌트 마운트 시 사용자 일정 가져오기
+      useEffect(() => {
+          const fetchUserSchedule = async () => {
+              try {
+                  const getData = await getUserSchedule();
+                  const scheduleData = getData.data;
+                  console.log('사용자 루틴 데이터:', scheduleData);
+
+              } catch (error) {
+                  console.error('사용자 일정 가져오기 실패:', error);
+              }
+          };
+  
+          fetchUserSchedule();
+      }, []);
 
   const [medicineRoutines, setMedicineRoutines] = useState([]);
   //임시 데이터 사용

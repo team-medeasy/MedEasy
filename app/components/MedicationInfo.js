@@ -6,8 +6,10 @@ import LogoIcon from '../../assets/icons/logo/logo.svg';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { getUserUsageDays } from '../api/user';
 import { getUserMedicineCount } from '../api/user';
+import { useNavigation } from '@react-navigation/native';
 
 const MedicationInfo = () => {
+  const navigation = useNavigation();
   const [daysSinceJoin, setDaysSinceJoin] = useState(0);
   const [medicineCount, setmedicineCount] = useState(0);
   
@@ -46,6 +48,10 @@ const MedicationInfo = () => {
     
     fetchUserMedicineCount();
   }, []);
+
+  const handleMedicineList = () => {
+    navigation.navigate('MedicineList');
+  };
   
   return (
     <Container>
@@ -62,7 +68,7 @@ const MedicationInfo = () => {
           />
         </IconWrapper>
       </DaysSinceMedication>
-      <MedicationCount>
+      <MedicationCount onPress={handleMedicineList}>
         <WithMedeasy>메디지와 함께</WithMedeasy>
         <InfoText>복용중인 약 </InfoText>
         <InfoNum>{medicineCount}개</InfoNum>
@@ -102,7 +108,7 @@ const DaysSinceMedication = styled.View`
   overflow: hidden;
 `;
 
-const MedicationCount = styled.View`
+const MedicationCount = styled.TouchableOpacity`
   background-color: ${pointColor.pointPrimaryDark};
   padding: 15px;
   width: 49%;
