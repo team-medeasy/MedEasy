@@ -14,18 +14,47 @@ const SetMedicineTime = ({ route, navigation }) => {
     console.log("day_of_weeks:", day_of_weeks);
 
     const progress = '60%';
-    
+
     // 여러 시간대 선택을 위해 배열로 변경
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [scheduleData, setScheduleData] = useState([]);
 
-    // 시간대와 ID 매핑
-    const scheduleMapping = {
-        '🐥️ 아침': 1,
-        '🥪️ 점심': 2,
-        '🌙️ 저녁': 3,
-        '🛏️️ 자기 전': 4
-    };
+    const [scheduleMapping, setScheduleMapping] = useState({});
+
+    // 컴포넌트 마운트 시 사용자 일정 가져오기
+    useEffect(() => {
+        const fetchUserSchedule = async () => {
+            try {
+                const getData = await getUserSchedule();
+                const scheduleData = getData.data;
+                console.log('사용자 일정 데이터:', scheduleData);
+
+                if (scheduleData && scheduleData.body && Array.isArray(scheduleData.body)) {
+                    const mapping = {};
+
+                    scheduleData.body.forEach((item) => {
+                        if (item.name.includes('아침')) {
+                            mapping['🐥️ 아침'] = item.user_schedule_id;
+                        } else if (item.name.includes('점심')) {
+                            mapping['🥪️ 점심'] = item.user_schedule_id;
+                        } else if (item.name.includes('저녁')) {
+                            mapping['🌙️ 저녁'] = item.user_schedule_id;
+                        } else if (item.name.includes('자기 전')) {
+                            mapping['🛏️️ 자기 전'] = item.user_schedule_id;
+                        }
+                    });
+
+                    setScheduleMapping(mapping);
+                    console.log('시간대 매핑:', mapping);
+                }
+            } catch (error) {
+                console.error('사용자 일정 가져오기 실패:', error);
+            }
+        };
+
+        fetchUserSchedule();
+    }, []);
+
 
     const handleSelect = (option) => {
         setSelectedOptions(prev => {
@@ -41,7 +70,7 @@ const SetMedicineTime = ({ route, navigation }) => {
     const handleNext = () => {
         // 선택된 시간대를 ID로 변환
         const user_schedule_ids = selectedOptions.map(option => scheduleMapping[option]);
-        
+
         navigation.navigate('SetMedicineDose', {
             medicine_id: medicine_id,
             nickname: nickname,
@@ -59,12 +88,12 @@ const SetMedicineTime = ({ route, navigation }) => {
         const [hour, minute] = timeString.split(':').map(Number);
         const period = hour < 12 ? '오전' : '오후';
         const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-        
-        return minute === 0 
+
+        return minute === 0
             ? `${period} ${formattedHour}시`
             : `${period} ${formattedHour}시 ${minute}분`;
     };
-    
+
     useEffect(() => {
         async function fetchUserSchedule() {
             try {
@@ -96,7 +125,7 @@ const SetMedicineTime = ({ route, navigation }) => {
                         <LargeText>이 약은 하루중 언제 복용하나요?</LargeText>
                         <SmallText>복약 시간을 놓치지 않도록 도와드릴게요!</SmallText>
                     </TextContainer>
-                    
+
                     <SelectTime>
                         <SelectTimeButton
                             title={'🐥️ 아침'}
@@ -135,7 +164,7 @@ const SetMedicineTime = ({ route, navigation }) => {
                             fontSize={FontSizes.body.default}
                         />
                     </SelectTime>
-                    
+
                     <TimeSettingButton onPress={handleSetTimings}>
                         <ButtonText>시간대 설정하기</ButtonText>
                         <OtherIcons.chevronDown
@@ -161,9 +190,9 @@ const SetMedicineTime = ({ route, navigation }) => {
                     paddingBottom: 30,
                     alignItems: 'center',
                 }}>
-                <Button 
-                    title="다음" 
-                    onPress={handleNext} 
+                <Button
+                    title="다음"
+                    onPress={handleNext}
                     disabled={selectedOptions.length === 0}
                     bgColor={selectedOptions.length > 0 ? themes.light.boxColor.buttonPrimary : themes.light.boxColor.inputSecondary}
                     textColor={selectedOptions.length > 0 ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
