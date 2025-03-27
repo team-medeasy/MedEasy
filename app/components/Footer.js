@@ -6,9 +6,9 @@ import FontSizes from '../../assets/fonts/fontSizes';
 
 const {logo: LogoIcon, logoKr: LogoKrIcon} = LogoIcons;
 
-const Footer = () => {
+const Footer = ({marginTop = 0}) => {
   return (
-    <FooterContainer>
+    <FooterContainer marginTop={marginTop}>
       <FooterText
         style={{
           borderBottomWidth: 1,
@@ -43,6 +43,7 @@ const Footer = () => {
 const FooterContainer = styled.View`
   padding: 10px 20px 130px 20px;
   background-color: ${themes.light.bgColor.footerBG};
+  margin-top: ${({marginTop}) => `${marginTop}px`};
 `;
 
 const FooterText = styled.Text`
