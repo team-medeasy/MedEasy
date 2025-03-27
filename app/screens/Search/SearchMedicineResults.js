@@ -112,6 +112,14 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
       // 결과 없을 때 처리
       if (!response.data?.body || response.data.body.length === 0) {
+        // 추가 로딩 시 결과가 없다면
+        if (isLoadMore) {
+          setHasMore(false);
+          setLoadingMore(false);
+          return;
+        }
+
+        // 초기 검색 시 결과 없음 처리
         setNoResults(true);
         setSearchResults([]);
         setHasMore(false);
@@ -156,10 +164,13 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       
     } catch (err) {
       console.error('검색 중 오류:', err);
-      setError('검색 중 오류가 발생했습니다.');
       
-      // 첫 검색일 때만 noResults를 true로
-      if (!isLoadMore) {
+      // 추가 로딩 시 에러 처리
+      if (isLoadMore) {
+        setHasMore(false);
+        setLoadingMore(false);
+      } else {
+        setError('검색 중 오류가 발생했습니다.');
         setNoResults(true);
       }
     } finally {
@@ -170,7 +181,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
   // 스크롤 이벤트 핸들러
   const handleLoadMore = () => {
-    if (!loading && !loadingMore && hasMore) {
+    if (hasMore && !loadingMore) {
+      setLoadingMore(true);
       fetchSearchResults(true);
     }
   };
