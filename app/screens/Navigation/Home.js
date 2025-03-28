@@ -342,6 +342,7 @@ const ReminderText = styled.Text`
 
 const RoutineContainer = styled.View`
   align-items: center;
+  margin-bottom: 20px;
 `;
 
 const RoutineButton = styled(TouchableOpacity)`
@@ -351,7 +352,6 @@ const RoutineButton = styled(TouchableOpacity)`
   justify-content: center;
   align-items: center;
   border-radius: 10px;
-  margin-bottom: 20px;
 `;
 
 const RoutineButtonText = styled.Text`

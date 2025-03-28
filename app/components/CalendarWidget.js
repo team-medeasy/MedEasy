@@ -64,11 +64,16 @@ const CalendarWidget = ({
         const routineData = response.data.body;
         console.log('월 데이터: ',routineData);
 
-        // 루틴이 있는 날짜에 대한 마킹 객체 생성
         const markedRoutineDates = routineData.reduce((acc, item) => {
           const dateString = item.take_date;
-          // 해당 날짜에 루틴이 있으면 마크
-          if (item.user_schedule_dtos && item.user_schedule_dtos.length > 0) {
+          
+          // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
+          const hasRoutineMedicines = item.user_schedule_dtos.some(schedule => 
+            schedule.routine_medicine_dtos.length > 0
+          );
+      
+          // 하나라도 routine_medicine_dtos가 있으면 마크
+          if (hasRoutineMedicines) {
             acc[dateString] = {
               marked: true,
             };
