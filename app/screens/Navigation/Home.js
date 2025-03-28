@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { View, TouchableOpacity } from 'react-native';
-import { themes } from './../../styles';
+import { useNavigation } from '@react-navigation/native';
 
+import { themes } from './../../styles';
 import { HeaderIcons, RoutineIcons, LogoIcons, OtherIcons } from './../../../assets/icons';
 import CalendarWidget from '../../components/CalendarWidget';
-import { useNavigation } from '@react-navigation/native';
-import FontSizes from '../../../assets/fonts/fontSizes';
 import TodayHeader from '../../components/TodayHeader';
+import HomeRoutine from '../../components/HomeRoutine';
+import FontSizes from '../../../assets/fonts/fontSizes';
 import dayjs from 'dayjs';
 dayjs.locale('ko');
-import HomeRoutine from '../../components/HomeRouine';
 
 import { useSignUp } from '../../api/context/SignUpContext';
 import { getRoutineByDate } from '../../api/routine';
@@ -20,6 +20,7 @@ const Home = () => {
   const { signUpData } = useSignUp();
 
   const [medicineRoutines, setMedicineRoutines] = useState([]);
+  const [todayRoutine, setTodayRoutine] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   // 한국어 요일 매핑
@@ -97,6 +98,40 @@ const Home = () => {
     fetchRoutineData();
   }, [selectedDate.fullDate]);
 
+  useEffect(() => {
+    const fetchTodayRoutineData = async () => {
+      const today = dayjs().format('YYYY-MM-DD');
+  
+      try {
+        const response = await getRoutineByDate(today, today);
+        const routineData = response.data.body;
+  
+        const todayRoutines = routineData.filter(routine => 
+          dayjs(routine.take_date).format('YYYY-MM-DD') === today
+        );
+  
+        if (todayRoutines.length > 0) {
+          console.log('⏰ 오늘의 루틴 일정이 존재합니다.');
+          setTodayRoutine(todayRoutines[0].user_schedule_dtos);
+        } else {
+          setTodayRoutine(null);
+        }
+      } catch (error) {
+        console.error('오늘의 루틴 데이터 가져오기 실패:', error);
+        setTodayRoutine(null);
+      }
+    };
+  
+    // 초기 호출
+    fetchTodayRoutineData();
+  
+    // 5분마다 다시 체크
+    const intervalId = setInterval(fetchTodayRoutineData, 5 * 60 * 1000);
+  
+    // 컴포넌트 언마운트 시 인터벌 정리
+    return () => clearInterval(intervalId);
+  }, []); // 빈 배열 유지
+
   // 날짜 변경 핸들러 추가
   const handleDateChange = (newSelectedDate) => {
     setSelectedDate(newSelectedDate);
@@ -158,7 +193,9 @@ const Home = () => {
           </TextContainer>
           {/* 버튼 추가 */}
           <RoutineContainer>
-            {medicineRoutines.length === 0 ? (
+            {todayRoutine ? (
+              <HomeRoutine schedules={todayRoutine} />
+            ) : (
               <RoutineButton onPress={handleAddMedicineRoutine}>
                 <LogoIcons.logoAdd
                   height={115}
@@ -166,7 +203,7 @@ const Home = () => {
                 />
                 <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
               </RoutineButton>
-            ) : (<HomeRoutine />)}
+            )}
           </RoutineContainer>
           <ButtonContainer>
             <AddButton onPress={handleAddMedicineRoutine}>
