@@ -101,15 +101,15 @@ const Home = () => {
   useEffect(() => {
     const fetchTodayRoutineData = async () => {
       const today = dayjs().format('YYYY-MM-DD');
-  
+
       try {
         const response = await getRoutineByDate(today, today);
         const routineData = response.data.body;
-  
-        const todayRoutines = routineData.filter(routine => 
+
+        const todayRoutines = routineData.filter(routine =>
           dayjs(routine.take_date).format('YYYY-MM-DD') === today
         );
-  
+
         if (todayRoutines.length > 0) {
           console.log('⏰ 오늘의 루틴 일정이 존재합니다.');
           setTodayRoutine(todayRoutines[0].user_schedule_dtos);
@@ -121,13 +121,13 @@ const Home = () => {
         setTodayRoutine(null);
       }
     };
-  
+
     // 초기 호출
     fetchTodayRoutineData();
-  
+
     // 5분마다 다시 체크
     const intervalId = setInterval(fetchTodayRoutineData, 5 * 60 * 1000);
-  
+
     // 컴포넌트 언마운트 시 인터벌 정리
     return () => clearInterval(intervalId);
   }, []); // 빈 배열 유지
@@ -276,7 +276,12 @@ const Home = () => {
           {medicineRoutines.map((routine) => (
             <RoutineList
               key={`routine-${routine.scheduleId}`}
-              onPress={() => { }}
+              onPress={() => {
+                navigation.navigate('루틴', {
+                  selectedDate: selectedDate,
+                  paramFromHome: selectedDate.fullDate.format('YYYY-MM-DD')
+                });
+              }}
             >
               <ListComponent>
                 <RoutineIcons.medicine
