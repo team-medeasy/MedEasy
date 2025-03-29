@@ -29,7 +29,7 @@ const HomeRoutine = ({ schedules }) => {
                     <TimeTitle>{item.name}</TimeTitle>
                 </TitleContainer>
                 <TimeText>
-                    {dayjs(`2024-01-01T${item.take_time}`).format('A h:m')
+                    {dayjs(`2024-01-01T${item.take_time}`).format('A h:mm')
                         .replace('AM', '오전')
                         .replace('PM', '오후')}
                 </TimeText>
