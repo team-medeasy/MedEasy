@@ -21,9 +21,17 @@ import { getUserSchedule } from '../../api/user';
 const { width } = Dimensions.get('window');
 const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
 
-const Routine = () => {
+const Routine = ({route}) => {
   const today = dayjs();
   const flatListRef = useRef(null);
+  const { paramFromHome } = route.params || {};
+
+  useEffect(() => {
+    if (paramFromHome) {
+      console.log('Home에서 받은 파라미터:', paramFromHome);
+      // 파라미터를 활용한 로직 구현
+    }
+  }, [paramFromHome]);
 
   // 현재 주차를 중심으로 이전 4주, 이후 4주까지 총 9주 데이터 생성
   const generateWeeks = centerDate => {

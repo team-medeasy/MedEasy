@@ -119,7 +119,7 @@ const TabNavigator = () => {
         />
       </Tab.Navigator>
       <CameraButton onPress={handleCameraPress} />
-      <ChatContainer>
+      {/* <ChatContainer>
         <ChatBuble>
           <BubbleTail />
           <BubbleText>챗봇 약사에게{'\n'}상담해보세요!</BubbleText>
@@ -131,7 +131,7 @@ const TabNavigator = () => {
             style={{color: themes.light.pointColor.Primary}}
           />
         </ChatButton>
-      </ChatContainer>
+      </ChatContainer> */}
     </MainContainer>
   );
 };
