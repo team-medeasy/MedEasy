@@ -22,6 +22,7 @@ export const darkTheme = {
   boxColor: {
     buttonPrimary: 'rgba(43, 72, 147, 1)',
     buttonSecondary: 'rgba(255, 255, 255, 0.1)',
+    buttonSecondary40: 'rgba(255, 255, 255, 0.4)',
     inputPrimary: 'rgba(255, 255, 255, 0.1)',
     inputSecondary: 'rgba(255, 255, 255, 0.2)',
     tagResultPrimary: 'rgba(66,115,237,0.1)',

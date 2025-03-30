@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 import styled from 'styled-components/native';
 import { themes } from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
@@ -18,8 +18,8 @@ const HomeRoutine = ({ schedules }) => {
     }, [schedules]);
 
     const renderRoutineItem = ({ item }) => (
-        <Routine>
-            <RoutineContainer>
+        <RoutineContainer>
+            <MedicineHeader>
                 <TitleContainer>
                     <RoutineIcons.medicine 
                         width={15} 
@@ -33,15 +33,18 @@ const HomeRoutine = ({ schedules }) => {
                         .replace('AM', '오전')
                         .replace('PM', '오후')}
                 </TimeText>
-                <MedicineList>
-                    {item.routine_medicine_dtos.map((medicine) => (
-                        <MedicineText key={medicine.routine_medicine_id}>
+            </MedicineHeader>
+            <MedicineList>
+                {item.routine_medicine_dtos.map((medicine) => (
+                    <MedicineItem key={medicine.routine_medicine_id}>
+                        {medicine.is_taken ? <FilledCircle /> : <EmptyCircle />}
+                        <MedicineText>
                             {medicine.nickname} {medicine.dose}정
                         </MedicineText>
-                    ))}
-                </MedicineList>
-            </RoutineContainer>
-        </Routine>
+                    </MedicineItem>
+                ))}
+            </MedicineList>
+        </RoutineContainer>
     );
 
     return (
@@ -53,14 +56,26 @@ const HomeRoutine = ({ schedules }) => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ 
                 paddingHorizontal: 20,
-                gap: 10 
+                gap: 15
             }}
+            style={{backgroundColor: 'transparent'}}
         />
     );
 };
 
-const Routine = styled.View`
-    margin-right: 10px;
+const FilledCircle = styled.View`
+  width: 10px;
+  height: 10px;
+  border-radius: 6px;
+  background-color: ${themes.light.textColor.buttonText};
+`;
+
+const EmptyCircle = styled.View`
+  width: 10px;
+  height: 10px;
+  border-radius: 6px;
+  border-width: 1.5px;
+  border-color: ${themes.light.boxColor.buttonSecondary40};
 `;
 
 const RoutineContainer = styled.View`
@@ -69,6 +84,11 @@ const RoutineContainer = styled.View`
     height: 220px;
     border-radius: 10px;
     padding: 20px;
+    justify-content: space-between;
+`;
+
+const MedicineHeader = styled.View`
+    gap: 6px;
 `;
 
 const TitleContainer = styled.View`
@@ -87,18 +107,23 @@ const TimeText = styled.Text`
     color: ${themes.light.textColor.buttonText};
     font-family: 'Pretendard-Regular';
     font-size: ${FontSizes.body.default};
-    margin-top: 10px;
 `;
 
 const MedicineList = styled.View`
     margin-top: 10px;
+    gap: 10px;
+`;
+
+const MedicineItem = styled.View`
+    flex-direction: row;
+    align-items: center;
+    gap: 9px;
 `;
 
 const MedicineText = styled.Text`
     color: ${themes.light.textColor.buttonText};
     font-family: 'Pretendard-Medium';
     font-size: ${FontSizes.body.default};
-    margin-bottom: 5px;
 `;
 
 export default HomeRoutine;
