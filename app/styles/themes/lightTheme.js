@@ -23,6 +23,7 @@ export const lightTheme = {
   boxColor: {
     buttonPrimary: 'rgba(0, 0, 0, 1)',
     buttonSecondary: 'rgba(255, 255, 255, 1)',
+    buttonSecondary40: 'rgba(255, 255, 255, 0.4)',
     inputPrimary: 'rgba(0, 0, 0, 0.04)',
     inputSecondary: 'rgba(0, 0, 0, 0.06)',
     tagResultPrimary: 'rgba(66,115,237,0.1)',
