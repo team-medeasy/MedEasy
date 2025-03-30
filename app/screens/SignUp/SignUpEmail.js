@@ -77,13 +77,14 @@ const SignUpEmailScreen = ({navigation, route}) => {
   
   const handleEmailChange = text => {
     setEmail(text);
-    if (text) {
-      validateEmail(text);
-    } else {
-      setEmailError('');
-    }
+    setEmailError('');
   };
-  
+
+  // when email input is unfocused, validate email
+  const handleEmailBlur = () => {
+    if (email) validateEmail(email);
+  };
+
   const handleNext = () => {
     if (!email) {
       setEmailError('이메일을 입력해주세요');
@@ -128,6 +129,7 @@ const SignUpEmailScreen = ({navigation, route}) => {
               value={email}
               onChangeText={handleEmailChange}
               returnKeyType="done"
+              onBlur={handleEmailBlur}
               onSubmitEditing={Keyboard.dismiss}
               keyboardType="email-address"
               autoCapitalize="none"
