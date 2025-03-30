@@ -76,11 +76,7 @@ const TabNavigator = () => {
               <TabIcons.search width={30} height={30} style={{color: color}} />
             ),
             tabBarItemStyle: {
-              marginLeft: -30,
-            },
-            tabBarItemStyle: {
-              marginLeft: -35,
-              marginRight: 15,
+              paddingRight: 20
             },
           }}
           listeners={{
@@ -99,11 +95,7 @@ const TabNavigator = () => {
               <TabIcons.routine width={30} height={30} style={{color: color}} />
             ),
             tabBarItemStyle: {
-              marginRight: -30,
-            },
-            tabBarItemStyle: {
-              marginLeft: 15,
-              marginRight: -35,
+              paddingLeft: 20
             },
           }}
         />
