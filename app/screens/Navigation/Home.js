@@ -150,7 +150,11 @@ const Home = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', paddingTop: 68 }}>
+    <View style={{ 
+      flex: 1, 
+      backgroundColor: themes.light.bgColor.bgPrimary, 
+      paddingTop: 68 
+    }}>
       <ScrollContainer>
         <Header>
           <LogoContainer>
@@ -187,7 +191,7 @@ const Home = () => {
                 transform: [{ rotate: '10deg' }],
                 position: 'absolute',
                 bottom: -20,
-                right: 20,
+                right: 40,
               }}
             />
           </TextContainer>
@@ -324,7 +328,6 @@ const LogoContainer = styled.View`
 `;
 
 const PillReminderContainer = styled.View`
-  padding: 20px;
   flex-direction: column;
   justify-content: space-between;
   border-bottom-width: 10px;
@@ -336,7 +339,8 @@ const TextContainer = styled.View`
   align-items: center;
   justify-content: space-between;
   overflow: hidden;
-  padding: 20px 0px;
+  margin-top: 20px;
+  padding: 20px 20px;
 `;
 
 const ReminderText = styled.Text`
@@ -347,7 +351,6 @@ const ReminderText = styled.Text`
 
 const RoutineContainer = styled.View`
   align-items: center;
-  margin-bottom: 20px;
 `;
 
 const RoutineButton = styled(TouchableOpacity)`
@@ -369,6 +372,7 @@ const RoutineButtonText = styled.Text`
 const ButtonContainer = styled.View`
   flex-direction: column;
   width: 100%;
+  padding: 20px;;
 `;
 
 const AddButton = styled(TouchableOpacity)`
