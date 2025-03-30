@@ -176,7 +176,6 @@ const SignUpDOBGenderScreen = ({navigation}) => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={{flex: 1}}>
           <ProgressBar progress={progress} />
-
           <Container1>
             <Text
               style={{
@@ -200,12 +199,15 @@ const SignUpDOBGenderScreen = ({navigation}) => {
             <InputContainer marginBottom="5px">
               <TextInput
                 placeholder="생년월일 (YYYY-MM-DD)"
+                placeholderTextColor={themes.light.textColor.placeholder}
                 value={birthday}
                 onChangeText={handleBirthDateChange}
                 keyboardType="numeric"
                 maxLength={10}
                 returnKeyType="done"
                 onSubmitEditing={Keyboard.dismiss}
+                autoCorrect={false}
+                blurOnSubmit={true}
               />
               {dateError ? (
                 <Text
