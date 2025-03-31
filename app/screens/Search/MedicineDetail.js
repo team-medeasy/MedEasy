@@ -102,6 +102,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
       screen: 'SetMedicineName', 
       params: { item: item }
     });
+    // navigation.navigate('SetMedicineRoutine', {item: medicine});
   };
 
   if (!medicine) { // 렌더링 전 error 방지
