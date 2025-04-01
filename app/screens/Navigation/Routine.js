@@ -434,7 +434,7 @@ const Routine = () => {
           </TodayContainer>
         </LinearGradient>
 
-        <ScrollView contentContainerStyle={{paddingTop: 64}}>
+        <ScrollView contentContainerStyle={{paddingVertical: 70}}>
           <ScheduleContainer>
             {/* 타임라인 컨테이너 추가 */}
             <TimelineContainer>
