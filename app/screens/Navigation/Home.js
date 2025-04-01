@@ -195,11 +195,16 @@ const Home = () => {
               }}
             />
           </TextContainer>
-          {/* 버튼 추가 */}
-          <RoutineContainer>
-            {todayRoutine ? (
+          {todayRoutine ? (
+            <View style={{
+              alignItems: 'center'
+            }}>
               <HomeRoutine schedules={todayRoutine} />
-            ) : (
+            </View>
+          ) : (
+            <View style={{
+              marginHorizontal: 20
+            }}>
               <RoutineButton onPress={handleAddMedicineRoutine}>
                 <LogoIcons.logoAdd
                   height={115}
@@ -207,8 +212,8 @@ const Home = () => {
                 />
                 <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
               </RoutineButton>
-            )}
-          </RoutineContainer>
+            </View>
+          )}
           <ButtonContainer>
             <AddButton onPress={handleAddMedicineRoutine}>
               <ButtonContent>
