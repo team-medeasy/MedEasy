@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {Text, TouchableOpacity, View} from 'react-native';
 import {themes} from '../styles';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 // 기본 버튼
 const ButtonContainer = styled(TouchableOpacity)`
@@ -17,7 +18,7 @@ const ButtonContainer = styled(TouchableOpacity)`
 
 const ButtonText = styled(Text)`
   color: ${props => props.color || themes.light.textColor.buttonText};
-  font-size: ${props => props.fontSize || '18px'};
+  font-size: ${props => props.fontSize || FontSizes.heading.default};
   font-family: ${props => props.fontFamily || 'KimjungchulGothic-Bold'};
 `;
 
@@ -63,8 +64,8 @@ const SelectTimeButtonContainer = styled(TouchableOpacity)`
 `;
 
 const SelectTimeButtonText = styled(Text)`
-  font-size: ${props => props.fontSize || '18px'};
-  font-family: ${props => props.fontFamily || 'KimjungchulGothic-Bold'};
+  font-size: ${props => props.fontSize || FontSizes.body.default};
+  font-family: ${props => props.fontFamily || 'Pretendard-SemiBold'};
   color: ${props => props.color || themes.light.textColor.buttonText};
 `;
 

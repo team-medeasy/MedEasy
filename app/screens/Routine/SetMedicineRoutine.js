@@ -254,37 +254,29 @@ const SetMedicineRoutine = ({route, navigation}) => {
                 title={'🐥️ 아침'}
                 timeText={scheduleData['아침 식사 후'] || '오전 7시'}
                 onPress={() => toggleTiming('아침')}
-                fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedTimings.includes('아침') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedTimings.includes('아침') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default}
               />
               <SelectTimeButton
                 title={'🥪️ 점심'}
                 timeText={scheduleData['점심 식사 후'] || '오후 12시'}
                 onPress={() => toggleTiming('점심')}
-                fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedTimings.includes('점심') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedTimings.includes('점심') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default}
               />
               <SelectTimeButton
                 title={'🌙️ 저녁'}
                 timeText={scheduleData['저녁 식사 후'] || '오후 7시'}
                 onPress={() => toggleTiming('저녁')}
-                fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedTimings.includes('저녁') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedTimings.includes('저녁') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default}
               />
               <SelectTimeButton
                 title={'🛏️️ 자기 전'}
                 timeText={'오후 10시 30분'}
                 onPress={() => toggleTiming('자기 전')}
-                fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedTimings.includes('자기 전') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedTimings.includes('자기 전') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default}
               />
             </SelectTime>
           </Section>

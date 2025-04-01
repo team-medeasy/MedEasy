@@ -19,6 +19,7 @@ import {
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {OtherIcons} from '../../../assets/icons';
 import { getSimilarMedicines, getMedicineById } from '../../api/medicine';
+import { getUserMedicineCount } from '../../api/user';
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {item, isModal, title} = route.params;
@@ -97,12 +98,33 @@ const MedicineDetailScreen = ({route, navigation}) => {
     navigation.navigate('MedicineImageDetail', {item: medicine, isModal: isModal});
   };
 
-  const handleSetMedicineRoutine = () => {
-    navigation.navigate('RoutineModal', { 
-      screen: 'SetMedicineName', 
-      params: { item: item }
-    });
-    // navigation.navigate('SetMedicineRoutine', {item: medicine});
+  const handleSetMedicineRoutine = async () => {
+    try {
+      const response = await getUserMedicineCount();
+      const countData = response.data?.body || response.data; // 동일한 방식으로 데이터 접근
+  
+      if (countData) {
+        const { medicine_count, medicine_ids } = countData;
+        
+        console.log("💊등록된 약 id 리스트: ", countData.medicine_ids)
+        console.log("현재 약 id: ", medicine.item_id)
+        
+        if (medicine_ids && medicine_ids.includes(Number(medicine.item_id))) {
+          // 등록된 약인 경우
+          navigation.navigate('SetMedicineRoutine', { item: medicine });
+        } else {
+          // 등록되지 않은 약인 경우
+          navigation.navigate('RoutineModal', { 
+            screen: 'SetMedicineName', 
+            params: { item: medicine }
+          });
+        }
+      } else {
+        console.error('API 응답에 유효한 데이터가 없습니다:', response);
+      }
+    } catch (error) {
+      console.error('API 호출 중 오류 발생:', error);
+    }
   };
 
   if (!medicine) { // 렌더링 전 error 방지
