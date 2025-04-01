@@ -354,10 +354,6 @@ const ReminderText = styled.Text`
   margin-left: 10px;
 `;
 
-const RoutineContainer = styled.View`
-  align-items: center;
-`;
-
 const RoutineButton = styled(TouchableOpacity)`
   background-color: ${themes.light.pointColor.Primary20};
   width: 100%;

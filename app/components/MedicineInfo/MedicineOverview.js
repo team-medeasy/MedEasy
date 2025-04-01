@@ -20,7 +20,7 @@ const MedicineOverview = ({
       blurRadius={15}>
       <Overlay />
 
-      <View style={{ position: 'relative' }}>
+      <ImageContainer>
         <MedicineImage source={{ uri: medicine.item_image }} />
         <TouchableOpacity
           onPress={() => onPressEnlarge(medicine.item_seq)}
@@ -33,7 +33,7 @@ const MedicineOverview = ({
             크게 보기
           </Tag>
         </TouchableOpacity>
-      </View>
+      </ImageContainer>
 
       <View
         style={{
@@ -98,11 +98,19 @@ const Overlay = styled.View`
   background-color: rgba(0, 0, 0, 0.4);
 `;
 
+const ImageContainer = styled.View`
+  width: 100%;
+  height: 188px;
+  position: relative;
+  border-radius: 10px;
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
+
 const MedicineImage = styled.Image.attrs({
   resizeMode: 'contain',
 })`
-  width: 344px;
-  height: 188px;
+  width: 100%;
+  height: 100%;
   border-radius: 10px;
 `;
 
