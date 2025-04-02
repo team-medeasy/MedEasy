@@ -49,16 +49,9 @@ const Home = () => {
         console.log('API 요청 파라미터:', { start_date: selectedDateString, end_date: selectedDateString });
 
         const response = await getRoutineByDate(selectedDateString, selectedDateString);
-        console.log('루틴 데이터 응답:', response.data.body);
+        const todayRoutines = response.data.body;
 
-        const routineData = response.data.body;
-
-        // 선택된 날짜와 동일한 take_date를 가진 루틴만 필터링
-        const todayRoutines = routineData.filter(routine =>
-          dayjs(routine.take_date).format('YYYY-MM-DD') === selectedDateString
-        );
-
-        console.log('오늘 루틴 데이터:', todayRoutines);
+        console.log(selectedDateString, '의 루틴 데이터:', todayRoutines);
 
         // 시간대별로 정리된 루틴 데이터 처리
         const processedRoutines = todayRoutines[0]?.user_schedule_dtos.map(schedule => ({
