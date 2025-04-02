@@ -94,18 +94,28 @@ const Home = () => {
   useEffect(() => {
     const fetchTodayRoutineData = async () => {
       const today = dayjs().format('YYYY-MM-DD');
-
+      
       try {
         const response = await getRoutineByDate(today, today);
         const routineData = response.data.body;
-
+        
         const todayRoutines = routineData.filter(routine =>
           dayjs(routine.take_date).format('YYYY-MM-DD') === today
         );
-
+        
         if (todayRoutines.length > 0) {
-          console.log('⏰ 오늘의 루틴 일정이 존재합니다.');
-          setTodayRoutine(todayRoutines[0].user_schedule_dtos);
+          // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
+          const hasMedicines = todayRoutines[0].user_schedule_dtos.some(schedule => 
+            schedule.routine_medicine_dtos && schedule.routine_medicine_dtos.length > 0
+          );
+          
+          // 하나라도 routine_medicine_dtos가 있으면
+          if (hasMedicines) {
+            console.log('⏰ 오늘의 루틴 일정이 존재합니다.');
+            setTodayRoutine(todayRoutines[0].user_schedule_dtos);
+          } else {
+            setTodayRoutine(null);
+          }
         } else {
           setTodayRoutine(null);
         }
@@ -114,13 +124,13 @@ const Home = () => {
         setTodayRoutine(null);
       }
     };
-
+    
     // 초기 호출
     fetchTodayRoutineData();
-
+    
     // 5분마다 다시 체크
     const intervalId = setInterval(fetchTodayRoutineData, 5 * 60 * 1000);
-
+    
     // 컴포넌트 언마운트 시 인터벌 정리
     return () => clearInterval(intervalId);
   }, []); // 빈 배열 유지
