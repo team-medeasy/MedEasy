@@ -179,8 +179,12 @@ const SetMedicineRoutine = ({route, navigation}) => {
   }
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ModalHeader showDelete="true" onDeletePress={() => {}}>
-        루틴 추가
+      <ModalHeader 
+        showDelete="true"
+        DeleteColor={themes.light.pointColor.Secondary}
+        onDeletePress={() => {}}
+      >
+        루틴 수정
       </ModalHeader>
 
       <ScrollView
@@ -293,7 +297,9 @@ const SetMedicineRoutine = ({route, navigation}) => {
           </Section>
 
           {/* 총 개수 */}
-          <Section>
+          <Section style={{
+            marginBottom: 34
+          }}>
             <SectionHeader title="총 개수" />
             <InputWithDelete
               placeholder="총 개수를 입력하세요"
@@ -302,6 +308,13 @@ const SetMedicineRoutine = ({route, navigation}) => {
               keyboardType="numeric"
             />
           </Section>
+
+          <Button
+            title="루틴 삭제하기"
+            onPress={() => {}}
+            bgColor={themes.light.pointColor.Secondary}
+          />
+
         </View>
       </ScrollView>
 
