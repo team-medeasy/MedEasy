@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useNavigation } from '@react-navigation/native';
 import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
 import styled from 'styled-components/native';
 import {OtherIcons, RoutineIcons} from '../../../assets/icons';
@@ -23,6 +23,7 @@ const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
 const Routine = () => {
   const today = dayjs();
   const flatListRef = useRef(null);
+  const navigation = useNavigation();
 
   // 현재 주차를 중심으로 이전 4주, 이후 4주까지 총 9주 데이터 생성
   const generateWeeks = centerDate => {
@@ -415,7 +416,7 @@ const Routine = () => {
             offset: width * index,
             index,
           })}
-          // initialScrollIndex 제거
+        // initialScrollIndex 제거
         />
       </DayContainerWrapper>
       <RoundedBox>
@@ -476,7 +477,7 @@ const Routine = () => {
                           {routine.medicines.every(
                             medicine =>
                               checkedItems[
-                                `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                              `medicine-${medicine.medicine_id}-${routine.timeKey}`
                               ],
                           ) ? (
                             <RoutineIcons.checkOn
@@ -542,15 +543,17 @@ const Routine = () => {
                               <MedicineText
                                 isChecked={
                                   checkedItems[
-                                    `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                                  `medicine-${medicine.medicine_id}-${routine.timeKey}`
                                   ]
-                                }>
+                                }
+                                onPress={() => navigation.navigate('SetMedicineRoutine', { medicineId: medicine.medicine_id })}
+                              >
                                 {`${medicine.nickname}`}
                               </MedicineText>
                               <MedicineCount
                                 isChecked={
                                   checkedItems[
-                                    `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                                  `medicine-${medicine.medicine_id}-${routine.timeKey}`
                                   ]
                                 }>
                                 {`${medicine.dose}개`}

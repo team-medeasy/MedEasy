@@ -12,9 +12,10 @@ import {
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { createRoutine } from '../../api/routine';
 import { getUserSchedule } from '../../api/user';
+import { getMedicineById } from '../../api/medicine';
 
 const SetMedicineRoutine = ({route, navigation}) => {
-  const { item } = route.params;
+  const { medicineId } = route.params;
   const [medicine, setMedicine] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicineName, setMedicineName] = useState('');
@@ -28,6 +29,36 @@ const SetMedicineRoutine = ({route, navigation}) => {
 
   const days = ['월', '화', '수', '목', '금', '토', '일'];
   const timings = ['아침', '점심', '저녁', '자기 전'];
+
+  // medicineId로 약 정보 가져오기
+useEffect(() => {
+  const fetchMedicineData = async () => {
+    try {
+      console.log('요청하는 medicineId:', medicineId);
+      const response = await getMedicineById(medicineId);
+      console.log('API 응답:', response);
+      
+      // API 응답 구조에 따라 적절히 데이터 추출
+      const medicineData = response.data?.body || response.data || response;
+      
+      if (medicineData) {
+        console.log('약 데이터:', medicineData);
+        setMedicine(medicineData);
+        // 약 이름으로 기본 별명 설정
+        setMedicineName(medicineData.item_name || medicineData.name || '');
+      } else {
+        console.error('약 정보를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('약 정보 가져오기 실패:', error);
+    }
+  };
+
+  if (medicineId) {
+    fetchMedicineData();
+  }
+}, [medicineId]);
+
 
   const handleSelect = (option) => {
     setSelectedOption((prev) => (prev === option ? null : option));
@@ -85,19 +116,6 @@ const SetMedicineRoutine = ({route, navigation}) => {
       // 오류 처리 (사용자에게 오류 메시지 표시)
     }
   };
-
-  useEffect(() => {
-    if (item) {
-      console.log('약 데이터:', item);
-      
-      setMedicine(item);
-      // 약 이름으로 기본 별명 설정
-      setMedicineName(item.item_name);
-    } else {
-      console.error('약 정보를 찾을 수 없습니다.');
-    }
-  }, [item]);
-
   // 컴포넌트 마운트 시 사용자 일정 가져오기
   useEffect(() => {
     const fetchUserSchedule = async () => {
