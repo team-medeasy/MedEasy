@@ -27,6 +27,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicine, setMedicine] = useState(null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
+  const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -86,6 +87,39 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   }, [medicine]);
 
+  // 루틴 등록 여부
+  useEffect(() => {
+    const checkMedicineRegistered = async () => {
+      try {
+        const response = await getUserMedicineCount();
+        const countData = response.data?.body || response.data;
+  
+        if (countData) {
+          const { medicine_ids } = countData;
+          
+          console.log("💊등록된 약 id 리스트: ", medicine_ids);
+          console.log("현재 약 id: ", medicine.item_id);
+  
+          if (medicine_ids && medicine_ids.includes(Number(medicine.item_id))) {
+            setIsRegistered(true);
+            console.log("📝 등록된 약입니다.")
+          } else {
+            setIsRegistered(false);
+            console.log("❔ 등록되지 않은 약입니다.")
+          }
+        } else {
+          console.error('API 응답에 유효한 데이터가 없습니다:', response);
+        }
+      } catch (error) {
+        console.error('API 호출 중 오류 발생:', error);
+      }
+    };
+  
+    if (medicine) {
+      checkMedicineRegistered();
+    }
+  }, [medicine]);
+
   const HeaderComponent = ({ isModal = false, ...props }) => {
     console.log('isModal:', isModal);
     if (isModal) {
@@ -99,31 +133,13 @@ const MedicineDetailScreen = ({route, navigation}) => {
   };
 
   const handleSetMedicineRoutine = async () => {
-    try {
-      const response = await getUserMedicineCount();
-      const countData = response.data?.body || response.data; // 동일한 방식으로 데이터 접근
-  
-      if (countData) {
-        const { medicine_count, medicine_ids } = countData;
-        
-        console.log("💊등록된 약 id 리스트: ", countData.medicine_ids)
-        console.log("현재 약 id: ", medicine.item_id)
-        
-        if (medicine_ids && medicine_ids.includes(Number(medicine.item_id))) {
-          // 등록된 약인 경우
-          navigation.navigate('SetMedicineRoutine', { item: medicine });
-        } else {
-          // 등록되지 않은 약인 경우
-          navigation.navigate('RoutineModal', { 
-            screen: 'SetMedicineName', 
-            params: { item: medicine }
-          });
-        }
-      } else {
-        console.error('API 응답에 유효한 데이터가 없습니다:', response);
-      }
-    } catch (error) {
-      console.error('API 호출 중 오류 발생:', error);
+    if (isRegistered) {
+      navigation.navigate('SetMedicineRoutine', { item: medicine });
+    } else {
+      navigation.navigate('RoutineModal', { 
+        screen: 'SetMedicineName', 
+        params: { item: medicine }
+      });
     }
   };
 
@@ -229,7 +245,18 @@ const MedicineDetailScreen = ({route, navigation}) => {
         paddingBottom: 30,
         alignItems: 'center',
       }}>
-        <Button title='루틴 추가하기' onPress={handleSetMedicineRoutine} ></Button>
+        {isRegistered ? (
+        <Button 
+          title="루틴 추가 완료!"
+          bgColor={themes.light.textColor.Primary50}
+          onPress={handleSetMedicineRoutine} 
+        />
+        ) : (
+        <Button 
+          title="루틴 추가하기" 
+          onPress={handleSetMedicineRoutine} 
+        />
+        )}
       </View>
 
     </Container>
@@ -326,7 +353,7 @@ const SimilarMedicineItem = ({item, navigation}) => {
     >
       <Image
         source={{uri: item.item_image}}
-        style={{width: 138.75, height: 74, borderRadius: 10}}
+        style={{width: 138.75, height: 74, borderRadius: 10, resizeMode: 'contain'}}
       />
       <View style={{marginTop: 15, gap: 8}}>
         <Text
