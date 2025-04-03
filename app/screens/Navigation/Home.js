@@ -49,16 +49,9 @@ const Home = () => {
         console.log('API 요청 파라미터:', { start_date: selectedDateString, end_date: selectedDateString });
 
         const response = await getRoutineByDate(selectedDateString, selectedDateString);
-        console.log('루틴 데이터 응답:', response.data.body);
+        const todayRoutines = response.data.body;
 
-        const routineData = response.data.body;
-
-        // 선택된 날짜와 동일한 take_date를 가진 루틴만 필터링
-        const todayRoutines = routineData.filter(routine =>
-          dayjs(routine.take_date).format('YYYY-MM-DD') === selectedDateString
-        );
-
-        console.log('오늘 루틴 데이터:', todayRoutines);
+        console.log(selectedDateString, '의 루틴 데이터:', todayRoutines);
 
         // 시간대별로 정리된 루틴 데이터 처리
         const processedRoutines = todayRoutines[0]?.user_schedule_dtos.map(schedule => ({
@@ -101,18 +94,28 @@ const Home = () => {
   useEffect(() => {
     const fetchTodayRoutineData = async () => {
       const today = dayjs().format('YYYY-MM-DD');
-
+      
       try {
         const response = await getRoutineByDate(today, today);
         const routineData = response.data.body;
-
+        
         const todayRoutines = routineData.filter(routine =>
           dayjs(routine.take_date).format('YYYY-MM-DD') === today
         );
-
+        
         if (todayRoutines.length > 0) {
-          console.log('⏰ 오늘의 루틴 일정이 존재합니다.');
-          setTodayRoutine(todayRoutines[0].user_schedule_dtos);
+          // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
+          const hasMedicines = todayRoutines[0].user_schedule_dtos.some(schedule => 
+            schedule.routine_medicine_dtos && schedule.routine_medicine_dtos.length > 0
+          );
+          
+          // 하나라도 routine_medicine_dtos가 있으면
+          if (hasMedicines) {
+            console.log('⏰ 오늘의 루틴 일정이 존재합니다.');
+            setTodayRoutine(todayRoutines[0].user_schedule_dtos);
+          } else {
+            setTodayRoutine(null);
+          }
         } else {
           setTodayRoutine(null);
         }
@@ -121,13 +124,13 @@ const Home = () => {
         setTodayRoutine(null);
       }
     };
-
+    
     // 초기 호출
     fetchTodayRoutineData();
-
+    
     // 5분마다 다시 체크
     const intervalId = setInterval(fetchTodayRoutineData, 5 * 60 * 1000);
-
+    
     // 컴포넌트 언마운트 시 인터벌 정리
     return () => clearInterval(intervalId);
   }, []); // 빈 배열 유지
@@ -195,11 +198,16 @@ const Home = () => {
               }}
             />
           </TextContainer>
-          {/* 버튼 추가 */}
-          <RoutineContainer>
-            {todayRoutine ? (
+          {todayRoutine ? (
+            <View style={{
+              alignItems: 'center'
+            }}>
               <HomeRoutine schedules={todayRoutine} />
-            ) : (
+            </View>
+          ) : (
+            <View style={{
+              marginHorizontal: 20
+            }}>
               <RoutineButton onPress={handleAddMedicineRoutine}>
                 <LogoIcons.logoAdd
                   height={115}
@@ -207,8 +215,8 @@ const Home = () => {
                 />
                 <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
               </RoutineButton>
-            )}
-          </RoutineContainer>
+            </View>
+          )}
           <ButtonContainer>
             <AddButton onPress={handleAddMedicineRoutine}>
               <ButtonContent>
@@ -347,10 +355,6 @@ const ReminderText = styled.Text`
   font-size: ${FontSizes.title.default};
   font-family: 'KimjungchulGothic-Bold';
   margin-left: 10px;
-`;
-
-const RoutineContainer = styled.View`
-  align-items: center;
 `;
 
 const RoutineButton = styled(TouchableOpacity)`

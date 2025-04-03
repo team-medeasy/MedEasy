@@ -6,7 +6,13 @@ import {HeaderIcons} from '../../../assets/icons';
 import {themes} from '../../styles'; 
 import FontSizes from '../../../assets/fonts/fontSizes';  
 
-const ModalHeader = ({children, onBackPress, showDelete = false, onDeletePress}) => {   
+const ModalHeader = ({
+  children, 
+  onBackPress, 
+  showDelete = false, 
+  DeleteColor, 
+  onDeletePress
+}) => {   
   const navigation = useNavigation();   
   const handleBackPress = onBackPress || (() => navigation.goBack());    
   
@@ -26,7 +32,7 @@ const ModalHeader = ({children, onBackPress, showDelete = false, onDeletePress})
             <HeaderIcons.trash
               width={17}
               height={17}
-              style={{color: themes.light.textColor.Primary30}}
+              style={{color: DeleteColor || themes.light.textColor.Primary30}}
             />
           </TouchableOpacity>
         ) : (

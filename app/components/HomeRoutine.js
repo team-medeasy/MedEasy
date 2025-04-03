@@ -124,6 +124,7 @@ const MedicineText = styled.Text`
     color: ${themes.light.textColor.buttonText};
     font-family: 'Pretendard-Medium';
     font-size: ${FontSizes.body.default};
+    width: 90%;
 `;
 
 export default HomeRoutine;

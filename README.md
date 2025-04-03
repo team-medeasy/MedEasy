@@ -1,9 +1,11 @@
-# 💊 MedEasy
+# 💊 내 손 안의 복약 도우미 - 메디지(MedEasy)
 ![Thumbnail](docs/thumbnail.png)
 
-
-**MedEasy**는 노년층, 장애인 및 만성 질환 환자를 위한 **간편하고 안전한 복약 관리 앱**입니다.  
-처방전에서 약 정보를 자동으로 등록하고, NFC 태그를 통해 복용 여부를 쉽게 체크할 수 있습니다. 또한 AI 기반 챗봇을 통해 약 정보를 빠르고 정확하게 제공하며, 알림 기능으로 규칙적인 복약을 도와줍니다.
+> 병원에서 처방받은 약, 까먹고 안 먹은 적이 있진 않으신가요?
+> 
+> 여러 개의 약을 받아왔는데 어떤 약이 어떤 역할을 하는지 잘 모르는 채로 약을 먹고 있진 않으신가요?
+> 
+> **메디지**가 복약 알림과 알약 이미지 검색을 통해 쉬운 복약 관리를 도와드릴게요!
 
 ---
 
@@ -132,6 +134,6 @@ erDiagram
 |----------------------|------|------|----------|
 | <img src="https://github.com/HONGMOEJI.png" width="50" height="50"> | 👑 홍영준 | Backend Developer | Email: moejihong@gmail.com<br>GitHub: [@HONGMOEJI](https://github.com/HONGMOEJI) |
 | <img src="https://github.com/jiwonp7747.png" width="50" height="50"> | 박지원 | Backend Developer | Email: angry9908@gmail.com<br>GitHub: [@jiwonp7747](https://github.com/jiwonp7747) |
-| <img src="https://github.com/hyynjju.png" width="50" height="50"> | 조현주 | UX/UI 설계 / Frontend Developer | Email: hyynjju@gmail.com<br>GitHub: [@hyynjju](https://github.com/hyynjju) |
+| <img src="https://github.com/hyynjju.png" width="50" height="50"> | 조현주 | UX/UI / Frontend Developer | Email: hyynjju@gmail.com<br>GitHub: [@hyynjju](https://github.com/hyynjju) |
 | <img src="https://github.com/kimgazii.png" width="50" height="50"> | 김가영 | Frontend Developer | Email: gy0424ya@gmail.com <br>GitHub: [@kimgazii](https://github.com/kimgazii) |
 | <img src="https://github.com/hs-2171117-yeyoungyang.png" width="50" height="50"> | 양예영 | Frontend Developer | Email: yangyeyoung13@gmail.com<br>GitHub: [@hs-2171117-yeyoungyang](https://github.com/hs-2171117-yeyoungyang) |
