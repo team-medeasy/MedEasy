@@ -134,7 +134,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
 
   const handleSetMedicineRoutine = async () => {
     if (isRegistered) {
-      navigation.navigate('SetMedicineRoutine', { item: medicine });
+      navigation.navigate('SetMedicineRoutine', { medicineId: medicine.item_id });
     } else {
       navigation.navigate('RoutineModal', { 
         screen: 'SetMedicineName', 
