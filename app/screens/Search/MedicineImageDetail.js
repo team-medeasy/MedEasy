@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
+import { Dimensions } from 'react-native';
 import {Header, ModalHeader} from '../../components';
 import {themes} from '../../styles';
-
-import { dummyMedicineData } from '../../../assets/data/data';
 
 const MedicineImageDetailScreen = ({route}) => {
   const { item, isModal = false } = route.params;
@@ -64,13 +63,15 @@ const ImageContainer = styled.View`
   width: 100%;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 `;
 
-const MedicineImage = styled.Image`
-  width: 718px;
-  height: 403px;
+const MedicineImage = styled.Image.attrs({
+  resizeMode: 'contain',
+})`
+  width: ${Dimensions.get('window').height}px;
+  height: ${Dimensions.get('window').width}px;
   transform: rotate(-90deg);
-  flex-shrink: 0;
 `;
 
 export default MedicineImageDetailScreen;

@@ -5,6 +5,7 @@ import {themes, pointColor} from './../../styles';
 
 import {SearchBar} from './../../components/SearchBar';
 import {OtherIcons, LogoIcons} from '../../../assets/icons';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Container = styled.View`
   flex: 1;
@@ -45,7 +46,7 @@ const SearchSectionHeader = styled.View`
 `;
 
 const SearchTitle = styled.Text`
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Semibold';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -53,13 +54,13 @@ const SearchTitle = styled.Text`
 const ClearAllButton = styled(TouchableOpacity)``;
 
 const ClearAllText = styled.Text`
-  font-size: 14px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
 `;
 
 const NoRecentSearchesText = styled.Text`
-  font-size: 14px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Semibold';
   color: ${themes.light.textColor.Primary30};
   text-align: center;
@@ -89,7 +90,7 @@ const RecentSearchItemButton = styled(TouchableOpacity)`
 `;
 
 const RecentSearchItemText = styled.Text`
-  font-size: 14px;
+  font-size: ${FontSizes.body.default};
   color: ${themes.light.textColor.textPrimary};
 `;
 
@@ -104,7 +105,7 @@ const PopularSearchItemButton = styled(TouchableOpacity)`
 `;
 
 const RankingText = styled.Text`
-  font-size: 14px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Bold';
   font-weight: bold;
   color: ${pointColor.pointPrimary};
@@ -112,7 +113,7 @@ const RankingText = styled.Text`
 `;
 
 const PopularSearchText = styled.Text`
-  font-size: 14px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
   flex: 1;
@@ -126,7 +127,7 @@ const IconContainer = styled.View`
 `;
 
 const RankingStayText = styled.Text`
-  font-size: 14px;
+  font-size: ${FontSizes.body.default};
   text-align: center;
   color: ${themes.light.textColor.Primary30};
 `;

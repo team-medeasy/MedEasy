@@ -18,7 +18,8 @@ import {
   Button} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {OtherIcons} from '../../../assets/icons';
-import { getSimilarMedicines } from '../../api/medicine';
+import { getSimilarMedicines, getMedicineById } from '../../api/medicine';
+import { getUserMedicineCount } from '../../api/user';
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {item, isModal, title} = route.params;
@@ -26,6 +27,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicine, setMedicine] = useState(null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
+  const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -85,6 +87,39 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   }, [medicine]);
 
+  // 루틴 등록 여부
+  useEffect(() => {
+    const checkMedicineRegistered = async () => {
+      try {
+        const response = await getUserMedicineCount();
+        const countData = response.data?.body || response.data;
+  
+        if (countData) {
+          const { medicine_ids } = countData;
+          
+          console.log("💊등록된 약 id 리스트: ", medicine_ids);
+          console.log("현재 약 id: ", medicine.item_id);
+  
+          if (medicine_ids && medicine_ids.includes(Number(medicine.item_id))) {
+            setIsRegistered(true);
+            console.log("📝 등록된 약입니다.")
+          } else {
+            setIsRegistered(false);
+            console.log("❔ 등록되지 않은 약입니다.")
+          }
+        } else {
+          console.error('API 응답에 유효한 데이터가 없습니다:', response);
+        }
+      } catch (error) {
+        console.error('API 호출 중 오류 발생:', error);
+      }
+    };
+  
+    if (medicine) {
+      checkMedicineRegistered();
+    }
+  }, [medicine]);
+
   const HeaderComponent = ({ isModal = false, ...props }) => {
     console.log('isModal:', isModal);
     if (isModal) {
@@ -97,11 +132,15 @@ const MedicineDetailScreen = ({route, navigation}) => {
     navigation.navigate('MedicineImageDetail', {item: medicine, isModal: isModal});
   };
 
-  const handleSetMedicineRoutine = () => {
-    navigation.navigate('RoutineModal', { 
-      screen: 'SetMedicineName', 
-      params: { item: item }
-    });
+  const handleSetMedicineRoutine = async () => {
+    if (isRegistered) {
+      navigation.navigate('SetMedicineRoutine', { item: medicine });
+    } else {
+      navigation.navigate('RoutineModal', { 
+        screen: 'SetMedicineName', 
+        params: { item: medicine }
+      });
+    }
   };
 
   if (!medicine) { // 렌더링 전 error 방지
@@ -178,7 +217,12 @@ const MedicineDetailScreen = ({route, navigation}) => {
                 showsHorizontalScrollIndicator={false}
                 paddingHorizontal={20}
                 keyExtractor={item => item.item_id}
-                renderItem={({item}) => <SimilarMedicineItem item={item} />}
+                renderItem={({item}) => (
+                  <SimilarMedicineItem 
+                  item={item} 
+                  navigation={navigation}
+                  />
+                )}
               />
             ) : (
               <Text style={{
@@ -201,7 +245,18 @@ const MedicineDetailScreen = ({route, navigation}) => {
         paddingBottom: 30,
         alignItems: 'center',
       }}>
-        <Button title='루틴 추가하기' onPress={handleSetMedicineRoutine} ></Button>
+        {isRegistered ? (
+        <Button 
+          title="루틴 추가 완료!"
+          bgColor={themes.light.textColor.Primary50}
+          onPress={handleSetMedicineRoutine} 
+        />
+        ) : (
+        <Button 
+          title="루틴 추가하기" 
+          onPress={handleSetMedicineRoutine} 
+        />
+        )}
       </View>
 
     </Container>
@@ -276,37 +331,56 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
   );
 };
 
-const SimilarMedicineItem = ({item}) => (
-  <View style={{marginRight: 15, width: 138.75}}>
-    <Image
-      source={{uri: item.item_image}}
-      style={{width: 138.75, height: 74, borderRadius: 10}}
-    />
-    <View style={{marginTop: 15, gap: 8}}>
-      <Text
-        style={{
-          fontFamily: 'Pretendard-SemiBold',
-          fontSize: FontSizes.caption.default,
-          color: themes.light.textColor.Primary50,
-        }}>
-        {item.entp_name}
-      </Text>
-      <Text
-        style={{
-          fontFamily: 'Pretendard-Bold',
-          fontSize: FontSizes.body.default,
-          color: themes.light.textColor.textPrimary,
-        }}
-        numberOfLines={1} // 한 줄로 제한
-        ellipsizeMode="tail">
-        {item.item_name}
-      </Text>
-      <Tag sizeType="small" colorType="resultPrimary">
-        {item.class_name || '약품 구분'}
-      </Tag>
-    </View>
-  </View>
-);
+const SimilarMedicineItem = ({item, navigation}) => {
+  const handlePressMedicine = async () => {
+    try {
+      const response = await getMedicineById(item.item_id);
+      const medicineData = response.data.body;
+
+      navigation.push('MedicineDetail', {
+        item: medicineData,
+        isModal: false
+      });
+    } catch (error) {
+      console.error('약 정보 불러오기 실패:', error);
+    }
+  };
+
+  return (
+    <TouchableOpacity 
+      style={{marginRight: 15, width: 138.75}}
+      onPress={handlePressMedicine}
+    >
+      <Image
+        source={{uri: item.item_image}}
+        style={{width: 138.75, height: 74, borderRadius: 10, resizeMode: 'contain'}}
+      />
+      <View style={{marginTop: 15, gap: 8}}>
+        <Text
+          style={{
+            fontFamily: 'Pretendard-SemiBold',
+            fontSize: FontSizes.caption.default,
+            color: themes.light.textColor.Primary50,
+          }}>
+          {item.entp_name}
+        </Text>
+        <Text
+          style={{
+            fontFamily: 'Pretendard-Bold',
+            fontSize: FontSizes.body.default,
+            color: themes.light.textColor.textPrimary,
+          }}
+          numberOfLines={1}
+          ellipsizeMode="tail">
+          {item.item_name}
+        </Text>
+        <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis' maxLength='14'>
+          {item.class_name || '약품 구분'}
+        </Tag>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const HeadingText = styled.Text`
   color: ${themes.light.textColor.textPrimary};

@@ -18,7 +18,7 @@ import SettingStack from './screens/Settings/SettingStack';
 import NotificationScreen from './screens/Notification';
 import AddMedicineRoutineScreen from './screens/Routine/AddMedicineRoutine';
 import AddHospitalVisitScreen from './screens/Routine/AddHospitalVisit';
-//import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
+import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
 import SetMedicineNameScreen from './screens/Routine/SetMedicineName';
 import SetMedicineDayScreen from './screens/Routine/SetMedicineDay';
 import SetMedicineTimeScreen from './screens/Routine/SetMedicineTime';
@@ -27,6 +27,8 @@ import SetMedicineTotalScreen from './screens/Routine/SetMedicineTotal';
 import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
 import {SignUpProvider} from './api/context/SignUpContext';
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
+
+import MedicineListScreen from './screens/Settings/MedicineList';
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -125,15 +127,24 @@ const App = () => {
                 component={AddHospitalVisitScreen}
                 options={{presentation: 'modal'}}
               />
-              {/* <RootStack.Screen
+              <RootStack.Screen
                 name="SetMedicineRoutine"
                 component={SetMedicineRoutineScreen}
                 options={{presentation: 'modal'}}
-              /> */}
+              />
               <RootStack.Screen
                 name="RoutineModal"
                 component={RoutineModalNavigator}
                 options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="SetRoutineTime"
+                component={SetRoutineTimeScreen}
+                options={{presentation: 'modal'}}
+              />
+              <RootStack.Screen
+                name="MedicineList"
+                component={MedicineListScreen}
               />
             </RootStack.Navigator>
           )}

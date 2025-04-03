@@ -12,6 +12,7 @@ import {ProgressBar, BackAndNextButtons} from './../../components';
 import {LogoIcons} from './../../../assets/icons';
 import {useSignUp} from '../../api/context/SignUpContext';
 import {handleSignUp} from '../../api/services/authService';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {logo: LogoIcon} = LogoIcons;
 
@@ -175,7 +176,6 @@ const SignUpDOBGenderScreen = ({navigation}) => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={{flex: 1}}>
           <ProgressBar progress={progress} />
-
           <Container1>
             <Text
               style={{
@@ -199,12 +199,15 @@ const SignUpDOBGenderScreen = ({navigation}) => {
             <InputContainer marginBottom="5px">
               <TextInput
                 placeholder="생년월일 (YYYY-MM-DD)"
+                placeholderTextColor={themes.light.textColor.placeholder}
                 value={birthday}
                 onChangeText={handleBirthDateChange}
                 keyboardType="numeric"
                 maxLength={10}
                 returnKeyType="done"
                 onSubmitEditing={Keyboard.dismiss}
+                autoCorrect={false}
+                blurOnSubmit={true}
               />
               {dateError ? (
                 <Text
@@ -311,7 +314,7 @@ const TextInput = styled.TextInput`
   border-radius: 10px;
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 20px;
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
 `;
 
 const GenderBtn = styled.TouchableOpacity`
@@ -331,7 +334,7 @@ const GenderText = styled.Text`
     props.selected
       ? themes.light.textColor.buttonText
       : themes.light.textColor.textPrimary};
-  font-size: 22px;
+  font-size: ${FontSizes.title.default};
   font-weight: bold;
 `;
 

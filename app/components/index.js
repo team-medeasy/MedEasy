@@ -1,5 +1,5 @@
-import { Header } from './\bHeader/Header';
-import { ModalHeader } from './\bHeader/ModalHeader';
+import { Header } from './Header/Header';
+import { ModalHeader } from './Header/ModalHeader';
 import { MedicineAppearance } from './MedicineInfo/MedicineAppearance';
 import { MedicineOverview } from './MedicineInfo/MedicineOverview';
 import { NoSearchResults } from './SearchResult/NoSearchResults';
@@ -9,7 +9,7 @@ import { CameraSearchResultsList } from './CameraSearchResult/CameraSearchResult
 import { CameraSearchResultItem } from './CameraSearchResult/CameraSearchResultItem'
 import { PrescriptionSearchResultsList } from './PrescriptionSearchResult/PrescriptionSearchResultsList';
 import { PrescriptionSearchResultItem } from './PrescriptionSearchResult/PrescriptionSearchResultItem';
-import { Button, BackAndNextButtons } from './Button';
+import { Button, BackAndNextButtons, SelectTimeButton } from './Button';
 import { ProgressBar } from './ProgressBar';
 import { SearchBar } from './SearchBar';
 import { Footer } from './Footer';
@@ -23,6 +23,7 @@ import { SearchScreenHeader } from './SearchResult/SearchScreenHeader';
 export {
   Button,
   BackAndNextButtons,
+  SelectTimeButton,
   ProgressBar,
   SearchBar,
   Header,

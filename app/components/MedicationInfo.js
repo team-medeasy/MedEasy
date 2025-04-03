@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components/native';
 import { pointColor, themes } from '../styles';
 import KarteIcon from '../../assets/icons/karte.svg';
@@ -6,46 +6,44 @@ import LogoIcon from '../../assets/icons/logo/logo.svg';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { getUserUsageDays } from '../api/user';
 import { getUserMedicineCount } from '../api/user';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const MedicationInfo = () => {
+  const navigation = useNavigation();
   const [daysSinceJoin, setDaysSinceJoin] = useState(0);
-  const [medicineCount, setmedicineCount] = useState(0);
+  const [medicineCount, setMedicineCount] = useState(0);
   
-  useEffect(() => {
-    // 사용자 사용 일수 가져오기
-    const fetchUserUsageDays = async () => {
-      try {
-        const response = await getUserUsageDays();
-        const usageData = response.data?.body || response.data;
-        
-        if (usageData && usageData.usage_days !== undefined) {
-          setDaysSinceJoin(usageData.usage_days);
-        }
-      } catch (error) {
-        console.error('사용자 사용 일수 가져오기 실패:', error);
+  const fetchData = useCallback(async () => {
+    try {
+      const [usageResponse, medicineResponse] = await Promise.all([
+        getUserUsageDays(),
+        getUserMedicineCount()
+      ]);
+
+      const usageData = usageResponse.data?.body || usageResponse.data;
+      const countData = medicineResponse.data?.body || medicineResponse.data;
+
+      if (usageData?.usage_days !== undefined) {
+        setDaysSinceJoin(usageData.usage_days);
       }
-    };
-    
-    fetchUserUsageDays();
+      if (countData?.medicine_count !== undefined) {
+        setMedicineCount(countData.medicine_count);
+      }
+    } catch (error) {
+      console.error('데이터 가져오기 실패:', error);
+    }
   }, []);
 
-  useEffect(() => {
-    // 사용자 약 개수 가져오기
-    const fetchUserMedicineCount = async () => {
-      try {
-        const response = await getUserMedicineCount();
-        const countData = response.data?.body || response.data;
-        
-        if (countData && countData.medicine_count !== undefined) {
-          setmedicineCount(countData.medicine_count);
-        }
-      } catch (error) {
-        console.error('사용자 약 개수 가져오기 실패:', error);
-      }
-    };
-    
-    fetchUserMedicineCount();
-  }, []);
+  // 🔹 화면이 포커스될 때마다 fetchData 실행
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [fetchData])
+  );
+
+  const handleMedicineList = () => {
+    navigation.navigate('MedicineList');
+  };
   
   return (
     <Container>
@@ -62,7 +60,7 @@ const MedicationInfo = () => {
           />
         </IconWrapper>
       </DaysSinceMedication>
-      <MedicationCount>
+      <MedicationCount onPress={handleMedicineList}>
         <WithMedeasy>메디지와 함께</WithMedeasy>
         <InfoText>복용중인 약 </InfoText>
         <InfoNum>{medicineCount}개</InfoNum>
@@ -102,7 +100,7 @@ const DaysSinceMedication = styled.View`
   overflow: hidden;
 `;
 
-const MedicationCount = styled.View`
+const MedicationCount = styled.TouchableOpacity`
   background-color: ${pointColor.pointPrimaryDark};
   padding: 15px;
   width: 49%;

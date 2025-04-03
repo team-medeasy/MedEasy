@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
-import {SafeAreaView, Text} from 'react-native';
+import {SafeAreaView, Text, Keyboard, TouchableWithoutFeedback, View, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -39,7 +40,7 @@ const TextInput = styled.TextInput`
   border-radius: 10px;
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 20px;
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
 `;
 
 const TxtLabel = styled.Text`
@@ -47,64 +48,110 @@ const TxtLabel = styled.Text`
   border-radius: 10px;
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 20px;
-  font-size: 16px;
+  font-size: ${FontSizes.body.default};
+`;
+
+const ErrorText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  color: red;
+  margin-top: 5px;
+  font-size: 12px;
 `;
 
 const SignUpEmailScreen = ({navigation, route}) => {
   const {signUpData, updateSignUpData} = useSignUp();
   const [email, setEmail] = useState(signUpData.email || '');
+  const[emailError, setEmailError] = useState('');
   const progress = '50%';
 
-  const handleNext = () => {
-    if (email) {
-      updateSignUpData({email});
-      // 다음 페이지로 이동
-      navigation.navigate('SignUpPassword');
+  const validateEmail = text => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(text && !emailRegex.test(text)) {
+      setEmailError('유효한 이메일 주소를 입력해주세요');
+      return false;
     } else {
-      alert('이메일을 입력하세요.');
+      setEmailError('');
+      return true;
     }
+  };
+  
+  const handleEmailChange = text => {
+    setEmail(text);
+    setEmailError('');
+  };
+
+  // when email input is unfocused, validate email
+  const handleEmailBlur = () => {
+    if (email) validateEmail(email);
+  };
+
+  const handleNext = () => {
+    if (!email) {
+      setEmailError('이메일을 입력해주세요');
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      return;
+    }
+    
+    updateSignUpData({email});
+    navigation.navigate('SignUpPassword');
   };
 
   return (
-    <Container>
-      <ProgressBar progress={progress} />
-      <Container1>
-        <Text
-          style={{
-            fontFamily: fonts.title.fontFamily,
-            fontSize: fonts.title.fontSize,
-          }}>
-          {signUpData.firstName}님, 반가워요!
-        </Text>
-        <Text
-          style={{
-            fontFamily: 'Pretendard-Medium',
-            fontSize: 16,
-            marginTop: 7,
-            color: themes.light.textColor.Primary50,
-          }}>
-          이메일 주소를 입력해주세요.
-        </Text>
-      </Container1>
-      <Container2>
-        <InputContainer marginBottom="5px">
-          <TextInput
-            placeholder="예: abcd@efg.com"
-            value={email}
-            onChangeText={setEmail}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <Container>
+        <ProgressBar progress={progress} />
+        <Container1>
+          <Text
+            style={{
+              fontFamily: fonts.title.fontFamily,
+              fontSize: fonts.title.fontSize,
+            }}>
+            {signUpData.firstName}님, 반가워요!
+          </Text>
+          <Text
+            style={{
+              fontFamily: 'Pretendard-Medium',
+              fontSize: 16,
+              marginTop: 7,
+              color: themes.light.textColor.Primary50,
+            }}>
+            이메일 주소를 입력해주세요.
+          </Text>
+        </Container1>
+        <Container2>
+          <InputContainer marginBottom="5px">
+            <TextInput
+              placeholder="example@hansung.kr"
+              placeholderTextColor={themes.light.textColor.placeholder}
+              value={email}
+              onChangeText={handleEmailChange}
+              returnKeyType="done"
+              onBlur={handleEmailBlur}
+              onSubmitEditing={Keyboard.dismiss}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="off"
+              autoCorrect={false}
+              spellCheck={false}
+              blurOnSubmit={true}
+            />
+            {emailError ? <ErrorText>{emailError}</ErrorText> : null}
+          </InputContainer>
+          <InputContainer marginTop="15px">
+            <TxtLabel>{signUpData.lastName + signUpData.firstName}</TxtLabel>
+          </InputContainer>
+        </Container2>
+        <BtnContainer>
+          <BackAndNextButtons
+            onPressPrev={() => navigation.goBack()}
+            onPressNext={handleNext}
           />
-        </InputContainer>
-        <InputContainer marginTop="5px">
-          <TxtLabel>{signUpData.lastName + signUpData.firstName}</TxtLabel>
-        </InputContainer>
-      </Container2>
-      <BtnContainer>
-        <BackAndNextButtons
-          onPressPrev={() => navigation.goBack()}
-          onPressNext={handleNext}
-        />
-      </BtnContainer>
-    </Container>
+        </BtnContainer>
+      </Container>
+    </TouchableWithoutFeedback>
   );
 };
 

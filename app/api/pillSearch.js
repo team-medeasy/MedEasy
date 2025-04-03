@@ -79,7 +79,7 @@ export const searchPillByImage = async (imageUri, topK = 5) => {
 
   try {
     const response = await pillApi.post(
-      `/api/v1/search/image?top_k=${topK}`,
+      `/v2/medicine/image?top_k=${topK}`,
       formData,
       {
         headers: {

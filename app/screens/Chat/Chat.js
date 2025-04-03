@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {FlatList, KeyboardAvoidingView, View} from 'react-native';
 import ChatInfoModal from './ChatInfoModal';
-import {Header} from './../../components/\bHeader/Header';
+import {Header} from '../../components/Header/Header';
 import {themes} from '../../styles';
 import MessageBubble from '../../components/Chat/MessageBubble';
 import MessageInput from '../../components/Chat/MessageInput';

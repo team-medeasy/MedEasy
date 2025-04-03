@@ -65,6 +65,9 @@ const TabNavigator = () => {
             tabBarIcon: ({color, size}) => (
               <TabIcons.home width={30} height={30} style={{color: color}} />
             ),
+            tabBarItemStyle: {
+              paddingLeft: 20,
+            },
           }}
         />
         <Tab.Screen
@@ -76,11 +79,7 @@ const TabNavigator = () => {
               <TabIcons.search width={30} height={30} style={{color: color}} />
             ),
             tabBarItemStyle: {
-              marginLeft: -30,
-            },
-            tabBarItemStyle: {
-              marginLeft: -35,
-              marginRight: 15,
+              paddingRight: 30,
             },
           }}
           listeners={{
@@ -99,11 +98,7 @@ const TabNavigator = () => {
               <TabIcons.routine width={30} height={30} style={{color: color}} />
             ),
             tabBarItemStyle: {
-              marginRight: -30,
-            },
-            tabBarItemStyle: {
-              marginLeft: 15,
-              marginRight: -35,
+              paddingLeft: 30,
             },
           }}
         />
@@ -115,11 +110,14 @@ const TabNavigator = () => {
             tabBarIcon: ({color, size}) => (
               <TabIcons.my width={30} height={30} style={{color: color}} />
             ),
+            tabBarItemStyle: {
+              paddingRight: 20,
+            },
           }}
         />
       </Tab.Navigator>
       <CameraButton onPress={handleCameraPress} />
-      <ChatContainer>
+      {/* <ChatContainer>
         <ChatBuble>
           <BubbleTail />
           <BubbleText>챗봇 약사에게{'\n'}상담해보세요!</BubbleText>
@@ -131,7 +129,7 @@ const TabNavigator = () => {
             style={{color: themes.light.pointColor.Primary}}
           />
         </ChatButton>
-      </ChatContainer>
+      </ChatContainer> */}
     </MainContainer>
   );
 };

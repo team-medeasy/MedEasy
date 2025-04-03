@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Animated } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Modal, Animated} from 'react-native';
 import styled from 'styled-components/native';
-import { Button } from './../../components';
-import { themes } from '../../styles';
-import { LogoIcons } from '../../../assets/icons';
+import {Button} from './../../components';
+import {themes} from '../../styles';
+import {LogoIcons} from '../../../assets/icons';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
-const ChatInfoModal = ({ visible, onClose }) => {
+const ChatInfoModal = ({visible, onClose}) => {
   // 배경 투명도
   const [fadeAnim] = useState(new Animated.Value(0));
   // 모달 위치
@@ -18,7 +19,7 @@ const ChatInfoModal = ({ visible, onClose }) => {
         duration: 300,
         useNativeDriver: true,
       }).start();
-      
+
       // 위로 슬라이드
       Animated.timing(slideAnim, {
         toValue: 0,
@@ -32,7 +33,7 @@ const ChatInfoModal = ({ visible, onClose }) => {
         duration: 300,
         useNativeDriver: true,
       }).start();
-      
+
       Animated.timing(slideAnim, {
         toValue: 300,
         duration: 300,
@@ -47,10 +48,10 @@ const ChatInfoModal = ({ visible, onClose }) => {
       transparent={true}
       animationType="none"
       onRequestClose={onClose}>
-      <AnimatedModalContainer style={{ opacity: fadeAnim }}>
+      <AnimatedModalContainer style={{opacity: fadeAnim}}>
         <AnimatedModalContent
           style={{
-            transform: [{ translateY: slideAnim }],
+            transform: [{translateY: slideAnim}],
           }}>
           <TopBar />
           <CautionContainer>
@@ -100,14 +101,14 @@ const CautionContainer = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: 22px;
+  font-size: ${FontSizes.title.default};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
   padding: 30px;
 `;
 
 const CautionText = styled.Text`
-  font-size: 15px;
+  font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
   padding: 30px 20px;

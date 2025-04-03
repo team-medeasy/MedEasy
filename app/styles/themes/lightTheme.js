@@ -12,7 +12,7 @@ export const lightTheme = {
     Primary6: 'rgba(0, 0, 0, 0.06)',
     Primary20: 'rgba(0, 0, 0, 0.2)',
     Primary30: 'rgba(0, 0, 0, 0.3)',
-    Primary50: 'rgba(0, 0, 0, 0.5)',
+    Primary50: 'rgba(128, 128, 128, 1)',
     Primary70: 'rgba(0, 0, 0, 0.7)',
     buttonText: 'rgba(255, 255, 255, 1)',
     buttonText70: 'rgba(255, 255, 255, 0.7)',
@@ -23,6 +23,7 @@ export const lightTheme = {
   boxColor: {
     buttonPrimary: 'rgba(0, 0, 0, 1)',
     buttonSecondary: 'rgba(255, 255, 255, 1)',
+    buttonSecondary40: 'rgba(255, 255, 255, 0.4)',
     inputPrimary: 'rgba(0, 0, 0, 0.04)',
     inputSecondary: 'rgba(0, 0, 0, 0.06)',
     tagResultPrimary: 'rgba(66,115,237,0.1)',

@@ -31,7 +31,7 @@ const SetMedicineName = ({route, navigation}) => {
       console.log('약 데이터:', item);
       // API 응답 데이터 필드를 기존 앱 구조에 맞게 매핑
       const mappedMedicine = {
-        item_id: item.id, // id를 item_id로 매핑
+        item_id: item.item_id, // id
         item_name: item.item_name, // 약 이름
         entp_name: item.entp_name, // 제조사 이름
         class_name: item.class_name, // 약 분류
