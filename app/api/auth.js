@@ -1,20 +1,42 @@
 import api from './index';
+import {getFCMToken} from './storage';
 
-export const signUp = data => api.post('/open-api/auth/sign_up', data, {
-  headers: {
-    Authorization: undefined,
-    'Content-Type': 'application/json',
-  },
-})
-.then(response => {
-  console.log('SignUp 응답:', response.data);
-  return response;
-});
+export const signUp = async data => {
+  // FCM 토큰 가져오기
+  const fcmToken = await getFCMToken();
+
+  // 기존 데이터에 FCM 토큰 추가
+  const requestData = {
+    ...data,
+    fcm_token: fcmToken || ''
+  };
+
+  return api.post('/open-api/auth/sign_up', requestData, {
+    headers: {
+      Authorization: undefined,
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => {
+    console.log('SignUp 응답:', response.data);
+    return response;
+  });
+};
 
 export const login = async data => {
   try {
-    const response = await api.post('/open-api/auth/login', data);
+    // FCM 토큰 가져오기
+    const fcmToken = await getFCMToken();
+    console.log('FCM 토큰:', fcmToken); // FCM 토큰 로깅
+    // 기존 데이터에 FCM 토큰 추가
+    const requestData = {
+      ...data,
+      fcm_token: fcmToken || ''
+    };
+    // login 함수 내부에 추가
+    console.log('요청 데이터 구조:', JSON.stringify(requestData, null, 2));
 
+    const response = await api.post('/open-api/auth/login', requestData);
     const {access_token, refresh_token} = response.data.body || {};
 
     if (!access_token || !refresh_token) {

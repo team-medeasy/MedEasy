@@ -8,28 +8,32 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
+# ✅ 정적 프레임워크 사용 (iOS 17/18 SDK 및 Swift 라이브러리와의 호환성 개선)
+use_frameworks! :linkage => :static
 
 target 'MedEasy' do
+  # ❌ use_modular_headers! 제거 - Xcode 16.2에서 빌드 오류 발생
+  # use_modular_headers! 
+
   config = use_native_modules!
+
+  # Firebase 관련 Pods을 위한 명시적 설정
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # An absolute path to your application root.
+    # 명시적으로 New Architecture 비활성화
+    :fabric_enabled => false,
+    :hermes_enabled => true,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   post_install do |installer|
-    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :mac_catalyst_enabled => false
     )
   end
 end
