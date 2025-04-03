@@ -153,9 +153,9 @@ const App = () => {
   const firebaseConfig = {
     apiKey: "AIzaSyD_PMFvwPN4fdyAucCbEb2rHA0SXsaLrpM",
     authDomain: "medeasy-64a51.firebaseapp.com",
-    databaseURL: "https://medeasy-64a51-default-rtdb.firebaseio.com", // ✅ 이거 추가
+    databaseURL: "https://medeasy-64a51-default-rtdb.firebaseio.com", // 의미 없음. 실제 사용하지 않음
     projectId: "medeasy-64a51",
-    storageBucket: "medeasy-64a51.appspot.com",
+    storageBucket: "medeasy-64a51.appspot.com", // 의미 없음. 실제 사용하지 않음
     messagingSenderId: "570714556248",
     appId: "1:570714556248:ios:9a5012774f8f3a207d872d"
   };
