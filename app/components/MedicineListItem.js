@@ -4,10 +4,19 @@ import { View, Text } from 'react-native';
 import { Tag } from './Tag';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { themes } from '../styles';
+import { useNavigation } from '@react-navigation/native';
 
 export const MedicineListItem = ({ item }) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    navigation.navigate('MedicineDetail', { 
+      item
+    });
+  };
+
   return (
-    <ItemContainer>
+    <ItemContainer onPress={handlePress}>
       <View style={{ flexDirection: 'row', gap: 15 }}>
         <MedicineImage source={{ uri: item.item_image }} resizeMode="cover" />
 
@@ -88,7 +97,7 @@ const Routine = ({ label, value }) => {
   );
 }
  
-const ItemContainer = styled.View`
+const ItemContainer = styled.TouchableOpacity`
   margin-bottom: 28px;
   gap: 15px;
 `;
