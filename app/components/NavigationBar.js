@@ -65,6 +65,9 @@ const TabNavigator = () => {
             tabBarIcon: ({color, size}) => (
               <TabIcons.home width={30} height={30} style={{color: color}} />
             ),
+            tabBarItemStyle: {
+              paddingLeft: 20,
+            },
           }}
         />
         <Tab.Screen
@@ -76,7 +79,7 @@ const TabNavigator = () => {
               <TabIcons.search width={30} height={30} style={{color: color}} />
             ),
             tabBarItemStyle: {
-              paddingRight: 20
+              paddingRight: 30,
             },
           }}
           listeners={{
@@ -95,7 +98,7 @@ const TabNavigator = () => {
               <TabIcons.routine width={30} height={30} style={{color: color}} />
             ),
             tabBarItemStyle: {
-              paddingLeft: 20
+              paddingLeft: 30,
             },
           }}
         />
@@ -107,6 +110,9 @@ const TabNavigator = () => {
             tabBarIcon: ({color, size}) => (
               <TabIcons.my width={30} height={30} style={{color: color}} />
             ),
+            tabBarItemStyle: {
+              paddingRight: 20,
+            },
           }}
         />
       </Tab.Navigator>
