@@ -80,7 +80,7 @@ const SetMedicineRoutine = ({route, navigation}) => {
   const convertTimingsToIds = selectedTimings.map(timing => scheduleMapping[timing] || (timings.indexOf(timing) + 1));
 
   // 저장 버튼 클릭 시 실행할 함수
-  const handleSaveRoutine = async () => {
+  const handleModifyRoutine = async () => {
     // 필수 입력값 검증
     if (!medicineName || selectedDays.length === 0 || selectedTimings.length === 0 || !dosage || !totalCount) {
       // 여기에 적절한 오류 메시지 표시 로직 추가
@@ -361,7 +361,7 @@ const SetMedicineRoutine = ({route, navigation}) => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-        <Button title="저장하기" onPress={handleSaveRoutine} />
+        <Button title="수정하기" onPress={handleModifyRoutine} />
       </View>
     </Container>
   );
