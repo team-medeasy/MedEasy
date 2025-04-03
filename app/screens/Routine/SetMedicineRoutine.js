@@ -68,8 +68,6 @@ useEffect(() => {
       // 매일: 월화수목금토일
       setSelectedDays(days);
     } else if (option === '특정 요일') {
-      // 특정 요일: 화,목,토 예시
-      setSelectedDays(['화', '목', '토']);
     } else if (option === '주기 설정') {
       // 2일 간격: 월수금일 예시
       setSelectedDays(['월', '수', '금', '일']);
@@ -246,13 +244,29 @@ useEffect(() => {
                 fontSize={FontSizes.body.default} 
               />
               <Button 
-                title={'특정 요일마다 (예: 화, 목, 토)'} 
+                title={'특정 요일마다 (예: 월, 수, 금)'} 
                 onPress={() => handleSelect('특정 요일')} 
                 fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedOption === '특정 요일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedOption === '특정 요일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
                 fontSize={FontSizes.body.default} 
               />
+              
+              {/* 특정 요일 선택 시 요일 선택 버튼 표시 */}
+              {selectedOption === '특정 요일' && (
+                <DaySelection>
+                  {days.map((day) => (
+                    <DayButton 
+                      key={day} 
+                      selected={selectedDays.includes(day)} 
+                      onPress={() => toggleDay(day)}
+                    >
+                      <DayText selected={selectedDays.includes(day)}>{day}</DayText>
+                    </DayButton>
+                  ))}
+                </DaySelection>
+              )}
+              
               <Button 
                 title={'주기 설정 (예: 2일 간격으로)'} 
                 onPress={() => handleSelect('주기 설정')} 
@@ -474,10 +488,22 @@ const SelectDay = styled.View`
   gap: 10px;
 `;
 
-const SmallText = styled.Text`
+const DaySelection = styled.View`
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+`;
+
+const DayButton = styled.TouchableOpacity`
+  background-color: ${(props) => (props.selected ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary)};
+  padding: 8px 10px;
+  border-radius: 5px;
+`;
+
+const DayText = styled.Text`
+  color: ${(props) => (props.selected ? themes.light.textColor.buttonText : themes.light.textColor.Primary30)};
   font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.Primary50};
+  font-family: 'Pretendard-SemiBold';
 `;
 
 const SelectTime = styled.View`
