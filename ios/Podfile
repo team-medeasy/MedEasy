@@ -18,8 +18,8 @@ target 'MedEasy' do
   config = use_native_modules!
 
   # Firebase 관련 Pods을 위한 명시적 설정
-  pod 'FirebaseCoreInternal', :modular_headers => true
-  pod 'GoogleUtilities', :modular_headers => true
+  # pod 'FirebaseCoreInternal', :modular_headers => true
+  # pod 'GoogleUtilities', :modular_headers => true
 
   use_react_native!(
     :path => config[:reactNativePath],
