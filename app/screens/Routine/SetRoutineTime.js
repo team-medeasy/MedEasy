@@ -270,22 +270,23 @@ const SetRoutineTime = () => {
     // 시간 선택기를 열 때 현재 설정된 시간으로 초기화
     let initialTime;
     
+    // 설정된 시간이 있으면 사용, 없으면 디폴트 설정
     switch (type) {
       case '아침식사':
-        initialTime = breakfastDate || new Date();
-        initialTime.setHours(8, 0, 0, 0);
+        initialTime = breakfastDate ? new Date(breakfastDate) : new Date();
+        if (!breakfastDate) initialTime.setHours(8, 0, 0, 0);
         break;
       case '점심식사':
-        initialTime = lunchDate || new Date();
-        initialTime.setHours(12, 0, 0, 0);
+        initialTime = lunchDate ? new Date(lunchDate) : new Date();
+        if (!lunchDate) initialTime.setHours(12, 0, 0, 0);
         break;
       case '저녁식사':
-        initialTime = dinnerDate || new Date();
-        initialTime.setHours(18, 0, 0, 0);
+        initialTime = dinnerDate ? new Date(dinnerDate) : new Date();
+        if (!dinnerDate) initialTime.setHours(18, 0, 0, 0);
         break;
       case '취침시간':
-        initialTime = bedDate || new Date();
-        initialTime.setHours(22, 0, 0, 0);
+        initialTime = bedDate ? new Date(bedDate) : new Date();
+        if (!bedDate) initialTime.setHours(22, 0, 0, 0);
         break;
       default:
         initialTime = new Date();
