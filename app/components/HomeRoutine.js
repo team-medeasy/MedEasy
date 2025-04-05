@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import styled from 'styled-components/native';
 import { themes } from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { RoutineIcons } from '../../assets/icons';
 import dayjs from 'dayjs';
-import { ScrollView } from 'react-native-gesture-handler';
 
 const HomeRoutine = ({ schedules }) => {
     const [routineSchedules, setRoutineSchedules] = useState([]);
