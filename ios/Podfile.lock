@@ -1351,6 +1351,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-nfc-manager (3.16.1):
+    - React-Core
   - react-native-safe-area-context (5.2.0):
     - DoubleConversion
     - glog
@@ -1991,6 +1993,7 @@ DEPENDENCIES:
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-nfc-manager (from `../node_modules/react-native-nfc-manager`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-worklets-core (from `../node_modules/react-native-worklets-core`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
@@ -2131,6 +2134,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-date-picker"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-nfc-manager:
+    :path: "../node_modules/react-native-nfc-manager"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-worklets-core:
@@ -2269,6 +2274,7 @@ SPEC CHECKSUMS:
   react-native-cameraroll: 10054f480dfd6e0bd02fdf08fb6d82f80b362575
   react-native-date-picker: 9af9a9747bc556fcadc584a69c08dee88276f45c
   react-native-image-picker: 4c10603e9b253c7f48f296034c04a09fe9c8d427
+  react-native-nfc-manager: a280ef94cd4871a471b052f0dc70381cf1223049
   react-native-safe-area-context: 02e0f487c16ccf1acc8a666bed2318ceeb5dc14c
   react-native-worklets-core: fa4ea25418a6089b2c08c653bbba6f02feff9e99
   React-nativeconfig: 1290b585850b8465f56f54a48b04968eefed0dd4
@@ -2279,7 +2285,7 @@ SPEC CHECKSUMS:
   React-RCTAnimation: b2fcc7c462f1fb5e195a5547f6e405ec9a60d80f
   React-RCTAppDelegate: d5aed095faa6fd0b0aff3c98d0b078680890cde2
   React-RCTBlob: 3b5441953e3dcc4aaee8f539b17d9c54b7a4b111
-  React-RCTFabric: eedb41b49ae96ad7e06db259f18a8b54c01f3300
+  React-RCTFabric: 022ff67d55ac5833b984085628e15af113cd9b52
   React-RCTFBReactNativeSpec: 536442edc77efaec464c3c805c1e44fd811639d3
   React-RCTImage: f189ae651e3c97879b4cdefcba1d4cffe55439da
   React-RCTLinking: 759ac5e4aed95ac3c29849f98ff3f3b5ece830ed

@@ -65,12 +65,27 @@ const AuthNavigator = () => {
 
 const RoutineModalNavigator = () => {
   return (
-    <RoutineModalStack.Navigator screenOptions={{ headerShown: false }}>
-      <RoutineModalStack.Screen name="SetMedicineName" component={SetMedicineNameScreen} />
-      <RoutineModalStack.Screen name="SetMedicineDay" component={SetMedicineDayScreen} />
-      <RoutineModalStack.Screen name="SetMedicineTime" component={SetMedicineTimeScreen} />
-      <RoutineModalStack.Screen name="SetMedicineDose" component={SetMedicineDoseScreen} />
-      <RoutineModalStack.Screen name="SetMedicineTotal" component={SetMedicineTotalScreen} />
+    <RoutineModalStack.Navigator screenOptions={{headerShown: false}}>
+      <RoutineModalStack.Screen
+        name="SetMedicineName"
+        component={SetMedicineNameScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineDay"
+        component={SetMedicineDayScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineTime"
+        component={SetMedicineTimeScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineDose"
+        component={SetMedicineDoseScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineTotal"
+        component={SetMedicineTotalScreen}
+      />
     </RoutineModalStack.Navigator>
   );
 };
