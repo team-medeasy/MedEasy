@@ -113,6 +113,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
   
       console.log('✅ 루틴 삭제 완료:', relatedRoutineIds);
       Alert.alert('삭제 완료', '선택한 약의 모든 루틴이 삭제되었습니다.');
+      navigation.goBack();
     } catch (error) {
       console.error('❌ 루틴 삭제 실패:', error);
       Alert.alert('삭제 실패', '루틴 삭제 중 오류가 발생했습니다.');
@@ -405,7 +406,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
 
           <Button
             title="루틴 삭제하기"
-            onPress={() => { }}
+            onPress={handleDeleteRoutine}
             bgColor={themes.light.pointColor.Secondary}
           />
 

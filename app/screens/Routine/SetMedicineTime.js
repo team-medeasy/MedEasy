@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { View, ScrollView, Platform } from 'react-native';
 import { themes } from './../../styles';
@@ -17,44 +18,65 @@ const SetMedicineTime = ({ route, navigation }) => {
 
     // 여러 시간대 선택을 위해 배열로 변경
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const [scheduleData, setScheduleData] = useState([]);
-
+    const [scheduleData, setScheduleData] = useState({});
     const [scheduleMapping, setScheduleMapping] = useState({});
 
-    // 컴포넌트 마운트 시 사용자 일정 가져오기
-    useEffect(() => {
-        const fetchUserSchedule = async () => {
-            try {
-                const getData = await getUserSchedule();
-                const scheduleData = getData.data;
-                console.log('사용자 일정 데이터:', scheduleData);
+    // 시간 변환 함수
+    const formatTime = (timeString) => {
+        const [hour, minute] = timeString.split(':').map(Number);
+        const period = hour < 12 ? '오전' : '오후';
+        const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
 
-                if (scheduleData && scheduleData.body && Array.isArray(scheduleData.body)) {
-                    const mapping = {};
+        return minute === 0
+            ? `${period} ${formattedHour}시`
+            : `${period} ${formattedHour}시 ${minute}분`;
+    };
 
-                    scheduleData.body.forEach((item) => {
-                        if (item.name.includes('아침')) {
-                            mapping['🐥️ 아침'] = item.user_schedule_id;
-                        } else if (item.name.includes('점심')) {
-                            mapping['🥪️ 점심'] = item.user_schedule_id;
-                        } else if (item.name.includes('저녁')) {
-                            mapping['🌙️ 저녁'] = item.user_schedule_id;
-                        } else if (item.name.includes('자기 전')) {
-                            mapping['🛏️️ 자기 전'] = item.user_schedule_id;
-                        }
-                    });
+    // 화면에 포커스될 때마다 실행
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchUserSchedule = async () => {
+                try {
+                    const getData = await getUserSchedule();
+                    const scheduleData = getData.data;
+                    console.log('사용자 일정 데이터:', scheduleData);
 
-                    setScheduleMapping(mapping);
-                    console.log('시간대 매핑:', mapping);
+                    if (scheduleData && scheduleData.body && Array.isArray(scheduleData.body)) {
+                        // 매핑을 위한 객체
+                        const mapping = {};
+                        // 시간 표시를 위한 객체
+                        const formattedSchedule = {};
+
+                        scheduleData.body.forEach((item) => {
+                            // 매핑 설정
+                            if (item.name.includes('아침')) {
+                                mapping['🐥️ 아침'] = item.user_schedule_id;
+                                formattedSchedule['아침 식사 후'] = formatTime(item.take_time);
+                            } else if (item.name.includes('점심')) {
+                                mapping['🥪️ 점심'] = item.user_schedule_id;
+                                formattedSchedule['점심 식사 후'] = formatTime(item.take_time);
+                            } else if (item.name.includes('저녁')) {
+                                mapping['🌙️ 저녁'] = item.user_schedule_id;
+                                formattedSchedule['저녁 식사 후'] = formatTime(item.take_time);
+                            } else if (item.name.includes('자기 전')) {
+                                mapping['🛏️️ 자기 전'] = item.user_schedule_id;
+                                formattedSchedule['자기 전'] = formatTime(item.take_time);
+                            }
+                        });
+
+                        setScheduleMapping(mapping);
+                        setScheduleData(formattedSchedule);
+                        console.log('시간대 매핑:', mapping);
+                        console.log('시간 데이터:', formattedSchedule);
+                    }
+                } catch (error) {
+                    console.error('사용자 일정 가져오기 실패:', error);
                 }
-            } catch (error) {
-                console.error('사용자 일정 가져오기 실패:', error);
-            }
-        };
+            };
 
-        fetchUserSchedule();
-    }, []);
-
+            fetchUserSchedule();
+        }, [])
+    );
 
     const handleSelect = (option) => {
         setSelectedOptions(prev => {
@@ -82,36 +104,6 @@ const SetMedicineTime = ({ route, navigation }) => {
     const handleSetTimings = () => {
         navigation.navigate('SetRoutineTime');
     };
-
-    // 시간 변환 함수
-    const formatTime = (timeString) => {
-        const [hour, minute] = timeString.split(':').map(Number);
-        const period = hour < 12 ? '오전' : '오후';
-        const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-
-        return minute === 0
-            ? `${period} ${formattedHour}시`
-            : `${period} ${formattedHour}시 ${minute}분`;
-    };
-
-    useEffect(() => {
-        async function fetchUserSchedule() {
-            try {
-                const getData = await getUserSchedule();
-                const formattedSchedule = {};
-
-                getData.data.body.forEach((item) => {
-                    formattedSchedule[item.name] = formatTime(item.take_time);
-                });
-
-                setScheduleData(formattedSchedule);
-            } catch (error) {
-                console.error('스케줄 데이터 가져오기 실패:', error);
-            }
-        }
-
-        fetchUserSchedule();
-    }, []);
 
     return (
         <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -156,7 +148,7 @@ const SetMedicineTime = ({ route, navigation }) => {
                         />
                         <SelectTimeButton
                             title={'🛏️️ 자기 전'}
-                            timeText={'오후 10시 30분'}
+                            timeText={scheduleData['자기 전'] || '오후 10시 30분'}
                             onPress={() => handleSelect('🛏️️ 자기 전')}
                             fontFamily={'Pretendard-SemiBold'}
                             bgColor={selectedOptions.includes('🛏️️ 자기 전') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
