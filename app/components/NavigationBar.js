@@ -48,7 +48,7 @@ const TabNavigator = () => {
     navigation.navigate('Chat');
   }, [navigation]);
 
-  useNfcListener();
+  const {ModalComponent} = useNfcListener();
 
   return (
     <MainContainer>
@@ -133,6 +133,7 @@ const TabNavigator = () => {
           />
         </ChatButton>
       </ChatContainer> */}
+      <ModalComponent />
     </MainContainer>
   );
 };
