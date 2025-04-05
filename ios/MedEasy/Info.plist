@@ -22,16 +22,19 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
+	<key>FirebaseMessagingAutoInitEnabled</key>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-
-	<!-- 네트워크 설정 -->
+	<key>NFCReaderUsageDescription</key>
+	<string>복약 체크를 위해 NFC 태깅 권한이 필요합니다.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-
 	<key>NSCameraUsageDescription</key>
 	<string>카메라 접근 권한이 필요합니다</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -40,24 +43,8 @@
 	<string>사진 저장을 위해 갤러리 접근 권한이 필요합니다</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>사진 저장을 위해 갤러리 접근 권한이 필요합니다</string>
-
-	<!-- ✅ 푸시 알림 권한 설명 (중요!) -->
 	<key>NSRemoteNotificationUsageDescription</key>
 	<string>알림을 받기 위해 권한이 필요합니다</string>
-
-	<!-- ✅ Firebase 자동 메시징 초기화 -->
-	<key>FirebaseMessagingAutoInitEnabled</key>
-	<true/>
-	<key>FirebaseAppDelegateProxyEnabled</key>
-	<true/>
-
-	<!-- 🔔 FCM background push 알림용 설정 -->
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
-
-	<!-- 🔤 앱 내 커스텀 폰트 사용 -->
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-Regular.otf</string>
@@ -71,7 +58,10 @@
 		<string>MaterialCommunityIcons.ttf</string>
 		<string>Pretendard-Medium.otf</string>
 	</array>
-
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

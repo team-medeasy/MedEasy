@@ -1351,6 +1351,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-nfc-manager (3.16.1):
+    - React-Core
   - react-native-safe-area-context (5.2.0):
     - DoubleConversion
     - glog
@@ -1991,6 +1993,7 @@ DEPENDENCIES:
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-nfc-manager (from `../node_modules/react-native-nfc-manager`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-worklets-core (from `../node_modules/react-native-worklets-core`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
@@ -2131,6 +2134,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-date-picker"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-nfc-manager:
+    :path: "../node_modules/react-native-nfc-manager"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-worklets-core:
@@ -2269,6 +2274,7 @@ SPEC CHECKSUMS:
   react-native-cameraroll: 10054f480dfd6e0bd02fdf08fb6d82f80b362575
   react-native-date-picker: 9af9a9747bc556fcadc584a69c08dee88276f45c
   react-native-image-picker: 4c10603e9b253c7f48f296034c04a09fe9c8d427
+  react-native-nfc-manager: a280ef94cd4871a471b052f0dc70381cf1223049
   react-native-safe-area-context: 02e0f487c16ccf1acc8a666bed2318ceeb5dc14c
   react-native-worklets-core: fa4ea25418a6089b2c08c653bbba6f02feff9e99
   React-nativeconfig: 1290b585850b8465f56f54a48b04968eefed0dd4
@@ -2316,4 +2322,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: d1dacb5c9a3c8134f16c63b34b205ae3082d7a69
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
