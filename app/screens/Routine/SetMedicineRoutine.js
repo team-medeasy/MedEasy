@@ -31,33 +31,33 @@ const SetMedicineRoutine = ({route, navigation}) => {
   const timings = ['아침', '점심', '저녁', '자기 전'];
 
   // medicineId로 약 정보 가져오기
-useEffect(() => {
-  const fetchMedicineData = async () => {
-    try {
-      console.log('요청하는 medicineId:', medicineId);
-      const response = await getMedicineById(medicineId);
-      console.log('API 응답:', response);
-      
-      // API 응답 구조에 따라 적절히 데이터 추출
-      const medicineData = response.data?.body || response.data || response;
-      
-      if (medicineData) {
-        console.log('약 데이터:', medicineData);
-        setMedicine(medicineData);
-        // 약 이름으로 기본 별명 설정
-        setMedicineName(medicineData.item_name || medicineData.name || '');
-      } else {
-        console.error('약 정보를 찾을 수 없습니다.');
+  useEffect(() => {
+    const fetchMedicineData = async () => {
+      try {
+        console.log('요청하는 medicineId:', medicineId);
+        const response = await getMedicineById(medicineId);
+        console.log('API 응답:', response);
+        
+        // API 응답 구조에 따라 적절히 데이터 추출
+        const medicineData = response.data?.body || response.data || response;
+        
+        if (medicineData) {
+          console.log('약 데이터:', medicineData);
+          setMedicine(medicineData);
+          // 약 이름으로 기본 별명 설정
+          setMedicineName(medicineData.item_name || medicineData.name || '');
+        } else {
+          console.error('약 정보를 찾을 수 없습니다.');
+        }
+      } catch (error) {
+        console.error('약 정보 가져오기 실패:', error);
       }
-    } catch (error) {
-      console.error('약 정보 가져오기 실패:', error);
-    }
-  };
+    };
 
-  if (medicineId) {
-    fetchMedicineData();
-  }
-}, [medicineId]);
+    if (medicineId) {
+      fetchMedicineData();
+    }
+  }, [medicineId]);
 
 
   const handleSelect = (option) => {
@@ -80,7 +80,7 @@ useEffect(() => {
   const convertTimingsToIds = selectedTimings.map(timing => scheduleMapping[timing] || (timings.indexOf(timing) + 1));
 
   // 저장 버튼 클릭 시 실행할 함수
-  const handleSaveRoutine = async () => {
+  const handleModifyRoutine = async () => {
     // 필수 입력값 검증
     if (!medicineName || selectedDays.length === 0 || selectedTimings.length === 0 || !dosage || !totalCount) {
       // 여기에 적절한 오류 메시지 표시 로직 추가
@@ -361,7 +361,7 @@ useEffect(() => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-        <Button title="저장하기" onPress={handleSaveRoutine} />
+        <Button title="수정하기" onPress={handleModifyRoutine} />
       </View>
     </Container>
   );

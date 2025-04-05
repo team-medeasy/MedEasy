@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { Header } from '../../components';
+import { FlatList, TouchableOpacity, View } from 'react-native';
+import { Header, MedicineListItem } from '../../components';
+import { themes } from '../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
 
 import { getUserMedicineCount } from '../../api/user';
 import { getMedicineById } from '../../api/medicine';
 
-
 const MedicineList = () => {
+    const [activeTab, setActiveTab] = useState('current'); // 'current' or 'previous'
     const [medicineCount, setMedicineCount] = useState(0);
     const [medicineList, setMedicineList] = useState([]);
     const [medicineIds, setMedicineIds] = useState([]);
@@ -55,37 +58,100 @@ const MedicineList = () => {
         }
     };
 
+    const renderTabContent = () => {
+        if (activeTab === 'current') {
+            return (
+                <FlatList
+                    data={medicineList}
+                    keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+                    renderItem={({ item }) => <MedicineListItem item={item} />}
+                    showsVerticalScrollIndicator={false}
+                    ListEmptyComponent={
+                        <NoResultContainer>
+                            <NoResultText>현재 복용 중인 약이 없습니다.</NoResultText>
+                        </NoResultContainer>
+                    }
+                />
+            );
+        } else {
+            return (
+                <NoResultContainer>
+                    <NoResultText>이전에 복용한 약 기록이 없습니다.</NoResultText>
+                </NoResultContainer>
+            );
+        }
+    };
 
     return (
         <Container>
-            <Header>
-                <Title>복용 중인 약 리스트</Title>
-            </Header>
+            <Header>약 목록</Header>
+            
+            {/* 탭 영역 */}
+            <TabContainer>
+                <TabButton 
+                    active={activeTab === 'current'}
+                    onPress={() => setActiveTab('current')}
+                >
+                    <TabText active={activeTab === 'current'}>현재 복용중인 약</TabText>
+                </TabButton>
+                <TabButton 
+                    active={activeTab === 'previous'}
+                    onPress={() => setActiveTab('previous')}
+                >
+                    <TabText active={activeTab === 'previous'}>이전에 복용한 약</TabText>
+                </TabButton>
+            </TabContainer>
+            
+            {/* 선택된 탭에 따른 콘텐츠 */}
             <ListContainer>
-                <MedicineCount>총 개수: {medicineCount}개</MedicineCount>
-                {medicineList.length > 0 ? (
-                    medicineList.map((medicine, index) => (
-                        <MedicineName key={medicine.id || index}>
-                            {medicine.item_name}
-                        </MedicineName>
-                    ))
-                ) : (
-                    <MedicineName>복용 중인 약이 없습니다.</MedicineName>
-                )}
+                {renderTabContent()}
             </ListContainer>
         </Container>
     );
 };
 
-const Container = styled.View``;
+const Container = styled.View`
+    flex: 1;
+    background-color: ${themes.light.bgColor.bgPrimary};
+`;
 
-const Title = styled.Text``;
+const TabContainer = styled.View`
+    flex-direction: row;
+    background-color: ${themes.light.bgColor.bgPrimary};
+`;
 
-const ListContainer = styled.View``;
+const TabButton = styled.TouchableOpacity`
+    flex: 1;
+    padding: 16px 0;
+    align-items: center;
+    border-bottom-width: 2px;
+    border-bottom-color: ${props => props.active ? themes.light.textColor.textPrimary : 'transparent'};
+`;
 
-const MedicineCount = styled.Text``;
+const TabText = styled.Text`
+    font-family: 'Pretendard-SemiBold';
+    font-size: ${FontSizes.body.default};
+    color: ${props => props.active ? themes.light.textColor.textPrimary : themes.light.textColor.Primary30};
+`;
 
-const MedicineName = styled.Text``;
+const ListContainer = styled.View`
+    flex: 1;
+    background-color: ${themes.light.bgColor.bgPrimary};
+    padding: 15px;
+`;
 
+const NoResultContainer = styled.View`
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+`;
+
+const NoResultText = styled.Text`
+    text-align: center;
+    font-family: 'Pretendard-Medium';
+    font-size: ${FontSizes.body.default};
+    color: ${themes.light.textColor.Primary50};
+`;
 
 export default MedicineList;

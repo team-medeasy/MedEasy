@@ -24,8 +24,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-
-	<!-- 네트워크 설정 -->
+	<key>NFCReaderUsageDescription</key>
+	<string>복약 체크를 위해 NFC 태깅 권한이 필요합니다.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
