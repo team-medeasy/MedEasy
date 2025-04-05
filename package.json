@@ -32,6 +32,7 @@
     "react-native-gesture-handler": "^2.23.1",
     "react-native-image-picker": "^8.2.0",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-photo-manipulator": "^1.9.2",
     "react-native-safe-area-context": "^5.2.0",
     "react-native-screens": "^4.6.0",
     "react-native-styled-components": "^2.1.0",
