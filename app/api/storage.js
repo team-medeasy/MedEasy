@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const ACCESS_TOKEN_KEY = 'ACCESS_TOKEN';
 const REFRESH_TOKEN_KEY = 'REFRESH_TOKEN';
 const USER_INFO_KEY = 'user_info';
+const FCM_TOKEN_KEY ='FCM_TOKEN'; // FCM 토큰 키
 
 // AccessToken 저장
 export const setAccessToken = async token => {
@@ -33,6 +34,16 @@ export const removeAccessToken = async () => {
 export const removeRefreshToken = async () => {
   await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
 };
+
+// FCM 토큰 저장
+export const setFCMToken = async token => {
+  await AsyncStorage.setItem(FCM_TOKEN_KEY, token);
+}
+
+// FCM 토큰 가져오기
+export const getFCMToken = async () => {
+  return await AsyncStorage.getItem(FCM_TOKEN_KEY);
+}
 
 // 사용자 정보 관리 함수
 export const setUserInfo = async userInfo => {
