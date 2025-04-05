@@ -5,6 +5,7 @@ import { themes } from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { RoutineIcons } from '../../assets/icons';
 import dayjs from 'dayjs';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const HomeRoutine = ({ schedules }) => {
     const [routineSchedules, setRoutineSchedules] = useState([]);
@@ -34,7 +35,12 @@ const HomeRoutine = ({ schedules }) => {
                         .replace('PM', '오후')}
                 </TimeText>
             </MedicineHeader>
-            <MedicineList>
+            <ScrollView 
+                style={{ marginTop: 10 }} 
+                contentContainerStyle={{ gap: 10 }} 
+                nestedScrollEnabled={true}
+                showsVerticalScrollIndicator={false}
+            >
                 {item.routine_medicine_dtos.map((medicine) => (
                     <MedicineItem key={medicine.routine_medicine_id}>
                         {medicine.is_taken ? <FilledCircle /> : <EmptyCircle />}
@@ -43,7 +49,7 @@ const HomeRoutine = ({ schedules }) => {
                         </MedicineText>
                     </MedicineItem>
                 ))}
-            </MedicineList>
+            </ScrollView>
         </RoutineContainer>
     );
 
