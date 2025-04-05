@@ -228,6 +228,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
                   <SimilarMedicineItem 
                   item={item} 
                   navigation={navigation}
+                  isModal={isModal}
                   />
                 )}
               />
@@ -338,7 +339,7 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
   );
 };
 
-const SimilarMedicineItem = ({item, navigation}) => {
+const SimilarMedicineItem = ({item, navigation, isModal}) => {
   const handlePressMedicine = async () => {
     try {
       const response = await getMedicineById(item.item_id);
@@ -346,7 +347,7 @@ const SimilarMedicineItem = ({item, navigation}) => {
 
       navigation.push('MedicineDetail', {
         item: medicineData,
-        isModal: false
+        isModal: isModal,
       });
     } catch (error) {
       console.error('약 정보 불러오기 실패:', error);
