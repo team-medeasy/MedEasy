@@ -2285,7 +2285,7 @@ SPEC CHECKSUMS:
   React-RCTAnimation: b2fcc7c462f1fb5e195a5547f6e405ec9a60d80f
   React-RCTAppDelegate: d5aed095faa6fd0b0aff3c98d0b078680890cde2
   React-RCTBlob: 3b5441953e3dcc4aaee8f539b17d9c54b7a4b111
-  React-RCTFabric: 022ff67d55ac5833b984085628e15af113cd9b52
+  React-RCTFabric: eedb41b49ae96ad7e06db259f18a8b54c01f3300
   React-RCTFBReactNativeSpec: 536442edc77efaec464c3c805c1e44fd811639d3
   React-RCTImage: f189ae651e3c97879b4cdefcba1d4cffe55439da
   React-RCTLinking: 759ac5e4aed95ac3c29849f98ff3f3b5ece830ed
@@ -2322,4 +2322,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: d1dacb5c9a3c8134f16c63b34b205ae3082d7a69
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
