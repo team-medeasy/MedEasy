@@ -36,6 +36,31 @@ const CalendarWidget = ({
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [routineMarkedDates, setRoutineMarkedDates] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
+  const [today, setToday] = useState(dayjs().format('YYYY-MM-DD'));
+
+  useEffect(() => {
+    // 오늘 날짜 초기화
+    setToday(dayjs().format('YYYY-MM-DD'));
+    
+    // 자정에 오늘 날짜 업데이트하는 타이머 설정
+    const updateTodayDate = () => {
+      const now = dayjs();
+      const tomorrow = now.add(1, 'day').startOf('day');
+      const timeUntilMidnight = tomorrow.diff(now);
+      
+      const timer = setTimeout(() => {
+        setToday(dayjs().format('YYYY-MM-DD'));
+        // 다음 자정을 위한 타이머 재설정
+        updateTodayDate();
+      }, timeUntilMidnight);
+      
+      return timer;
+    };
+    
+    const timer = updateTodayDate();
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // 날짜 선택 핸들러
   const handleDayPress = (day) => {
@@ -112,8 +137,8 @@ const CalendarWidget = ({
   const CustomDay = React.memo(({ date, state, marking, onPress }) => {
     const isSelected = selectedDate === date.dateString;
     const hasRoutine = marking?.marked || false;
-    const isToday = date.dateString === new Date().toISOString().split('T')[0];
-    
+    const isToday = date.dateString === today;
+
     // 날짜 텍스트 스타일
     const dayTextStyle = {
       color: state === 'disabled' 
