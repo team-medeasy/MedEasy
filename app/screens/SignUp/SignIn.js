@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {SafeAreaView, Text} from 'react-native';
+import {SafeAreaView, Text, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
 import {BackAndNextButtons} from './../../components';
@@ -99,51 +99,57 @@ const SignInScreen = ({navigation, route}) => {
   };
 
   return (
-    <Container>
-      <Container1>
-        <Text
-          style={{
-            fontFamily: fonts.title.fontFamily,
-            fontSize: fonts.title.fontSize,
-          }}>
-          안녕하세요, 메디지입니다 👋
-        </Text>
-        <Text
-          style={{
-            fontFamily: 'Pretendard-Medium',
-            fontSize: 16,
-            marginTop: 7,
-            color: themes.light.textColor.Primary50,
-          }}>
-          로그인 후 다양한 서비스를 이용해 보세요!
-        </Text>
-      </Container1>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <Container>
+        <Container1>
+          <Text
+            style={{
+              fontFamily: fonts.title.fontFamily,
+              fontSize: fonts.title.fontSize,
+            }}>
+            안녕하세요, 메디지입니다 👋
+          </Text>
+          <Text
+            style={{
+              fontFamily: 'Pretendard-Medium',
+              fontSize: 16,
+              marginTop: 7,
+              color: themes.light.textColor.Primary50,
+            }}>
+            로그인 후 다양한 서비스를 이용해 보세요!
+          </Text>
+        </Container1>
 
-      <Container2>
-        <InputContainer marginBottom="5px">
-          <TextInput
-            placeholder="이메일 입력"
-            value={email}
-            onChangeText={setEmail}
-          />
-        </InputContainer>
-        <InputContainer marginBottom="5px">
-          <TextInput
-            placeholder="비밀번호 입력"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={true}
-          />
-        </InputContainer>
-      </Container2>
+        <Container2>
+          <InputContainer marginBottom="5px">
+            <TextInput
+              placeholder="이메일 입력"
+              placeholderTextColor={themes.light.textColor.placeholder}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </InputContainer>
+          <InputContainer marginBottom="5px">
+            <TextInput
+              placeholder="비밀번호 입력"
+              placeholderTextColor={themes.light.textColor.placeholder}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={true}
+            />
+          </InputContainer>
+        </Container2>
 
-      <BtnContainer>
-        <BackAndNextButtons
-          onPressPrev={() => navigation.goBack()}
-          onPressNext={handleNext}
-        />
-      </BtnContainer>
-    </Container>
+        <BtnContainer>
+          <BackAndNextButtons
+            onPressPrev={() => navigation.goBack()}
+            onPressNext={handleNext}
+          />
+        </BtnContainer>
+      </Container>
+    </TouchableWithoutFeedback>
   );
 };
 
