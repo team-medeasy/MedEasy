@@ -186,7 +186,7 @@ const Routine = () => {
     const getDayOfWeek = dateString => {
       const date = new Date(dateString);
       // 요일을 0(일)~6(토)에서 1(월)~7(일)로 변환
-      return date.getDay() === 0 ? 7 : date.getDay() + 1;
+      return date.getDay() === 0 ? 7 : date.getDay();
     };
 
     // 스케줄 이름에 따른 시간대 매핑
