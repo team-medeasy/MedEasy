@@ -1,13 +1,13 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ScrollView, Dimensions, FlatList, Platform } from 'react-native';
 import styled from 'styled-components/native';
-import {OtherIcons, RoutineIcons} from '../../../assets/icons';
-import {themes} from '../../styles';
+import { OtherIcons, RoutineIcons } from '../../../assets/icons';
+import { themes } from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
 import LinearGradient from 'react-native-linear-gradient';
-import {getRoutineByDate} from '../../api/routine';
+import { getRoutineByDate } from '../../api/routine';
 // data.js에서 데이터 import
 import {
   timeMapping,
@@ -15,10 +15,10 @@ import {
   weekDays,
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import {getUserSchedule} from '../../api/user';
+import { getUserSchedule } from '../../api/user';
 import RoutineCard from '../../components/\bRoutineCard';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
 
 const Routine = () => {
@@ -117,7 +117,7 @@ const Routine = () => {
       );
 
     // 해당 시간대의 모든 약물 체크 상태를 변경
-    const updatedChecks = {...checkedItems};
+    const updatedChecks = { ...checkedItems };
     medicinesForTime.forEach(medicine => {
       updatedChecks[`medicine-${medicine.medicine_id}-${time}`] = !allChecked;
     });
@@ -183,8 +183,11 @@ const Routine = () => {
     const medicineMap = {};
 
     // 요일 매핑 (API 날짜 -> 요일 숫자로 변환)
+    // getDayOfWeek 함수 수정 - 시간대 이슈 방지
     const getDayOfWeek = dateString => {
-      const date = new Date(dateString);
+      // 날짜 문자열에 시간을 명시적으로 추가하여 시간대 이슈 방지
+      const date = new Date(`${dateString}T12:00:00`);
+      console.log('날짜:', dateString, '요일:', date.getDay());
       // 요일을 0(일)~6(토)에서 1(월)~7(일)로 변환
       return date.getDay() === 0 ? 7 : date.getDay();
     };
@@ -264,7 +267,7 @@ const Routine = () => {
       medicine.day_of_weeks.sort((a, b) => a - b);
 
       // 시간대 정렬 (MORNING, LUNCH, DINNER, BEDTIME 순)
-      const timeOrder = {MORNING: 0, LUNCH: 1, DINNER: 2, BEDTIME: 3};
+      const timeOrder = { MORNING: 0, LUNCH: 1, DINNER: 2, BEDTIME: 3 };
       medicine.types.sort((a, b) => timeOrder[a] - timeOrder[b]);
 
       return medicine;
@@ -279,11 +282,12 @@ const Routine = () => {
     const todayMedicineItems = [];
 
     Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
-      const medicinesForTime = medicineRoutines.filter(
-        medicine =>
-          medicine.types.includes(timeKey) &&
-          medicine.day_of_weeks.includes(selectedDate.fullDate.day() + 1),
-      );
+  
+      const medicinesForTime = medicineRoutines.filter(medicine => {
+        const dayMatch = medicine.day_of_weeks.includes(
+          selectedDate.fullDate.day() === 0 ? 7 : selectedDate.fullDate.day());
+        return medicine.types.includes(timeKey) && dayMatch;
+      });
 
       if (medicinesForTime.length > 0) {
         todayMedicineItems.push({
@@ -326,7 +330,7 @@ const Routine = () => {
   };
 
   // 페이지 변경 감지
-  const onViewableItemsChanged = useRef(({viewableItems}) => {
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       setCurrentPage(viewableItems[0].index);
     }
@@ -341,13 +345,13 @@ const Routine = () => {
     const wait = new Promise(resolve => setTimeout(resolve, 500));
     wait.then(() => {
       if (flatListRef.current) {
-        flatListRef.current.scrollToIndex({index: info.index, animated: true});
+        flatListRef.current.scrollToIndex({ index: info.index, animated: true });
       }
     });
   };
 
   // 각 주차를 렌더링하는 함수
-  const renderWeek = ({item, index}) => (
+  const renderWeek = ({ item, index }) => (
     <WeekContainer>
       {item.map((dayInfo, dayIndex) => (
         <DayBox
@@ -392,7 +396,7 @@ const Routine = () => {
           <OtherIcons.return
             width={11}
             height={9}
-            style={{color: themes.light.pointColor.Primary10}}
+            style={{ color: themes.light.pointColor.Primary10 }}
           />
           <ButtonText>돌아가기</ButtonText>
         </ReturnButton>
@@ -417,7 +421,7 @@ const Routine = () => {
             offset: width * index,
             index,
           })}
-          // initialScrollIndex 제거
+        // initialScrollIndex 제거
         />
       </DayContainerWrapper>
       <RoundedBox>
@@ -436,7 +440,7 @@ const Routine = () => {
           </TodayContainer>
         </LinearGradient>
 
-        <ScrollView contentContainerStyle={{paddingVertical: 70}}>
+        <ScrollView contentContainerStyle={{ paddingVertical: 70 }}>
           <ScheduleContainer>
             {/* 타임라인 컨테이너 추가 */}
             <TimelineContainer>
@@ -521,7 +525,7 @@ const DayBox = styled.TouchableOpacity`
   display: flex;
   padding: 10px 4px;
   border-radius: 7px;
-  background-color: ${({isToday, isSelected}) =>
+  background-color: ${({ isToday, isSelected }) =>
     isSelected ? themes.light.pointColor.PrimaryDark : 'transparent'};
 `;
 
