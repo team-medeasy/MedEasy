@@ -119,8 +119,6 @@ const SetMedicineRoutine = ({ route, navigation }) => {
       Alert.alert('삭제 실패', '루틴 삭제 중 오류가 발생했습니다.');
     }
   };
-  
-
 
 
   const handleSelect = (option) => {
@@ -156,8 +154,8 @@ const SetMedicineRoutine = ({ route, navigation }) => {
       const routineData = {
         medicine_id: medicine.item_id,
         nickname: medicineName,
-        dose: parseInt(dosage, 10),
-        total_quantity: parseInt(totalCount, 10),
+        dose: parseInt(dosage, 0),
+        total_quantity: parseInt(totalCount, 0),
         day_of_weeks: convertDaysToNumbers,
         user_schedule_ids: convertTimingsToIds
       };
@@ -177,6 +175,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
       // 오류 처리 (사용자에게 오류 메시지 표시)
     }
   };
+
   // 컴포넌트 마운트 시 사용자 일정 가져오기
   useEffect(() => {
     const fetchUserSchedule = async () => {
