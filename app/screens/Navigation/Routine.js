@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { ScrollView, Dimensions, FlatList, Platform } from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
 import styled from 'styled-components/native';
-import { OtherIcons, RoutineIcons } from '../../../assets/icons';
-import { themes } from '../../styles';
+import {HeaderIcons, OtherIcons, RoutineIcons} from '../../../assets/icons';
+import {themes} from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
 import LinearGradient from 'react-native-linear-gradient';
-import { getRoutineByDate } from '../../api/routine';
+import {getRoutineByDate} from '../../api/routine';
 // data.js에서 데이터 import
 import {
   timeMapping,
@@ -15,10 +15,10 @@ import {
   weekDays,
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { getUserSchedule } from '../../api/user';
+import {getUserSchedule} from '../../api/user';
 import RoutineCard from '../../components/\bRoutineCard';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
 
 const Routine = () => {
@@ -117,7 +117,7 @@ const Routine = () => {
       );
 
     // 해당 시간대의 모든 약물 체크 상태를 변경
-    const updatedChecks = { ...checkedItems };
+    const updatedChecks = {...checkedItems};
     medicinesForTime.forEach(medicine => {
       updatedChecks[`medicine-${medicine.medicine_id}-${time}`] = !allChecked;
     });
@@ -267,7 +267,7 @@ const Routine = () => {
       medicine.day_of_weeks.sort((a, b) => a - b);
 
       // 시간대 정렬 (MORNING, LUNCH, DINNER, BEDTIME 순)
-      const timeOrder = { MORNING: 0, LUNCH: 1, DINNER: 2, BEDTIME: 3 };
+      const timeOrder = {MORNING: 0, LUNCH: 1, DINNER: 2, BEDTIME: 3};
       medicine.types.sort((a, b) => timeOrder[a] - timeOrder[b]);
 
       return medicine;
@@ -282,10 +282,10 @@ const Routine = () => {
     const todayMedicineItems = [];
 
     Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
-  
       const medicinesForTime = medicineRoutines.filter(medicine => {
         const dayMatch = medicine.day_of_weeks.includes(
-          selectedDate.fullDate.day() === 0 ? 7 : selectedDate.fullDate.day());
+          selectedDate.fullDate.day() === 0 ? 7 : selectedDate.fullDate.day(),
+        );
         return medicine.types.includes(timeKey) && dayMatch;
       });
 
@@ -330,7 +330,7 @@ const Routine = () => {
   };
 
   // 페이지 변경 감지
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+  const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
       setCurrentPage(viewableItems[0].index);
     }
@@ -345,13 +345,13 @@ const Routine = () => {
     const wait = new Promise(resolve => setTimeout(resolve, 500));
     wait.then(() => {
       if (flatListRef.current) {
-        flatListRef.current.scrollToIndex({ index: info.index, animated: true });
+        flatListRef.current.scrollToIndex({index: info.index, animated: true});
       }
     });
   };
 
   // 각 주차를 렌더링하는 함수
-  const renderWeek = ({ item, index }) => (
+  const renderWeek = ({item, index}) => (
     <WeekContainer>
       {item.map((dayInfo, dayIndex) => (
         <DayBox
@@ -396,7 +396,7 @@ const Routine = () => {
           <OtherIcons.return
             width={11}
             height={9}
-            style={{ color: themes.light.pointColor.Primary10 }}
+            style={{color: themes.light.pointColor.Primary10}}
           />
           <ButtonText>돌아가기</ButtonText>
         </ReturnButton>
@@ -421,7 +421,7 @@ const Routine = () => {
             offset: width * index,
             index,
           })}
-        // initialScrollIndex 제거
+          // initialScrollIndex 제거
         />
       </DayContainerWrapper>
       <RoundedBox>
@@ -437,10 +437,21 @@ const Routine = () => {
           }}>
           <TodayContainer>
             <TodayHeader today={today} selectedDate={selectedDate} />
+            <MedicineListButton>
+              <MedicineListText>전체 목록</MedicineListText>
+              <HeaderIcons.chevron
+                width={11}
+                height={11}
+                style={{
+                  transform: [{rotate: '180deg'}],
+                  color: themes.light.textColor.Primary30,
+                }}
+              />
+            </MedicineListButton>
           </TodayContainer>
         </LinearGradient>
 
-        <ScrollView contentContainerStyle={{ paddingVertical: 70 }}>
+        <ScrollView contentContainerStyle={{paddingVertical: 70}}>
           <ScheduleContainer>
             {/* 타임라인 컨테이너 추가 */}
             <TimelineContainer>
@@ -492,7 +503,7 @@ const HeaderText = styled.Text`
 
 const ReturnButton = styled.TouchableOpacity`
   flex-direction: row;
-  padding: 6px 10px;
+  padding: 4px 8px;
   justify-content: center;
   align-items: center;
   gap: 7px;
@@ -504,6 +515,15 @@ const ButtonText = styled.Text`
   font-size: ${FontSizes.caption.default};
   font-family: 'Pretendart-Regular';
   color: ${themes.light.pointColor.Primary10};
+`;
+
+const MedicineListButton = styled(ReturnButton)`
+  border: 1.5px solid ${themes.light.borderColor.borderPrimary};
+  gap: 4px;
+`;
+
+const MedicineListText = styled(ButtonText)`
+  color: ${themes.light.textColor.Primary50};
 `;
 
 // 페이징을 위한 컨테이너
@@ -525,7 +545,7 @@ const DayBox = styled.TouchableOpacity`
   display: flex;
   padding: 10px 4px;
   border-radius: 7px;
-  background-color: ${({ isToday, isSelected }) =>
+  background-color: ${({isToday, isSelected}) =>
     isSelected ? themes.light.pointColor.PrimaryDark : 'transparent'};
 `;
 
@@ -557,7 +577,7 @@ const RoundedBox = styled.View`
 const TodayContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   padding: 20px 30px;
 `;
 // 타임라인 관련 스타일 추가
