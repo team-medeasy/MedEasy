@@ -37,8 +37,19 @@ export const removeRefreshToken = async () => {
 
 // FCM 토큰 저장
 export const setFCMToken = async token => {
-  await AsyncStorage.setItem(FCM_TOKEN_KEY, token);
-}
+  try {
+    const currentToken = await AsyncStorage.getItem(FCM_TOKEN_KEY);
+    if (currentToken !== token) {
+      await AsyncStorage.setItem(FCM_TOKEN_KEY, token);
+      console.log('새로운 FCM 토큰 저장:', token);
+    } else {
+      console.log('ℹ️ 동일한 FCM 토큰, 저장 생략');
+    }
+  } catch (e) {
+    console.error('❌ FCM 토큰 저장 실패', e);
+  }
+};
+
 
 // FCM 토큰 가져오기
 export const getFCMToken = async () => {
