@@ -16,7 +16,7 @@ import {
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
-import RoutineCard from '../../components/\bRoutineCard';
+import RoutineCard from '../../components/RoutineCard';
 
 const {width} = Dimensions.get('window');
 const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시

@@ -1,46 +1,41 @@
 import PhotoManipulator from 'react-native-photo-manipulator';
-import { Dimensions } from 'react-native';
+import { Platform, Dimensions } from 'react-native';
+import ImageSize from 'react-native-image-size';
 
-const { width, height } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const PREVIEW_SIZE = screenWidth - 60;
 
 export const cropCenterArea = async (photoPath, isPrescriptionMode) => {
   try {
-    // Ensure PhotoManipulator is available
-    if (!PhotoManipulator) {
-      console.error('PhotoManipulator is not available');
-      return null;
-    }
-
-    // Make sure the path is properly formatted
     const properPath = photoPath.startsWith('file://') ? photoPath : `file://${photoPath}`;
-    
-    // Define the crop region
-    const cropWidth = width - 60;
-    const cropHeight = isPrescriptionMode ? (cropWidth * 4) / 3 : cropWidth;
-    
-    const originX = (width - cropWidth) / 2;
-    const originY = (height - cropHeight) / 2;
-    
+
+    // ✅ 1. 이미지 원본 크기 가져오기
+    const { width: imageWidth, height: imageHeight } = await ImageSize.getSize(properPath);
+
+    // ✅ 2. 보더라인 기준 영역 계산 (화면 기준)
+    const previewWidth = PREVIEW_SIZE;
+    const previewHeight = isPrescriptionMode ? (PREVIEW_SIZE * 4) / 3 : PREVIEW_SIZE;
+    const previewX = (screenWidth - previewWidth) / 2;
+    const previewY = (screenHeight - previewHeight) / 2;
+
+    // ✅ 3. 비율 기반으로 이미지 상의 좌표 환산
+    const xRatio = imageWidth / screenWidth;
+    const yRatio = imageHeight / screenHeight;
+
     const cropRegion = {
-      x: Math.floor(originX),
-      y: Math.floor(originY),
-      width: Math.floor(cropWidth),
-      height: Math.floor(cropHeight),
+      x: Math.floor(previewX * xRatio),
+      y: Math.floor(previewY * yRatio),
+      width: Math.floor(previewWidth * xRatio),
+      height: Math.floor(previewHeight * yRatio),
     };
 
-    console.log('Cropping with region:', cropRegion);
-    console.log('Using path:', properPath);
+    console.log('원본 이미지 크기:', imageWidth, imageHeight);
+    console.log('크롭 영역:', cropRegion);
 
-    // Perform the crop operation
-    const croppedUri = await PhotoManipulator.crop(
-      properPath,
-      cropRegion
-    );
-
-    console.log('Crop successful, new URI:', croppedUri);
+    const croppedUri = await PhotoManipulator.crop(properPath, cropRegion);
     return croppedUri;
   } catch (err) {
-    console.error('이미지 크롭 실패:', err);
+    console.error('이미지 크롭 실패:', err.message);
     return null;
   }
 };
