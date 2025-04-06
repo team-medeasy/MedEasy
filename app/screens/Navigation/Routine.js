@@ -395,7 +395,7 @@ const Routine = () => {
           }}>
           <OtherIcons.return
             width={11}
-            height={9}
+            height={11}
             style={{color: themes.light.pointColor.Primary10}}
           />
           <ButtonText>돌아가기</ButtonText>
@@ -437,14 +437,15 @@ const Routine = () => {
           }}>
           <TodayContainer>
             <TodayHeader today={today} selectedDate={selectedDate} />
-            <MedicineListButton>
+            <MedicineListButton
+              onPress={() => navigation.navigate('MedicineList')}>
               <MedicineListText>전체 목록</MedicineListText>
               <HeaderIcons.chevron
                 width={11}
                 height={11}
                 style={{
                   transform: [{rotate: '180deg'}],
-                  color: themes.light.textColor.Primary30,
+                  color: themes.light.textColor.Primary50,
                 }}
               />
             </MedicineListButton>
@@ -503,7 +504,7 @@ const HeaderText = styled.Text`
 
 const ReturnButton = styled.TouchableOpacity`
   flex-direction: row;
-  padding: 4px 8px;
+  padding: 4px 10px;
   justify-content: center;
   align-items: center;
   gap: 7px;
@@ -513,7 +514,7 @@ const ReturnButton = styled.TouchableOpacity`
 
 const ButtonText = styled.Text`
   font-size: ${FontSizes.caption.default};
-  font-family: 'Pretendart-Regular';
+  font-family: 'Pretendart-Medium';
   color: ${themes.light.pointColor.Primary10};
 `;
 
@@ -523,7 +524,8 @@ const MedicineListButton = styled(ReturnButton)`
 `;
 
 const MedicineListText = styled(ButtonText)`
-  color: ${themes.light.textColor.Primary50};
+  color: ${themes.light.textColor.Primary70};
+  font-size: ${FontSizes.body.default};
 `;
 
 // 페이징을 위한 컨테이너
