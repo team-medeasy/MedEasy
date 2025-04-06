@@ -6,7 +6,7 @@ import FontSizes from '../../assets/fonts/fontSizes';
 import {themes} from '../styles';
 import styled from 'styled-components/native';
 import {Button} from '../components';
-import RoutineCard from '../components/\bRoutineCard';
+import RoutineCard from '../components/RoutineCard';
 
 const dummyRoutines = [
   {
