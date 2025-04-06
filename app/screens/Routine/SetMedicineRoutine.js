@@ -139,9 +139,11 @@ const SetMedicineRoutine = ({ route, navigation }) => {
 
   const convertDaysToNumbers = selectedDays.map(day => days.indexOf(day) + 1);
   const convertTimingsToIds = selectedTimings.map(timing => scheduleMapping[timing] || (timings.indexOf(timing) + 1));
-
-  // 저장 버튼 클릭 시 실행할 함수
+  
+  // 수정 버튼 클릭 시 실행할 함수
   const handleModifyRoutine = async () => {
+    await handleDeleteRoutine();
+
     // 필수 입력값 검증
     if (!medicineName || selectedDays.length === 0 || selectedTimings.length === 0 || !dosage || !totalCount) {
       // 여기에 적절한 오류 메시지 표시 로직 추가
@@ -152,10 +154,10 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     try {
       // API 요청에 맞게 데이터 형식 변환
       const routineData = {
-        medicine_id: medicine.item_id,
+        medicine_id: medicineId,
         nickname: medicineName,
-        dose: parseInt(dosage, 0),
-        total_quantity: parseInt(totalCount, 0),
+        dose: parseInt(dosage, 10),
+        total_quantity: parseInt(totalCount, 10),
         day_of_weeks: convertDaysToNumbers,
         user_schedule_ids: convertTimingsToIds
       };
@@ -371,7 +373,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
               />
               <SelectTimeButton
                 title={'🛏️️ 자기 전'}
-                timeText={'오후 10시 30분'}
+                timeText={scheduleData['자기 전'] ||'오후 10시 30분'}
                 onPress={() => toggleTiming('자기 전')}
                 bgColor={selectedTimings.includes('자기 전') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedTimings.includes('자기 전') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
