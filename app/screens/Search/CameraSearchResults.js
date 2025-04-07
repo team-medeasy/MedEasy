@@ -9,6 +9,7 @@ import {
 } from '../../components';
 import {searchPillByImage} from '../../api/pillSearch';
 import {getMedicineDetail} from '../../api/search';
+import {CameraSearchPlaceholder} from '../../components/CameraSearchResult/CameraSearchPlaceholder';
 
 const CameraSearchResultsScreen = ({route, navigation}) => {
   const {photoUri} = route.params || {};
@@ -105,14 +106,7 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
 
       <SearchResultContainer>
         {loading ? (
-          <View
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <ActivityIndicator
-              size="large"
-              color={themes.light.pointColor.Primary}
-            />
-            <Text>검색 중...</Text>
-          </View>
+          <CameraSearchPlaceholder />
         ) : error || searchResults.length === 0 ? (
           <NoSearchResults />
         ) : (
