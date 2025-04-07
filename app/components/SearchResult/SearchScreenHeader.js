@@ -24,7 +24,7 @@ export const SearchScreenHeader = ({
   return (
     <HeaderContainer>
       <ChevronAndSearchContainer>
-        <ChevronIconButton onPress={onBackPress}>
+        <ChevronIconButton style={{padding: 12}} onPress={onBackPress}>
           <ChevronIcon
             height={17}
             width={17}
@@ -84,7 +84,6 @@ const ChevronAndSearchContainer = styled.View`
   flex-direction: row;
   align-items: center;
   padding-right: 15px;
-  padding-left: 12px;
 `;
 
 const SearchBarTouchable = styled(TouchableOpacity)`
@@ -109,9 +108,7 @@ const SearchIconContainer = styled.View`
   align-items: center;
 `;
 
-const ChevronIconButton = styled(TouchableOpacity)`
-  margin-right: 12px;
-`;
+const ChevronIconButton = styled(TouchableOpacity)``;
 
 const FeatureSearchContainer = styled.View`
   margin-top: 15px;

@@ -161,7 +161,9 @@ const SearchMedicineScreen = ({navigation, route}) => {
     <Container>
       <HeaderContainer>
         <ChevronAndSearchContainer>
-          <ChevronIconButton onPress={() => navigation.goBack()}>
+          <ChevronIconButton
+            style={{padding: 12}}
+            onPress={() => navigation.goBack()}>
             <HeaderIcons.chevron
               height={17}
               width={17}
@@ -181,7 +183,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
         <View>
           <SearchSectionHeader>
             <SearchTitle>최근 검색어</SearchTitle>
-            <TouchableOpacity onPress={handleClearAll}>
+            <TouchableOpacity style={{padding: 12}} onPress={handleClearAll}>
               <ClearAllText>전체 삭제</ClearAllText>
             </TouchableOpacity>
           </SearchSectionHeader>
@@ -195,6 +197,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
                   onPress={() => handleRecentSearchClick(item)}>
                   <RecentSearchItemText>{item}</RecentSearchItemText>
                   <DeleteIconButton
+                    style={{padding: 8}}
                     onPress={e => {
                       e.stopPropagation();
                       handleDeleteSearch(item);
@@ -260,7 +263,6 @@ const ChevronAndSearchContainer = styled.View`
   flex-direction: row;
   align-items: center;
   padding-right: 15px;
-  padding-left: 12px;
 `;
 
 const ChevronIconButton = styled(TouchableOpacity)`
@@ -276,7 +278,7 @@ const SearchSectionHeader = styled.View`
   justify-content: space-between;
   align-items: center;
   padding-left: 25px;
-  padding-right: 25px;
+  padding-right: 12px;
 `;
 
 const SearchTitle = styled.Text`
@@ -308,7 +310,6 @@ const RecentSearchListContainer = styled.ScrollView`
 
 const PopularSearchListContainer = styled.View`
   margin-top: 20px;
-  gap: 18px;
 `;
 
 const RecentSearchItemButton = styled(TouchableOpacity)`
@@ -316,9 +317,10 @@ const RecentSearchItemButton = styled(TouchableOpacity)`
   align-items: center;
   border: 1px;
   border-color: ${themes.light.borderColor.borderPrimary};
-  padding: 8px 15px 7px 14px;
+  padding: 4px 6px 4px 12px;
   border-radius: 20px;
   margin-right: 10px;
+  gap: 4px;
 `;
 
 const RecentSearchItemText = styled.Text`
@@ -327,14 +329,12 @@ const RecentSearchItemText = styled.Text`
   color: ${themes.light.textColor.textPrimary};
 `;
 
-const DeleteIconButton = styled(TouchableOpacity)`
-  margin-left: 10px;
-`;
+const DeleteIconButton = styled(TouchableOpacity)``;
 
 const PopularSearchItemButton = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
-  padding: 0 25px 0 25px;
+  padding: 9px 25px 9px 25px;
 `;
 
 const RankingText = styled.Text`

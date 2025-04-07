@@ -24,7 +24,9 @@ export const FilterButton = ({
         </FilterButtonText>
       </View>
       {selectedItems.length > 0 ? (
-        <TouchableOpacity onPress={() => onClearFilter(type)}>
+        <TouchableOpacity
+          style={{padding: 8}}
+          onPress={() => onClearFilter(type)}>
           <Delete
             width={10}
             height={10}
@@ -32,7 +34,13 @@ export const FilterButton = ({
           />
         </TouchableOpacity>
       ) : (
-        <ChevronDownIcon style={{color: themes.light.textColor.Primary30}} />
+        <View style={{padding: 8}}>
+          <ChevronDownIcon
+            width={10}
+            height={10}
+            style={{color: themes.light.textColor.Primary30}}
+          />
+        </View>
       )}
     </FilterBtn>
   );
@@ -45,7 +53,7 @@ const FilterBtn = styled(TouchableOpacity)`
       : themes.light.boxColor.inputSecondary};
   flex-direction: row;
   border-width: 1.5px;
-  padding: 6px 9px 6px 11px;
+  padding: 2px 4px 2px 11px;
   border-radius: 40px;
   margin-right: 10px;
   align-items: center;
@@ -55,7 +63,6 @@ const FilterBtn = styled(TouchableOpacity)`
 
 const FilterButtonText = styled.Text`
   font-size: ${FontSizes.body.default};
-  margin-right: 6px;
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
