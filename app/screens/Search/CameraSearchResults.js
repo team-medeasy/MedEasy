@@ -53,6 +53,7 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
               uniqueKey: `${result.itemSeq}`,
               id: result.detail.id || '',
               item_image: result.detail.item_image || '',
+              entp_name: result.detail.entp_name || '정보 없음',
               etc_otc_name: result.detail.etc_otc_name || '정보 없음',
               class_name: result.detail.class_name || '정보 없음',
               item_name: result.detail.item_name || '정보 없음',
