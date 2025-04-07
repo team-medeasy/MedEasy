@@ -14,6 +14,7 @@ const RoutineCard = ({
   toggleHospitalCheck,
   toggleCheck,
   isInModal = false,
+  selectedDateString,
 }) => {
   const navigation = useNavigation();
 
@@ -52,7 +53,7 @@ const RoutineCard = ({
               {routine.medicines.every(
                 medicine =>
                   checkedItems[
-                    `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                    `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                   ],
               ) ? (
                 <RoutineIcons.checkOn
@@ -109,7 +110,7 @@ const RoutineCard = ({
                   <MedicineText
                     isChecked={
                       checkedItems[
-                        `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                        `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                       ]
                     }
                     onPress={() =>
@@ -122,7 +123,7 @@ const RoutineCard = ({
                   <MedicineCount
                     isChecked={
                       checkedItems[
-                        `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                        `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                       ]
                     }>
                     {`${medicine.dose}개`}
@@ -132,7 +133,7 @@ const RoutineCard = ({
                       toggleCheck(medicine.medicine_id, routine.timeKey)
                     }>
                     {checkedItems[
-                      `medicine-${medicine.medicine_id}-${routine.timeKey}`
+                      `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                     ] ? (
                       <RoutineIcons.checkOn
                         width={26}
