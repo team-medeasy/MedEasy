@@ -106,7 +106,10 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
 
       <SearchResultContainer>
         {loading ? (
-          <CameraSearchPlaceholder />
+          <>
+            <CameraSearchPlaceholder />
+            <CameraSearchPlaceholder />
+          </>
         ) : error || searchResults.length === 0 ? (
           <NoSearchResults />
         ) : (
