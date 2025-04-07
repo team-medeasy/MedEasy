@@ -41,80 +41,81 @@ const Home = () => {
     fullDate: today,
   });
 
-  // API에서 루틴 데이터 가져오기
-  useEffect(() => {
-    const fetchRoutineData = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // 선택된 특정 날짜로 조회
-        const selectedDateString = selectedDate.fullDate.format('YYYY-MM-DD');
-
-        console.log('API 요청 파라미터:', {
-          start_date: selectedDateString,
-          end_date: selectedDateString,
-        });
-
-        const response = await getRoutineByDate(
-          selectedDateString,
-          selectedDateString,
-        );
-        const todayRoutines = response.data.body;
-
-        console.log(selectedDateString, '의 루틴 데이터:', todayRoutines);
-
-        // 시간대별로 정리된 루틴 데이터 처리
-        const processedRoutines =
-          todayRoutines[0]?.user_schedule_dtos
-            .map(schedule => ({
-              scheduleId: schedule.user_schedule_id,
-              timeName: schedule.name,
-              takeTime: (() => {
-                const time = dayjs(`2024-01-01T${schedule.take_time}`);
-                const hourMinute =
-                  time.format('mm') === '00'
-                    ? time.format('A h시')
-                    : time.format('A h시 mm분');
-
-                return hourMinute.replace('AM', '오전').replace('PM', '오후');
-              })(),
-              medicines: schedule.routine_medicine_dtos.map(medicine => ({
-                name: medicine.nickname,
-                dose: medicine.dose,
-                isTaken: medicine.is_taken,
-              })),
-              medicineTitle: (() => {
-                const medicineNames = schedule.routine_medicine_dtos.map(
-                  med => med.nickname,
-                );
-                if (medicineNames.length === 1) {
-                  return medicineNames[0];
-                } else if (medicineNames.length === 2) {
-                  return `${medicineNames[0]}, ${medicineNames[1]}`;
-                } else if (medicineNames.length > 2) {
-                  return `${medicineNames[0]}, ${medicineNames[1]} 외 ${
-                    medicineNames.length - 2
-                  }건`;
-                }
-                return '';
-              })(),
-            }))
-            .filter(routine => routine.medicineTitle !== '') || [];
-
-        setMedicineRoutines(processedRoutines);
-      } catch (error) {
-        console.error('루틴 데이터 가져오기 실패:', error);
-        setError(error);
-        setMedicineRoutines([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRoutineData();
-  }, [selectedDate.fullDate]);
-
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchRoutineData = async () => {
+        setIsLoading(true);
+        setError(null);
+  
+        try {
+          const selectedDateString = selectedDate.fullDate.format('YYYY-MM-DD');
+  
+          console.log('API 요청 파라미터:', {
+            start_date: selectedDateString,
+            end_date: selectedDateString,
+          });
+  
+          const response = await getRoutineByDate(
+            selectedDateString,
+            selectedDateString,
+          );
+          const todayRoutines = response.data.body;
+  
+          console.log(selectedDateString, '의 루틴 데이터:', todayRoutines);
+  
+          const processedRoutines =
+            todayRoutines[0]?.user_schedule_dtos
+              .map(schedule => ({
+                scheduleId: schedule.user_schedule_id,
+                timeName: schedule.name,
+                takeTime: (() => {
+                  const time = dayjs(`2024-01-01T${schedule.take_time}`);
+                  const hourMinute =
+                    time.format('mm') === '00'
+                      ? time.format('A h시')
+                      : time.format('A h시 mm분');
+                  return hourMinute.replace('AM', '오전').replace('PM', '오후');
+                })(),
+                medicines: schedule.routine_medicine_dtos.map(medicine => ({
+                  name: medicine.nickname,
+                  dose: medicine.dose,
+                  isTaken: medicine.is_taken,
+                })),
+                medicineTitle: (() => {
+                  const medicineNames = schedule.routine_medicine_dtos.map(
+                    med => med.nickname,
+                  );
+                  if (medicineNames.length === 1) {
+                    return medicineNames[0];
+                  } else if (medicineNames.length === 2) {
+                    return `${medicineNames[0]}, ${medicineNames[1]}`;
+                  } else if (medicineNames.length > 2) {
+                    return `${medicineNames[0]}, ${medicineNames[1]} 외 ${
+                      medicineNames.length - 2
+                    }건`;
+                  }
+                  return '';
+                })(),
+              }))
+              .filter(routine => routine.medicineTitle !== '') || [];
+  
+          setMedicineRoutines(processedRoutines);
+        } catch (error) {
+          console.error('루틴 데이터 가져오기 실패:', error);
+          setError(error);
+          setMedicineRoutines([]);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      fetchRoutineData();
+  
+      // cleanup 없음
+      return () => {};
+    }, [selectedDate.fullDate]),
+  );
+  
   useFocusEffect(
     React.useCallback(() => {
       const fetchTodayRoutineData = async () => {
