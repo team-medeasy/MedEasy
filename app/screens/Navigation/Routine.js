@@ -604,12 +604,15 @@ const ButtonText = styled.Text`
 
 const MedicineListButton = styled(ReturnButton)`
   border: 1.5px solid ${themes.light.borderColor.borderPrimary};
-  gap: 4px;
+  border-radius: 40px;
+  padding: 6px 10px;
+  gap: 7px;
 `;
 
 const MedicineListText = styled(ButtonText)`
-  color: ${themes.light.textColor.Primary70};
-  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.Primary50};
+  font-family: 'Pretendart-Medium';
+  font-size: ${FontSizes.caption.default};
 `;
 
 // 페이징을 위한 컨테이너
