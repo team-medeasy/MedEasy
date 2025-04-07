@@ -1,17 +1,14 @@
 import React, {useEffect, useState, Suspense} from 'react';
 import styled from 'styled-components/native';
+import {View} from 'react-native';
 import {ActivityIndicator} from 'react-native';
 import {Header, ModalHeader, Button} from '../../components';
 import {themes} from '../../styles';
 import {useNavigation} from '@react-navigation/native';
-import {View, Alert} from 'react-native';
-import {searchPillByImage} from '../../api/pillSearch';
-import {getMedicineDetail} from '../../api/search';
 
 const PhotoPreviewContent = ({route}) => {
   const {photoUri, isModal = false} = route.params;
   const [photo, setPhoto] = useState(null);
-  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -29,7 +26,7 @@ const PhotoPreviewContent = ({route}) => {
     return <Header {...props} />;
   };
 
-  const handleSearch = async () => {
+  const handleNavigateToSearch = () => {
     if (!photo) return;
 
     setLoading(true);
@@ -130,6 +127,9 @@ const PhotoPreviewContent = ({route}) => {
     } finally {
       setLoading(false);
     }
+    navigation.navigate('CameraSearchResults', {
+      photoUri: photo,
+    });
   };
 
   return (
@@ -151,11 +151,7 @@ const PhotoPreviewContent = ({route}) => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-        <Button
-          title={loading ? '검색 중...' : '검색하기'}
-          onPress={handleSearch}
-          disabled={loading}
-        />
+        <Button title="검색하기" onPress={handleNavigateToSearch} />
       </View>
     </Container>
   );

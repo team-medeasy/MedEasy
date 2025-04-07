@@ -1,12 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import styled from 'styled-components/native';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, Image, TouchableOpacity} from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
 import {
@@ -16,15 +11,16 @@ import {
   ModalHeader,
   MedicineOverview,
   MedicineAppearance,
-  Button} from './../../components';
+  Button,
+} from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {OtherIcons} from '../../../assets/icons';
-import { getSimilarMedicines, getMedicineById } from '../../api/medicine';
-import { getUserMedicineCount } from '../../api/user';
+import {getSimilarMedicines, getMedicineById} from '../../api/medicine';
+import {getUserMedicineCount} from '../../api/user';
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {item, isModal, title} = route.params;
-  console.log('전달된 데이터값: ',item); // 전체 데이터 확인
+  console.log('전달된 데이터값: ', item); // 전체 데이터 확인
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicine, setMedicine] = useState(null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
@@ -38,7 +34,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
         item_name: item.item_name,
         entp_name: item.entp_name,
         class_name: item.class_name,
-        etc_otc_name : item.etc_otc_name,
+        etc_otc_name: item.etc_otc_name,
         item_image: item.item_image,
         chart: item.chart,
         // 외관 정보
@@ -56,18 +52,18 @@ const MedicineDetailScreen = ({route, navigation}) => {
         atpn_qesitm: item.precautions, // 주의사항
         se_qesitm: item.side_effects, // 부작용
       };
-      
+
       setMedicine(mappedMedicine);
-    } 
+    }
   }, [item]);
 
-  // 비슷한 약 
+  // 비슷한 약
   useEffect(() => {
     if (medicine) {
-      getSimilarMedicines({ 
-        medicine_id: medicine.item_id, 
-        page: 1, 
-        size: 10 
+      getSimilarMedicines({
+        medicine_id: medicine.item_id,
+        page: 1,
+        size: 10,
       })
         .then(response => {
           if (response.data && response.data.body) {
@@ -93,31 +89,30 @@ const MedicineDetailScreen = ({route, navigation}) => {
       if (medicine) {
         checkMedicineRegistered();
       }
-      return () => {
-      };
-    }, [medicine])
+      return () => {};
+    }, [medicine]),
   );
 
   // 루틴 등록 여부
   const checkMedicineRegistered = async () => {
     try {
       if (!medicine) return;
-      
+
       const response = await getUserMedicineCount();
       const countData = response.data?.body || response.data;
 
       if (countData) {
-        const { medicine_ids } = countData;
-        
-        console.log("💊등록된 약 id 리스트: ", medicine_ids);
-        console.log("현재 약 id: ", medicine.item_id);
+        const {medicine_ids} = countData;
+
+        console.log('💊등록된 약 id 리스트: ', medicine_ids);
+        console.log('현재 약 id: ', medicine.item_id);
 
         if (medicine_ids && medicine_ids.includes(Number(medicine.item_id))) {
           setIsRegistered(true);
-          console.log("📝 등록된 약입니다.")
+          console.log('📝 등록된 약입니다.');
         } else {
           setIsRegistered(false);
-          console.log("❔ 등록되지 않은 약입니다.")
+          console.log('❔ 등록되지 않은 약입니다.');
         }
       } else {
         console.error('API 응답에 유효한 데이터가 없습니다:', response);
@@ -127,7 +122,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   };
 
-  const HeaderComponent = ({ isModal = false, ...props }) => {
+  const HeaderComponent = ({isModal = false, ...props}) => {
     console.log('isModal:', isModal);
     if (isModal) {
       return <ModalHeader {...props} />;
@@ -136,26 +131,29 @@ const MedicineDetailScreen = ({route, navigation}) => {
   };
 
   const handlePressEnlarge = item => {
-    navigation.navigate('MedicineImageDetail', {item: medicine, isModal: isModal});
+    navigation.navigate('MedicineImageDetail', {
+      item: medicine,
+      isModal: isModal,
+    });
   };
 
   const handleSetMedicineRoutine = async () => {
     if (isRegistered) {
-      navigation.navigate('SetMedicineRoutine', { medicineId: medicine.item_id });
+      navigation.navigate('SetMedicineRoutine', {medicineId: medicine.item_id});
     } else {
-      navigation.navigate('RoutineModal', { 
-        screen: 'SetMedicineName', 
-        params: { item: medicine }
+      navigation.navigate('RoutineModal', {
+        screen: 'SetMedicineName',
+        params: {item: medicine},
       });
     }
   };
 
-  if (!medicine) { // 렌더링 전 error 방지
+  if (!medicine) {
+    // 렌더링 전 error 방지
     return (
       <Container>
-        <HeaderComponent
-          isModal={isModal}
-        >약 정보를 불러오는 중...
+        <HeaderComponent isModal={isModal}>
+          약 정보를 불러오는 중...
         </HeaderComponent>
       </Container>
     );
@@ -164,10 +162,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const headerTitle = title || medicine.item_name;
   return (
     <Container>
-      <HeaderComponent
-        isModal={isModal}
-      >{headerTitle}
-      </HeaderComponent>
+      <HeaderComponent isModal={isModal}>{headerTitle}</HeaderComponent>
 
       <ScrollView>
         <MedicineOverview
@@ -179,7 +174,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
 
         <MedicineDetailContainer>
           <MedicineAppearanceContainer>
-            <MedicineAppearance item={medicine} size='large'/>
+            <MedicineAppearance item={medicine} size="large" />
           </MedicineAppearanceContainer>
 
           <MedicineUsageContainer>
@@ -225,48 +220,50 @@ const MedicineDetailScreen = ({route, navigation}) => {
                 paddingHorizontal={20}
                 keyExtractor={item => item.item_id}
                 renderItem={({item}) => (
-                  <SimilarMedicineItem 
-                  item={item} 
-                  navigation={navigation}
-                  isModal={isModal}
+                  <SimilarMedicineItem
+                    item={item}
+                    navigation={navigation}
+                    isModal={isModal}
                   />
                 )}
               />
             ) : (
-              <Text style={{
-                color: themes.light.textColor.Primary30,
-                fontFamily: 'Pretendard-semiBold',
-                fontSize: FontSizes.caption.large,
-                paddingHorizontal: 20
-              }}>비슷한 약이 존재하지 않아요.</Text>
+              <Text
+                style={{
+                  color: themes.light.textColor.Primary30,
+                  fontFamily: 'Pretendard-semiBold',
+                  fontSize: FontSizes.caption.large,
+                  paddingHorizontal: 20,
+                }}>
+                비슷한 약이 존재하지 않아요.
+              </Text>
             )}
           </SimilarMedicinesContainer>
         </MedicineDetailContainer>
         <Footer />
       </ScrollView>
 
-      <View style={{
-        position: 'absolute',
-        bottom: 0, left: 0, right: 0,
-        paddingLeft: 20,
-        paddingRight: 20,
-        paddingBottom: 30,
-        alignItems: 'center',
-      }}>
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingLeft: 20,
+          paddingRight: 20,
+          paddingBottom: 30,
+          alignItems: 'center',
+        }}>
         {isRegistered ? (
-        <Button 
-          title="루틴 추가 완료!"
-          bgColor={themes.light.textColor.Primary50}
-          onPress={handleSetMedicineRoutine} 
-        />
+          <Button
+            title="루틴 추가 완료!"
+            bgColor={themes.light.textColor.Primary50}
+            onPress={handleSetMedicineRoutine}
+          />
         ) : (
-        <Button 
-          title="루틴 추가하기" 
-          onPress={handleSetMedicineRoutine} 
-        />
+          <Button title="루틴 추가하기" onPress={handleSetMedicineRoutine} />
         )}
       </View>
-
     </Container>
   );
 };
@@ -297,9 +294,8 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
   const isLongText = value && value.length > textLengthThreshold;
 
   // 축소된 텍스트는 처음 70자만 보여주고 '...' 추가
-  const shortenedText = isLongText && !expanded
-    ? value.substring(0, 100) + '...'
-    : value;
+  const shortenedText =
+    isLongText && !expanded ? value.substring(0, 100) + '...' : value;
 
   return (
     <View
@@ -310,18 +306,34 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
         borderBottomWidth: borderBottomWidth,
         borderBottomColor: themes.light.borderColor.borderSecondary,
       }}>
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
         <HeadingText>{label}</HeadingText>
 
         {isLongText && (
-          <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-            {expanded
-              ? <OtherIcons.chevronDown width={17} height={17} style={{color: themes.light.textColor.Primary30, transform: [{ rotate: '180deg' }]}}/>
-              : <OtherIcons.chevronDown width={17} height={17} style={{color: themes.light.textColor.Primary30}}/>}
+          <TouchableOpacity
+            style={{paddingVertical: 8, paddingLeft: 8}}
+            onPress={() => setExpanded(!expanded)}>
+            {expanded ? (
+              <OtherIcons.chevronDown
+                width={17}
+                height={17}
+                style={{
+                  color: themes.light.textColor.Primary30,
+                  transform: [{rotate: '180deg'}],
+                }}
+              />
+            ) : (
+              <OtherIcons.chevronDown
+                width={17}
+                height={17}
+                style={{color: themes.light.textColor.Primary30}}
+              />
+            )}
           </TouchableOpacity>
         )}
       </View>
@@ -355,13 +367,17 @@ const SimilarMedicineItem = ({item, navigation, isModal}) => {
   };
 
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={{marginRight: 15, width: 138.75}}
-      onPress={handlePressMedicine}
-    >
+      onPress={handlePressMedicine}>
       <Image
         source={{uri: item.item_image}}
-        style={{width: 138.75, height: 74, borderRadius: 10, resizeMode: 'contain'}}
+        style={{
+          width: 138.75,
+          height: 74,
+          borderRadius: 10,
+          resizeMode: 'contain',
+        }}
       />
       <View style={{marginTop: 15, gap: 8}}>
         <Text
@@ -382,7 +398,11 @@ const SimilarMedicineItem = ({item, navigation, isModal}) => {
           ellipsizeMode="tail">
           {item.item_name}
         </Text>
-        <Tag sizeType="small" colorType="resultPrimary" overflowMode='ellipsis' maxLength='14'>
+        <Tag
+          sizeType="small"
+          colorType="resultPrimary"
+          overflowMode="ellipsis"
+          maxLength="14">
           {item.class_name || '약품 구분'}
         </Tag>
       </View>

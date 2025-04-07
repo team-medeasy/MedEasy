@@ -61,9 +61,9 @@ const EmailBtnText = styled.Text`
 `;
 const SignUpContainer = styled.View`
   flex-direction: row;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  gap: 20px;
+  margin-top: 2px;
+  margin-bottom: 12px;
+  gap: 4px;
 `;
 
 const SignUpStartScreen = ({navigation}) => {
@@ -95,10 +95,14 @@ const SignUpStartScreen = ({navigation}) => {
           <BtnText>Google로 시작하기</BtnText>
         </SignUpBtn>
         <SignUpContainer>
-          <EmailBtn onPress={() => navigation.navigate('SignUpName')}>
+          <EmailBtn
+            style={{padding: 8}}
+            onPress={() => navigation.navigate('SignUpName')}>
             <EmailBtnText>회원가입</EmailBtnText>
           </EmailBtn>
-          <EmailBtn onPress={() => navigation.navigate('SignIn')}>
+          <EmailBtn
+            style={{padding: 8}}
+            onPress={() => navigation.navigate('SignIn')}>
             <EmailBtnText>이메일 로그인</EmailBtnText>
           </EmailBtn>
         </SignUpContainer>

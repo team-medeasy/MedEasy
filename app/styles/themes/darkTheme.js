@@ -30,6 +30,7 @@ export const darkTheme = {
     tagDetailPrimary: 'rgba(135,166,255,0.7)',
     tagDetailSecondary: 'rgba(255, 255, 255, 0.2)',
     modalBar: 'rgba(0, 0, 0, 0.15)',
+    placeholder: 'rgba(255, 255, 255, 0.1)',
   },
   bgColor: {
     bgPrimary: 'rgba(17, 17, 17, 1)',
