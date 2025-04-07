@@ -13,7 +13,7 @@ const SearchBarContainer = styled.View`
   border-radius: 10px;
   background-color: ${({theme}) => themes.light.boxColor.inputSecondary};
   flex: 1;
-  padding: 13px 20px 13px 15px;
+  padding: 13px 0 13px 15px;
 `;
 
 const SearchInput = styled.TextInput`
@@ -37,7 +37,7 @@ const SearchBar = ({searchQuery, setSearchQuery, onSearch, placeholder}) => {
         onSubmitEditing={onSearch}
         returnKeyType="search"
       />
-      <SearchButton onPress={onSearch}>
+      <SearchButton style={{padding: 14, marginTop: 4}} onPress={onSearch}>
         <OtherIcons.search
           width={17.5}
           height={17.5}

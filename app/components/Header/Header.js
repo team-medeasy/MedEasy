@@ -13,7 +13,7 @@ const Header = ({children, onBackPress}) => {
   return (
     <HeaderContainer>
       <BackAndTitleContainer>
-        <TouchableOpacity onPress={handleBackPress}>
+        <TouchableOpacity style={{padding: 12}} onPress={handleBackPress}>
           <HeaderIcons.chevron
             width={17}
             height={17}
@@ -21,21 +21,22 @@ const Header = ({children, onBackPress}) => {
           />
         </TouchableOpacity>
         <Title>{children}</Title>
-        <View width={17} height={17} />
+        <View width={41} height={41} />
       </BackAndTitleContainer>
     </HeaderContainer>
   );
 };
 
 const HeaderContainer = styled.View`
-  ${Platform.OS === 'ios' && `
+  ${Platform.OS === 'ios' &&
+  `
     height: 108px;
   `}
-  ${Platform.OS === 'android' && `
+  ${Platform.OS === 'android' &&
+  `
     height: 50px;
   `}
   justify-content: flex-end;
-  padding-bottom: 10px;
   background-color: ${themes.light.bgColor.bgPrimary};
   border-bottom-width: 1;
   border-bottom-color: ${themes.light.borderColor.borderPrimary};
