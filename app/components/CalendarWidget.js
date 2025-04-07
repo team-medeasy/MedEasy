@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { themes } from '../styles';
@@ -38,6 +39,54 @@ const CalendarWidget = ({
   const [selectedDate, setSelectedDate] = useState('');
   const [today, setToday] = useState(dayjs().format('YYYY-MM-DD'));
 
+  // 현재 보여지는 월의 루틴 데이터 가져오기
+  const fetchMonthlyRoutine = async (month) => {
+    try {
+      // 현재 보여지는 월의 시작일과 종료일 계산
+      const startDate = month.startOf('month').format('YYYY-MM-DD');
+      const endDate = month.endOf('month').format('YYYY-MM-DD');
+      
+      console.log('루틴 데이터 조회 기간:', startDate, '~', endDate);
+      
+      const response = await getRoutineByDate(startDate, endDate);
+      const routineData = response.data.body;
+      console.log('월 데이터 조회 결과:', routineData);
+
+      const markedRoutineDates = routineData.reduce((acc, item) => {
+        const dateString = item.take_date;
+        
+        // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
+        const hasRoutineMedicines = item.user_schedule_dtos.some(schedule => 
+          schedule.routine_medicine_dtos.length > 0
+        );
+    
+        if (hasRoutineMedicines) {
+          // 모든 약이 복용 완료되었는지 확인
+          const allTaken = item.user_schedule_dtos.every(schedule => 
+            schedule.routine_medicine_dtos.length === 0 || 
+            schedule.routine_medicine_dtos.every(medicine => medicine.is_taken)
+          );
+          
+          acc[dateString] = {
+            marked: true,
+            allTaken: allTaken // 모든 약 복용 완료 여부 저장
+          };
+        }
+        return acc;
+      }, {});
+
+      // 기존 markedDates와 병합
+      setRoutineMarkedDates({
+        ...markedDates,
+        ...markedRoutineDates
+      });
+      
+      console.log('마킹된 날짜 정보 업데이트:', markedRoutineDates);
+    } catch (error) {
+      console.error('루틴 데이터 가져오기 실패:', error);
+    }
+  };
+
   useEffect(() => {
     // 오늘 날짜 초기화
     setToday(dayjs().format('YYYY-MM-DD'));
@@ -62,6 +111,22 @@ const CalendarWidget = ({
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    fetchMonthlyRoutine(currentMonth);
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('루틴 데이터 다시 로드 중...');
+      // 현재 표시 중인 월의 데이터 다시 로드
+      fetchMonthlyRoutine(currentMonth);
+      
+      return () => {
+        // 클린업 함수 (필요시)
+      };
+    }, [currentMonth])
+  );
+
   // 날짜 선택 핸들러
   const handleDayPress = (day) => {
     const selectedDayjs = dayjs(day.dateString);
@@ -76,68 +141,18 @@ const CalendarWidget = ({
     setSelectedDate(day.dateString);
 
     onDateChange(newSelectedDate);
-    console.log("디버깅: ", newSelectedDate);
+    console.log("선택된 날짜: ", newSelectedDate);
   };
 
   // 월 변경 핸들러
   const handleMonthChange = (month) => {
-    const newMonth = dayjs(`${month.year}-${month.month}`);
+    const newMonth = dayjs(`${month.year}-${month.month}-01`);
     setCurrentMonth(newMonth);
-  
+    console.log('달력 월 변경:', newMonth.format('YYYY-MM'));
+    
     // 월 변경 시 해당 월의 루틴 데이터 가져오기
-    const fetchMonthlyRoutine = async () => {
-      try {
-        // 현재 보여지는 월의 시작일과 종료일 계산
-        const startDate = newMonth.startOf('month').format('YYYY-MM-DD');
-        const endDate = newMonth.endOf('month').format('YYYY-MM-DD');
-        
-        const response = await getRoutineByDate(startDate, endDate);
-        const routineData = response.data.body;
-        console.log('월 데이터: ',routineData);
-  
-        const markedRoutineDates = routineData.reduce((acc, item) => {
-          const dateString = item.take_date;
-          
-          // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
-          const hasRoutineMedicines = item.user_schedule_dtos.some(schedule => 
-            schedule.routine_medicine_dtos.length > 0
-          );
-      
-          if (hasRoutineMedicines) {
-            // 모든 약이 복용 완료되었는지 확인
-            const allTaken = item.user_schedule_dtos.every(schedule => 
-              schedule.routine_medicine_dtos.length === 0 || 
-              schedule.routine_medicine_dtos.every(medicine => medicine.is_taken)
-            );
-            
-            acc[dateString] = {
-              marked: true,
-              allTaken: allTaken // 모든 약 복용 완료 여부 저장
-            };
-          }
-          return acc;
-        }, {});
-  
-        // 기존 markedDates와 병합
-        setRoutineMarkedDates({
-          ...markedDates,
-          ...markedRoutineDates
-        });
-      } catch (error) {
-        console.error('루틴 데이터 가져오기 실패:', error);
-      }
-    };
-  
-    fetchMonthlyRoutine();
+    fetchMonthlyRoutine(newMonth);
   };
-
-  // 컴포넌트 마운트 시 초기 월의 루틴 데이터 가져오기
-  useEffect(() => {
-    handleMonthChange({
-      year: currentMonth.year(),
-      month: currentMonth.month() + 1
-    });
-  }, []);
 
   // 커스텀 날짜 컴포넌트 
   const CustomDay = React.memo(({ date, state, marking, onPress }) => {
@@ -171,10 +186,11 @@ const CalendarWidget = ({
               <RoutineIcons.medicine 
                 width={15} 
                 height={15}
-                color={allTaken 
-                  ? themes.light.pointColor.Primary // 모든 약 복용 완료
-                  : themes.light.textColor.Primary20 // 일부만 복용 또는 모두 미복용
-                } 
+                style={{
+                  color: allTaken 
+                    ? themes.light.pointColor.Primary  // 모든 약 복용 완료
+                    : themes.light.textColor.Primary20 // 일부만 복용 또는 모두 미복용
+                }}
               />
             </IconContainer>
           )}
@@ -241,7 +257,6 @@ const DayContainer = styled.View`
 const DayText = styled.Text`
   font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-Bold';
-
 `;
 
 const IconContainer = styled.View`
