@@ -1,32 +1,40 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
+import LinearGradient from 'react-native-linear-gradient';
 import {themes} from '../../styles';
+import {Dimensions} from 'react-native';
+
+const screenWidth = Dimensions.get('window').width;
+const padding = 20;
 
 export const CameraSearchPlaceholder = () => {
   return (
     <Container>
-      <ImagePlaceholder />
+      <Shimmer
+        width={screenWidth - padding * 2}
+        height={180}
+        style={{marginBottom: 16, borderRadius: 12}}
+      />
+
       <Row>
-        <TagPlaceholder />
-        <TagPlaceholder />
+        <Shimmer width={70} height={22} style={{borderRadius: 6}} />
+        <Shimmer width={70} height={22} style={{borderRadius: 6}} />
       </Row>
-      <NamePlaceholder />
-      <InfoPlaceholder />
+
+      <Shimmer
+        width={200}
+        height={20}
+        style={{marginBottom: 10, borderRadius: 6}}
+      />
+      <Shimmer width={100} height={16} style={{borderRadius: 6}} />
     </Container>
   );
 };
 
 const Container = styled.View`
-  padding: 0 20px;
+  padding: 0 ${padding}px;
   margin-bottom: 32px;
-`;
-
-const ImagePlaceholder = styled.View`
-  width: 100%;
-  height: 180px;
-  background-color: ${themes.light.boxColor.placeholder};
-  border-radius: 12px;
-  margin-bottom: 16px;
 `;
 
 const Row = styled.View`
@@ -35,24 +43,14 @@ const Row = styled.View`
   margin-bottom: 12px;
 `;
 
-const TagPlaceholder = styled.View`
-  width: 70px;
-  height: 22px;
-  background-color: ${themes.light.boxColor.placeholder};
-  border-radius: 6px;
-`;
-
-const NamePlaceholder = styled.View`
-  width: 60%;
-  height: 20px;
-  background-color: ${themes.light.boxColor.placeholder};
-  border-radius: 6px;
-  margin-bottom: 10px;
-`;
-
-const InfoPlaceholder = styled.View`
-  width: 40%;
-  height: 16px;
-  background-color: ${themes.light.boxColor.placeholder};
-  border-radius: 6px;
-`;
+const Shimmer = props => (
+  <ShimmerPlaceholder
+    shimmerColors={[
+      themes.light.boxColor.placeholder,
+      '#F5F5F5',
+      themes.light.boxColor.placeholder,
+    ]}
+    LinearGradient={LinearGradient}
+    {...props}
+  />
+);
