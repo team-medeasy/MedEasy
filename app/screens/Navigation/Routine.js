@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
 import styled from 'styled-components/native';
@@ -184,69 +184,60 @@ const Routine = () => {
     initialHospitalRoutines,
   );
 
-  // API에서 루틴 데이터 가져오기
-  useEffect(() => {
-    const fetchRoutineData = async () => {
-      try {
-        // 현재 선택된 날짜의 시작일과 종료일 계산 (일주일 범위로 설정)
-        const startDate = selectedDate.fullDate
-          .startOf('week')
-          .format('YYYY-MM-DD');
-        const endDate = selectedDate.fullDate
-          .endOf('week')
-          .format('YYYY-MM-DD');
-        console.log('API 요청 파라미터:', {
-          start_date: startDate,
-          end_date: endDate,
+  useFocusEffect(
+    useCallback(() => {
+      const fetchRoutineData = async () => {
+        try {
+          const startDate = selectedDate.fullDate.startOf('week').format('YYYY-MM-DD');
+          const endDate = selectedDate.fullDate.endOf('week').format('YYYY-MM-DD');
+  
+          console.log('API 요청 파라미터:', { start_date: startDate, end_date: endDate });
+  
+          const response = await getRoutineByDate(startDate, endDate);
+          const routineData = response.data.body;
+          console.log('루틴 데이터 응답:', routineData);
+  
+          const processedRoutines = processRoutineData(routineData);
+          setMedicineRoutines(processedRoutines);
+  
+          const { routineMap, checkedMap } = mapRoutineData(routineData);
+          setRoutineMedicineMap(routineMap);
+          setCheckedItems(checkedMap);
+  
+        } catch (error) {
+          console.error('루틴 데이터 가져오기 실패:', error);
+        }
+      };
+  
+      fetchRoutineData();
+    }, [selectedDate.fullDate])
+  );
+  
+  const mapRoutineData = (routineData) => {
+    const routineMap = {};
+    const checkedMap = {};
+  
+    routineData.forEach(day => {
+      const dateKey = day.take_date;
+      routineMap[dateKey] = {};
+  
+      day.user_schedule_dtos.forEach(schedule => {
+        const timeType = getTimeTypeFromScheduleName(schedule.name) || getTimeTypeFromTime(schedule.take_time);
+  
+        if (!routineMap[dateKey][timeType]) {
+          routineMap[dateKey][timeType] = {};
+        }
+  
+        schedule.routine_medicine_dtos?.forEach(medicine => {
+          const checkKey = `${dateKey}-${timeType}-${medicine.medicine_id}`;
+          routineMap[dateKey][timeType][medicine.medicine_id] = medicine.routine_medicine_id;
+          checkedMap[checkKey] = medicine.is_taken;
         });
+      });
+    });
   
-        const response = await getRoutineByDate(startDate, endDate);
-        console.log('루틴 데이터 응답:', response.data.body);
-        const routineData = response.data.body;
-  
-        // API 응답에서 initialMedicineRoutines 형식으로 데이터 가공
-        const processedMedicineRoutines = processRoutineData(routineData);
-        setMedicineRoutines(processedMedicineRoutines);
-        
-        // 날짜별, 시간대별 routine_medicine_id 매핑
-        const routineIdMap = {};
-        const initialCheckedState = {};
-        
-        routineData.forEach(dayData => {
-          const dateKey = dayData.take_date;
-          routineIdMap[dateKey] = {};
-          
-          dayData.user_schedule_dtos.forEach(schedule => {
-            const timeType = getTimeTypeFromScheduleName(schedule.name) || 
-                           getTimeTypeFromTime(schedule.take_time);
-            
-            if (!routineIdMap[dateKey][timeType]) {
-              routineIdMap[dateKey][timeType] = {};
-            }
-            
-            if (schedule.routine_medicine_dtos && schedule.routine_medicine_dtos.length > 0) {
-              schedule.routine_medicine_dtos.forEach(medicine => {
-                // 날짜, 시간대, medicine_id에 대한 routine_medicine_id 매핑
-                routineIdMap[dateKey][timeType][medicine.medicine_id] = medicine.routine_medicine_id;
-                
-                // 복용 상태 초기화 (날짜, 시간대, medicine_id 조합으로 키 생성)
-                const checkKey = `${dateKey}-${timeType}-${medicine.medicine_id}`;
-                initialCheckedState[checkKey] = medicine.is_taken;
-              });
-            }
-          });
-        });
-        
-        // 매핑 정보와 체크 상태 저장
-        setRoutineMedicineMap(routineIdMap);
-        setCheckedItems(initialCheckedState);
-      } catch (error) {
-        console.error('루틴 데이터 가져오기 실패:', error);
-      }
-    };
-  
-    fetchRoutineData();
-  }, [selectedDate.fullDate]);
+    return { routineMap, checkedMap };
+  };
 
   const getTimeTypeFromScheduleName = scheduleName => {
     const lowerName = scheduleName.toLowerCase();
@@ -604,12 +595,15 @@ const ButtonText = styled.Text`
 
 const MedicineListButton = styled(ReturnButton)`
   border: 1.5px solid ${themes.light.borderColor.borderPrimary};
-  gap: 4px;
+  border-radius: 40px;
+  padding: 6px 10px;
+  gap: 7px;
 `;
 
 const MedicineListText = styled(ButtonText)`
-  color: ${themes.light.textColor.Primary70};
-  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.Primary50};
+  font-family: 'Pretendart-Medium';
+  font-size: ${FontSizes.caption.default};
 `;
 
 // 페이징을 위한 컨테이너
