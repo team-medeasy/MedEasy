@@ -1,12 +1,16 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   TouchableOpacity,
   Animated,
+  Linking,
+  Platform,
 } from 'react-native';
 import {Camera, useCameraDevices} from 'react-native-vision-camera';
 import {useNavigation, useIsFocused} from '@react-navigation/native';
+import {cropCenterArea} from '../../api/services/cameraService';
 import styled from 'styled-components/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Svg, {Rect, Mask} from 'react-native-svg';
@@ -33,6 +37,8 @@ const CameraSearchScreen = () => {
   const [isPrescriptionMode, setIsPrescriptionMode] = useState(false);
   const previewSize = useRef(new Animated.Value(PREVIEW_SIZE)).current;
   const [cameraPosition, setCameraPosition] = useState('back');
+  const [permissionGranted, setPermissionGranted] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(true);
 
   const devices = useCameraDevices();
   const navigation = useNavigation();
@@ -43,37 +49,87 @@ const CameraSearchScreen = () => {
     devices && devices.find(d => d.position === 'back'),
   ); // 초기값 설정
 
-  useEffect(() => {
-    const checkCameraPermission = async () => {
-      console.log('Checking camera permission...');
+  // 새로 추가된 함수
+  const checkAndRequestCameraPermission = async () => {
+    try {
+      // 현재 카메라 권한 상태 확인
       const cameraPermission = await Camera.getCameraPermissionStatus();
-      console.log('Camera permission status:', cameraPermission);
-      console.log('isFocused:', isFocused);
-
+      
+      // 권한이 있는 경우
       if (cameraPermission === 'authorized' || cameraPermission === 'granted') {
-        console.log('카메라 권한이 이미 있습니다. 카메라를 시작합니다.');
-      } else {
-        console.warn('카메라 권한이 없습니다. 요청 중...');
-        const requestPermission = await Camera.requestCameraPermission();
-        console.log('Requested Camera Permission:', requestPermission);
-        if (requestPermission !== 'authorized') {
-          console.warn('카메라 권한 요청 거부됨. 이전 화면으로 이동합니다.');
-          navigation.goBack();
-        } else {
-          console.log('카메라 권한 획득 성공!');
-        }
+        setPermissionGranted(true);
+        return true;
       }
-      console.log('Devices:', devices);
-      console.log('Device:', device);
-    };
-
-    checkCameraPermission();
-  }, [navigation, isFocused]);
+      
+      // 권한이 없을 경우 요청
+      const requestPermission = await Camera.requestCameraPermission();
+      
+      // 권한 요청 성공
+      if (requestPermission === 'authorized' || requestPermission === 'granted') {
+        setPermissionGranted(true);
+        return true;
+      }
+      
+      // 권한 요청 실패 - 설정으로 이동 안내
+      Alert.alert(
+        '카메라 권한 필요',
+        '사진 검색을 위해 카메라 권한이 필요합니다. 설정에서 권한을 활성화해 주세요.',
+        [
+          { text: '취소', onPress: () => navigation.goBack(), style: 'cancel' },
+          { 
+            text: '설정으로 이동', 
+            onPress: () => {
+              // iOS와 Android에서 설정 앱으로 이동
+              if (Platform.OS === 'ios') {
+                Linking.openURL('app-settings:');
+              } else {
+                Linking.openSettings();
+              }
+              navigation.goBack();
+            }
+          }
+        ]
+      );
+      setPermissionGranted(false);
+      return false;
+    } catch (error) {
+      console.error('카메라 권한 확인 중 오류 발생:', error);
+      navigation.goBack();
+      setPermissionGranted(false);
+      return false;
+    }
+  };
 
   useEffect(() => {
-    if (devices) {
+    checkAndRequestCameraPermission();
+  }, []); // 마운트 시 한 번만 실행
+
+  useEffect(() => {
+    if (isFocused) {
+      setIsCameraActive(true);
+      const checkPermissionOnFocus = async () => {
+        const cameraPermission = await Camera.getCameraPermissionStatus();
+        
+        // 권한이 취소된 경우 다시 요청
+        if (cameraPermission !== 'authorized' && cameraPermission !== 'granted') {
+          await checkAndRequestCameraPermission();
+        } else {
+          setPermissionGranted(true);
+        }
+      };
+      
+      checkPermissionOnFocus();
+    } else {
+      setIsCameraActive(false);
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    if (devices && devices.length > 0) {
       const newDevice = devices.find(d => d.position === cameraPosition);
-      setDevice(newDevice);
+      if (newDevice) {
+        setDevice(newDevice);
+      }
     }
   }, [devices, cameraPosition]);
 
@@ -93,15 +149,34 @@ const CameraSearchScreen = () => {
   };
 
   const handleCapture = async () => {
-    if (!cameraRef.current) return;
-
+    if (!cameraRef.current || !permissionGranted) {
+      if(!permissionGranted) {
+        // 카메라 권한이 없을 경우
+        await checkAndRequestCameraPermission();
+        return;
+      }
+      return;
+    }
+  
     try {
+      // 사진 촬영
       const photo = await cameraRef.current.takePhoto({
         qualityPrioritization: 'quality',
         flash: 'off',
       });
-      console.log('Photo taken:', photo.path);
-      navigation.navigate('PhotoPreview', {photoUri: `file://${photo.path}`});
+      
+      // 먼저 카메라를 비활성화
+      setIsCameraActive(false);
+      
+      const croppedUri = await cropCenterArea(photo.path, isPrescriptionMode);
+      // 그 다음 화면 전환
+      if (croppedUri) {
+        setTimeout(() => {
+          navigation.navigate('PhotoPreview', {
+            photoUri: croppedUri,
+          });
+        }, 50);
+      }
     } catch (error) {
       console.error('사진 촬영 실패:', error);
     }
@@ -151,7 +226,15 @@ const CameraSearchScreen = () => {
     <CameraContainer>
       <Header>
         <HeaderItem>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity 
+            onPress={() => {
+              setIsCameraActive(false);
+              // 약간의 지연 후 화면 전환
+              setTimeout(() => {
+                navigation.goBack();
+              }, 50);
+            }}
+          >
             <HeaderButton>
               <HeaderIcons.chevron
                 width={20}
@@ -200,12 +283,12 @@ const CameraSearchScreen = () => {
       </Header>
 
       {/* 카메라 미리보기 */}
-      {isFocused && (
+      {isFocused && device && isCameraActive && (
         <Camera
           ref={cameraRef}
           style={{flex: 1}}
           device={device}
-          isActive={true}
+          isActive={isFocused && permissionGranted}
           photo={true}
         />
       )}

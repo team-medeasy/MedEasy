@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {useFocusEffect, useNavigation } from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
 import styled from 'styled-components/native';
-import {OtherIcons, RoutineIcons} from '../../../assets/icons';
+import {HeaderIcons, OtherIcons, RoutineIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
@@ -16,6 +16,7 @@ import {
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
+import RoutineCard from '../../components/RoutineCard';
 
 const {width} = Dimensions.get('window');
 const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
@@ -182,10 +183,13 @@ const Routine = () => {
     const medicineMap = {};
 
     // 요일 매핑 (API 날짜 -> 요일 숫자로 변환)
+    // getDayOfWeek 함수 수정 - 시간대 이슈 방지
     const getDayOfWeek = dateString => {
-      const date = new Date(dateString);
+      // 날짜 문자열에 시간을 명시적으로 추가하여 시간대 이슈 방지
+      const date = new Date(`${dateString}T12:00:00`);
+      console.log('날짜:', dateString, '요일:', date.getDay());
       // 요일을 0(일)~6(토)에서 1(월)~7(일)로 변환
-      return date.getDay() === 0 ? 7 : date.getDay() + 1;
+      return date.getDay() === 0 ? 7 : date.getDay();
     };
 
     // 스케줄 이름에 따른 시간대 매핑
@@ -278,11 +282,12 @@ const Routine = () => {
     const todayMedicineItems = [];
 
     Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
-      const medicinesForTime = medicineRoutines.filter(
-        medicine =>
-          medicine.types.includes(timeKey) &&
-          medicine.day_of_weeks.includes(selectedDate.fullDate.day() + 1),
-      );
+      const medicinesForTime = medicineRoutines.filter(medicine => {
+        const dayMatch = medicine.day_of_weeks.includes(
+          selectedDate.fullDate.day() === 0 ? 7 : selectedDate.fullDate.day(),
+        );
+        return medicine.types.includes(timeKey) && dayMatch;
+      });
 
       if (medicinesForTime.length > 0) {
         todayMedicineItems.push({
@@ -390,7 +395,7 @@ const Routine = () => {
           }}>
           <OtherIcons.return
             width={11}
-            height={9}
+            height={11}
             style={{color: themes.light.pointColor.Primary10}}
           />
           <ButtonText>돌아가기</ButtonText>
@@ -416,7 +421,7 @@ const Routine = () => {
             offset: width * index,
             index,
           })}
-        // initialScrollIndex 제거
+          // initialScrollIndex 제거
         />
       </DayContainerWrapper>
       <RoundedBox>
@@ -432,6 +437,18 @@ const Routine = () => {
           }}>
           <TodayContainer>
             <TodayHeader today={today} selectedDate={selectedDate} />
+            <MedicineListButton
+              onPress={() => navigation.navigate('MedicineList')}>
+              <MedicineListText>전체 목록</MedicineListText>
+              <HeaderIcons.chevron
+                width={11}
+                height={11}
+                style={{
+                  transform: [{rotate: '180deg'}],
+                  color: themes.light.textColor.Primary50,
+                }}
+              />
+            </MedicineListButton>
           </TodayContainer>
         </LinearGradient>
 
@@ -444,155 +461,16 @@ const Routine = () => {
 
               {/* 모든 루틴을 시간순으로 렌더링 */}
               {allRoutines.map((routine, index) => (
-                <RoutineBoxContainer key={routine.id}>
-                  {/* 타임라인 포인트 */}
-                  <TimelinePoint
-                    type={routine.type}
-                    isFirst={index === 0}
-                    isLast={index === allRoutines.length - 1}
-                  />
-                  <TimelineBigPoint
-                    type={routine.type}
-                    isFirst={index === 0}
-                    isLast={index === allRoutines.length - 1}
-                  />
-
-                  {/* 루틴 컨테이너 */}
-                  <RoutineContainer>
-                    {routine.type === 'medicine' ? (
-                      <TimeContainer>
-                        <IconContainer>
-                          <RoutineIcons.medicine
-                            width={22}
-                            height={22}
-                            style={{color: themes.light.pointColor.Primary}}
-                          />
-                        </IconContainer>
-                        <TextContainer>
-                          <TypeText>{routine.label}</TypeText>
-                          <TimeText>{routine.time}</TimeText>
-                        </TextContainer>
-                        <CheckBox
-                          onPress={() => toggleTimeCheck(routine.timeKey)}>
-                          {routine.medicines.every(
-                            medicine =>
-                              checkedItems[
-                              `medicine-${medicine.medicine_id}-${routine.timeKey}`
-                              ],
-                          ) ? (
-                            <RoutineIcons.checkOn
-                              width={26}
-                              height={26}
-                              style={{color: themes.light.pointColor.Primary}}
-                            />
-                          ) : (
-                            <RoutineIcons.checkOff
-                              width={26}
-                              height={26}
-                              style={{
-                                color: themes.light.boxColor.inputSecondary,
-                              }}
-                            />
-                          )}
-                        </CheckBox>
-                      </TimeContainer>
-                    ) : (
-                      <HospitalTimeContainer>
-                        <IconContainer>
-                          <RoutineIcons.hospital
-                            width={22}
-                            height={22}
-                            style={{color: themes.light.pointColor.Secondary}}
-                          />
-                        </IconContainer>
-                        <TextContainer>
-                          <TypeText>{routine.label}</TypeText>
-                          <TimeText>{routine.time}</TimeText>
-                        </TextContainer>
-                        <CheckBox
-                          onPress={() =>
-                            toggleHospitalCheck(routine.hospital.hospital_id)
-                          }>
-                          {checkedItems[
-                            `hospital-${routine.hospital.hospital_id}`
-                          ] ? (
-                            <RoutineIcons.checkOn
-                              width={26}
-                              height={26}
-                              style={{color: themes.light.pointColor.Primary}}
-                            />
-                          ) : (
-                            <RoutineIcons.checkOff
-                              width={26}
-                              height={26}
-                              style={{
-                                color: themes.light.boxColor.inputSecondary,
-                              }}
-                            />
-                          )}
-                        </CheckBox>
-                      </HospitalTimeContainer>
-                    )}
-
-                    {/* 약 복용 루틴일 경우에만 약 목록 표시 */}
-                    {routine.type === 'medicine' && (
-                      <Routines>
-                        <RoutineList>
-                          {routine.medicines.map(medicine => (
-                            <MedicineItem key={medicine.medicine_id}>
-                              <MedicineText
-                                isChecked={
-                                  checkedItems[
-                                  `medicine-${medicine.medicine_id}-${routine.timeKey}`
-                                  ]
-                                }
-                                onPress={() => navigation.navigate('SetMedicineRoutine', { medicineId: medicine.medicine_id })}
-                              >
-                                {`${medicine.nickname}`}
-                              </MedicineText>
-                              <MedicineCount
-                                isChecked={
-                                  checkedItems[
-                                  `medicine-${medicine.medicine_id}-${routine.timeKey}`
-                                  ]
-                                }>
-                                {`${medicine.dose}개`}
-                              </MedicineCount>
-                              <CheckBox
-                                onPress={() =>
-                                  toggleCheck(
-                                    medicine.medicine_id,
-                                    routine.timeKey,
-                                  )
-                                }>
-                                {checkedItems[
-                                  `medicine-${medicine.medicine_id}-${routine.timeKey}`
-                                ] ? (
-                                  <RoutineIcons.checkOn
-                                    width={26}
-                                    height={26}
-                                    style={{
-                                      color: themes.light.pointColor.Primary,
-                                    }}
-                                  />
-                                ) : (
-                                  <RoutineIcons.checkOff
-                                    width={26}
-                                    height={26}
-                                    style={{
-                                      color:
-                                        themes.light.boxColor.inputSecondary,
-                                    }}
-                                  />
-                                )}
-                              </CheckBox>
-                            </MedicineItem>
-                          ))}
-                        </RoutineList>
-                      </Routines>
-                    )}
-                  </RoutineContainer>
-                </RoutineBoxContainer>
+                <RoutineCard
+                  key={routine.id}
+                  routine={routine}
+                  index={index}
+                  allLength={allRoutines.length}
+                  checkedItems={checkedItems}
+                  toggleTimeCheck={toggleTimeCheck}
+                  toggleHospitalCheck={toggleHospitalCheck}
+                  toggleCheck={toggleCheck}
+                />
               ))}
             </TimelineContainer>
           </ScheduleContainer>
@@ -626,7 +504,7 @@ const HeaderText = styled.Text`
 
 const ReturnButton = styled.TouchableOpacity`
   flex-direction: row;
-  padding: 6px 10px;
+  padding: 4px 10px;
   justify-content: center;
   align-items: center;
   gap: 7px;
@@ -636,8 +514,18 @@ const ReturnButton = styled.TouchableOpacity`
 
 const ButtonText = styled.Text`
   font-size: ${FontSizes.caption.default};
-  font-family: 'Pretendart-Regular';
+  font-family: 'Pretendart-Medium';
   color: ${themes.light.pointColor.Primary10};
+`;
+
+const MedicineListButton = styled(ReturnButton)`
+  border: 1.5px solid ${themes.light.borderColor.borderPrimary};
+  gap: 4px;
+`;
+
+const MedicineListText = styled(ButtonText)`
+  color: ${themes.light.textColor.Primary70};
+  font-size: ${FontSizes.body.default};
 `;
 
 // 페이징을 위한 컨테이너
@@ -691,7 +579,7 @@ const RoundedBox = styled.View`
 const TodayContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
   padding: 20px 30px;
 `;
 // 타임라인 관련 스타일 추가
@@ -708,119 +596,6 @@ const TimelineLine = styled.View`
   bottom: 30px;
   width: 6px;
   background-color: ${themes.light.pointColor.Primary};
-`;
-
-const TimelineBigPoint = styled.View`
-  position: absolute;
-  left: -16px;
-  top: 15px;
-  width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  background-color: ${themes.light.pointColor.primary30};
-  z-index: 2;
-`;
-
-const TimelinePoint = styled.View`
-  position: absolute;
-  left: -12px;
-  top: 19px;
-  width: 12px;
-  height: 12px;
-  border-radius: 10px;
-  background-color: ${themes.light.pointColor.Primary};
-  z-index: 2;
-`;
-
-const RoutineBoxContainer = styled.View`
-  position: relative;
-  margin-bottom: 30px;
-`;
-
-// 루틴 컨테이너 스타일 수정
-const RoutineContainer = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  padding: 0 20px;
-  border-radius: 10px;
-  width: auto;
-  height: auto;
-  margin-left: 24px;
-  margin-right: 20px;
-  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
-`;
-
-const TimeContainer = styled.View`
-  flex-direction: row;
-  border-bottom-width: 1px;
-  border-bottom-color: ${themes.light.borderColor.borderPrimary};
-  padding: 20px 0px;
-  align-items: center;
-`;
-
-// 병원 루틴용 컨테이너
-const HospitalTimeContainer = styled.View`
-  flex-direction: row;
-  padding: 20px 0px;
-  align-items: center;
-`;
-
-const IconContainer = styled.View`
-  padding-right: 15px;
-`;
-
-const TextContainer = styled.View``;
-
-const TypeText = styled.Text`
-  font-size: ${FontSizes.heading.default};
-  font-family: 'Pretendard-ExtraBold';
-`;
-
-const TimeText = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.Primary50};
-`;
-
-const RoutineList = styled.View``;
-
-const MedicineItem = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const CheckBox = styled.TouchableOpacity`
-  position: absolute;
-  right: 0;
-`;
-
-const Routines = styled.View``;
-
-const MedicineText = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Medium';
-  padding: 20px;
-  width: 80%;
-  overflow: hidden;
-  text-decoration-line: ${({isChecked}) =>
-    isChecked ? 'line-through' : 'none'};
-  color: ${({isChecked}) =>
-    isChecked
-      ? themes.light.textColor.Primary50
-      : themes.light.textColor.textPrimary};
-`;
-
-const MedicineCount = styled.Text`
-  position: absolute;
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Medium';
-  right: 45px;
-  text-decoration-line: ${({isChecked}) =>
-    isChecked ? 'line-through' : 'none'};
-  color: ${({isChecked}) =>
-    isChecked
-      ? themes.light.textColor.Primary50
-      : themes.light.textColor.textPrimary};
 `;
 
 export default Routine;

@@ -19,6 +19,7 @@ import { DateTimePickerModal } from './DateTimePickerModal';
 import { FilterModal } from './SearchResult/FilterModal';
 import { FilterButton } from './SearchResult/FilterButton';
 import { SearchScreenHeader } from './SearchResult/SearchScreenHeader';
+import { MedicineListItem } from './MedicineListItem';
 
 export {
   Button,
@@ -43,5 +44,6 @@ export {
   PrescriptionSearchResultItem,
   FilterModal,
   FilterButton,
-  SearchScreenHeader
+  SearchScreenHeader,
+  MedicineListItem,
 };

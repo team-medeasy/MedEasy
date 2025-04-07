@@ -1,6 +1,18 @@
+// FCM
+import firebase from '@react-native-firebase/app';
+import messaging from '@react-native-firebase/messaging';
+
+import {Alert, Platform, PermissionsAndroid, Linking} from 'react-native';
+
 import React, {useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+
+// Custom Hooks
+import useFCMTokenRefresh from './hooks/useFCMTokenRefresh';
+
+// FCM 토큰 저장 함수
+import {setFCMToken} from './api/storage';
 
 import Splash from './screens/Splash';
 import SignUpStartScreen from './screens/SignUp/SignUpStart';
@@ -55,21 +67,149 @@ const AuthNavigator = () => {
 
 const RoutineModalNavigator = () => {
   return (
-    <RoutineModalStack.Navigator screenOptions={{ headerShown: false }}>
-      <RoutineModalStack.Screen name="SetMedicineName" component={SetMedicineNameScreen} />
-      <RoutineModalStack.Screen name="SetMedicineDay" component={SetMedicineDayScreen} />
-      <RoutineModalStack.Screen name="SetMedicineTime" component={SetMedicineTimeScreen} />
-      <RoutineModalStack.Screen name="SetMedicineDose" component={SetMedicineDoseScreen} />
-      <RoutineModalStack.Screen name="SetMedicineTotal" component={SetMedicineTotalScreen} />
+    <RoutineModalStack.Navigator screenOptions={{headerShown: false}}>
+      <RoutineModalStack.Screen
+        name="SetMedicineName"
+        component={SetMedicineNameScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineDay"
+        component={SetMedicineDayScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineTime"
+        component={SetMedicineTimeScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineDose"
+        component={SetMedicineDoseScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineTotal"
+        component={SetMedicineTotalScreen}
+      />
     </RoutineModalStack.Navigator>
   );
+};
+
+let fcmListenersRegistered = false;
+
+const registerFCMListeners = () => {
+  if (fcmListenersRegistered) return;
+  fcmListenersRegistered = true;
+
+  messaging().onMessage(async remoteMessage => {
+    Alert.alert('📬 새 알림', remoteMessage.notification?.title || '알림이 도착했습니다.');
+  });
+
+  messaging().onNotificationOpenedApp(remoteMessage => {
+    console.log('🔔 백그라운드에서 알림 열림:', remoteMessage);
+  });
+
+  messaging().getInitialNotification().then(remoteMessage => {
+    if (remoteMessage) {
+      console.log('🔔 종료 상태에서 알림 열림:', remoteMessage);
+    }
+  });
 };
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
 
+  // FCM 토큰 갱신 훅
+  useFCMTokenRefresh();
+
+  const initializeFCM = async () => {
+    try {
+      console.log('🔔 FCM 초기화 시작');
+  
+      let permissionGranted = false;
+  
+      // 1. 권한 확인 및 요청
+      if (Platform.OS === 'ios') {
+        const currentStatus = await messaging().hasPermission();
+        console.log('📋 iOS 현재 알림 권한 상태:', currentStatus);
+  
+        if (currentStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
+          const authStatus = await messaging().requestPermission({
+            alert: true,
+            badge: true,
+            sound: true,
+          });
+          console.log('📋 iOS 권한 요청 결과:', authStatus);
+  
+          if (authStatus === messaging.AuthorizationStatus.AUTHORIZED || authStatus === messaging.AuthorizationStatus.PROVISIONAL) {
+            permissionGranted = true;
+          } else {
+            showPermissionAlert();
+            return;
+          }
+        } else if (currentStatus === messaging.AuthorizationStatus.AUTHORIZED || currentStatus === messaging.AuthorizationStatus.PROVISIONAL) {
+          permissionGranted = true;
+        } else {
+          showPermissionAlert();
+          return;
+        }
+  
+      } else if (Platform.OS === 'android' && Platform.Version >= 33) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        );
+        console.log('📋 Android 권한 요청 결과:', granted);
+  
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          permissionGranted = true;
+        } else {
+          showPermissionAlert();
+          return;
+        }
+      } else {
+        // Android 12 이하는 권한 요청 없음
+        permissionGranted = true;
+      }
+  
+      // 2. 권한이 허용된 경우에만 토큰 요청
+      if (permissionGranted) {
+        const token = await messaging().getToken();
+        console.log('📱 발급받은 FCM 토큰:', token);
+  
+        if (token) {
+          await setFCMToken(token);
+          console.log('✅ FCM 토큰 저장 완료');
+        } else {
+          console.warn('⚠️ FCM 토큰이 비어 있음');
+        }
+  
+        // 3. 수신 리스너 등록
+        registerFCMListeners();
+      }
+    } catch (error) {
+      console.error('🔴 FCM 초기화 오류:', error);
+    }
+  };
+
+  const showPermissionAlert = () => {
+    Alert.alert(
+      '알림 권한이 꺼져 있습니다',
+      '약 복용 알림을 받으시려면 설정에서 푸시 알림을 허용해주세요.',
+      [
+        { text: '나중에', style: 'cancel' },
+        { text: '설정으로 이동', onPress: () => Linking.openSettings() },
+      ]
+    );
+  };
+  
   useEffect(() => {
-    // 2초 후에 Splash 화면을 종료하고 메인 화면으로 이동
+    const startApp = async () => {
+      try {
+        await initializeFCM();
+      } catch (error) {
+        console.error('🔴 앱 시작 오류:', error);
+      }
+    };
+
+    startApp();
+
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2000);

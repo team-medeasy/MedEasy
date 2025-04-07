@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import styled from 'styled-components/native';
 import { themes } from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
@@ -34,7 +35,12 @@ const HomeRoutine = ({ schedules }) => {
                         .replace('PM', '오후')}
                 </TimeText>
             </MedicineHeader>
-            <MedicineList>
+            <ScrollView 
+                style={{ marginTop: 10 }} 
+                contentContainerStyle={{ gap: 10 }} 
+                nestedScrollEnabled={true}
+                showsVerticalScrollIndicator={false}
+            >
                 {item.routine_medicine_dtos.map((medicine) => (
                     <MedicineItem key={medicine.routine_medicine_id}>
                         {medicine.is_taken ? <FilledCircle /> : <EmptyCircle />}
@@ -43,7 +49,7 @@ const HomeRoutine = ({ schedules }) => {
                         </MedicineText>
                     </MedicineItem>
                 ))}
-            </MedicineList>
+            </ScrollView>
         </RoutineContainer>
     );
 

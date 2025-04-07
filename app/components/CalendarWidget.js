@@ -36,6 +36,31 @@ const CalendarWidget = ({
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [routineMarkedDates, setRoutineMarkedDates] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
+  const [today, setToday] = useState(dayjs().format('YYYY-MM-DD'));
+
+  useEffect(() => {
+    // 오늘 날짜 초기화
+    setToday(dayjs().format('YYYY-MM-DD'));
+    
+    // 자정에 오늘 날짜 업데이트하는 타이머 설정
+    const updateTodayDate = () => {
+      const now = dayjs();
+      const tomorrow = now.add(1, 'day').startOf('day');
+      const timeUntilMidnight = tomorrow.diff(now);
+      
+      const timer = setTimeout(() => {
+        setToday(dayjs().format('YYYY-MM-DD'));
+        // 다음 자정을 위한 타이머 재설정
+        updateTodayDate();
+      }, timeUntilMidnight);
+      
+      return timer;
+    };
+    
+    const timer = updateTodayDate();
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // 날짜 선택 핸들러
   const handleDayPress = (day) => {
@@ -58,7 +83,7 @@ const CalendarWidget = ({
   const handleMonthChange = (month) => {
     const newMonth = dayjs(`${month.year}-${month.month}`);
     setCurrentMonth(newMonth);
-
+  
     // 월 변경 시 해당 월의 루틴 데이터 가져오기
     const fetchMonthlyRoutine = async () => {
       try {
@@ -69,7 +94,7 @@ const CalendarWidget = ({
         const response = await getRoutineByDate(startDate, endDate);
         const routineData = response.data.body;
         console.log('월 데이터: ',routineData);
-
+  
         const markedRoutineDates = routineData.reduce((acc, item) => {
           const dateString = item.take_date;
           
@@ -78,15 +103,21 @@ const CalendarWidget = ({
             schedule.routine_medicine_dtos.length > 0
           );
       
-          // 하나라도 routine_medicine_dtos가 있으면 마크
           if (hasRoutineMedicines) {
+            // 모든 약이 복용 완료되었는지 확인
+            const allTaken = item.user_schedule_dtos.every(schedule => 
+              schedule.routine_medicine_dtos.length === 0 || 
+              schedule.routine_medicine_dtos.every(medicine => medicine.is_taken)
+            );
+            
             acc[dateString] = {
               marked: true,
+              allTaken: allTaken // 모든 약 복용 완료 여부 저장
             };
           }
           return acc;
         }, {});
-
+  
         // 기존 markedDates와 병합
         setRoutineMarkedDates({
           ...markedDates,
@@ -96,7 +127,7 @@ const CalendarWidget = ({
         console.error('루틴 데이터 가져오기 실패:', error);
       }
     };
-
+  
     fetchMonthlyRoutine();
   };
 
@@ -112,8 +143,9 @@ const CalendarWidget = ({
   const CustomDay = React.memo(({ date, state, marking, onPress }) => {
     const isSelected = selectedDate === date.dateString;
     const hasRoutine = marking?.marked || false;
-    const isToday = date.dateString === new Date().toISOString().split('T')[0];
-    
+    const allTaken = marking?.allTaken || false;
+    const isToday = date.dateString === today;
+  
     // 날짜 텍스트 스타일
     const dayTextStyle = {
       color: state === 'disabled' 
@@ -124,7 +156,7 @@ const CalendarWidget = ({
             ? themes.light.textColor.textPrimary
             : themes.light.textColor.textPrimary,
     };
-
+  
     return (
       <TouchableWrapper onPress={() => onPress(date)}>
         {isSelected && <SelectedBackground />}
@@ -139,7 +171,10 @@ const CalendarWidget = ({
               <RoutineIcons.medicine 
                 width={15} 
                 height={15}
-                color={themes.light.pointColor.Primary} 
+                color={allTaken 
+                  ? themes.light.pointColor.Primary // 모든 약 복용 완료
+                  : themes.light.textColor.Primary20 // 일부만 복용 또는 모두 미복용
+                } 
               />
             </IconContainer>
           )}

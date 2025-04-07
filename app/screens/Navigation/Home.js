@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { View, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import { themes } from './../../styles';
 import { HeaderIcons, RoutineIcons, LogoIcons, OtherIcons } from './../../../assets/icons';
@@ -57,9 +57,16 @@ const Home = () => {
         const processedRoutines = todayRoutines[0]?.user_schedule_dtos.map(schedule => ({
           scheduleId: schedule.user_schedule_id,
           timeName: schedule.name,
-          takeTime: dayjs(`2024-01-01T${schedule.take_time}`).format('A h시 m분')
-            .replace('AM', '오전')
-            .replace('PM', '오후'),
+          takeTime: (() => {
+            const time = dayjs(`2024-01-01T${schedule.take_time}`);
+            const hourMinute = time.format('mm') === '00'
+              ? time.format('A h시')
+              : time.format('A h시 mm분');
+          
+            return hourMinute
+              .replace('AM', '오전')
+              .replace('PM', '오후');
+          })(),          
           medicines: schedule.routine_medicine_dtos.map(medicine => ({
             name: medicine.nickname,
             dose: medicine.dose,
@@ -91,49 +98,45 @@ const Home = () => {
     fetchRoutineData();
   }, [selectedDate.fullDate]);
 
-  useEffect(() => {
-    const fetchTodayRoutineData = async () => {
-      const today = dayjs().format('YYYY-MM-DD');
-      
-      try {
-        const response = await getRoutineByDate(today, today);
-        const routineData = response.data.body;
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchTodayRoutineData = async () => {
+        const today = dayjs().format('YYYY-MM-DD');
         
-        const todayRoutines = routineData.filter(routine =>
-          dayjs(routine.take_date).format('YYYY-MM-DD') === today
-        );
-        
-        if (todayRoutines.length > 0) {
-          // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
-          const hasMedicines = todayRoutines[0].user_schedule_dtos.some(schedule => 
-            schedule.routine_medicine_dtos && schedule.routine_medicine_dtos.length > 0
+        try {
+          const response = await getRoutineByDate(today, today);
+          const routineData = response.data.body;
+          
+          const todayRoutines = routineData.filter(routine =>
+            dayjs(routine.take_date).format('YYYY-MM-DD') === today
           );
           
-          // 하나라도 routine_medicine_dtos가 있으면
-          if (hasMedicines) {
-            console.log('⏰ 오늘의 루틴 일정이 존재합니다.');
-            setTodayRoutine(todayRoutines[0].user_schedule_dtos);
+          if (todayRoutines.length > 0) {
+            const hasMedicines = todayRoutines[0].user_schedule_dtos.some(schedule => 
+              schedule.routine_medicine_dtos && schedule.routine_medicine_dtos.length > 0
+            );
+            
+            if (hasMedicines) {
+              console.log('⏰ 오늘의 루틴 일정이 존재합니다.');
+              setTodayRoutine(todayRoutines[0].user_schedule_dtos);
+            } else {
+              setTodayRoutine(null);
+            }
           } else {
             setTodayRoutine(null);
           }
-        } else {
+        } catch (error) {
+          console.error('오늘의 루틴 데이터 가져오기 실패:', error);
           setTodayRoutine(null);
         }
-      } catch (error) {
-        console.error('오늘의 루틴 데이터 가져오기 실패:', error);
-        setTodayRoutine(null);
-      }
-    };
-    
-    // 초기 호출
-    fetchTodayRoutineData();
-    
-    // 5분마다 다시 체크
-    const intervalId = setInterval(fetchTodayRoutineData, 5 * 60 * 1000);
-    
-    // 컴포넌트 언마운트 시 인터벌 정리
-    return () => clearInterval(intervalId);
-  }, []); // 빈 배열 유지
+      };
+      
+      fetchTodayRoutineData();
+      
+      // 인터벌을 사용할 필요 없음
+      return () => {}; 
+    }, [])
+  );
 
   // 날짜 변경 핸들러 추가
   const handleDateChange = (newSelectedDate) => {

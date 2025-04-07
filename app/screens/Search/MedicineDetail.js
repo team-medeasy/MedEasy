@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import {
   View,
@@ -87,38 +88,44 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   }, [medicine]);
 
-  // 루틴 등록 여부
-  useEffect(() => {
-    const checkMedicineRegistered = async () => {
-      try {
-        const response = await getUserMedicineCount();
-        const countData = response.data?.body || response.data;
-  
-        if (countData) {
-          const { medicine_ids } = countData;
-          
-          console.log("💊등록된 약 id 리스트: ", medicine_ids);
-          console.log("현재 약 id: ", medicine.item_id);
-  
-          if (medicine_ids && medicine_ids.includes(Number(medicine.item_id))) {
-            setIsRegistered(true);
-            console.log("📝 등록된 약입니다.")
-          } else {
-            setIsRegistered(false);
-            console.log("❔ 등록되지 않은 약입니다.")
-          }
-        } else {
-          console.error('API 응답에 유효한 데이터가 없습니다:', response);
-        }
-      } catch (error) {
-        console.error('API 호출 중 오류 발생:', error);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (medicine) {
+        checkMedicineRegistered();
       }
-    };
-  
-    if (medicine) {
-      checkMedicineRegistered();
+      return () => {
+      };
+    }, [medicine])
+  );
+
+  // 루틴 등록 여부
+  const checkMedicineRegistered = async () => {
+    try {
+      if (!medicine) return;
+      
+      const response = await getUserMedicineCount();
+      const countData = response.data?.body || response.data;
+
+      if (countData) {
+        const { medicine_ids } = countData;
+        
+        console.log("💊등록된 약 id 리스트: ", medicine_ids);
+        console.log("현재 약 id: ", medicine.item_id);
+
+        if (medicine_ids && medicine_ids.includes(Number(medicine.item_id))) {
+          setIsRegistered(true);
+          console.log("📝 등록된 약입니다.")
+        } else {
+          setIsRegistered(false);
+          console.log("❔ 등록되지 않은 약입니다.")
+        }
+      } else {
+        console.error('API 응답에 유효한 데이터가 없습니다:', response);
+      }
+    } catch (error) {
+      console.error('API 호출 중 오류 발생:', error);
     }
-  }, [medicine]);
+  };
 
   const HeaderComponent = ({ isModal = false, ...props }) => {
     console.log('isModal:', isModal);
@@ -134,7 +141,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
 
   const handleSetMedicineRoutine = async () => {
     if (isRegistered) {
-      navigation.navigate('SetMedicineRoutine', { item: medicine });
+      navigation.navigate('SetMedicineRoutine', { medicineId: medicine.item_id });
     } else {
       navigation.navigate('RoutineModal', { 
         screen: 'SetMedicineName', 
@@ -221,6 +228,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
                   <SimilarMedicineItem 
                   item={item} 
                   navigation={navigation}
+                  isModal={isModal}
                   />
                 )}
               />
@@ -331,7 +339,7 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
   );
 };
 
-const SimilarMedicineItem = ({item, navigation}) => {
+const SimilarMedicineItem = ({item, navigation, isModal}) => {
   const handlePressMedicine = async () => {
     try {
       const response = await getMedicineById(item.item_id);
@@ -339,7 +347,7 @@ const SimilarMedicineItem = ({item, navigation}) => {
 
       navigation.push('MedicineDetail', {
         item: medicineData,
-        isModal: false
+        isModal: isModal,
       });
     } catch (error) {
       console.error('약 정보 불러오기 실패:', error);

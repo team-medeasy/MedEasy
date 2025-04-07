@@ -44,6 +44,7 @@ const PhotoPreviewContent = ({route}) => {
           item.searchResults.map(async result => {
             try {
               const detail = await getMedicineDetail(result.itemSeq);
+              console.log('Detail response:', detail);
 
               if (detail?.body) {
                 return {
@@ -72,6 +73,7 @@ const PhotoPreviewContent = ({route}) => {
         if(result.detail) {
           return {
             uniqueKey: `${result.itemSeq}`,
+            id: result.detail.id || "",
             item_image: result.detail.item_image || "",
             etc_otc_name: result.detail.etc_otc_name || "정보 없음",
             class_name: result.detail.class_name || "정보 없음",
@@ -80,6 +82,14 @@ const PhotoPreviewContent = ({route}) => {
             drug_shape: result.detail.drug_shape || "",
             color_classes: result.detail.color_classes || "",
             original_id: result.itemSeq,
+
+            // ✅ 추가: 상세 정보 (효능/복용법/보관법/주의사항/부작용)
+            indications: result.detail.indications || "",
+            dosage: result.detail.dosage || "",
+            storage_method: result.detail.storage_method || "",
+            precautions: result.detail.precautions || "",
+            side_effects: result.detail.side_effects || "",
+            
             // MedicineAppearance 컴포넌트에 필요한 속성들
             colorClasses: result.colorClasses || result.detail.color_classes || "",
             colorGroup: result.colorGroup || result.detail.colorGroup || "",

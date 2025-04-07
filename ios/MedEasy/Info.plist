@@ -22,8 +22,14 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
+	<key>FirebaseMessagingAutoInitEnabled</key>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>복약 체크를 위해 NFC 태깅 권한이 필요합니다.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -32,11 +38,13 @@
 	<key>NSCameraUsageDescription</key>
 	<string>카메라 접근 권한이 필요합니다</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>위치 기반 서비스를 사용하기 위해 권한이 필요합니다</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>사진 저장을 위해 갤러리 접근 권한이 필요합니다</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>사진 저장을 위해 갤러리 접근 권한이 필요합니다</string>
+	<key>NSRemoteNotificationUsageDescription</key>
+	<string>알림을 받기 위해 권한이 필요합니다</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-Regular.otf</string>
@@ -49,6 +57,10 @@
 		<string>FontAwesome.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
 		<string>Pretendard-Medium.otf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

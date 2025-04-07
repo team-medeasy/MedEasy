@@ -15,6 +15,7 @@ import Chat from '../screens/Chat/Chat.js';
 import {pointColor, themes} from './../styles';
 import {TabIcons, CameraIcons, OtherIcons} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes.js';
+import useNfcListener from '../services/nfcListener.js';
 
 // 카메라 버튼
 const CameraButton = ({onPress}) => {
@@ -46,6 +47,8 @@ const TabNavigator = () => {
   const handleChatPress = useCallback(() => {
     navigation.navigate('Chat');
   }, [navigation]);
+
+  const {ModalComponent} = useNfcListener();
 
   return (
     <MainContainer>
@@ -130,6 +133,7 @@ const TabNavigator = () => {
           />
         </ChatButton>
       </ChatContainer> */}
+      <ModalComponent />
     </MainContainer>
   );
 };

@@ -51,7 +51,10 @@ export const CameraSearchResultItem = ({item, onPress}) => {
             title="이 약이 맞아요"
             fontSize="15"
             height="40"
-            onPress={() => onPress(item)}
+            onPress={() => onPress({
+              ...item,
+              id: item.id,
+            })}
           />
         </View>
       </InfoContainer>

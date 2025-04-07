@@ -2,6 +2,7 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import FirebaseCore // ✅ 추가
 
 @main
 class AppDelegate: RCTAppDelegate {
@@ -9,10 +10,10 @@ class AppDelegate: RCTAppDelegate {
     self.moduleName = "MedEasy"
     self.dependencyProvider = RCTAppDependencyProvider()
 
-    // You can add your custom initial props in the dictionary below.
-    // They will be passed down to the ViewController used by React Native.
-    self.initialProps = [:]
+    // ✅ Firebase 초기화
+    FirebaseApp.configure()
 
+    self.initialProps = [:]
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

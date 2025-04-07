@@ -1,21 +1,22 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import {View, ScrollView} from 'react-native';
-import {themes} from './../../styles';
-import {HeaderIcons, OtherIcons} from '../../../assets/icons';
+import { Alert, View, ScrollView } from 'react-native';
+import { themes } from './../../styles';
+import { HeaderIcons, OtherIcons } from '../../../assets/icons';
 import {
-  ModalHeader, 
-  Button, 
+  ModalHeader,
+  Button,
   SelectTimeButton,
   MedicineOverview
 } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { createRoutine } from '../../api/routine';
+import { createRoutine, deleteRoutine, getRoutineByDate } from '../../api/routine';
 import { getUserSchedule } from '../../api/user';
 import { getMedicineById } from '../../api/medicine';
 
-const SetMedicineRoutine = ({route, navigation}) => {
+const SetMedicineRoutine = ({ route, navigation }) => {
   const { medicineId } = route.params;
+  const [relatedRoutineIds, setRelatedRoutineIds] = useState([]);
   const [medicine, setMedicine] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicineName, setMedicineName] = useState('');
@@ -31,45 +32,103 @@ const SetMedicineRoutine = ({route, navigation}) => {
   const timings = ['아침', '점심', '저녁', '자기 전'];
 
   // medicineId로 약 정보 가져오기
-useEffect(() => {
-  const fetchMedicineData = async () => {
-    try {
-      console.log('요청하는 medicineId:', medicineId);
-      const response = await getMedicineById(medicineId);
-      console.log('API 응답:', response);
-      
-      // API 응답 구조에 따라 적절히 데이터 추출
-      const medicineData = response.data?.body || response.data || response;
-      
-      if (medicineData) {
-        console.log('약 데이터:', medicineData);
-        setMedicine(medicineData);
-        // 약 이름으로 기본 별명 설정
-        setMedicineName(medicineData.item_name || medicineData.name || '');
-      } else {
-        console.error('약 정보를 찾을 수 없습니다.');
+  useEffect(() => {
+    const fetchMedicineData = async () => {
+      try {
+        console.log('요청하는 medicineId:', medicineId);
+        const response = await getMedicineById(medicineId);
+        console.log('API 응답:', response);
+
+        // API 응답 구조에 따라 적절히 데이터 추출
+        const medicineData = response.data?.body || response.data || response;
+
+        if (medicineData) {
+          console.log('약 데이터:', medicineData);
+          setMedicine(medicineData);
+          // 약 이름으로 기본 별명 설정
+          setMedicineName(medicineData.item_name || medicineData.name || '');
+        } else {
+          console.error('약 정보를 찾을 수 없습니다.');
+        }
+      } catch (error) {
+        console.error('약 정보 가져오기 실패:', error);
       }
+    };
+
+    if (medicineId) {
+      fetchMedicineData();
+    }
+  }, [medicineId]);
+
+  useEffect(() => {
+    const fetchRoutineData = async () => {
+      try {
+        const startDate = '2025-03-01';
+        const endDate = '2025-12-31';
+        const response = await getRoutineByDate(startDate, endDate);
+
+        console.log('루틴 데이터 불러오기 성공:', response.data);
+
+        const data = response.data.body;
+
+        const medicineIdMap = {};
+
+        data.forEach(({ user_schedule_dtos }) => {
+          user_schedule_dtos.forEach(({ routine_medicine_dtos }) => {
+            routine_medicine_dtos.forEach(({ medicine_id, routine_medicine_id }) => {
+              if (!medicineIdMap[medicine_id]) {
+                medicineIdMap[medicine_id] = [];
+              }
+              medicineIdMap[medicine_id].push(routine_medicine_id);
+            });
+          });
+        });
+
+        console.log('routine_medicine_id 목록:', medicineIdMap);
+
+        const relatedRoutineIds = medicineIdMap[medicineId] || [];
+        setRelatedRoutineIds(relatedRoutineIds);
+
+        console.log(`'${medicineId}'에 해당하는 routine_medicine_id 목록:`, relatedRoutineIds);
+
+      } catch (error) {
+        console.error('루틴 데이터 불러오기 실패:', error);
+      }
+    };
+
+    fetchRoutineData();
+  }, [medicineId]);
+
+  const handleDeleteRoutine = async () => {
+    try {
+      if (!relatedRoutineIds || relatedRoutineIds.length === 0) {
+        console.log('삭제할 루틴이 없습니다.');
+        Alert.alert('안내', '삭제할 루틴이 없습니다.');
+        return;
+      }
+  
+      await Promise.all(
+        relatedRoutineIds.map(id => deleteRoutine(id))
+      );
+  
+      console.log('✅ 루틴 삭제 완료:', relatedRoutineIds);
+      Alert.alert('삭제 완료', '선택한 약의 모든 루틴이 삭제되었습니다.');
+      navigation.goBack();
     } catch (error) {
-      console.error('약 정보 가져오기 실패:', error);
+      console.error('❌ 루틴 삭제 실패:', error);
+      Alert.alert('삭제 실패', '루틴 삭제 중 오류가 발생했습니다.');
     }
   };
-
-  if (medicineId) {
-    fetchMedicineData();
-  }
-}, [medicineId]);
 
 
   const handleSelect = (option) => {
     setSelectedOption((prev) => (prev === option ? null : option));
-    
+
     // 선택된 옵션에 따라 day_of_weeks 설정
     if (option === '매일') {
       // 매일: 월화수목금토일
       setSelectedDays(days);
     } else if (option === '특정 요일') {
-      // 특정 요일: 화,목,토 예시
-      setSelectedDays(['화', '목', '토']);
     } else if (option === '주기 설정') {
       // 2일 간격: 월수금일 예시
       setSelectedDays(['월', '수', '금', '일']);
@@ -78,11 +137,13 @@ useEffect(() => {
     }
   };
 
-  const convertDaysToNumbers = selectedDays.map(day => days.indexOf(day)+1);
+  const convertDaysToNumbers = selectedDays.map(day => days.indexOf(day) + 1);
   const convertTimingsToIds = selectedTimings.map(timing => scheduleMapping[timing] || (timings.indexOf(timing) + 1));
+  
+  // 수정 버튼 클릭 시 실행할 함수
+  const handleModifyRoutine = async () => {
+    await handleDeleteRoutine();
 
-  // 저장 버튼 클릭 시 실행할 함수
-  const handleSaveRoutine = async () => {
     // 필수 입력값 검증
     if (!medicineName || selectedDays.length === 0 || selectedTimings.length === 0 || !dosage || !totalCount) {
       // 여기에 적절한 오류 메시지 표시 로직 추가
@@ -93,7 +154,7 @@ useEffect(() => {
     try {
       // API 요청에 맞게 데이터 형식 변환
       const routineData = {
-        medicine_id: medicine.item_id,
+        medicine_id: medicineId,
         nickname: medicineName,
         dose: parseInt(dosage, 10),
         total_quantity: parseInt(totalCount, 10),
@@ -102,20 +163,21 @@ useEffect(() => {
       };
 
       console.log('전송 데이터:', routineData);
-      
+
       // API 호출
       const response = await createRoutine(routineData);
       console.log('루틴 저장 성공:', response);
-      
+
       // 성공 시 이전 화면으로 이동
       navigation.goBack();
-      
+
       // 성공 메시지 표시 (필요시 추가)
     } catch (error) {
       console.error('루틴 저장 실패:', error);
       // 오류 처리 (사용자에게 오류 메시지 표시)
     }
   };
+
   // 컴포넌트 마운트 시 사용자 일정 가져오기
   useEffect(() => {
     const fetchUserSchedule = async () => {
@@ -157,7 +219,7 @@ useEffect(() => {
   }, []);
 
   const handlePressEnlarge = () => {
-    navigation.navigate('MedicineImageDetail', {item: medicine, isModal: true});
+    navigation.navigate('MedicineImageDetail', { item: medicine, isModal: true });
   };
 
   const toggleDay = day => {
@@ -197,10 +259,10 @@ useEffect(() => {
   }
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ModalHeader 
+      <ModalHeader
         showDelete="true"
         DeleteColor={themes.light.pointColor.Secondary}
-        onDeletePress={() => {}}
+        onDeletePress={() => handleDeleteRoutine()}
       >
         루틴 수정
       </ModalHeader>
@@ -237,29 +299,45 @@ useEffect(() => {
           <Section>
             <SectionHeader title="복용 주기" />
             <SelectDay>
-              <Button 
-                title={'매일'} 
-                onPress={() => handleSelect('매일')} 
+              <Button
+                title={'매일'}
+                onPress={() => handleSelect('매일')}
                 fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedOption === '매일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedOption === '매일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default} 
+                fontSize={FontSizes.body.default}
               />
-              <Button 
-                title={'특정 요일마다 (예: 화, 목, 토)'} 
-                onPress={() => handleSelect('특정 요일')} 
+              <Button
+                title={'특정 요일마다 (예: 월, 수, 금)'}
+                onPress={() => handleSelect('특정 요일')}
                 fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedOption === '특정 요일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedOption === '특정 요일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default} 
+                fontSize={FontSizes.body.default}
               />
-              <Button 
-                title={'주기 설정 (예: 2일 간격으로)'} 
-                onPress={() => handleSelect('주기 설정')} 
+
+              {/* 특정 요일 선택 시 요일 선택 버튼 표시 */}
+              {selectedOption === '특정 요일' && (
+                <DaySelection>
+                  {days.map((day) => (
+                    <DayButton
+                      key={day}
+                      selected={selectedDays.includes(day)}
+                      onPress={() => toggleDay(day)}
+                    >
+                      <DayText selected={selectedDays.includes(day)}>{day}</DayText>
+                    </DayButton>
+                  ))}
+                </DaySelection>
+              )}
+
+              <Button
+                title={'주기 설정 (예: 2일 간격으로)'}
+                onPress={() => handleSelect('주기 설정')}
                 fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedOption === '주기 설정' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedOption === '주기 설정' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default} 
+                fontSize={FontSizes.body.default}
               />
             </SelectDay>
           </Section>
@@ -295,7 +373,7 @@ useEffect(() => {
               />
               <SelectTimeButton
                 title={'🛏️️ 자기 전'}
-                timeText={'오후 10시 30분'}
+                timeText={scheduleData['자기 전'] ||'오후 10시 30분'}
                 onPress={() => toggleTiming('자기 전')}
                 bgColor={selectedTimings.includes('자기 전') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedTimings.includes('자기 전') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
@@ -329,7 +407,7 @@ useEffect(() => {
 
           <Button
             title="루틴 삭제하기"
-            onPress={() => {}}
+            onPress={handleDeleteRoutine}
             bgColor={themes.light.pointColor.Secondary}
           />
 
@@ -347,14 +425,14 @@ useEffect(() => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-        <Button title="저장하기" onPress={handleSaveRoutine} />
+        <Button title="수정하기" onPress={handleModifyRoutine} />
       </View>
     </Container>
   );
 };
 
 // 섹션 헤더 컴포넌트
-const SectionHeader = ({title, buttonText, onButtonPress}) => {
+const SectionHeader = ({ title, buttonText, onButtonPress }) => {
   return (
     <View
       style={{
@@ -364,15 +442,15 @@ const SectionHeader = ({title, buttonText, onButtonPress}) => {
       }}>
       <SectionTitle>{title}</SectionTitle>
       {buttonText && (
-        <HeaderButton 
-          onPress={onButtonPress} 
+        <HeaderButton
+          onPress={onButtonPress}
           style={{
-            flexDirection: 'row', 
+            flexDirection: 'row',
             alignItems: 'center',
             gap: 5,
           }}>
           <HeaderButtonText>{buttonText}</HeaderButtonText>
-          <HeaderIcons.chevron width={15} height={15} style={{color: themes.light.textColor.Primary20, transform: [{ rotate: '180deg' }]}}/>
+          <HeaderIcons.chevron width={15} height={15} style={{ color: themes.light.textColor.Primary20, transform: [{ rotate: '180deg' }] }} />
         </HeaderButton>
       )}
     </View>
@@ -399,7 +477,7 @@ const InputWithDelete = ({
           <OtherIcons.deleteCircle
             width={15}
             height={15}
-            style={{color: themes.light.textColor.Primary20}}
+            style={{ color: themes.light.textColor.Primary20 }}
           />
         </DeleteButton>
       )}
@@ -474,10 +552,22 @@ const SelectDay = styled.View`
   gap: 10px;
 `;
 
-const SmallText = styled.Text`
+const DaySelection = styled.View`
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+`;
+
+const DayButton = styled.TouchableOpacity`
+  background-color: ${(props) => (props.selected ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary)};
+  padding: 8px 10px;
+  border-radius: 5px;
+`;
+
+const DayText = styled.Text`
+  color: ${(props) => (props.selected ? themes.light.textColor.buttonText : themes.light.textColor.Primary30)};
   font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.Primary50};
+  font-family: 'Pretendard-SemiBold';
 `;
 
 const SelectTime = styled.View`
