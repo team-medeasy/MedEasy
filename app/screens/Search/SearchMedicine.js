@@ -265,9 +265,7 @@ const ChevronAndSearchContainer = styled.View`
   padding-right: 15px;
 `;
 
-const ChevronIconButton = styled(TouchableOpacity)`
-  margin-right: 12px;
-`;
+const ChevronIconButton = styled(TouchableOpacity)``;
 
 const SearchesContainer = styled.View`
   margin-top: 25px;
@@ -320,7 +318,6 @@ const RecentSearchItemButton = styled(TouchableOpacity)`
   padding: 4px 6px 4px 12px;
   border-radius: 20px;
   margin-right: 10px;
-  gap: 4px;
 `;
 
 const RecentSearchItemText = styled.Text`

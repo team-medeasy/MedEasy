@@ -37,7 +37,7 @@ const SearchBar = ({searchQuery, setSearchQuery, onSearch, placeholder}) => {
         onSubmitEditing={onSearch}
         returnKeyType="search"
       />
-      <SearchButton style={{padding: 14, marginTop: 4}} onPress={onSearch}>
+      <SearchButton style={{padding: 14, marginTop: 7}} onPress={onSearch}>
         <OtherIcons.search
           width={17.5}
           height={17.5}
