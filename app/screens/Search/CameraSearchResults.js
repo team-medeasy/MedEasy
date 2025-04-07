@@ -60,17 +60,22 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
               chart: result.detail.chart || '정보 없음',
               drug_shape: result.detail.drug_shape || '',
               color_classes: result.detail.color_classes || '',
+              print_front: result.detail.print_front || '',
+              print_back: result.detail.print_back || '',
+              leng_long: result.detail.leng_long || '',
+              leng_short: result.detail.leng_short || '',
+              thick: result.detail.thick || '',
               original_id: result.itemSeq,
               indications: result.detail.indications || '',
               dosage: result.detail.dosage || '',
               storage_method: result.detail.storage_method || '',
               precautions: result.detail.precautions || '',
               side_effects: result.detail.side_effects || '',
-              colorClasses:
-                result.colorClasses || result.detail.color_classes || '',
-              colorGroup: result.colorGroup || result.detail.colorGroup || '',
-              drugShape: result.drugShape || result.detail.drug_shape || '',
-              score: result.score || 0,
+              // colorClasses:
+              //   result.colorClasses || result.detail.color_classes || '',
+              // colorGroup: result.colorGroup || result.detail.colorGroup || '',
+              // drugShape: result.drugShape || result.detail.drug_shape || '',
+              // score: result.score || 0,
             };
           }
           return {
