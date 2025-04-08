@@ -40,6 +40,7 @@ const MedicineList = () => {
                 // 3. 복용 루틴 정보 가져오기
                 const routinesResponse = await getUserMedicinesCurrent();
                 const routines = routinesResponse.data?.body || [];
+                console.log(routines);
 
                 // 4. 약을 현재/이전 카테고리로 분류
                 const today = new Date();
