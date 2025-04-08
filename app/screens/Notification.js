@@ -1,11 +1,19 @@
 import React, {useCallback, useEffect, useState} from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { resetNavigate } from './Navigation/NavigationRef';
 import styled from 'styled-components/native';
-import {FlatList, ActivityIndicator, Text, View} from 'react-native';
+import {
+  FlatList, 
+  ActivityIndicator, 
+  Text, 
+  View,
+  TouchableOpacity,
+} from 'react-native';
 import {themes} from '../styles';
 import {Header} from '../components/Header/Header';
 import {RoutineIcons} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
-import { getNotificationList } from '../api/notification';
+import { getNotificationList, markNotificationAsRead } from '../api/notification';
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 // 날짜 형식 변환 함수
@@ -30,6 +38,7 @@ const formatDate = (dateString) => {
 };
 
 const Notification = () => {
+  const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -52,6 +61,9 @@ const Notification = () => {
         message: item.content,
         time: formatDate(item.sent_at),
         type: 'medicine', // 모든 알림을 medicine 타입으로 설정
+        is_read: item.is_read,
+        routine_id: item.routine_id,
+        routine_date: item.routine_date
       }));
       
       if (refresh) {
@@ -97,31 +109,51 @@ const Notification = () => {
     fetchNotifications(nextPage);
   };
 
+  const handlePress = async (item) => {
+    try {
+      console.log("📖 읽으려는 알림: ", item);
+      await markNotificationAsRead(item.id); // ✅ 알림 읽음 처리
+      resetNavigate('NavigationBar', {
+        screen: 'TabNavigator',
+        params: {
+          screen: '루틴',
+          params: {
+            selectedDate: item.routine_date,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('알림 읽음 처리 실패:', error);
+    }
+  };  
+
   const renderItem = ({item}) => (
-    <NotificationItem>
-      <NotiContainer>
-        {item.type === 'medicine' ? (
-          <MediIcon
-            width={18}
-            height={18}
-            marginRight={15}
-            style={{color: themes.light.pointColor.Primary}}
-          />
-        ) : item.type === 'hospital' ? (
-          <HospitalIcon
-            width={18}
-            height={18}
-            marginRight={15}
-            style={{color: themes.light.pointColor.Secondary}}
-          />
-        ) : null}
-        <NotiTextContainer>
-          <NotificationTitle>{item.title}</NotificationTitle>
-          <NotificationMessage>{item.message}</NotificationMessage>
-        </NotiTextContainer>
-      </NotiContainer>
-      <NotiTime>{item.time}</NotiTime>
-    </NotificationItem>
+    <TouchableOpacity onPress={() => handlePress(item)}>
+      <NotificationItem isRead={item.is_read}>
+        <NotiContainer>
+          {item.type === 'medicine' ? (
+            <MediIcon
+              width={18}
+              height={18}
+              marginRight={15}
+              style={{color: themes.light.pointColor.Primary}}
+            />
+          ) : item.type === 'hospital' ? (
+            <HospitalIcon
+              width={18}
+              height={18}
+              marginRight={15}
+              style={{color: themes.light.pointColor.Secondary}}
+            />
+          ) : null}
+          <NotiTextContainer>
+            <NotificationTitle>{item.title}</NotificationTitle>
+            <NotificationMessage>{item.message}</NotificationMessage>
+          </NotiTextContainer>
+        </NotiContainer>
+        <NotiTime>{item.time}</NotiTime>
+      </NotificationItem>
+    </TouchableOpacity>
   );
 
   const renderFooter = () => {
@@ -170,6 +202,9 @@ const NotificationItem = styled.View`
   flex-direction: row;
   justify-content: space-between;
   padding: 20px;
+  background-color: ${props => props.isRead === false ? 
+    `${themes.light.pointColor.Primary10}` : 
+    `${themes.light.bgColor.bgPrimary}`};
 `;
 
 const NotiContainer = styled.View`
