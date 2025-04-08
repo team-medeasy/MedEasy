@@ -37,10 +37,12 @@ import SetMedicineTimeScreen from './screens/Routine/SetMedicineTime';
 import SetMedicineDoseScreen from './screens/Routine/SetMedicineDose';
 import SetMedicineTotalScreen from './screens/Routine/SetMedicineTotal';
 import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
+import MedicineListScreen from './screens/Settings/MedicineList';
+
 import {SignUpProvider} from './api/context/SignUpContext';
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
-import MedicineListScreen from './screens/Settings/MedicineList';
+import {navigationRef} from './screens/Navigation/NavigationRef';
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -232,7 +234,7 @@ const App = () => {
   return (
     <SignUpProvider>
       <FontSizeProvider>
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           {isLoading ? (
             <Splash />
           ) : (
