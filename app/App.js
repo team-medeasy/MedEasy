@@ -92,99 +92,74 @@ const RoutineModalNavigator = () => {
   );
 };
 
+// FCM 리스너 등록 상태 관리 (앱 전체 생명주기에서 한 번만 등록하기 위함)
 let fcmListenersRegistered = false;
 
 const registerFCMListeners = () => {
   if (fcmListenersRegistered) return;
   fcmListenersRegistered = true;
 
+  // 포그라운드 메시지 수신 리스너
   messaging().onMessage(async remoteMessage => {
     Alert.alert('📬 새 알림', remoteMessage.notification?.title || '알림이 도착했습니다.');
   });
 
+  // 백그라운드에서 알림 탭 리스너
   messaging().onNotificationOpenedApp(remoteMessage => {
     console.log('🔔 백그라운드에서 알림 열림:', remoteMessage);
+    // 여기에 알림 탭 시 특정 화면으로 이동하는 로직 추가 가능
   });
 
+  // 종료 상태에서 알림 탭으로 앱 실행 처리
   messaging().getInitialNotification().then(remoteMessage => {
     if (remoteMessage) {
       console.log('🔔 종료 상태에서 알림 열림:', remoteMessage);
+      // 여기에 알림 탭 시 특정 화면으로 이동하는 로직 추가 가능
     }
   });
 };
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [permissionInitialized, setPermissionInitialized] = useState(false);
 
-  // FCM 토큰 갱신 훅
-  useFCMTokenRefresh();
+  // FCM 토큰 갱신 훅 - 개선된 버전 사용
+  const { refreshToken } = useFCMTokenRefresh();
 
-  const initializeFCM = async () => {
+  const requestNotificationPermission = async () => {
     try {
-      console.log('🔔 FCM 초기화 시작');
-  
+      console.log('🔔 알림 권한 요청 시작');
       let permissionGranted = false;
-  
-      // 1. 권한 확인 및 요청
+      
       if (Platform.OS === 'ios') {
-        const currentStatus = await messaging().hasPermission();
-        console.log('📋 iOS 현재 알림 권한 상태:', currentStatus);
-  
-        if (currentStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
-          const authStatus = await messaging().requestPermission({
-            alert: true,
-            badge: true,
-            sound: true,
-          });
-          console.log('📋 iOS 권한 요청 결과:', authStatus);
-  
-          if (authStatus === messaging.AuthorizationStatus.AUTHORIZED || authStatus === messaging.AuthorizationStatus.PROVISIONAL) {
-            permissionGranted = true;
-          } else {
-            showPermissionAlert();
-            return;
-          }
-        } else if (currentStatus === messaging.AuthorizationStatus.AUTHORIZED || currentStatus === messaging.AuthorizationStatus.PROVISIONAL) {
-          permissionGranted = true;
-        } else {
-          showPermissionAlert();
-          return;
-        }
-  
+        const authStatus = await messaging().requestPermission({
+          alert: true,
+          badge: true,
+          sound: true,
+        });
+        console.log('📋 iOS 권한 요청 결과:', authStatus);
+        
+        permissionGranted = 
+          authStatus === messaging.AuthorizationStatus.AUTHORIZED || 
+          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+          
       } else if (Platform.OS === 'android' && Platform.Version >= 33) {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
         );
         console.log('📋 Android 권한 요청 결과:', granted);
-  
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          permissionGranted = true;
-        } else {
-          showPermissionAlert();
-          return;
-        }
+        
+        permissionGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
       } else {
-        // Android 12 이하는 권한 요청 없음
+        // Android 12 이하는 별도 권한 요청 없음
         permissionGranted = true;
       }
-  
-      // 2. 권한이 허용된 경우에만 토큰 요청
-      if (permissionGranted) {
-        const token = await messaging().getToken();
-        console.log('📱 발급받은 FCM 토큰:', token);
-  
-        if (token) {
-          await setFCMToken(token);
-          console.log('✅ FCM 토큰 저장 완료');
-        } else {
-          console.warn('⚠️ FCM 토큰이 비어 있음');
-        }
-  
-        // 3. 수신 리스너 등록
-        registerFCMListeners();
-      }
+      
+      console.log('📋 권한 요청 결과:', permissionGranted ? '허용됨' : '거부됨');
+      return permissionGranted;
     } catch (error) {
-      console.error('🔴 FCM 초기화 오류:', error);
+      console.error('🔴 알림 권한 요청 오류:', error);
+      return false;
     }
   };
 
@@ -199,23 +174,60 @@ const App = () => {
     );
   };
   
+  // 스플래시 화면 표시용 useEffect
   useEffect(() => {
-    const startApp = async () => {
-      try {
-        await initializeFCM();
-      } catch (error) {
-        console.error('🔴 앱 시작 오류:', error);
-      }
-    };
-
-    startApp();
-
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
+  
+  // 스플래시 화면이 사라진 후 FCM 초기화를 위한 useEffect
+  useEffect(() => {
+    if (!isLoading && !permissionInitialized) {
+      const initializePermissions = async () => {
+        try {
+          console.log('🔔 FCM 초기화 시작 (스플래시 화면 이후)');
+          
+          // 1. FCM 리스너 등록 (한 번만)
+          registerFCMListeners();
+          
+          // 2. 알림 권한 상태 확인
+          const currentPermission = await messaging().hasPermission();
+          console.log('📋 현재 알림 권한 상태:', currentPermission);
+          
+          // 3. 권한 상태에 따른 처리
+          if (currentPermission === messaging.AuthorizationStatus.NOT_DETERMINED) {
+            // 권한을 아직 요청하지 않은 경우 요청
+            const granted = await requestNotificationPermission();
+            if (granted) {
+              // 권한 획득 시 토큰 강제 갱신
+              await refreshToken();
+            } else {
+              // 권한 거부 시 안내 (선택적)
+              showPermissionAlert();
+            }
+          } else if (
+            currentPermission === messaging.AuthorizationStatus.AUTHORIZED || 
+            currentPermission === messaging.AuthorizationStatus.PROVISIONAL
+          ) {
+            // 이미 권한이 있는 경우 토큰 갱신 (쿨다운 적용)
+            await refreshToken();
+          } else if (currentPermission === messaging.AuthorizationStatus.DENIED) {
+            // 권한이 거부된 경우 안내 (선택적)
+            showPermissionAlert();
+          }
+          
+          setPermissionInitialized(true);
+        } catch (error) {
+          console.error('🔴 FCM 초기화 오류:', error);
+        }
+      };
+      
+      initializePermissions();
+    }
+  }, [isLoading]);
 
   return (
     <SignUpProvider>
