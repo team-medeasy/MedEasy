@@ -6,8 +6,28 @@ import {Header} from '../components/Header/Header';
 import {RoutineIcons} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { getNotificationList } from '../api/notification';
-
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
+
+// 날짜 형식 변환 함수
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  
+  // 오늘 날짜인 경우 시간만 표시
+  if (date.toDateString() === now.toDateString()) {
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  }
+  
+  // 어제 날짜인 경우
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (date.toDateString() === yesterday.toDateString()) {
+    return '어제';
+  }
+  
+  // 그 외의 경우 날짜 표시
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
 
 const Notification = () => {
   const [refreshing, setRefreshing] = useState(false);
@@ -15,9 +35,19 @@ const Notification = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await getNotificationList({ page: 0, size: 20 }); // 페이지, 개수 조절 가능
+      const res = await getNotificationList({ page: 0, size: 20 });
       const notiData = res.data.body;
       console.log('알림 목록: ', notiData);
+      
+      const formattedNotifications = notiData.map(item => ({
+        id: item.notification_id,
+        title: item.title,
+        message: item.content,
+        time: formatDate(item.sent_at),
+        type: 'medicine', // 모든 알림을 medicine 타입으로 설정
+      }));
+      
+      setNotifications(formattedNotifications);
     } catch (err) {
       console.error('알림 목록 불러오기 실패:', err);
     }
@@ -29,22 +59,11 @@ const Notification = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    // 새로고침 로직
-    setTimeout(() => {
-      // 새로운 알림 목록으로 업데이트
-      setNotifications([
-        {
-          id: Date.now(),
-          title: '새로운 알림',
-          message: '새로운 알림 메시지',
-          time: '방금',
-          type: 'medicine',
-        },
-        ...notifications,
-      ]);
+    // 새로고침 로직 - API 호출로 대체
+    fetchNotifications().finally(() => {
       setRefreshing(false);
-    }, 500); // 0.5초 후 새로고침 완료
-  }, [notifications]);
+    });
+  }, []);
 
   const renderItem = ({item}) => (
     <NotificationItem>
@@ -87,6 +106,7 @@ const Notification = () => {
     </Container>
   );
 };
+
 const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
@@ -102,7 +122,9 @@ const NotiContainer = styled.View`
   flex-direction: row;
 `;
 
-const NotiTextContainer = styled.View``;
+const NotiTextContainer = styled.View`
+  overflow: hidden;
+`;
 
 const NotificationTitle = styled.Text`
   font-size: ${FontSizes.body.default};
@@ -112,6 +134,7 @@ const NotificationTitle = styled.Text`
 `;
 
 const NotificationMessage = styled.Text`
+  width: 80%;
   font-size: ${FontSizes.caption.default};
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
