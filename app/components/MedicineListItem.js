@@ -1,50 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components/native';
 import { View, Text } from 'react-native';
 import { Tag } from './Tag';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { themes } from '../styles';
 import { useNavigation } from '@react-navigation/native';
-import { getUserMedicinesCurrent } from '../api/user';
 
-export const MedicineListItem = ({ item }) => {
+export const MedicineListItem = ({ item, routineInfo }) => {
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(true);
-  const [routineInfo, setRoutineInfo] = useState(null);
+  
+  // 종료일이 오늘을 지났는지 확인
+  const isPastMedicine = () => {
+    if (!routineInfo || !routineInfo.routine_end_date) return false;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const endDate = new Date(routineInfo.routine_end_date);
+    endDate.setHours(0, 0, 0, 0);
+    
+    return endDate < today;
+  };
 
   const handlePress = () => {
     navigation.navigate('MedicineDetail', { item });
   };
 
-  useEffect(() => {
-    const fetchMedicines = async () => {
-      try {
-        setLoading(true);
-        const response = await getUserMedicinesCurrent();
-        const routines = response.data.body || [];
-        console.log('정보 조회 데이터: ', routines);
-        console.log('현재 아이템 ID:', item.id);
-  
-        // 현재 item에 해당하는 medicine_id와 일치하는 데이터 찾기
-        const matched = routines.find(
-          (medicine) => medicine.medicine_id === item.id
-        );
-  
-        console.log('일치하는 데이터:', matched);
-        
-        if (matched) {
-          setRoutineInfo(matched);
-        }
-      } catch (error) {
-        console.error('약 루틴 정보 불러오기 실패:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchMedicines();
-  }, [item.id]);
-  
   const formatDate = (dateString) => {
     if (!dateString) return '정보 없음';
     const date = new Date(dateString);
@@ -58,6 +39,8 @@ export const MedicineListItem = ({ item }) => {
     const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
     return dayOfWeeks.map(day => dayNames[(day - 1) % 7]).join(', ');
   };
+
+  const isPast = isPastMedicine();
 
   return (
     <ItemContainer onPress={handlePress}>
@@ -109,8 +92,14 @@ export const MedicineListItem = ({ item }) => {
         }}
       >
         <Routine
-          label={'복용 시작일'}
-          value={routineInfo ? formatDate(routineInfo.routine_start_date) : '정보 없음'}
+          label={isPast ? '복용 기간    ' : '복용 시작일'}
+          value={
+            isPast && routineInfo && routineInfo.routine_start_date && routineInfo.routine_end_date
+              ? `${formatDate(routineInfo.routine_start_date)} ~ ${formatDate(routineInfo.routine_end_date)}`
+              : routineInfo && routineInfo.routine_start_date 
+                ? formatDate(routineInfo.routine_start_date)
+                : '정보 없음'
+          }
         />
         <Routine
           label={'복용량        '}
