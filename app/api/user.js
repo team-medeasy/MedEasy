@@ -12,3 +12,5 @@ export const getUserUsageDays = () => api.get('/user/usage-days');
 export const getUserSchedule = () => api.get('/user/schedule');
 
 export const getUserMedicineCount = () => api.get('/user/medicine/count');
+
+export const getUserMedicinesCurrent = () => api.get('/user/medicines/current');
