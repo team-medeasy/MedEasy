@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import {FlatList} from 'react-native';
+import {FlatList, ActivityIndicator, Text, View} from 'react-native';
 import {themes} from '../styles';
 import {Header} from '../components/Header/Header';
 import {RoutineIcons} from './../../assets/icons';
@@ -32,12 +32,19 @@ const formatDate = (dateString) => {
 const Notification = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const PAGE_SIZE = 10;
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (page = 0, refresh = false) => {
+    if (loading) return;
+    
     try {
-      const res = await getNotificationList({ page: 0, size: 20 });
+      setLoading(true);
+      const res = await getNotificationList({ page: page, size: PAGE_SIZE });
       const notiData = res.data.body;
-      console.log('알림 목록: ', notiData);
+      console.log(`알림 목록 (페이지 ${page}): `, notiData);
       
       const formattedNotifications = notiData.map(item => ({
         id: item.notification_id,
@@ -47,23 +54,48 @@ const Notification = () => {
         type: 'medicine', // 모든 알림을 medicine 타입으로 설정
       }));
       
-      setNotifications(formattedNotifications);
+      if (refresh) {
+        setNotifications(formattedNotifications);
+      } else {
+        setNotifications(prev => [...prev, ...formattedNotifications]);
+      }
+      
+      // 더 이상 불러올 데이터가 없는 경우
+      if (formattedNotifications.length < PAGE_SIZE) {
+        setHasMoreData(false);
+      }
+      
     } catch (err) {
       console.error('알림 목록 불러오기 실패:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchNotifications(); // 컴포넌트 mount 시 실행
+    fetchNotifications(0, true); // 컴포넌트 mount 시 첫 페이지 실행
   }, []);
 
   const onRefresh = useCallback(() => {
+    if (loading) return;
+    
     setRefreshing(true);
-    // 새로고침 로직 - API 호출로 대체
-    fetchNotifications().finally(() => {
+    setCurrentPage(0);
+    setHasMoreData(true);
+    
+    // 새로고침 로직 - 첫 페이지부터 다시 로드
+    fetchNotifications(0, true).finally(() => {
       setRefreshing(false);
     });
-  }, []);
+  }, [loading]);
+
+  const loadMoreNotifications = () => {
+    if (loading || !hasMoreData) return;
+    
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchNotifications(nextPage);
+  };
 
   const renderItem = ({item}) => (
     <NotificationItem>
@@ -92,6 +124,25 @@ const Notification = () => {
     </NotificationItem>
   );
 
+  const renderFooter = () => {
+    if (!loading) return null;
+    
+    return (
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20}}>
+        <ActivityIndicator
+          size="medium"
+          color={themes.light.pointColor.Primary}
+        />
+        <Text style={{
+          marginTop: 10,
+          fontSize: FontSizes.caption.default,
+          color: themes.light.textColor.Primary50,
+          fontFamily: 'Pretendard-Medium'
+        }}>검색 중...</Text>
+      </View>
+    );
+  };
+
   return (
     <Container>
       <Header>알림</Header>
@@ -102,6 +153,9 @@ const Notification = () => {
         contentContainerStyle={{paddingBottom: 100}}
         refreshing={refreshing}
         onRefresh={onRefresh}
+        onEndReached={loadMoreNotifications}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
       />
     </Container>
   );
