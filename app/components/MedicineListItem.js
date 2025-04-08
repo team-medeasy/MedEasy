@@ -64,7 +64,7 @@ export const MedicineListItem = ({ item, routineInfo }) => {
               <Tag
                 sizeType="small"
                 colorType="resultPrimary"
-                overflowMode="scroll"
+                overflowMode="ellipsis"
                 maxWidth="66"
               >
                 {item.etc_otc_name || '정보 없음'}
@@ -72,7 +72,7 @@ export const MedicineListItem = ({ item, routineInfo }) => {
               <Tag
                 sizeType="small"
                 colorType="resultSecondary"
-                overflowMode="scroll"
+                overflowMode="ellipsis"
                 maxWidth="110"
                 maxLength={10}
               >
