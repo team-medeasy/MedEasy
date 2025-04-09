@@ -104,6 +104,16 @@ const TabNavigator = () => {
               paddingLeft: 30,
             },
           }}
+          listeners={({navigation}) => ({
+            tabPress: e => {
+              // 기본 탭 동작 방지
+              e.preventDefault();
+              // 루틴 화면으로 이동할 때 파라미터 초기화
+              navigation.navigate('루틴', {
+                selectedDate: null,
+              });
+            },
+          })}
         />
         <Tab.Screen
           name="내 정보"
