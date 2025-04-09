@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { FlatList, TouchableOpacity, View } from 'react-native';
+import { FlatList, View, Text, ActivityIndicator } from 'react-native';
 import { Header, MedicineListItem } from '../../components';
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
-import { getUserMedicineCount } from '../../api/user';
 import { getMedicineById } from '../../api/medicine';
-import { getUserMedicinesCurrent } from '../../api/user';
+import { getUserMedicinesCurrent, getUserMedicinesPast } from '../../api/user';
 
 const MedicineList = () => {
     const [activeTab, setActiveTab] = useState('current'); // 'current' or 'previous'
@@ -23,75 +22,54 @@ const MedicineList = () => {
     const fetchMedicineData = async () => {
         try {
             setLoading(true);
-            // 1. 사용자 약 ID 목록 가져오기
-            const countResponse = await getUserMedicineCount();
-            const countData = countResponse.data?.body || countResponse.data;
             
-            if (countData && countData.medicine_ids && Array.isArray(countData.medicine_ids)) {
-                if (countData.medicine_count !== undefined) {
-                    setMedicineCount(countData.medicine_count);
+            // 1. 현재 복용 중인 약 데이터 가져오기
+            const currentResponse = await getUserMedicinesCurrent();
+            const currentRoutines = currentResponse.data?.body || [];
+            
+            // 2. 이전에 복용한 약 데이터 가져오기
+            const pastResponse = await getUserMedicinesPast();
+            const pastRoutines = pastResponse.data?.body || [];
+            
+            // 3. 모든 약 ID 목록 추출
+            const allMedicineIds = [
+                ...new Set([
+                    ...currentRoutines.map(item => item.medicine_id),
+                    ...pastRoutines.map(item => item.medicine_id)
+                ])
+            ];
+            
+            // 4. 약 개수 업데이트
+            setMedicineCount(allMedicineIds.length);
+            
+            // 5. 각 약의 상세 정보 가져오기
+            const medicineDataPromises = allMedicineIds.map(id => getMedicineById(id));
+            const medicineResponses = await Promise.all(medicineDataPromises);
+            const medicinesMap = {};
+            
+            medicineResponses.forEach(response => {
+                const medicine = response.data?.body || response.data;
+                if (medicine && medicine.id) {
+                    medicinesMap[medicine.id] = medicine;
                 }
-                
-                // 2. 각 약의 상세 정보 가져오기
-                const medicineDataPromises = countData.medicine_ids.map(id => getMedicineById(id));
-                const medicineResponses = await Promise.all(medicineDataPromises);
-                const medicines = medicineResponses.map(response => response.data?.body || response.data);
-                
-                // 3. 복용 루틴 정보 가져오기
-                const routinesResponse = await getUserMedicinesCurrent();
-                const routines = routinesResponse.data?.body || [];
-                console.log(routines);
-
-                // 4. 약을 현재/이전 카테고리로 분류
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                const current = [];
-                const previous = [];
-                
-                // 각 약에 대해 루틴 정보 찾기
-                medicines.forEach(medicine => {
-                    const matchedRoutine = routines.find(
-                        routine => routine.medicine_id === medicine.id
-                    );
-                    
-                    if (matchedRoutine) {
-                        // 종료일이 있고 오늘보다 이전인지 확인
-                        if (matchedRoutine.routine_end_date) {
-                            const endDate = new Date(matchedRoutine.routine_end_date);
-                            endDate.setHours(0, 0, 0, 0);
-                            
-                            if (endDate < today) {
-                                // 종료일이 오늘보다 이전이면 이전 약으로 분류
-                                previous.push({
-                                    ...medicine,
-                                    routineInfo: matchedRoutine
-                                });
-                            } else {
-                                // 그 외에는 현재 약으로 분류
-                                current.push({
-                                    ...medicine,
-                                    routineInfo: matchedRoutine
-                                });
-                            }
-                        } else {
-                            // 종료일이 없으면 현재 약으로 분류
-                            current.push({
-                                ...medicine,
-                                routineInfo: matchedRoutine
-                            });
-                        }
-                    } else {
-                        // 루틴 정보가 없으면 일단 현재 약으로 분류
-                        current.push(medicine);
-                    }
-                });
-                
-                setCurrentMedicines(current);
-                setPreviousMedicines(previous);
-                console.log('현재 복용 중인 약:', current.length);
-                console.log('이전에 복용한 약:', previous.length);
-            }
+            });
+            
+            // 6. 현재 복용 중인 약과 이전에 복용한 약 목록 생성
+            const current = currentRoutines.map(routine => ({
+                ...medicinesMap[routine.medicine_id],
+                routineInfo: routine
+            })).filter(item => item.id); // id가 있는 항목만 필터링
+            
+            const previous = pastRoutines.map(routine => ({
+                ...medicinesMap[routine.medicine_id],
+                routineInfo: routine
+            })).filter(item => item.id); // id가 있는 항목만 필터링
+            
+            setCurrentMedicines(current);
+            setPreviousMedicines(previous);
+            console.log('현재 복용 중인 약:', current.length);
+            console.log('이전에 복용한 약:', previous.length);
+            
         } catch (error) {
             console.error('약 데이터 불러오기 실패:', error);
         } finally {
@@ -103,7 +81,24 @@ const MedicineList = () => {
         const data = activeTab === 'current' ? currentMedicines : previousMedicines;
         const emptyMessage = activeTab === 'current' 
             ? '현재 복용 중인 약이 없습니다.' 
-            : '이전에 복용한 약 기록이 없습니다.';
+            : '이전에 복용한 약이 없습니다.';
+
+        if (loading) {
+            return (
+                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20}}>
+                <ActivityIndicator
+                  size="medium"
+                  color={themes.light.pointColor.Primary}
+                />
+                <Text style={{
+                  marginTop: 10,
+                  fontSize: FontSizes.caption.default,
+                  color: themes.light.textColor.Primary50,
+                  fontFamily: 'Pretendard-Medium'
+                }}>검색 중...</Text>
+              </View>
+            );
+        }
             
         return (
             <FlatList

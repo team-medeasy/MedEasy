@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
 import styled from 'styled-components/native';
-import {HeaderIcons, OtherIcons, RoutineIcons} from '../../../assets/icons';
+import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
@@ -19,15 +19,15 @@ import {getUserSchedule} from '../../api/user';
 import RoutineCard from '../../components/RoutineCard';
 
 const {width} = Dimensions.get('window');
-const PAGE_SIZE = 7; // 한 페이지에 7일씩 표시
 
-const Routine = () => {
+const Routine = ({ route }) => {
   const today = dayjs();
   const flatListRef = useRef(null);
   const navigation = useNavigation();
+  const paramDate = route.params?.selectedDate; // 스크롤할 날짜 파라미터
+
   // 날짜별 routine_medicine_id를 저장
   const [routineMedicineMap, setRoutineMedicineMap] = useState({});
-
 
   // 현재 주차를 중심으로 이전 4주, 이후 4주까지 총 9주 데이터 생성
   const generateWeeks = centerDate => {
@@ -58,6 +58,18 @@ const Routine = () => {
   };
 
   const [weeks, setWeeks] = useState(() => generateWeeks(today));
+
+   // 파라미터 날짜가 있으면 해당 주의 인덱스 계산, 없으면 4(중앙)
+   const calculateInitialPage = (initDate) => {
+    // 시작 주와 파라미터 날짜의 주 차이 계산
+    const startWeek = today.startOf('week').subtract(4 * 7, 'day');
+    const dateWeek = initDate.startOf('week');
+    const weekDiff = dateWeek.diff(startWeek, 'week');
+    
+    // 유효 범위(0-8) 내로 제한
+    return Math.max(0, Math.min(8, weekDiff));
+  };
+
   const [currentPage, setCurrentPage] = useState(4); // 현재 주차 인덱스 (중앙 = 4)
 
   const [selectedDate, setSelectedDate] = useState({
@@ -70,22 +82,30 @@ const Routine = () => {
 
   useFocusEffect(
     React.useCallback(() => {
+      console.log("📨 날짜 파라미터: ",paramDate);
+      // 파라미터로 받은 날짜가 있으면 해당 날짜로, 없으면 오늘 날짜로 설정
+      const targetDate = paramDate ? dayjs(paramDate) : today;
+      const pageIndex = calculateInitialPage(targetDate);
+      
       setSelectedDate({
-        day: weekDays[today.day()],
-        date: today.date(),
-        month: today.month() + 1,
-        year: today.year(),
-        fullDate: today,
+        day: weekDays[targetDate.day()],
+        date: targetDate.date(),
+        month: targetDate.month() + 1,
+        year: targetDate.year(),
+        fullDate: targetDate,
       });
 
-      // 오늘 날짜가 있는 페이지로 스크롤
+      // 계산된 페이지 인덱스로 스크롤
       if (flatListRef.current) {
-        flatListRef.current.scrollToIndex({
-          index: 4,
-          animated: true,
-        });
+        setTimeout(() => {
+          flatListRef.current.scrollToIndex({
+            index: pageIndex,
+            animated: true,
+          });
+        }, 300); // 컴포넌트가 완전히 렌더링된 후 스크롤되도록 함
       }
-    }, []),
+      
+    }, [route.params])
   );
 
   const [checkedItems, setCheckedItems] = useState({});
@@ -397,11 +417,6 @@ const Routine = () => {
   };
 
   const allRoutines = getAllRoutinesByTime();
-
-  // 페이지 변경 처리
-  const onPageChange = index => {
-    setCurrentPage(index);
-  };
 
   // 페이지 변경 감지
   const onViewableItemsChanged = useRef(({viewableItems}) => {

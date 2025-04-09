@@ -327,8 +327,7 @@ const Home = () => {
               key={`routine-${routine.scheduleId}`}
               onPress={() => {
                 navigation.navigate('루틴', {
-                  selectedDate: selectedDate,
-                  paramFromHome: selectedDate.fullDate.format('YYYY-MM-DD'),
+                  selectedDate: selectedDate.fullDate.format('YYYY-MM-DD'),
                 });
               }}>
               <ListComponent>
