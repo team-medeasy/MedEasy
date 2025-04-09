@@ -14,3 +14,8 @@ export const getUserSchedule = () => api.get('/user/schedule');
 export const getUserMedicineCount = () => api.get('/user/medicine/count');
 
 export const getUserMedicinesCurrent = () => api.get('/user/medicines/current');
+
+export const getUserMedicinesPast = (start_date, end_date) =>
+  api.get('/user/medicines/past', {
+    params: { start_date, end_date },
+  });
