@@ -39,6 +39,7 @@ const CameraSearchScreen = () => {
   const [cameraPosition, setCameraPosition] = useState('back');
   const [permissionGranted, setPermissionGranted] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(true);
+  const [cameraLayout, setCameraLayout] = useState({width, height});
 
   const devices = useCameraDevices();
   const navigation = useNavigation();
@@ -49,37 +50,30 @@ const CameraSearchScreen = () => {
     devices && devices.find(d => d.position === 'back'),
   ); // 초기값 설정
 
-  // 새로 추가된 함수
   const checkAndRequestCameraPermission = async () => {
     try {
-      // 현재 카메라 권한 상태 확인
       const cameraPermission = await Camera.getCameraPermissionStatus();
-      
-      // 권한이 있는 경우
+
       if (cameraPermission === 'authorized' || cameraPermission === 'granted') {
         setPermissionGranted(true);
         return true;
       }
-      
-      // 권한이 없을 경우 요청
+
       const requestPermission = await Camera.requestCameraPermission();
-      
-      // 권한 요청 성공
+
       if (requestPermission === 'authorized' || requestPermission === 'granted') {
         setPermissionGranted(true);
         return true;
       }
-      
-      // 권한 요청 실패 - 설정으로 이동 안내
+
       Alert.alert(
         '카메라 권한 필요',
         '사진 검색을 위해 카메라 권한이 필요합니다. 설정에서 권한을 활성화해 주세요.',
         [
           { text: '취소', onPress: () => navigation.goBack(), style: 'cancel' },
-          { 
-            text: '설정으로 이동', 
+          {
+            text: '설정으로 이동',
             onPress: () => {
-              // iOS와 Android에서 설정 앱으로 이동
               if (Platform.OS === 'ios') {
                 Linking.openURL('app-settings:');
               } else {
@@ -109,15 +103,14 @@ const CameraSearchScreen = () => {
       setIsCameraActive(true);
       const checkPermissionOnFocus = async () => {
         const cameraPermission = await Camera.getCameraPermissionStatus();
-        
-        // 권한이 취소된 경우 다시 요청
+
         if (cameraPermission !== 'authorized' && cameraPermission !== 'granted') {
           await checkAndRequestCameraPermission();
         } else {
           setPermissionGranted(true);
         }
       };
-      
+
       checkPermissionOnFocus();
     } else {
       setIsCameraActive(false);
@@ -149,27 +142,23 @@ const CameraSearchScreen = () => {
   };
 
   const handleCapture = async () => {
-    if (!cameraRef.current || !permissionGranted) {
+    if (!cameraRef.current || !permissionGranted || !cameraLayout.width || !cameraLayout.height) {
       if(!permissionGranted) {
-        // 카메라 권한이 없을 경우
         await checkAndRequestCameraPermission();
         return;
       }
+      console.warn('카메라 레퍼런스 또는 권한이 없거나 카메라 레이아웃이 설정되지 않았습니다.');
       return;
     }
-  
+
     try {
-      // 사진 촬영
+      setIsCameraActive(false);
       const photo = await cameraRef.current.takePhoto({
         qualityPrioritization: 'quality',
         flash: 'off',
       });
-      
-      // 먼저 카메라를 비활성화
-      setIsCameraActive(false);
-      
-      const croppedUri = await cropCenterArea(photo.path, isPrescriptionMode);
-      // 그 다음 화면 전환
+
+      const croppedUri = await cropCenterArea(photo.path, isPrescriptionMode, cameraLayout);
       if (croppedUri) {
         setTimeout(() => {
           navigation.navigate('PhotoPreview', {
@@ -179,6 +168,7 @@ const CameraSearchScreen = () => {
       }
     } catch (error) {
       console.error('사진 촬영 실패:', error);
+      setIsCameraActive(true); // 오류 발생 시 카메라 다시 활성화
     }
   };
 
@@ -226,7 +216,7 @@ const CameraSearchScreen = () => {
     <CameraContainer>
       <Header>
         <HeaderItem>
-        <TouchableOpacity 
+        <TouchableOpacity
             onPress={() => {
               setIsCameraActive(false);
               // 약간의 지연 후 화면 전환
@@ -290,6 +280,10 @@ const CameraSearchScreen = () => {
           device={device}
           isActive={isFocused && permissionGranted}
           photo={true}
+          onLayout={e => {
+            const { width, height } = e.nativeEvent.layout;
+            setCameraLayout({ width, height });
+          }}
         />
       )}
 
