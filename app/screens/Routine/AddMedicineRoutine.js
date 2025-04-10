@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { Platform, Keyboard, View, Text, ActivityIndicator } from 'react-native';
 import { themes } from './../../styles';
@@ -20,8 +20,7 @@ const AddMedicineRoutine = ({navigation}) => {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
-  const [dataSize, setDataSize] = useState(10);
-  const [allDataLoaded, setAllDataLoaded] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   
   const [originalResponseData, setOriginalResponseData] = useState([]);
 
@@ -30,6 +29,8 @@ const fetchSearchResults = async (isLoadMore = false) => {
     if (!isLoadMore) {
       setPage(0);
       setHasMore(true);
+      setHasSearched(true); 
+      setLoading(true);
     }
   
     try {
@@ -171,9 +172,9 @@ const fetchSearchResults = async (isLoadMore = false) => {
               color={themes.light.pointColor.Primary} />
             <Text>검색 중...</Text>
           </View>
-        ) : noResults || searchResults.length === 0 ? (
+        ) : hasSearched && (noResults || searchResults.length === 0) ? (
           <NoSearchResults />
-        ) : (
+        ) : hasSearched ? (
           <SearchResultsList
             searchResults={searchResults}
             handleSearchResultPress={handleSearchResultPress}
@@ -181,6 +182,10 @@ const fetchSearchResults = async (isLoadMore = false) => {
             onEndReachedThreshold={0.5}
             refreshing={loadingMore}
           />
+        ) : (
+          // 초기 상태
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          </View>
         )}
       </SearchResultContainer>
     </Container>
@@ -212,14 +217,6 @@ const LogoIconContainer = styled.View`
 const SearchResultContainer = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
-  margin-top: 16px;
-`;
-
-const FooterLoading = styled.View`
-  padding: 16px;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
 `;
 
 export default AddMedicineRoutine;
