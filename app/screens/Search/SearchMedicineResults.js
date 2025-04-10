@@ -85,25 +85,29 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       setPage(0);
       setHasMore(true);
     }
-  
+
     try {
       let response;
       let requestParams = {
         name: searchQuery,
         page: isLoadMore ? page + 1 : 0,
-        size: 10
+        size: 10,
       };
 
       console.log('검색 요청 파라미터:', requestParams);
-  
+
       if (selectedColors.length > 0 || selectedShapes.length > 0) {
-        const mappedColors = selectedColors.map(color => mapColorToApiValue(color));
-        const mappedShapes = selectedShapes.map(shape => mapShapeToApiValue(shape));
-  
+        const mappedColors = selectedColors.map(color =>
+          mapColorToApiValue(color),
+        );
+        const mappedShapes = selectedShapes.map(shape =>
+          mapShapeToApiValue(shape),
+        );
+
         requestParams = {
           ...requestParams,
           colors: mappedColors,
-          shape: mappedShapes
+          shape: mappedShapes,
         };
         response = await searchMedicineWithFilters(requestParams);
       } else {
@@ -127,8 +131,8 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       }
 
       // 결과 있을 때 처리
-      setOriginalResponseData(prev => 
-        isLoadMore ? [...prev, ...response.data.body] : response.data.body
+      setOriginalResponseData(prev =>
+        isLoadMore ? [...prev, ...response.data.body] : response.data.body,
       );
 
       const formattedResults = response.data.body.map((item, index) => ({
@@ -138,17 +142,17 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         class_name: item.class_name,
         etc_otc_name: item.etc_otc_name,
         original_id: item.id,
-        uniqueKey: `${item.id}_${index}`
+        uniqueKey: `${item.id}_${index}`,
       }));
 
       console.log('포맷된 결과:', {
         resultCount: formattedResults.length,
-        results: formattedResults
+        results: formattedResults,
       });
 
       // 첫 페이지면 결과 교체, 추가 로드면 기존 결과에 추가
-      setSearchResults(prev => 
-        isLoadMore ? [...prev, ...formattedResults] : formattedResults
+      setSearchResults(prev =>
+        isLoadMore ? [...prev, ...formattedResults] : formattedResults,
       );
 
       // NoResults 상태 초기화
@@ -161,10 +165,9 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
       // 더 이상 로드할 데이터가 없으면 hasMore 상태 업데이트
       setHasMore(formattedResults.length === 10);
-      
     } catch (err) {
       console.error('검색 중 오류:', err);
-      
+
       // 추가 로딩 시 에러 처리
       if (isLoadMore) {
         setHasMore(false);
@@ -365,7 +368,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
             color: selectedColors,
             shape: selectedShapes,
             dosageForm: selectedDosageForms,
-            split: selectedSplits
+            split: selectedSplits,
           }}
         />
       ))}
