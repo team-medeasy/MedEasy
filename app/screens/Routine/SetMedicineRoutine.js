@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { Alert, View, ScrollView } from 'react-native';
 import { themes } from './../../styles';
@@ -178,45 +179,50 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     }
   };
 
-  // 컴포넌트 마운트 시 사용자 일정 가져오기
-  useEffect(() => {
-    const fetchUserSchedule = async () => {
-      try {
-        const getData = await getUserSchedule();
-        const scheduleData = getData.data;
-        console.log('사용자 일정 데이터:', scheduleData);
+  useFocusEffect(
+      React.useCallback(() => {
+          const fetchUserSchedule = async () => {
+              try {
+                  const getData = await getUserSchedule();
+                  const scheduleData = getData.data;
+                  console.log('사용자 일정 데이터:', scheduleData);
 
-        if (scheduleData && scheduleData.body && Array.isArray(scheduleData.body)) {
-          const mapping = {};
-          const formattedSchedule = {};
+                  if (scheduleData && scheduleData.body && Array.isArray(scheduleData.body)) {
+                      // 매핑을 위한 객체
+                      const mapping = {};
+                      // 시간 표시를 위한 객체
+                      const formattedSchedule = {};
 
-          scheduleData.body.forEach((item) => {
-            if (item.name.includes('아침')) {
-              mapping['아침'] = item.user_schedule_id;
-              formattedSchedule['아침 식사 후'] = formatTime(item.take_time);
-            } else if (item.name.includes('점심')) {
-              mapping['점심'] = item.user_schedule_id;
-              formattedSchedule['점심 식사 후'] = formatTime(item.take_time);
-            } else if (item.name.includes('저녁')) {
-              mapping['저녁'] = item.user_schedule_id;
-              formattedSchedule['저녁 식사 후'] = formatTime(item.take_time);
-            } else if (item.name.includes('자기 전')) {
-              mapping['자기 전'] = item.user_schedule_id;
-              formattedSchedule['자기 전'] = formatTime(item.take_time);
-            }
-          });
+                      scheduleData.body.forEach((item) => {
+                          // 매핑 설정
+                          if (item.name.includes('아침')) {
+                              mapping['🐥️ 아침'] = item.user_schedule_id;
+                              formattedSchedule['아침 식사 후'] = formatTime(item.take_time);
+                          } else if (item.name.includes('점심')) {
+                              mapping['🥪️ 점심'] = item.user_schedule_id;
+                              formattedSchedule['점심 식사 후'] = formatTime(item.take_time);
+                          } else if (item.name.includes('저녁')) {
+                              mapping['🌙️ 저녁'] = item.user_schedule_id;
+                              formattedSchedule['저녁 식사 후'] = formatTime(item.take_time);
+                          } else if (item.name.includes('자기 전')) {
+                              mapping['🛏️️ 자기 전'] = item.user_schedule_id;
+                              formattedSchedule['자기 전'] = formatTime(item.take_time);
+                          }
+                      });
 
-          setScheduleMapping(mapping);
-          setScheduleData(formattedSchedule);
-          console.log('시간대 매핑:', mapping);
-        }
-      } catch (error) {
-        console.error('사용자 일정 가져오기 실패:', error);
-      }
-    };
+                      setScheduleMapping(mapping);
+                      setScheduleData(formattedSchedule);
+                      console.log('시간대 매핑:', mapping);
+                      console.log('시간 데이터:', formattedSchedule);
+                  }
+              } catch (error) {
+                  console.error('사용자 일정 가져오기 실패:', error);
+              }
+          };
 
-    fetchUserSchedule();
-  }, []);
+          fetchUserSchedule();
+      }, [])
+  );
 
   const handlePressEnlarge = () => {
     navigation.navigate('MedicineImageDetail', { item: medicine, isModal: true });

@@ -82,73 +82,65 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
   // 검색 결과 가져오기
   const fetchSearchResults = async (isLoadMore = false) => {
     if (!isLoadMore) {
+      setLoading(true);
       setPage(0);
       setHasMore(true);
     }
-  
+
     try {
       let response;
       let requestParams = {
         name: searchQuery,
         page: isLoadMore ? page + 1 : 0,
-        size: 10
+        size: 10,
       };
-
       console.log('검색 요청 파라미터:', requestParams);
-  
+
       if (selectedColors.length > 0 || selectedShapes.length > 0) {
-        const mappedColors = selectedColors.map(color => mapColorToApiValue(color));
-        const mappedShapes = selectedShapes.map(shape => mapShapeToApiValue(shape));
-  
+        const mappedColors = selectedColors.map(mapColorToApiValue);
+        const mappedShapes = selectedShapes.map(mapShapeToApiValue);
+
         requestParams = {
           ...requestParams,
           colors: mappedColors,
-          shape: mappedShapes
+          shape: mappedShapes,
         };
+
         response = await searchMedicineWithFilters(requestParams);
       } else {
         response = await searchMedicine(requestParams);
       }
 
-      // 결과 없을 때 처리
-      if (!response.data?.body || response.data.body.length === 0) {
-        // 추가 로딩 시 결과가 없다면
+      const responseData = response.data?.body ?? [];
+
+      if (responseData.length === 0) {
         if (isLoadMore) {
           setHasMore(false);
-          setLoadingMore(false);
-          return;
+        } else {
+          setNoResults(true);
+          setSearchResults([]);
+          setHasMore(false);
         }
-
-        // 초기 검색 시 결과 없음 처리
-        setNoResults(true);
-        setSearchResults([]);
-        setHasMore(false);
         return;
       }
 
-      // 결과 있을 때 처리
-      setOriginalResponseData(prev => 
-        isLoadMore ? [...prev, ...response.data.body] : response.data.body
+      setOriginalResponseData(prev =>
+        isLoadMore ? [...prev, ...responseData] : responseData,
       );
 
-      const formattedResults = response.data.body.map((item, index) => ({
+      const formattedResults = responseData.map((item, index) => ({
         item_name: item.item_name,
         entp_name: item.entp_name,
         item_image: item.item_image,
         class_name: item.class_name,
         etc_otc_name: item.etc_otc_name,
         original_id: item.id,
-        uniqueKey: `${item.id}_${index}`
+        uniqueKey: `${item.id}_${index}`,
       }));
 
-      console.log('포맷된 결과:', {
-        resultCount: formattedResults.length,
-        results: formattedResults
-      });
-
       // 첫 페이지면 결과 교체, 추가 로드면 기존 결과에 추가
-      setSearchResults(prev => 
-        isLoadMore ? [...prev, ...formattedResults] : formattedResults
+      setSearchResults(prev =>
+        isLoadMore ? [...prev, ...formattedResults] : formattedResults,
       );
 
       // NoResults 상태 초기화
@@ -161,20 +153,17 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 
       // 더 이상 로드할 데이터가 없으면 hasMore 상태 업데이트
       setHasMore(formattedResults.length === 10);
-      
     } catch (err) {
       console.error('검색 중 오류:', err);
-      
       // 추가 로딩 시 에러 처리
       if (isLoadMore) {
         setHasMore(false);
-        setLoadingMore(false);
       } else {
         setError('검색 중 오류가 발생했습니다.');
         setNoResults(true);
       }
     } finally {
-      setLoading(false);
+      if (!isLoadMore) setLoading(false);
       setLoadingMore(false);
     }
   };
@@ -185,6 +174,34 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       setLoadingMore(true);
       fetchSearchResults(true);
     }
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <ActivityIndicator
+            size="large"
+            color={themes.light.pointColor.Primary}
+          />
+          <Text>검색 중...</Text>
+        </View>
+      );
+    }
+
+    if (noResults || searchResults.length === 0) {
+      return <NoSearchResults />;
+    }
+
+    return (
+      <SearchResultsList
+        searchResults={searchResults}
+        handleSearchResultPress={handleSearchResultPress}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        refreshing={loadingMore}
+      />
+    );
   };
 
   // 검색어나 필터가 변경될 때마다 API 호출
@@ -365,32 +382,11 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
             color: selectedColors,
             shape: selectedShapes,
             dosageForm: selectedDosageForms,
-            split: selectedSplits
+            split: selectedSplits,
           }}
         />
       ))}
-      <SearchResultContainer>
-        {loading ? (
-          <View
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <ActivityIndicator
-              size="large"
-              color={themes.light.pointColor.Primary}
-            />
-            <Text>검색 중...</Text>
-          </View>
-        ) : noResults || searchResults.length === 0 ? (
-          <NoSearchResults />
-        ) : (
-          <SearchResultsList
-            searchResults={searchResults}
-            handleSearchResultPress={handleSearchResultPress}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            refreshing={loadingMore}
-          />
-        )}
-      </SearchResultContainer>
+      <SearchResultContainer>{renderContent()}</SearchResultContainer>
     </Container>
   );
 };

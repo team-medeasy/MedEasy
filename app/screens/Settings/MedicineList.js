@@ -1,85 +1,118 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { FlatList, TouchableOpacity, View } from 'react-native';
+import { FlatList, View, Text, ActivityIndicator } from 'react-native';
 import { Header, MedicineListItem } from '../../components';
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
-import { getUserMedicineCount } from '../../api/user';
 import { getMedicineById } from '../../api/medicine';
+import { getUserMedicinesCurrent, getUserMedicinesPast } from '../../api/user';
 
 const MedicineList = () => {
     const [activeTab, setActiveTab] = useState('current'); // 'current' or 'previous'
     const [medicineCount, setMedicineCount] = useState(0);
-    const [medicineList, setMedicineList] = useState([]);
-    const [medicineIds, setMedicineIds] = useState([]);
+    const [currentMedicines, setCurrentMedicines] = useState([]);
+    const [previousMedicines, setPreviousMedicines] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // 사용자 약 개수 및 ID 목록 가져오기
-        const fetchUserMedicineData = async () => {
-            try {
-                const response = await getUserMedicineCount();
-                const countData = response.data?.body || response.data;
-
-                if (countData) {
-                    // 약 개수 설정
-                    if (countData.medicine_count !== undefined) {
-                        setMedicineCount(countData.medicine_count);
-                    }
-
-                    // medicine_ids 데이터가 있는 경우 상태 업데이트 후 약 정보 가져오기
-                    if (countData.medicine_ids && Array.isArray(countData.medicine_ids)) {
-                        setMedicineIds(countData.medicine_ids);
-                        console.log('사용자 약 ID 목록:', countData.medicine_ids);
-
-                        // 약 ID를 기반으로 약 정보 가져오기
-                        fetchMedicineDetails(countData.medicine_ids);
-                    }
-                }
-            } catch (error) {
-                console.error('사용자 약 개수 및 ID 가져오기 실패:', error);
-            }
-        };
-
-        fetchUserMedicineData();
+        fetchMedicineData();
     }, []);
 
-    const fetchMedicineDetails = async (ids) => {
+    const fetchMedicineData = async () => {
         try {
-            const medicineDataPromises = ids.map(id => getMedicineById(id));
+            setLoading(true);
+            
+            // 1. 현재 복용 중인 약 데이터 가져오기
+            const currentResponse = await getUserMedicinesCurrent();
+            const currentRoutines = currentResponse.data?.body || [];
+            
+            // 2. 이전에 복용한 약 데이터 가져오기
+            const pastResponse = await getUserMedicinesPast();
+            const pastRoutines = pastResponse.data?.body || [];
+            
+            // 3. 모든 약 ID 목록 추출
+            const allMedicineIds = [
+                ...new Set([
+                    ...currentRoutines.map(item => item.medicine_id),
+                    ...pastRoutines.map(item => item.medicine_id)
+                ])
+            ];
+            
+            // 4. 약 개수 업데이트
+            setMedicineCount(allMedicineIds.length);
+            
+            // 5. 각 약의 상세 정보 가져오기
+            const medicineDataPromises = allMedicineIds.map(id => getMedicineById(id));
             const medicineResponses = await Promise.all(medicineDataPromises);
-
-            const medicines = medicineResponses.map(response => response.data?.body || response.data);
-            setMedicineList(medicines);
-
-            console.log('사용자 약 정보:', medicines);
+            const medicinesMap = {};
+            
+            medicineResponses.forEach(response => {
+                const medicine = response.data?.body || response.data;
+                if (medicine && medicine.id) {
+                    medicinesMap[medicine.id] = medicine;
+                }
+            });
+            
+            // 6. 현재 복용 중인 약과 이전에 복용한 약 목록 생성
+            const current = currentRoutines.map(routine => ({
+                ...medicinesMap[routine.medicine_id],
+                routineInfo: routine
+            })).filter(item => item.id); // id가 있는 항목만 필터링
+            
+            const previous = pastRoutines.map(routine => ({
+                ...medicinesMap[routine.medicine_id],
+                routineInfo: routine
+            })).filter(item => item.id); // id가 있는 항목만 필터링
+            
+            setCurrentMedicines(current);
+            setPreviousMedicines(previous);
+            console.log('현재 복용 중인 약:', current.length);
+            console.log('이전에 복용한 약:', previous.length);
+            
         } catch (error) {
-            console.error('사용자 약 정보 가져오기 실패:', error);
+            console.error('약 데이터 불러오기 실패:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const renderTabContent = () => {
-        if (activeTab === 'current') {
+        const data = activeTab === 'current' ? currentMedicines : previousMedicines;
+        const emptyMessage = activeTab === 'current' 
+            ? '현재 복용 중인 약이 없습니다.' 
+            : '이전에 복용한 약이 없습니다.';
+
+        if (loading) {
             return (
-                <FlatList
-                    data={medicineList}
-                    keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-                    renderItem={({ item }) => <MedicineListItem item={item} />}
-                    showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={
-                        <NoResultContainer>
-                            <NoResultText>현재 복용 중인 약이 없습니다.</NoResultText>
-                        </NoResultContainer>
-                    }
+                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20}}>
+                <ActivityIndicator
+                  size="medium"
+                  color={themes.light.pointColor.Primary}
                 />
-            );
-        } else {
-            return (
-                <NoResultContainer>
-                    <NoResultText>이전에 복용한 약 기록이 없습니다.</NoResultText>
-                </NoResultContainer>
+                <Text style={{
+                  marginTop: 10,
+                  fontSize: FontSizes.caption.default,
+                  color: themes.light.textColor.Primary50,
+                  fontFamily: 'Pretendard-Medium'
+                }}>검색 중...</Text>
+              </View>
             );
         }
+            
+        return (
+            <FlatList
+                data={data}
+                keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+                renderItem={({ item }) => <MedicineListItem item={item} routineInfo={item.routineInfo} />}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                    <NoResultContainer>
+                        <NoResultText>{emptyMessage}</NoResultText>
+                    </NoResultContainer>
+                }
+            />
+        );
     };
 
     return (

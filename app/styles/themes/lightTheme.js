@@ -31,6 +31,7 @@ export const lightTheme = {
     tagDetailPrimary: 'rgba(135,166,255,0.7)',
     tagDetailSecondary: 'rgba(255, 255, 255, 0.2)',
     modalBar: 'rgba(0, 0, 0, 0.15)',
+    placeholder: '#E5E5E5',
   },
   bgColor: {
     bgPrimary: 'rgba(255, 255, 255, 1)',

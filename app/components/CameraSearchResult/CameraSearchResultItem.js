@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {View} from 'react-native';
+import {View, Dimensions} from 'react-native';
 import {Tag, Button, MedicineAppearance} from './../index';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {themes} from '../../styles';
@@ -8,17 +8,15 @@ import {themes} from '../../styles';
 export const CameraSearchResultItem = ({item, onPress}) => {
   return (
     <ItemContainer>
-      <ImageContainer>
-        <TopHalfContainer>
-          <LeftHalfImage source={{uri: item.item_image}} resizeMode="cover" />
-        </TopHalfContainer>
-        <BottomHalfContainer>
-          <RightHalfImage source={{uri: item.item_image}} resizeMode="cover" />
-        </BottomHalfContainer>
-      </ImageContainer>
+      <FullWidthImageContainer>
+        <PillImage 
+          source={{uri: item.item_image}} 
+          resizeMode="cover" // props로 전달
+        />
+      </FullWidthImageContainer>
 
       <InfoContainer>
-        <View style={{flexDirection: 'row', gap: 11, marginBottom: 9}}>
+        <View style={{flexDirection: 'row', gap: 8, marginBottom: 12}}>
           <Tag
             sizeType="small"
             colorType="resultPrimary"
@@ -35,8 +33,8 @@ export const CameraSearchResultItem = ({item, onPress}) => {
           </Tag>
         </View>
 
-        <View style={{gap: 13}}>
-          <View style={{gap: 5}}>
+        <View style={{gap: 10}}>
+          <View style={{gap: 10}}>
             <MedicineName numberOfLines={1} ellipsizeMode="tail">
               {item.item_name || '정보 없음'}
             </MedicineName>
@@ -45,12 +43,13 @@ export const CameraSearchResultItem = ({item, onPress}) => {
             </Description>
           </View>
 
-          <MedicineAppearance item={item} />
+          <MedicineAppearance item={item} style={{marginTop: 2}} />
 
           <Button
             title="이 약이 맞아요"
             fontSize="15"
             height="40"
+            style={{marginTop: 12}}
             onPress={() => onPress({
               ...item,
               id: item.id,
@@ -63,50 +62,26 @@ export const CameraSearchResultItem = ({item, onPress}) => {
 };
 
 const ItemContainer = styled.View`
-  flex-direction: row;
-  margin-bottom: 40px;
-  gap: 20px;
-`;
-
-const ImageContainer = styled.View`
-  width: 117px;
-  height: 250px;
   flex-direction: column;
+  margin-bottom: 32px;
 `;
 
-const HalfImageContainer = styled.View`
-  width: 117px;
-  height: 125px;
-  flex-shrink: 0;
+const FullWidthImageContainer = styled.View`
+  width: 100%;
+  height: 200px;
+  margin-bottom: 16px;
   overflow: hidden;
+  border-radius: 12px;
+  background-color: #f5f5f5;
 `;
 
-const LeftHalfImage = styled.Image`
-  width: 234px;
-  height: 125px;
-  position: absolute;
-  left: 0;
-  border-radius: 10px 10px 0px 0px;
-`;
-
-const RightHalfImage = styled.Image`
-  width: 234px;
-  height: 125px;
-  position: absolute;
-  left: -117px;
-  border-radius: 0px 0px 10px 10px;
-`;
-
-const TopHalfContainer = styled(HalfImageContainer)`
-  border-radius: 10px 10px 0 0;
-`;
-
-const BottomHalfContainer = styled(HalfImageContainer)`
-  border-radius: 0 0 10px 10px;
+const PillImage = styled.Image`
+  width: 100%;
+  height: 100%;
 `;
 
 const InfoContainer = styled.View`
-  flex: 1;
+  width: 100%;
 `;
 
 const MedicineName = styled.Text`

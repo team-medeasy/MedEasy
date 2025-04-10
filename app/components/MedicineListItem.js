@@ -1,84 +1,55 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components/native';
 import { View, Text } from 'react-native';
 import { Tag } from './Tag';
 import FontSizes from '../../assets/fonts/fontSizes';
 import { themes } from '../styles';
 import { useNavigation } from '@react-navigation/native';
-import { getRoutineByDate } from '../api/routine';
 
-export const MedicineListItem = ({ item }) => {
+export const MedicineListItem = ({ item, routineInfo }) => {
   const navigation = useNavigation();
-  const [doses, setDoses] = useState({
-    timesPerDay: 0,
-    dosePerTime: null,
-    startDate: null,
-  });
+  
+  // 종료일이 오늘을 지났는지 확인
+  const isPastMedicine = () => {
+    if (!routineInfo || !routineInfo.routine_end_date) return false;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const endDate = new Date(routineInfo.routine_end_date);
+    endDate.setHours(0, 0, 0, 0);
+    
+    return endDate < today;
+  };
 
   const handlePress = () => {
     navigation.navigate('MedicineDetail', { item });
   };
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchRoutine = async () => {
-      try {
-        const response = await getRoutineByDate('2025-03-01', '2025-12-31');
-        const routines = response.data.body || [];
-
-        const scheduleSet = new Set();
-        let doseValue = null;
-        let firstDate = null;
-
-        routines.forEach((day) => {
-          let foundInDay = false;
-
-          day.user_schedule_dtos.forEach((schedule) => {
-            schedule.routine_medicine_dtos.forEach((med) => {
-              if (med.medicine_id === item.id) {
-                scheduleSet.add(schedule.user_schedule_id);
-                doseValue = med.dose;
-
-                if (!foundInDay) {
-                  if (!firstDate || new Date(day.take_date) < new Date(firstDate)) {
-                    firstDate = day.take_date;
-                    foundInDay = true;
-                  }
-                }
-              }
-            });
-          });
-        });
-
-        if (isMounted) {
-          setDoses({
-            timesPerDay: scheduleSet.size,
-            dosePerTime: doseValue,
-            startDate: firstDate,
-          });
-        }
-      } catch (error) {
-        console.error('루틴 데이터 불러오기 실패:', error);
-      }
-    };
-
-    fetchRoutine();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [item.id]);
-
   const formatDate = (dateString) => {
+    if (!dateString) return '정보 없음';
     const date = new Date(dateString);
     return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
   };
+  
+  // 요일 숫자 배열을 텍스트로 변환하는 함수 (1=월, 2=화, ..., 7=일)
+  const getDayOfWeekText = (dayOfWeeks) => {
+    if (!dayOfWeeks || dayOfWeeks.length === 0) return '정보 없음';
+    
+    const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+    return dayOfWeeks.map(day => dayNames[(day - 1) % 7]).join(', ');
+  };
+
+  const isPast = isPastMedicine();
 
   return (
     <ItemContainer onPress={handlePress}>
       <View style={{ flexDirection: 'row', gap: 15 }}>
-        <MedicineImage source={{ uri: item.item_image }} resizeMode="cover" />
+        {/* API 응답과 일치하도록 속성명 변경 */}
+        <MedicineImage 
+          source={{ uri: item.medicine_image || item.item_image }} 
+          resizeMode="cover" 
+        />
 
         <InfoContainer>
           <View style={{ gap: 7 }}>
@@ -86,14 +57,14 @@ export const MedicineListItem = ({ item }) => {
               {item.entp_name || '정보 없음'}
             </Description>
             <MedicineName numberOfLines={1} ellipsizeMode="tail">
-              {item.item_name || '정보 없음'}
+              {item.medicine_name || item.item_name || '정보 없음'}
             </MedicineName>
 
             <View style={{ flexDirection: 'row', gap: 11 }}>
               <Tag
                 sizeType="small"
                 colorType="resultPrimary"
-                overflowMode="scroll"
+                overflowMode="ellipsis"
                 maxWidth="66"
               >
                 {item.etc_otc_name || '정보 없음'}
@@ -101,7 +72,7 @@ export const MedicineListItem = ({ item }) => {
               <Tag
                 sizeType="small"
                 colorType="resultSecondary"
-                overflowMode="scroll"
+                overflowMode="ellipsis"
                 maxWidth="110"
                 maxLength={10}
               >
@@ -121,22 +92,34 @@ export const MedicineListItem = ({ item }) => {
         }}
       >
         <Routine
-          label={'복용 시작일'}
-          value={doses.startDate ? formatDate(doses.startDate) : '정보 없음'}
+          label={isPast ? '복용 기간    ' : '복용 시작일'}
+          value={
+            isPast && routineInfo && routineInfo.routine_start_date && routineInfo.routine_end_date
+              ? `${formatDate(routineInfo.routine_start_date)} ~ ${formatDate(routineInfo.routine_end_date)}`
+              : routineInfo && routineInfo.routine_start_date 
+                ? formatDate(routineInfo.routine_start_date)
+                : '정보 없음'
+          }
         />
         <Routine
           label={'복용량        '}
           value={
-            doses.timesPerDay && doses.dosePerTime
-              ? `하루 ${doses.timesPerDay}번, ${doses.dosePerTime}정씩`
+            routineInfo && routineInfo.schedule_size && routineInfo.dose
+              ? `하루 ${routineInfo.schedule_size}번, ${routineInfo.dose}정씩`
               : '정보 없음'
           }
         />
-        <Routine label={'복용 주기    '} value={'월, 수, 금'} />
+        <Routine 
+          label={'복용 주기    '} 
+          value={routineInfo && routineInfo.day_of_weeks 
+            ? getDayOfWeekText(routineInfo.day_of_weeks) 
+            : '정보 없음'} 
+        />
       </View>
     </ItemContainer>
   );
 };
+
 
 const Routine = ({ label, value }) => {
   return (
