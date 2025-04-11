@@ -10,6 +10,7 @@ import {
   View,
   StyleSheet,
   Text,
+  InteractionManager,
 } from 'react-native';
 import {
   Camera,
@@ -53,12 +54,12 @@ const CameraSearchScreen = () => {
   const [flash, setFlash] = useState('off');
   const [focusPoint, setFocusPoint] = useState(null);
   const [showFocusIndicator, setShowFocusIndicator] = useState(false);
-  const [autoFocus, setAutoFocus] = useState('on'); // 자동 포커스 상태 추가
-  const [isProcessing, setIsProcessing] = useState(false); // 사진 처리 중 상태 추가
   const [cameraLayout, setCameraLayout] = useState({
     width: windowWidth,
     height: windowHeight,
   });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(false);
 
   // --- Refs ---
   const cameraRef = useRef(null);
@@ -66,32 +67,39 @@ const CameraSearchScreen = () => {
   const focusAreaHeight = useRef(new Animated.Value(PREVIEW_SIZE)).current;
   const focusIndicatorOpacity = useRef(new Animated.Value(0)).current;
   const focusIndicatorScale = useRef(new Animated.Value(1.2)).current;
+  const isMounted = useRef(true);
 
   // --- Derived State ---
   const isPrescriptionMode = activeIndex === 1;
   const device = useCameraDevice(cameraPosition);
-  
-  // 최적의 카메라 포맷 선택
-  const optimalFormat = useMemo(() => {
-    if (!device?.formats) return null;
-    
-    // 자동 포커스 지원 포맷 중 해상도가 높은 포맷 선택
-    const autoFocusFormats = device.formats.filter(format => 
-      format.autoFocusSystem === 'phase-detection' || 
-      format.autoFocusSystem === 'contrast-detection'
-    );
-    
-    if (autoFocusFormats.length > 0) {
-      // 해상도 기준으로 정렬 (높은 것 우선)
-      return autoFocusFormats.sort((a, b) => {
-        const aResolution = a.photoWidth * a.photoHeight;
-        const bResolution = b.photoWidth * b.photoHeight;
-        return bResolution - aResolution;
-      })[0]; // 가장 높은 해상도 선택
+
+  // --- Clean up on unmount ---
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      
+      // Cleanup animation values to avoid memory leaks
+      translateX.stopAnimation();
+      focusAreaHeight.stopAnimation();
+      focusIndicatorOpacity.stopAnimation();
+      focusIndicatorScale.stopAnimation();
+    };
+  }, []);
+
+  // Manage camera active state based on screen focus
+  useEffect(() => {
+    if (isFocused && hasPermission) {
+      // Start camera when screen is focused
+      InteractionManager.runAfterInteractions(() => {
+        if (isMounted.current) {
+          setIsCameraActive(true);
+        }
+      });
+    } else {
+      // Stop camera when screen loses focus
+      setIsCameraActive(false);
     }
-    
-    return null;
-  }, [device?.formats]);
+  }, [isFocused, hasPermission]);
 
   // --- Permission Handling ---
   const checkAndRequestCameraPermission = useCallback(async () => {
@@ -100,7 +108,7 @@ const CameraSearchScreen = () => {
     console.log('Requesting camera permission...');
     const granted = await requestPermission();
     
-    if (!granted) {
+    if (!granted && isMounted.current) {
       Alert.alert(
         '카메라 권한 필요',
         '사진 검색을 위해 카메라 권한이 필요합니다. 설정에서 권한을 활성화해 주세요.',
@@ -131,17 +139,16 @@ const CameraSearchScreen = () => {
 
   // --- Event Handlers ---
   const handleGoBack = useCallback(() => {
-    // 처리 중이면 뒤로가기 동작 막기
-    if (isProcessing) return;
+    // Disable camera before navigation
+    setIsCameraActive(false);
     
-    // 화면 전환 애니메이션 적용
-    const backOptions = {
-      animation: 'slide_from_left', // 왼쪽에서 슬라이드 (기본 뒤로가기 애니메이션)
-      duration: 300, // 애니메이션 시간 (300ms)
-    };
-    
-    navigation.goBack(backOptions);
-  }, [navigation, isProcessing]);
+    // Use setTimeout to ensure camera is properly released before navigation
+    setTimeout(() => {
+      if (isMounted.current) {
+        navigation.goBack();
+      }
+    }, 50);
+  }, [navigation]);
 
   const toggleFlash = useCallback(() => {
     setFlash(prev => (prev === 'off' ? 'on' : 'off'));
@@ -157,19 +164,21 @@ const CameraSearchScreen = () => {
       Animated.spring(focusAreaHeight, {
         toValue: targetHeight,
         useNativeDriver: false,
+        friction: 8,
+        tension: 50,
       }),
       Animated.spring(translateX, {
         toValue: targetTranslateX,
         useNativeDriver: true,
+        friction: 8,
+        tension: 50,
       }),
     ]).start();
   }, [focusAreaHeight, translateX]);
 
   const openGallery = useCallback(async () => {
-    // 이미 처리 중인 경우 중복 실행 방지
     if (isProcessing) return;
     
-    // 갤러리 열기 전 처리 중 상태로 변경
     setIsProcessing(true);
     
     try {
@@ -182,122 +191,104 @@ const CameraSearchScreen = () => {
         quality: 0.9,
       });
 
+      if (!isMounted.current) return;
+
       if (result.didCancel) {
         console.log('User cancelled image picker');
-        setIsProcessing(false); // 취소 시 처리 상태 해제
       } else if (result.errorCode) {
         console.error('ImagePicker Error: ', result.errorMessage);
-        setIsProcessing(false); // 오류 시 처리 상태 해제
         Alert.alert('오류', '갤러리를 여는 데 실패했습니다.');
       } else if (result.assets && result.assets.length > 0 && result.assets[0].uri) {
-        // 이미지 선택 완료 후 잠시 로딩 상태 유지 (자연스러운 전환을 위해)
-        setTimeout(() => {
-          setIsProcessing(false); // 처리 상태 해제
-          navigation.navigate('PhotoPreview', {
-            photoUri: result.assets[0].uri,
-            // 화면 전환 애니메이션 설정
-            transitionAnimation: {
-              animation: 'slide_from_right',
-              duration: 350,
-            },
-          });
-        }, 200);
+        setIsCameraActive(false);
+        
+        // Use interaction manager to improve transition performance
+        InteractionManager.runAfterInteractions(() => {
+          if (isMounted.current) {
+            navigation.navigate('PhotoPreview', {photoUri: result.assets[0].uri});
+          }
+        });
       }
     } catch (error) {
       console.error('갤러리 열기 실패:', error);
-      setIsProcessing(false); // 오류 시 처리 상태 해제
-      Alert.alert('오류', '갤러리를 여는 데 실패했습니다.');
+      if (isMounted.current) {
+        Alert.alert('오류', '갤러리를 여는 데 실패했습니다.');
+      }
+    } finally {
+      if (isMounted.current) {
+        setIsProcessing(false);
+      }
     }
   }, [navigation, isProcessing]);
 
   const handleCapture = useCallback(async () => {
-    if (!cameraRef.current || !hasPermission || !cameraLayout.width || !cameraLayout.height) {
+    if (isProcessing || !cameraRef.current || !hasPermission || !cameraLayout.width || !cameraLayout.height) {
       if (!hasPermission) {
         // 권한이 없는 상태에서 촬영 버튼 누르면 권한 요청
         const granted = await checkAndRequestCameraPermission();
         if (!granted) return;
+      } else if (isProcessing) {
+        return; // 이미 처리 중인 경우 중복 촬영 방지
       } else {
         Alert.alert('오류', '사진을 촬영할 준비가 되지 않았습니다.');
       }
       return;
     }
-    
-    // 이미 처리 중인 경우 중복 실행 방지
-    if (isProcessing) return;
-    
-    // 처리 중 상태로 변경 (UI에 로딩 표시 및 버튼 비활성화)
+
     setIsProcessing(true);
 
     try {
-      // 촬영 전 자동 포커스 맞추기 시도
-      if (autoFocus === 'on' && device?.supportsFocus) {
-        try {
-          // 화면 중앙에 포커스 맞추기
-          const centerPoint = {
-            x: Math.round(cameraLayout.width / 2),
-            y: Math.round(cameraLayout.height / 2),
-          };
-          await cameraRef.current.focus(centerPoint);
-          console.log('Auto focus applied before capture');
-        } catch (focusError) {
-          console.warn('Failed to auto-focus before capture:', focusError);
-          // 포커스 실패해도 계속 촬영 진행
+      console.log('Taking photo...');
+      const photo = await cameraRef.current.takePhoto({
+        qualityPrioritization: 'quality',
+        flash: flash,
+        enableAutoStabilization: true,
+        skipMetadata: false,
+      });
+      
+      if (!isMounted.current) return;
+      
+      console.log('Photo taken:', photo.path);
+
+      console.log('Cropping photo...');
+      const croppedUri = await cropCenterArea(photo.path, isPrescriptionMode, cameraLayout);
+      
+      if (!isMounted.current) return;
+      
+      console.log('Cropped URI:', croppedUri);
+
+      if (croppedUri) {
+        // 전환 전 카메라 비활성화
+        setIsCameraActive(false);
+        
+        // 무거운 작업 전에 UI 트랜잭션이 완료되도록 처리
+        InteractionManager.runAfterInteractions(() => {
+          if (isMounted.current) {
+            navigation.navigate('PhotoPreview', {
+              photoUri: croppedUri,
+            });
+          }
+        });
+      } else {
+        console.error('Photo cropping failed or returned null URI');
+        if (isMounted.current) {
+          Alert.alert('오류', '사진 처리 중 문제가 발생했습니다.');
         }
       }
-
-      // 잠시 지연 후 촬영 (포커스가 적용될 시간)
-      setTimeout(async () => {
-        try {
-          console.log('Taking photo...');
-          const photo = await cameraRef.current.takePhoto({
-            qualityPrioritization: 'quality',
-            flash: flash,
-            enableAutoStabilization: true,
-            skipMetadata: false,
-            // 물체에 가까이 갈수록 매크로 모드 활성화
-            photoCodec: 'jpeg',
-            quality: 90, // 높은 품질
-          });
-          console.log('Photo taken:', photo.path);
-
-          console.log('Cropping photo...');
-          const croppedUri = await cropCenterArea(photo.path, isPrescriptionMode, cameraLayout);
-          console.log('Cropped URI:', croppedUri);
-
-          if (croppedUri) {
-            // 잠시 지연 후 화면 전환하여 처리가 완료된 느낌을 줌
-            setTimeout(() => {
-              setIsProcessing(false); // 처리 완료
-              navigation.navigate('PhotoPreview', {
-                photoUri: croppedUri,
-                // 화면 전환 애니메이션 설정
-                transitionAnimation: {
-                  animation: 'slide_from_right',
-                  duration: 350,
-                },
-              });
-            }, 200);
-          } else {
-            console.error('Photo cropping failed or returned null URI');
-            setIsProcessing(false); // 처리 완료
-            Alert.alert('오류', '사진 처리 중 문제가 발생했습니다.');
-          }
-        } catch (photoError) {
-          console.error('Failed to take photo:', photoError);
-          setIsProcessing(false); // 처리 완료
-          if (photoError.message.includes('permission')) {
-            Alert.alert('오류', '카메라 접근 권한 문제로 촬영에 실패했습니다.');
-          } else {
-            Alert.alert('오류', '사진 촬영 중 오류가 발생했습니다.');
-          }
-        }
-      }, 300); // 포커스 적용 시간 300ms
     } catch (error) {
-      console.error('Failed during capture preparation:', error);
-      setIsProcessing(false); // 처리 완료
-      Alert.alert('오류', '사진 촬영 준비 중 오류가 발생했습니다.');
+      console.error('Failed to take photo:', error);
+      if (isMounted.current) {
+        if (error.message && error.message.includes('permission')) {
+          Alert.alert('오류', '카메라 접근 권한 문제로 촬영에 실패했습니다.');
+        } else {
+          Alert.alert('오류', '사진 촬영 중 오류가 발생했습니다.');
+        }
+      }
+    } finally {
+      if (isMounted.current) {
+        setIsProcessing(false);
+      }
     }
-  }, [hasPermission, cameraLayout, flash, isPrescriptionMode, navigation, checkAndRequestCameraPermission, autoFocus, device?.supportsFocus, isProcessing]);
+  }, [hasPermission, isProcessing, cameraLayout, flash, isPrescriptionMode, navigation, checkAndRequestCameraPermission]);
 
   const animateFocusIndicator = useCallback(() => {
     setShowFocusIndicator(true);
@@ -319,7 +310,9 @@ const CameraSearchScreen = () => {
         }),
       ]),
     ]).start(() => {
-      setShowFocusIndicator(false);
+      if (isMounted.current) {
+        setShowFocusIndicator(false);
+      }
     });
   }, [focusIndicatorOpacity, focusIndicatorScale]);
 
@@ -330,9 +323,6 @@ const CameraSearchScreen = () => {
     }
 
     try {
-      // 자동 포커스를 일시적으로 비활성화하고 수동 포커스로 전환
-      setAutoFocus('off');
-      
       const {locationX, locationY} = event.nativeEvent;
       const point = {
         x: Math.round(locationX),
@@ -343,19 +333,11 @@ const CameraSearchScreen = () => {
       setFocusPoint(point);
       animateFocusIndicator();
 
-      // 터치한 포인트에 포커스 맞추기 
       await cameraRef.current.focus(point);
       console.log('Focus successful');
-      
-      // 3초 후에 자동 포커스 다시 활성화 (선택적)
-      setTimeout(() => {
-        setAutoFocus('on');
-      }, 3000);
 
     } catch (error) {
       console.error('Failed to focus:', error);
-      // 포커스 실패 시 자동 포커스로 복귀
-      setAutoFocus('on');
     }
   }, [isFocused, device?.supportsFocus, animateFocusIndicator]);
 
@@ -411,12 +393,8 @@ const CameraSearchScreen = () => {
       {/* Header */}
       <Header>
         <HeaderTopRow>
-          <HeaderButtonWrapper 
-            onPress={handleGoBack} 
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-            disabled={isProcessing}
-          >
-            <HeaderButton style={isProcessing ? {opacity: 0.5} : null}>
+          <HeaderButtonWrapper onPress={handleGoBack} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} disabled={isProcessing}>
+            <HeaderButton>
               <HeaderIcons.chevron
                 width={20}
                 height={20}
@@ -425,64 +403,36 @@ const CameraSearchScreen = () => {
             </HeaderButton>
           </HeaderButtonWrapper>
           <Title>사진으로 검색하기</Title>
-          <View style={{flexDirection: 'row'}}>
-            {/* 자동 포커스 토글 버튼 추가 */}
-            <HeaderButtonWrapper 
-              onPress={() => !isProcessing && setAutoFocus(prev => prev === 'on' ? 'off' : 'on')} 
-              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-              style={{marginRight: 10}}
-              disabled={isProcessing}
-            >
-              <HeaderButton
+          <HeaderButtonWrapper onPress={toggleFlash} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} disabled={isProcessing}>
+            <HeaderButton
+              style={{
+                backgroundColor: flash === 'on' ? 'rgba(255, 215, 0, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+              }}>
+              <CameraIcons.flash
+                width={24}
+                height={24}
                 style={{
-                  backgroundColor: autoFocus === 'on' ? 'rgba(0, 150, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-                  opacity: isProcessing ? 0.5 : 1,
-                }}>
-                <MaterialCommunityIcons
-                  name={autoFocus === 'on' ? 'focus-auto' : 'focus-field'}
-                  size={20}
-                  color={autoFocus === 'on' ? '#00BFFF' : themes.light.textColor.buttonText}
-                />
-              </HeaderButton>
-            </HeaderButtonWrapper>
-            
-            {/* 플래시 버튼 */}
-            <HeaderButtonWrapper 
-              onPress={toggleFlash} 
-              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-              disabled={isProcessing}
-            >
-              <HeaderButton
-                style={{
-                  backgroundColor: flash === 'on' ? 'rgba(255, 215, 0, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-                  opacity: isProcessing ? 0.5 : 1,
-                }}>
-                <CameraIcons.flash
-                  width={24}
-                  height={24}
-                  style={{
-                    color: flash === 'on' ? '#FFD700' : themes.light.textColor.buttonText,
-                  }}
-                />
-              </HeaderButton>
-            </HeaderButtonWrapper>
-          </View>
+                  color: flash === 'on' ? '#FFD700' : themes.light.textColor.buttonText,
+                }}
+              />
+            </HeaderButton>
+          </HeaderButtonWrapper>
         </HeaderTopRow>
 
         <HeaderBottomRow>
-          <ToggleContainer style={isProcessing ? {opacity: 0.5} : null}>
+          <ToggleContainer>
             <Animated.View
               style={[
                 styles.toggleBackground,
                 { transform: [{ translateX }] },
               ]}
             />
-            <ToggleOption onPress={() => !isProcessing && handleToggle(0)} disabled={isProcessing}>
+            <ToggleOption onPress={() => handleToggle(0)} disabled={isProcessing}>
               <ToggleButton>
                 <ToggleText isActive={activeIndex === 0}>알약 촬영</ToggleText>
               </ToggleButton>
             </ToggleOption>
-            <ToggleOption onPress={() => !isProcessing && handleToggle(1)} disabled={isProcessing}>
+            <ToggleOption onPress={() => handleToggle(1)} disabled={isProcessing}>
               <ToggleButton>
                 <ToggleText isActive={activeIndex === 1}>처방전 촬영</ToggleText>
               </ToggleButton>
@@ -503,21 +453,25 @@ const CameraSearchScreen = () => {
             ref={cameraRef}
             style={StyleSheet.absoluteFill}
             device={device}
-            isActive={isFocused}
+            isActive={isFocused && isCameraActive}
             photo={true}
             audio={false}
-            enableZoomGesture={true} // 줌 제스처 활성화
+            enableZoomGesture={false}
             enableHighQualityPhotos={true}
             onLayout={onCameraLayout}
             orientation="portrait"
             torch={flash === 'on' ? 'on' : 'off'}
-            focusMode={autoFocus} // 자동 포커스 설정 적용
-            minZoom={device.minZoom}
-            maxZoom={device.maxZoom}
-            format={optimalFormat} // 최적화된 포맷 사용
+            preset="photo"
           />
         )}
       </TouchableOpacity>
+
+      {/* Processing Indicator */}
+      {isProcessing && (
+        <View style={styles.processingOverlay}>
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      )}
 
       {/* Focus Indicator */}
       {showFocusIndicator && focusPoint && (
@@ -576,18 +530,10 @@ const CameraSearchScreen = () => {
         pointerEvents="none"
       />
 
-      {/* Processing Overlay - 사진 처리 중 표시 */}
-      {isProcessing && (
-        <View style={styles.processingOverlay}>
-          <ActivityIndicator size="large" color="white" />
-          <Text style={styles.processingText}>사진 처리 중...</Text>
-        </View>
-      )}
-      
       {/* Bottom UI (Hint, Buttons) */}
-      <BottomContainer pointerEvents={isProcessing ? "none" : "box-none"}>
+      <BottomContainer pointerEvents="box-none">
         {/* Hint (Pill mode only) */}
-        {!isPrescriptionMode && !isProcessing && (
+        {!isPrescriptionMode && (
           <Animated.View style={{opacity: activeIndex === 0 ? 1 : 0, marginBottom: 25}}>
             <Hint>
               <HintIconWrapper>
@@ -613,24 +559,27 @@ const CameraSearchScreen = () => {
             <MaterialCommunityIcons 
               name="image" 
               size={28} 
-              color={isProcessing ? "rgba(255, 255, 255, 0.5)" : "#fff"} 
+              color={isProcessing ? "rgba(255,255,255,0.5)" : "#fff"} 
             />
           </ButtonItem>
-          <CaptureButton onPress={handleCapture} disabled={isProcessing}>
-            <CaptureButtonInner style={isProcessing ? {opacity: 0.7} : null} />
+          <CaptureButton 
+            onPress={handleCapture} 
+            disabled={isProcessing}
+            style={isProcessing ? {opacity: 0.7} : {}}
+          >
+            <CaptureButtonInner />
           </CaptureButton>
           <ButtonItem
             onPress={() => {
-              if (!isProcessing) {
-                setCameraPosition(prev => (prev === 'back' ? 'front' : 'back'));
-              }
-            }}>
+              setCameraPosition(prev => (prev === 'back' ? 'front' : 'back'));
+            }}
+            disabled={isProcessing}>
             <CameraIcons.cameraSwitch
               width={28}
               height={28}
               style={{
                 color: isProcessing 
-                  ? "rgba(255, 255, 255, 0.5)" 
+                  ? "rgba(255,255,255,0.5)" 
                   : themes.light.textColor.buttonText
               }}
             />
@@ -689,16 +638,10 @@ const styles = StyleSheet.create({
   },
   processingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 100,
-  },
-  processingText: {
-    color: 'white',
-    fontSize: 16,
-    marginTop: 15,
-    fontFamily: 'Pretendard-Medium',
   },
 });
 
@@ -857,7 +800,6 @@ const CaptureButton = styled.TouchableOpacity`
   background-color: rgba(255, 255, 255, 0.2);
   justify-content: center;
   align-items: center;
-  opacity: ${props => props.disabled ? 0.7 : 1};
 `;
 
 const CaptureButtonInner = styled.View`
