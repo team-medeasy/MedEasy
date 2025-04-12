@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components/native';
 import { Platform, Keyboard, View, Text, ActivityIndicator } from 'react-native';
 import { themes } from './../../styles';
@@ -21,16 +21,31 @@ const AddMedicineRoutine = ({navigation}) => {
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+
+  const [loadingTimer, setLoadingTimer] = useState(null);
+  const loadingTimerRef = useRef(null);
   
   const [originalResponseData, setOriginalResponseData] = useState([]);
 
   // 검색 결과 가져오기
-const fetchSearchResults = async (isLoadMore = false) => {
+  const fetchSearchResults = async (isLoadMore = false) => {
     if (!isLoadMore) {
+      // 기존 타이머가 있다면 정리
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+      }
+      
+      // 400ms 후에 로딩 상태를 true로 설정하는 타이머 생성
+      const timer = setTimeout(() => {
+        setLoading(true);
+      }, 400);
+      
+      setLoadingTimer(timer);
+      loadingTimerRef.current = timer;
+      
       setPage(0);
       setHasMore(true);
-      setHasSearched(true); 
-      setLoading(true);
+      setHasSearched(true);
     }
   
     try {
@@ -109,7 +124,14 @@ const fetchSearchResults = async (isLoadMore = false) => {
         setNoResults(true);
       }
     } finally {
-      setLoading(false);
+      if (!isLoadMore) {
+        // 타이머가 있다면 정리
+        if (loadingTimerRef.current) {
+          clearTimeout(loadingTimerRef.current);
+          loadingTimerRef.current = null;
+        }
+        setLoading(false);
+      }
       setLoadingMore(false);
     }
   };
@@ -147,6 +169,62 @@ const fetchSearchResults = async (isLoadMore = false) => {
     });
   };
 
+  const renderContent = () => {
+    // 로딩 중일 때
+    if (loading) {
+      return (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <ActivityIndicator 
+            size="large" 
+            color={themes.light.pointColor.Primary} />
+          <Text>검색 중...</Text>
+        </View>
+      );
+    }
+    
+    // 검색이 시작되었지만 아직 로딩 중이 아닌 상태 처리
+    if (loadingTimerRef.current && hasSearched && !loading) {
+      // 이전 결과를 유지하거나 빈 화면 표시
+      return (
+        <View style={{flex: 1}}>
+          {searchResults.length > 0 ? (
+            <SearchResultsList
+              searchResults={searchResults}
+              handleSearchResultPress={handleSearchResultPress}
+              onEndReached={handleLoadMore}
+              onEndReachedThreshold={0.5}
+              refreshing={loadingMore}
+            />
+          ) : null}
+        </View>
+      );
+    }
+    
+    // 검색 완료 후 결과가 없을 때
+    if (hasSearched && (noResults || searchResults.length === 0)) {
+      return <NoSearchResults />;
+    }
+    
+    // 검색 완료 후 결과가 있을 때
+    if (hasSearched) {
+      return (
+        <SearchResultsList
+          searchResults={searchResults}
+          handleSearchResultPress={handleSearchResultPress}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          refreshing={loadingMore}
+        />
+      );
+    }
+    
+    // 초기 상태
+    return (
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      </View>
+    );
+  };
+
   return (
     <Container>
       <ModalHeader>루틴 추가</ModalHeader>
@@ -165,28 +243,7 @@ const fetchSearchResults = async (isLoadMore = false) => {
       </HeaderContainer>
 
       <SearchResultContainer>
-        {loading ? (
-          <View style={{flex: 1 ,alignItems: 'center', justifyContent: 'center'}}>
-            <ActivityIndicator 
-              size="large" 
-              color={themes.light.pointColor.Primary} />
-            <Text>검색 중...</Text>
-          </View>
-        ) : hasSearched && (noResults || searchResults.length === 0) ? (
-          <NoSearchResults />
-        ) : hasSearched ? (
-          <SearchResultsList
-            searchResults={searchResults}
-            handleSearchResultPress={handleSearchResultPress}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            refreshing={loadingMore}
-          />
-        ) : (
-          // 초기 상태
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          </View>
-        )}
+        {renderContent()}
       </SearchResultContainer>
     </Container>
   );
