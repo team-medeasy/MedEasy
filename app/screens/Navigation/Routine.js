@@ -127,7 +127,6 @@ const Routine = ({ route }) => {
           [checkKey]: newCheckState,
         };
         
-        // 토글된 상태값을 API에 전달
         checkRoutine({ 
           routine_id: routineMedicineId, 
           is_taken: newCheckState 
@@ -138,7 +137,7 @@ const Routine = ({ route }) => {
         return newState;
       });
     } else {
-      console.error(`routine_medicine_id not found for date: ${dateKey}, time: ${time}, medicine: ${medicineId}`);
+      console.error(`routine_id not found for date: ${dateKey}, time: ${time}, medicine: ${medicineId}`);
     }
   };
 
@@ -168,15 +167,19 @@ const Routine = ({ route }) => {
   
     // 해당 시간대의 모든 약물 체크 상태를 변경
     const updatedChecks = {...checkedItems};
+
     medicinesForTime.forEach(medicine => {
       const checkKey = `${dateKey}-${time}-${medicine.medicine_id}`;
       updatedChecks[checkKey] = !allChecked;
       
       const routineMedicineId = routineMedicineMap[dateKey]?.[time]?.[medicine.medicine_id];
       if (routineMedicineId) {
-        {/* 한번에 모든 약물 복용 체크 변경하기 로직 추가 */}
-        // 예시: updateMedicineStatus(routineMedicineId, !allChecked);
-        // console.log(`Update routine_medicine_id: ${routineMedicineId} to status: ${!allChecked}`);
+        checkRoutine({ 
+          routine_id: routineMedicineId, 
+          is_taken: !allChecked 
+        });
+        
+        console.log(`📝 시간대 일괄 체크: ${routineMedicineId}의 상태 ${!allChecked}로 변경`);
       }
     });
   
