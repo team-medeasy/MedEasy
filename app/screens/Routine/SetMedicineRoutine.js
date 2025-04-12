@@ -75,22 +75,22 @@ const SetMedicineRoutine = ({ route, navigation }) => {
         const medicineIdMap = {};
 
         data.forEach(({ user_schedule_dtos }) => {
-          user_schedule_dtos.forEach(({ routine_medicine_dtos }) => {
-            routine_medicine_dtos.forEach(({ medicine_id, routine_medicine_id }) => {
+          user_schedule_dtos.forEach(({ routine_dtos }) => {
+            routine_dtos.forEach(({ medicine_id, routine_id }) => {
               if (!medicineIdMap[medicine_id]) {
                 medicineIdMap[medicine_id] = [];
               }
-              medicineIdMap[medicine_id].push(routine_medicine_id);
+              medicineIdMap[medicine_id].push(routine_id);
             });
           });
         });
 
-        console.log('routine_medicine_id 목록:', medicineIdMap);
+        console.log('routine_id 목록:', medicineIdMap);
 
         const relatedRoutineIds = medicineIdMap[medicineId] || [];
         setRelatedRoutineIds(relatedRoutineIds);
 
-        console.log(`'${medicineId}'에 해당하는 routine_medicine_id 목록:`, relatedRoutineIds);
+        console.log(`'${medicineId}'에 해당하는 routine_id 목록:`, relatedRoutineIds);
 
       } catch (error) {
         console.error('루틴 데이터 불러오기 실패:', error);

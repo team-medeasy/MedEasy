@@ -129,7 +129,7 @@ const Routine = ({ route }) => {
         
         // 토글된 상태값을 API에 전달
         checkRoutine({ 
-          routine_medicine_id: routineMedicineId, 
+          routine_id: routineMedicineId, 
           is_taken: newCheckState 
         });
         
@@ -248,9 +248,9 @@ const Routine = ({ route }) => {
           routineMap[dateKey][timeType] = {};
         }
   
-        schedule.routine_medicine_dtos?.forEach(medicine => {
+        schedule.routine_dtos?.forEach(medicine => {
           const checkKey = `${dateKey}-${timeType}-${medicine.medicine_id}`;
-          routineMap[dateKey][timeType][medicine.medicine_id] = medicine.routine_medicine_id;
+          routineMap[dateKey][timeType][medicine.medicine_id] = medicine.routine_id;
           checkedMap[checkKey] = medicine.is_taken;
         });
       });
@@ -322,10 +322,10 @@ const Routine = ({ route }) => {
 
         // 해당 스케줄의 약물 정보 처리
         if (
-          schedule.routine_medicine_dtos &&
-          schedule.routine_medicine_dtos.length > 0
+          schedule.routine_dtos &&
+          schedule.routine_dtos.length > 0
         ) {
-          schedule.routine_medicine_dtos.forEach(medicine => {
+          schedule.routine_dtos.forEach(medicine => {
             const medicineId = parseInt(medicine.medicine_id);
 
             // 약물이 맵에 없으면 초기화

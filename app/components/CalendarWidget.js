@@ -57,14 +57,14 @@ const CalendarWidget = ({
         
         // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
         const hasRoutineMedicines = item.user_schedule_dtos.some(schedule => 
-          schedule.routine_medicine_dtos.length > 0
+          schedule.routine_dtos.length > 0
         );
     
         if (hasRoutineMedicines) {
           // 모든 약이 복용 완료되었는지 확인
           const allTaken = item.user_schedule_dtos.every(schedule => 
-            schedule.routine_medicine_dtos.length === 0 || 
-            schedule.routine_medicine_dtos.every(medicine => medicine.is_taken)
+            schedule.routine_dtos.length === 0 || 
+            schedule.routine_dtos.every(medicine => medicine.is_taken)
           );
           
           acc[dateString] = {
