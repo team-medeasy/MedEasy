@@ -107,7 +107,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
         console.log('💊등록된 약 id 리스트: ', medicine_ids);
         console.log('현재 약 id: ', medicine.item_id);
 
-        if (medicine_ids && medicine_ids.includes(Number(medicine.item_id))) {
+        if (medicine_ids && medicine_ids.includes(String(medicine.item_id))) {
           setIsRegistered(true);
           console.log('📝 등록된 약입니다.');
         } else {
