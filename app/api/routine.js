@@ -7,7 +7,7 @@ export const registerOcrRoutine = data => api.post('/routine/ocr', data);
 export const checkRoutine = data =>
     api.patch('/routine/check', null, {
       params: {
-        routine_medicine_id: data.routine_medicine_id,
+        routine_id: data.routine_id,
         is_taken: data.is_taken,
       },
     });
