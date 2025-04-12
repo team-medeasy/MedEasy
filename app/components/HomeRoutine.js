@@ -13,7 +13,7 @@ const HomeRoutine = ({ schedules }) => {
     useEffect(() => {
         // 약이 있는 스케줄만 필터링
         const medicineSchedules = schedules.filter(schedule => 
-            schedule.routine_medicine_dtos.length > 0
+            schedule.routine_dtos.length > 0
         );
         setRoutineSchedules(medicineSchedules);
     }, [schedules]);
@@ -41,8 +41,8 @@ const HomeRoutine = ({ schedules }) => {
                 nestedScrollEnabled={true}
                 showsVerticalScrollIndicator={false}
             >
-                {item.routine_medicine_dtos.map((medicine) => (
-                    <MedicineItem key={medicine.routine_medicine_id}>
+                {item.routine_dtos.map((medicine) => (
+                    <MedicineItem key={medicine.routine_id}>
                         {medicine.is_taken ? <FilledCircle /> : <EmptyCircle />}
                         <MedicineText>
                             {medicine.nickname} {medicine.dose}정

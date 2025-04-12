@@ -76,13 +76,13 @@ const Home = () => {
                       : time.format('A h시 mm분');
                   return hourMinute.replace('AM', '오전').replace('PM', '오후');
                 })(),
-                medicines: schedule.routine_medicine_dtos.map(medicine => ({
+                medicines: schedule.routine_dtos.map(medicine => ({
                   name: medicine.nickname,
                   dose: medicine.dose,
                   isTaken: medicine.is_taken,
                 })),
                 medicineTitle: (() => {
-                  const medicineNames = schedule.routine_medicine_dtos.map(
+                  const medicineNames = schedule.routine_dtos.map(
                     med => med.nickname,
                   );
                   if (medicineNames.length === 1) {
@@ -132,8 +132,8 @@ const Home = () => {
           if (todayRoutines.length > 0) {
             const hasMedicines = todayRoutines[0].user_schedule_dtos.some(
               schedule =>
-                schedule.routine_medicine_dtos &&
-                schedule.routine_medicine_dtos.length > 0,
+                schedule.routine_dtos &&
+                schedule.routine_dtos.length > 0,
             );
 
             if (hasMedicines) {
