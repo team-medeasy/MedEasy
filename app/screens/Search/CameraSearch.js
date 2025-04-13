@@ -265,6 +265,7 @@ const CameraSearchScreen = () => {
           if (isMounted.current) {
             navigation.navigate('PhotoPreview', {
               photoUri: croppedUri,
+              isPrescription: isPrescriptionMode
             });
           }
         });

@@ -16,7 +16,7 @@ import ImageSize from 'react-native-image-size';
 const { width, height } = Dimensions.get('window');
 
 const PhotoPreviewScreen = ({route}) => {
-  const {photoUri, isModal = false} = route.params || {};
+  const {photoUri, isModal = false, isPrescription = false} = route.params || {};
   const [photo, setPhoto] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [imageSize, setImageSize] = useState(null);
@@ -115,15 +115,28 @@ const PhotoPreviewScreen = ({route}) => {
   const handleNavigateToSearch = () => {
     if (!photo) return;
 
-    navigation.navigate('CameraSearchResults', {
-      photoUri: photo,
-    });
+    if (isPrescription) {
+      // 처방전 모드인 경우 처방전 분석 결과 화면으로 이동
+      navigation.navigate('PrescriptionSearchResults', {
+        photoUri: photo,
+      });
+    } else {
+      // 알약 모드인 경우 기존 검색 결과 화면으로 이동
+      navigation.navigate('CameraSearchResults', {
+        photoUri: photo,
+      });
+    }
   };
 
   return (
     <Container>
       <StatusBar barStyle="dark-content" backgroundColor={themes.light.bgColor.bgPrimary} />
-      <HeaderComponent isModal={isModal}>사진 미리보기</HeaderComponent>
+      <HeaderComponent 
+        isModal={isModal} 
+        onBackPress={() => navigation.goBack()}
+      >
+        {isPrescription ? '처방전 미리보기' : '사진 미리보기'}
+      </HeaderComponent>
 
       <ContentContainer>
         {isLoading ? (
@@ -150,7 +163,7 @@ const PhotoPreviewScreen = ({route}) => {
 
       <ButtonContainer>
         <Button 
-          title="검색하기" 
+          title={isPrescription ? "처방전 분석하기" : "검색하기"} 
           onPress={handleNavigateToSearch} 
           disabled={isLoading || !photo}
         />

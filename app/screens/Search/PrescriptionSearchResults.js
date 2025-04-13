@@ -1,225 +1,360 @@
 import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  FlatList,
+} from 'react-native';
 import styled from 'styled-components/native';
-import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import { themes } from './../../styles';
+import { themes } from '../../styles';
 import {
   Header,
-  PrescriptionSearchResultsList,
+  Button,
   NoSearchResults,
-  Button
 } from '../../components';
-import { searchMedicine } from '../../api/medicine';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { searchPrescriptionByImage } from '../../api/prescriptionSearch';
 
-const PrescriptionSearchResultsScreen = ({ navigation }) => {
-  const testSearchQuery = "술"; // 테스트용 검색어
+const PrescriptionSearchResultsScreen = ({ route, navigation }) => {
+  // 이미지 경로 가져오기
+  const { photoUri } = route.params || {};
   
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // 상태 관리
+  const [prescriptionData, setPrescriptionData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
-
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [dataSize, setDataSize] = useState(10);
-  const [allDataLoaded, setAllDataLoaded] = useState(false);
   
-  // API 응답 데이터를 저장할 상태 변수
-  const [originalResponseData, setOriginalResponseData] = useState([]);
-
-  // 검색 결과 가져오기
-  const fetchSearchResults = async (isLoadMore = false) => {
-    if (!isLoadMore) {
-      setLoading(true);
-      setDataSize(10); // 새 검색시 데이터 크기 초기화
-      setAllDataLoaded(false);
-    } else {
-      setLoadingMore(true);
+  // 처방전 분석 요청
+  const analyzePrescription = async () => {
+    if (!photoUri) {
+      setError('처방전 이미지가 없습니다.');
+      setLoading(false);
+      setNoResults(true);
+      return;
     }
+    
+    setLoading(true);
     setError(null);
-  
-    console.log('카메라 검색 요청 파라미터:', {
-      searchQuery: testSearchQuery,
-      size: isLoadMore ? dataSize + 10 : 10 // 데이터 크기 증가
-    });
-  
+    
     try {
-      // 기본 검색 실행
-      const requestParams = {
-        name: testSearchQuery,
-        size: isLoadMore ? dataSize + 10 : 10 // 로드 시마다 10개씩 증가
-      };
+      // API 호출
+      console.log('처방전 분석 요청:', photoUri);
+      const response = await searchPrescriptionByImage(photoUri);
       
-      console.log('검색 요청:', requestParams);
-      const response = await searchMedicine(requestParams);
-  
-      console.log('API 응답 전체:', response);
-  
-      // API 응답에서 데이터 추출
-      if (response.data && response.data.result && response.data.result.result_code === 200) {
-        console.log('API 응답 데이터:', response.data.body);
-  
-        // 이전 데이터 크기와 새 데이터 크기 비교하여 모든 데이터 로드 여부 확인
-        if (!response.data.body || response.data.body.length === 0) {
-          setNoResults(true);
-          setAllDataLoaded(true);
-          setSearchResults([]);
-        } else if (isLoadMore && response.data.body.length <= dataSize) {
-          // 추가 로드 요청했는데 데이터가 더 안 늘어났으면 모든 데이터 로드 완료
-          setAllDataLoaded(true);
-        }
-  
-        // 원본 응답 데이터 저장
-        setOriginalResponseData(response.data.body);
-  
-        // API 응답 데이터를 기존 앱 구조에 맞게 변환
-        const formattedResults = response.data.body.map((item, index) => {
-          const formatted = {
-            // 기본 정보
-            item_name: item.item_name,
-            entp_name: item.entp_name,
-            item_image: item.item_image,
-            class_name: item.class_name,
-            etc_otc_name: item.etc_otc_name,
-            // id
-            original_id: item.id,
-            uniqueKey: `${item.id}_${index}` // 고유 키 생성
-          };
-          return formatted;
-        });
-  
-        console.log('변환된 검색 결과:', formattedResults);
-  
-        // 검색 결과 설정
-        setSearchResults(formattedResults);
-        
-        // 데이터 크기 업데이트 (추가 로드인 경우)
-        if (isLoadMore) {
-          setDataSize(dataSize + 10);
-        }
-        
+      // 응답 데이터 처리
+      if (response.body && response.body.length > 0) {
+        console.log('처방전 분석 결과:', response.body);
+        setPrescriptionData(response.body);
         setNoResults(false);
       } else {
-        console.error('API 에러 응답:', response);
-        setError('검색 결과를 가져오는데 실패했습니다.');
+        console.log('처방전에서 약 정보를 찾을 수 없음');
         setNoResults(true);
+        setPrescriptionData([]);
       }
     } catch (err) {
-      console.error('검색 중 오류:', err);
-      if (err.response) {
-        console.error('에러 응답:', err.response.data);
-        console.error('에러 상태:', err.response.status);
-      } else if (err.request) {
-        console.error('요청 에러:', err.request);
-      } else {
-        console.error('에러 메시지:', err.message);
-      }
-      setError('검색 중 오류가 발생했습니다.');
+      console.error('처방전 분석 오류:', err);
+      setError('처방전 분석 중 오류가 발생했습니다.');
       setNoResults(true);
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
   };
-
-  // 스크롤 이벤트 핸들러
-  const handleLoadMore = () => {
-    if (!loading && !loadingMore && !allDataLoaded) {
-      fetchSearchResults(true);
-    }
-  };
-
-  // 컴포넌트 마운트 시 API 호출
+  
+  // 컴포넌트 마운트 시 처방전 분석 실행
   useEffect(() => {
-    fetchSearchResults(false);
-  }, []);
-
-  const handleSearchResultPress = item => {
-    // API 원본 데이터 찾기
-    const originalItem = originalResponseData.find(
-      originalItem => originalItem.id === item.original_id
-    );
+    analyzePrescription();
+  }, [photoUri]);
+  
+  // 약 상세 정보 페이지로 이동
+  const handleMedicinePress = (medicine) => {
+    navigation.navigate('MedicineDetail', { item: medicine });
+  };
+  
+  // 루틴 등록 처리
+  const handleRegisterRoutines = () => {
+    if (prescriptionData.length === 0) {
+      Alert.alert('알림', '등록할 약 정보가 없습니다.');
+      return;
+    }
     
-    // 원본 데이터 전달
-    navigation.navigate('MedicineDetail', { 
-      item: originalItem,
+    // 루틴 등록 요청 데이터 생성
+    const routineRequests = prescriptionData.map(medicine => ({
+      medicine_id: medicine.medicine_id,
+      nickname: medicine.medicine_name,
+      dose: medicine.dose,
+      total_quantity: medicine.total_quantity,
+      day_of_weeks: medicine.day_of_weeks,
+      // 추천된 스케줄만 필터링
+      user_schedule_ids: medicine.user_schedules
+        .filter(schedule => schedule.recommended)
+        .map(schedule => schedule.user_schedule_id)
+    }));
+    
+    // 루틴 등록 화면으로 이동
+    navigation.navigate('RoutineRegister', { 
+      routineRequests,
+      fromPrescription: true
     });
+  };
+  
+  // 처방전 내용 수정 화면으로 이동
+  const handleModifyContent = () => {
+    navigation.navigate('ModifyPrescription', {
+      prescriptionData
+    });
+  };
+
+  // 요일 표시 헬퍼 함수
+  const formatDayOfWeek = (dayNumbers) => {
+    if (!dayNumbers || dayNumbers.length === 0) return '매일';
+    if (dayNumbers.length === 7) return '매일';
+    
+    const days = ['월', '화', '수', '목', '금', '토', '일'];
+    return dayNumbers.map(day => days[day - 1]).join(', ');
+  };
+  
+  // 시간 포맷팅 함수
+  const formatTime = (timeObj) => {
+    if (!timeObj) return '';
+    
+    const hour = String(timeObj.hour).padStart(2, '0');
+    const minute = String(timeObj.minute).padStart(2, '0');
+    
+    return `${hour}:${minute}`;
+  };
+
+  // 처방전 검색 결과 렌더링 함수
+  const renderPrescriptionItem = ({ item, index }) => {
+    return (
+      <MedicineItem onPress={() => handleMedicinePress(item)}>
+        {/* 약 이미지 */}
+        <ImageContainer>
+          {item.image_url ? (
+            <MedicineImage source={{ uri: item.image_url }} />
+          ) : (
+            <NoImageContainer>
+              <NoImageText>이미지 없음</NoImageText>
+            </NoImageContainer>
+          )}
+        </ImageContainer>
+        
+        {/* 약 정보 */}
+        <InfoContainer>
+          <HeaderRow>
+            <MedicineName numberOfLines={1} ellipsizeMode="tail">
+              {item.medicine_name}
+            </MedicineName>
+            {item.etc_otc_name && (
+              <MedicineType>{item.etc_otc_name}</MedicineType>
+            )}
+          </HeaderRow>
+          
+          <CompanyName numberOfLines={1} ellipsizeMode="tail">
+            {item.entp_name}
+          </CompanyName>
+          
+          <DetailRow>
+            <DetailLabel>용량:</DetailLabel>
+            <DetailValue>{item.dose}정</DetailValue>
+          </DetailRow>
+          
+          <DetailRow>
+            <DetailLabel>총 수량:</DetailLabel>
+            <DetailValue>{item.total_quantity}정</DetailValue>
+          </DetailRow>
+          
+          <DetailRow>
+            <DetailLabel>복용 주기:</DetailLabel>
+            <DetailValue>{formatDayOfWeek(item.day_of_weeks)}</DetailValue>
+          </DetailRow>
+          
+          {/* 권장 복용 시간 */}
+          {item.user_schedules && item.user_schedules.length > 0 && (
+            <ScheduleSection>
+              <ScheduleLabel>권장 복용 시간:</ScheduleLabel>
+              <ScheduleList>
+                {item.user_schedules.map((schedule, idx) => (
+                  <ScheduleItem 
+                    key={`schedule-${idx}`} 
+                    isRecommended={schedule.recommended}
+                  >
+                    <ScheduleTime>{formatTime(schedule.take_time)}</ScheduleTime>
+                    <ScheduleName>{schedule.name}</ScheduleName>
+                    {schedule.recommended && (
+                      <RecommendBadge>권장</RecommendBadge>
+                    )}
+                  </ScheduleItem>
+                ))}
+              </ScheduleList>
+            </ScheduleSection>
+          )}
+        </InfoContainer>
+      </MedicineItem>
+    );
   };
 
   return (
     <Container>
-      <Header 
-        onBackPress={() => navigation.goBack()}
-      >약 검색 결과</Header>
-
-      <View style={{
-        paddingHorizontal: 30,
-        paddingTop: 40,
-        gap: 7,
-      }}>
-        <Text style={{
-           fontFamily: 'KimjungchulGothic-Bold', 
-           fontSize: FontSizes.title.default,
-           color: themes.light.textColor.textPrimary
-        }}>이대로 루틴을 등록할까요?</Text>
-        <Text style={{
-            fontFamily: 'Pretendard-Medium',
-            fontSize: FontSizes.body.default,
-            color: themes.light.textColor.Primary50
-        }}>메디지가 일정에 맞춰 복약 알림을 보내드릴게요!</Text>
-      </View>
-
-      <SearchResultContainer>
-        {loading ? (
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <ActivityIndicator size="large" color={themes.light.pointColor.Primary} />
-            <Text>검색 중...</Text>
-          </View>
-        ) : noResults || searchResults.length === 0 ? (
-          <NoSearchResults />
-        ) : (
-          <PrescriptionSearchResultsList
-            searchResults={searchResults}
-            handleSearchResultPress={handleSearchResultPress}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            refreshing={loadingMore}
-          />
-        )}
-      </SearchResultContainer>
-
-      <View style={{
-        position: 'absolute',
-        bottom: 0, left: 0, right: 0,
-        paddingTop: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
-        paddingBottom: 30,
-        gap: 20,
-        alignItems: 'center',
-        backgroundColor: themes.light.bgColor.bgPrimary
-      }}>
-        <Button title='확인' onPress={() => {}} />
-        <ModifyButton>
+      <Header onBackPress={() => navigation.goBack()}>
+        처방전 분석 결과
+      </Header>
+      
+      <ContentView>
+        <TitleSection>
+          <TitleText>이대로 루틴을 등록할까요?</TitleText>
+          <SubtitleText>메디지가 일정에 맞춰 복약 알림을 보내드릴게요!</SubtitleText>
+        </TitleSection>
+        
+        <ResultsContainer>
+          {loading ? (
+            <LoadingView>
+              <ActivityIndicator size="large" color={themes.light.pointColor.Primary} />
+              <LoadingText>처방전을 분석하고 있어요...</LoadingText>
+            </LoadingView>
+          ) : error ? (
+            <ErrorView>
+              <ErrorText>{error}</ErrorText>
+              <RetryButton onPress={analyzePrescription}>
+                <RetryText>다시 시도</RetryText>
+              </RetryButton>
+            </ErrorView>
+          ) : noResults ? (
+            <NoSearchResults 
+              message="처방전에서 약 정보를 찾을 수 없습니다."
+              subMessage="다른 각도나 밝은 환경에서 다시 촬영해보세요."
+            />
+          ) : (
+            <FlatList
+              data={prescriptionData}
+              renderItem={renderPrescriptionItem}
+              keyExtractor={(item, index) => `prescription-item-${index}`}
+              contentContainerStyle={styles.listContent}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+        </ResultsContainer>
+      </ContentView>
+      
+      <BottomButtonContainer>
+        <Button 
+          title="이대로 등록하기" 
+          onPress={handleRegisterRoutines}
+          disabled={loading || noResults || prescriptionData.length === 0}
+        />
+        <ModifyButton 
+          onPress={handleModifyContent}
+          disabled={loading || noResults || prescriptionData.length === 0}
+        >
           <ModifyText>내용을 수정하고 싶어요.</ModifyText>
         </ModifyButton>
-      </View>
+      </BottomButtonContainer>
     </Container>
   );
 };
 
+const styles = StyleSheet.create({
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 120,
+    paddingTop: 10,
+  },
+});
+
+// 스타일 컴포넌트
 const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-const SearchResultContainer = styled.View`
+const ContentView = styled.View`
   flex: 1;
-  margin-top: 37px;
-  margin-bottom: 120px;
-  background-color: ${themes.light.bgColor.bgPrimary};
+  padding-top: 20px;
 `;
 
-const ModifyButton = styled(TouchableOpacity)`
+const TitleSection = styled.View`
+  padding-horizontal: 30px;
+  margin-bottom: 30px;
+`;
+
+const TitleText = styled.Text`
+  font-family: 'KimjungchulGothic-Bold';
+  font-size: ${FontSizes.title.default};
+  color: ${themes.light.textColor.textPrimary};
+  margin-bottom: 5px;
+`;
+
+const SubtitleText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.Primary50};
+`;
+
+const ResultsContainer = styled.View`
+  flex: 1;
+  margin-bottom: 100px;
+`;
+
+const LoadingView = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+`;
+
+const LoadingText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.textSecondary};
+  margin-top: 15px;
+`;
+
+const ErrorView = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+`;
+
+const ErrorText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.textPrimary};
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const RetryButton = styled.TouchableOpacity`
+  background-color: ${themes.light.pointColor.Primary};
+  padding-vertical: 10px;
+  padding-horizontal: 20px;
+  border-radius: 8px;
+`;
+
+const RetryText = styled.Text`
+  font-family: 'Pretendard-Bold';
+  font-size: ${FontSizes.body.default};
+  color: white;
+`;
+
+const BottomButtonContainer = styled.View`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background-color: ${themes.light.bgColor.bgPrimary};
+  border-top-width: 1px;
+  border-top-color: ${themes.light.borderColor.BorderSecondary};
+  align-items: center;
+`;
+
+const ModifyButton = styled.TouchableOpacity`
+  margin-top: 15px;
+  opacity: ${props => props.disabled ? 0.5 : 1};
 `;
 
 const ModifyText = styled.Text`
@@ -227,7 +362,155 @@ const ModifyText = styled.Text`
   font-size: ${FontSizes.body.default};
   color: ${themes.light.textColor.Primary50};
   text-decoration: underline;
-  text-decoration-color: ${themes.light.textColor.Primary50}; 
+  text-decoration-color: ${themes.light.textColor.Primary50};
+`;
+
+// 약 아이템 스타일 컴포넌트
+const MedicineItem = styled.TouchableOpacity`
+  flex-direction: row;
+  background-color: ${themes.light.bgColor.bgSecondary};
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  elevation: 2;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+`;
+
+const ImageContainer = styled.View`
+  width: 80px;
+  height: 80px;
+  margin-right: 16px;
+`;
+
+const MedicineImage = styled.Image`
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+`;
+
+const NoImageContainer = styled.View`
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NoImageText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.caption.small};
+  color: ${themes.light.textColor.textTertiary};
+  text-align: center;
+`;
+
+const InfoContainer = styled.View`
+  flex: 1;
+`;
+
+const HeaderRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 4px;
+`;
+
+const MedicineName = styled.Text`
+  font-family: 'Pretendard-Bold';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.textPrimary};
+  flex: 1;
+`;
+
+const MedicineType = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.caption.small};
+  color: ${themes.light.pointColor.Primary};
+  background-color: ${themes.light.bgColor.bgTertiary};
+  padding-vertical: 2px;
+  padding-horizontal: 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+`;
+
+const CompanyName = styled.Text`
+  font-family: 'Pretendard-Regular';
+  font-size: ${FontSizes.caption.default};
+  color: ${themes.light.textColor.textSecondary};
+  margin-bottom: 10px;
+`;
+
+const DetailRow = styled.View`
+  flex-direction: row;
+  margin-bottom: 4px;
+`;
+
+const DetailLabel = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.caption.default};
+  color: ${themes.light.textColor.textTertiary};
+  width: 70px;
+`;
+
+const DetailValue = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.caption.default};
+  color: ${themes.light.textColor.textSecondary};
+  flex: 1;
+`;
+
+const ScheduleSection = styled.View`
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top-width: 1px;
+  border-top-color: ${themes.light.borderColor.BorderSecondary};
+`;
+
+const ScheduleLabel = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.caption.default};
+  color: ${themes.light.textColor.textTertiary};
+  margin-bottom: 8px;
+`;
+
+const ScheduleList = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+`;
+
+const ScheduleItem = styled.View`
+  flex-direction: row;
+  align-items: center;
+  background-color: ${props => props.isRecommended ? 'rgba(76, 175, 80, 0.1)' : themes.light.bgColor.bgTertiary};
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-right: 8px;
+  margin-bottom: 6px;
+  border-width: ${props => props.isRecommended ? '1px' : '0px'};
+  border-color: ${themes.light.pointColor.Secondary};
+`;
+
+const ScheduleTime = styled.Text`
+  font-family: 'Pretendard-Bold';
+  font-size: ${FontSizes.caption.default};
+  color: ${themes.light.textColor.textPrimary};
+`;
+
+const ScheduleName = styled.Text`
+  font-family: 'Pretendard-Regular';
+  font-size: ${FontSizes.caption.default};
+  color: ${themes.light.textColor.textSecondary};
+  margin-left: 5px;
+`;
+
+const RecommendBadge = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.caption.small};
+  color: ${themes.light.pointColor.Secondary};
+  margin-left: 5px;
 `;
 
 export default PrescriptionSearchResultsScreen;
