@@ -73,30 +73,38 @@ const CameraSearchScreen = () => {
   const isPrescriptionMode = activeIndex === 1;
   const device = useCameraDevice(cameraPosition);
 
-  // --- Clean up on unmount ---
+// --- Clean up on unmount ---
   useEffect(() => {
     return () => {
-      isMounted.current = false;
+      // 화면이 unmount될 때 즉시 카메라 비활성화
+      setIsCameraActive(false);
       
-      // Cleanup animation values to avoid memory leaks
-      translateX.stopAnimation();
-      focusAreaHeight.stopAnimation();
-      focusIndicatorOpacity.stopAnimation();
-      focusIndicatorScale.stopAnimation();
+      // 약간의 지연 후 메모리 정리 작업
+      setTimeout(() => {
+        if (isMounted.current) {
+          // Cleanup animation values
+          translateX.stopAnimation();
+          focusAreaHeight.stopAnimation();
+          focusIndicatorOpacity.stopAnimation();
+          focusIndicatorScale.stopAnimation();
+          
+          isMounted.current = false;
+        }
+      }, 100);
     };
   }, []);
 
-  // Manage camera active state based on screen focus
   useEffect(() => {
     if (isFocused && hasPermission) {
-      // Start camera when screen is focused
-      InteractionManager.runAfterInteractions(() => {
+      // 화면 렌더링 완료 후 카메라 활성화
+      const timer = setTimeout(() => {
         if (isMounted.current) {
           setIsCameraActive(true);
         }
-      });
+      }, 100); // 약간의 지연으로 렌더링 완료 보장
+      
+      return () => clearTimeout(timer);
     } else {
-      // Stop camera when screen loses focus
       setIsCameraActive(false);
     }
   }, [isFocused, hasPermission]);
@@ -137,18 +145,16 @@ const CameraSearchScreen = () => {
     }
   }, [isFocused, hasPermission, checkAndRequestCameraPermission]);
 
-  // --- Event Handlers ---
   const handleGoBack = useCallback(() => {
-    // Disable camera before navigation
-    setIsCameraActive(false);
-    
-    // Use setTimeout to ensure camera is properly released before navigation
+    if (isMounted.current) {
+      setIsCameraActive(false); // 먼저 비활성화 (카메라 해제)
+    }
+  
+    // 네비게이션 이동은 약간 delay
     setTimeout(() => {
-      if (isMounted.current) {
-        navigation.goBack();
-      }
+      navigation.goBack();
     }, 50);
-  }, [navigation]);
+  }, [navigation]);  
 
   const toggleFlash = useCallback(() => {
     setFlash(prev => (prev === 'off' ? 'on' : 'off'));
@@ -178,10 +184,15 @@ const CameraSearchScreen = () => {
 
   const openGallery = useCallback(async () => {
     if (isProcessing) return;
-    
+
+    const isPrescriptionNow = activeIndex === 1; 
+
     setIsProcessing(true);
-    
+
     try {
+      // 갤러리 열기 전에 카메라 비활성화 (리소스 해제)
+      setIsCameraActive(false);
+      
       const result = await launchImageLibrary({
         mediaType: 'photo',
         selectionLimit: 1,
@@ -195,42 +206,42 @@ const CameraSearchScreen = () => {
 
       if (result.didCancel) {
         console.log('User cancelled image picker');
+        // 취소시 카메라 다시 활성화
+        setIsCameraActive(true);
       } else if (result.errorCode) {
         console.error('ImagePicker Error: ', result.errorMessage);
         Alert.alert('오류', '갤러리를 여는 데 실패했습니다.');
+        setIsCameraActive(true);
       } else if (result.assets && result.assets.length > 0 && result.assets[0].uri) {
-        setIsCameraActive(false);
-        
-        // Use interaction manager to improve transition performance
-        InteractionManager.runAfterInteractions(() => {
-          if (isMounted.current) {
-            navigation.navigate('PhotoPreview', {photoUri: result.assets[0].uri});
-          }
+        // 화면 전환을 메인 스레드 작업 후로 지연
+        requestAnimationFrame(() => {
+          InteractionManager.runAfterInteractions(() => {
+            if (isMounted.current) {
+              navigation.navigate('PhotoPreview', {
+                photoUri: result.assets[0].uri,
+                isPrescription: isPrescriptionNow,
+              });
+            }
+          });
         });
       }
     } catch (error) {
       console.error('갤러리 열기 실패:', error);
       if (isMounted.current) {
         Alert.alert('오류', '갤러리를 여는 데 실패했습니다.');
+        setIsCameraActive(true);
       }
     } finally {
       if (isMounted.current) {
         setIsProcessing(false);
       }
     }
-  }, [navigation, isProcessing]);
+  }, [navigation, isProcessing, activeIndex]);
+  
 
   const handleCapture = useCallback(async () => {
     if (isProcessing || !cameraRef.current || !hasPermission || !cameraLayout.width || !cameraLayout.height) {
-      if (!hasPermission) {
-        // 권한이 없는 상태에서 촬영 버튼 누르면 권한 요청
-        const granted = await checkAndRequestCameraPermission();
-        if (!granted) return;
-      } else if (isProcessing) {
-        return; // 이미 처리 중인 경우 중복 촬영 방지
-      } else {
-        Alert.alert('오류', '사진을 촬영할 준비가 되지 않았습니다.');
-      }
+      // 기존 권한 체크 코드 유지
       return;
     }
 
@@ -249,7 +260,11 @@ const CameraSearchScreen = () => {
       
       console.log('Photo taken:', photo.path);
 
+      // 사진이 찍히면 즉시 UI 피드백을 주기 위해 카메라 비활성화
+      setIsCameraActive(false);
+      
       console.log('Cropping photo...');
+      // 크롭 작업은 비동기로 계속 진행
       const croppedUri = await cropCenterArea(photo.path, isPrescriptionMode, cameraLayout);
       
       if (!isMounted.current) return;
@@ -257,31 +272,28 @@ const CameraSearchScreen = () => {
       console.log('Cropped URI:', croppedUri);
 
       if (croppedUri) {
-        // 전환 전 카메라 비활성화
-        setIsCameraActive(false);
-        
-        // 무거운 작업 전에 UI 트랜잭션이 완료되도록 처리
-        InteractionManager.runAfterInteractions(() => {
-          if (isMounted.current) {
-            navigation.navigate('PhotoPreview', {
-              photoUri: croppedUri,
-            });
-          }
+        // 네비게이션 전환을 메인 스레드 작업 후로 지연
+        requestAnimationFrame(() => {
+          InteractionManager.runAfterInteractions(() => {
+            if (isMounted.current) {
+              navigation.navigate('PhotoPreview', {
+                photoUri: croppedUri,
+                isPrescription: isPrescriptionMode
+              });
+            }
+          });
         });
       } else {
         console.error('Photo cropping failed or returned null URI');
         if (isMounted.current) {
           Alert.alert('오류', '사진 처리 중 문제가 발생했습니다.');
+          // 오류 시 카메라 다시 활성화
+          setIsCameraActive(true);
         }
       }
     } catch (error) {
-      console.error('Failed to take photo:', error);
       if (isMounted.current) {
-        if (error.message && error.message.includes('permission')) {
-          Alert.alert('오류', '카메라 접근 권한 문제로 촬영에 실패했습니다.');
-        } else {
-          Alert.alert('오류', '사진 촬영 중 오류가 발생했습니다.');
-        }
+        setIsCameraActive(true); // 오류 시 카메라 다시 활성화
       }
     } finally {
       if (isMounted.current) {

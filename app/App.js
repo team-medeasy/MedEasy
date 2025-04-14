@@ -26,6 +26,7 @@ import SearchMedicineScreen from './screens/Search/SearchMedicine';
 import SearchMedicineResultsScreen from './screens/Search/SearchMedicineResults';
 import MedicineDetailScreen from './screens/Search/MedicineDetail';
 import MedicineImageDetailScreen from './screens/Search/MedicineImageDetail';
+import PrescriptionSearchResults from './screens/Search/PrescriptionSearchResults';
 import SettingStack from './screens/Settings/SettingStack';
 import NotificationScreen from './screens/Notification';
 import AddMedicineRoutineScreen from './screens/Routine/AddMedicineRoutine';
@@ -266,6 +267,10 @@ const App = () => {
               <RootStack.Screen
                 name="MedicineImageDetail"
                 component={MedicineImageDetailScreen}
+              />
+              <RootStack.Screen
+                name="PrescriptionSearchResults"
+                component={PrescriptionSearchResults}
               />
               <RootStack.Screen
                 name="Notification"
