@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, Text, TouchableOpacity, Alert } from 'react-native';
 import { themes } from './../../styles';
 import {
   Header,
@@ -8,7 +8,8 @@ import {
   NoSearchResults,
   Button
 } from '../../components';
-import { searchPrescriptionByImage } from '../../api/prescriptionSearch'; // 두 번째 파일의 API 임포트로 변경
+import { searchPrescriptionByImage } from '../../api/prescriptionSearch';
+import { getMedicineDetailByMedicineId } from '../../api/search';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
@@ -94,17 +95,100 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
     analyzePrescription();
   }, [photoUri]);
 
-  const handleSearchResultPress = item => {
-    // API 원본 데이터 찾기
-    const originalItem = originalResponseData.find(
-      originalItem => originalItem.medicine_id === item.original_id
-    );
-    
-    // 원본 데이터 전달
-    navigation.navigate('MedicineDetail', { 
-      item: originalItem,
-    });
-  };
+  // 약 상세 정보로 이동 처리
+  const handleSearchResultPress = async (item) => {
+    try {
+      // 원본 API 응답에서 medicine_id를 기준으로 항목 찾기
+      const originalItem = originalResponseData.find(
+        original => original.medicine_id === item.original_id
+      );
+  
+      if (!originalItem) {
+        console.error('원본 약 데이터를 찾을 수 없습니다.');
+        Alert.alert('오류', '약 정보를 불러올 수 없습니다.');
+        return;
+      }
+  
+      // 상세 정보 API 호출
+      const detailResponse = await getMedicineDetailByMedicineId(originalItem.medicine_id);
+      const detail = detailResponse?.body;
+  
+      if (!detail) {
+        console.warn('상세 정보가 없어서 기본 정보만 전달합니다.');
+        const fallbackItem = {
+          id: originalItem.medicine_id,
+          item_id: originalItem.medicine_id,
+          item_name: originalItem.medicine_name,
+          entp_name: originalItem.entp_name || '정보 없음',
+          item_image: originalItem.image_url,
+          class_name: originalItem.class_name || '일반의약품',
+          etc_otc_name: originalItem.etc_otc_name || '일반의약품',
+          dose: originalItem.dose,
+          total_days: originalItem.total_days,
+          total_quantity: originalItem.total_quantity,
+          day_of_weeks: originalItem.day_of_weeks,
+          user_schedules: originalItem.user_schedules,
+        };
+  
+        navigation.navigate('MedicineDetail', { item: fallbackItem });
+        return;
+      }
+  
+      // 상세 정보가 있을 경우 병합하여 전달
+      const fullItem = {
+        // 기본 정보
+        id: detail.id || originalItem.medicine_id,
+        item_id: detail.id || originalItem.medicine_id,
+        item_name: detail.item_name || originalItem.medicine_name,
+        entp_name: detail.entp_name || originalItem.entp_name || '정보 없음',
+        item_image: detail.item_image || originalItem.image_url,
+        class_name: detail.class_name || originalItem.class_name || '일반의약품',
+        etc_otc_name: detail.etc_otc_name || originalItem.etc_otc_name || '일반의약품',
+  
+        // 외형 정보
+        drug_shape: detail.drug_shape || '',
+        color_classes: detail.color_classes || '',
+        print_front: detail.print_front || '',
+        print_back: detail.print_back || '',
+        leng_long: detail.leng_long || '',
+        leng_short: detail.leng_short || '',
+        thick: detail.thick || '',
+        chart: detail.chart || '',
+  
+        // 복용 정보 (처방전에서 온 것 유지)
+        dose: originalItem.dose,
+        total_days: originalItem.total_days,
+        total_quantity: originalItem.total_quantity,
+        day_of_weeks: originalItem.day_of_weeks,
+        user_schedules: originalItem.user_schedules,
+  
+        // 부가 정보
+        indications: detail.indications || '',
+        dosage: detail.dosage || originalItem.dose || '',
+        storage_method: detail.storage_method || '',
+        precautions: detail.precautions || '',
+        side_effects: detail.side_effects || '',
+      };
+  
+      navigation.navigate('MedicineDetail', { item: fullItem });
+    } catch (error) {
+      console.error('약 상세 정보 가져오기 실패:', error);
+      Alert.alert('오류', '약 정보를 가져오는 중 문제가 발생했습니다.');
+  
+      // 에러 시 기본 정보만 전달
+      const fallbackItem = {
+        id: item.original_id,
+        item_id: item.original_id,
+        item_name: item.item_name,
+        entp_name: item.entp_name || '정보 없음',
+        item_image: item.item_image,
+        class_name: item.class_name || '일반의약품',
+        etc_otc_name: item.etc_otc_name || '일반의약품',
+      };
+  
+      navigation.navigate('MedicineDetail', { item: fallbackItem });
+    }
+  };  
 
   // 루틴 등록 처리
   const handleRegisterRoutines = () => {
