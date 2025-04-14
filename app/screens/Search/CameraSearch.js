@@ -178,9 +178,11 @@ const CameraSearchScreen = () => {
 
   const openGallery = useCallback(async () => {
     if (isProcessing) return;
-    
+  
+    const isPrescriptionNow = activeIndex === 1; 
+  
     setIsProcessing(true);
-    
+  
     try {
       const result = await launchImageLibrary({
         mediaType: 'photo',
@@ -190,9 +192,9 @@ const CameraSearchScreen = () => {
         maxHeight: 1920,
         quality: 0.9,
       });
-
+  
       if (!isMounted.current) return;
-
+  
       if (result.didCancel) {
         console.log('User cancelled image picker');
       } else if (result.errorCode) {
@@ -200,11 +202,13 @@ const CameraSearchScreen = () => {
         Alert.alert('오류', '갤러리를 여는 데 실패했습니다.');
       } else if (result.assets && result.assets.length > 0 && result.assets[0].uri) {
         setIsCameraActive(false);
-        
-        // Use interaction manager to improve transition performance
+  
         InteractionManager.runAfterInteractions(() => {
           if (isMounted.current) {
-            navigation.navigate('PhotoPreview', {photoUri: result.assets[0].uri});
+            navigation.navigate('PhotoPreview', {
+              photoUri: result.assets[0].uri,
+              isPrescription: isPrescriptionNow, // ✅ 고정값 전달
+            });
           }
         });
       }
@@ -218,7 +222,8 @@ const CameraSearchScreen = () => {
         setIsProcessing(false);
       }
     }
-  }, [navigation, isProcessing]);
+  }, [navigation, isProcessing, activeIndex]);
+  
 
   const handleCapture = useCallback(async () => {
     if (isProcessing || !cameraRef.current || !hasPermission || !cameraLayout.width || !cameraLayout.height) {
