@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import styled from 'styled-components/native';
-import {View, Text, Image, TouchableOpacity} from 'react-native';
+import {View, Text, Image, TouchableOpacity, InteractionManager} from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
 import {
@@ -26,47 +26,73 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const [similarMedicines, setSimilarMedicines] = useState([]);
   const [isRegistered, setIsRegistered] = useState(false);
 
+  const isMounted = useRef(true);
+
   useEffect(() => {
     if (item) {
-      const mappedMedicine = {
-        // 기본 정보
+      // 기본 정보만 먼저 매핑하여 빠르게 렌더링
+      const basicMedicine = {
         item_id: item.id,
         item_name: item.item_name,
         entp_name: item.entp_name,
         class_name: item.class_name,
         etc_otc_name: item.etc_otc_name,
         item_image: item.item_image,
-        chart: item.chart,
-        // 외관 정보
-        drug_shape: item.drug_shape,
-        color_classes: item.color_classes,
-        print_front: item.print_front,
-        print_back: item.print_back,
-        leng_long: item.leng_long,
-        leng_short: item.leng_short,
-        thick: item.thick,
-        // 사용 정보
-        efcy_qesitm: item.indications, // 효능
-        use_method_qesitm: item.dosage, // 복용법
-        deposit_method_qesitm: item.storage_method, // 보관법
-        atpn_qesitm: item.precautions, // 주의사항
-        se_qesitm: item.side_effects, // 부작용
       };
-
-      setMedicine(mappedMedicine);
+      
+      // 기본 정보로 먼저 상태 업데이트
+      setMedicine(basicMedicine);
+      
+      // 나머지 정보는 별도 스레드에서 처리
+      InteractionManager.runAfterInteractions(() => {
+        if (isMounted.current) {
+          // 전체 정보 매핑
+          const fullMappedMedicine = {
+            ...basicMedicine,
+            // 추가 정보
+            chart: item.chart,
+            drug_shape: item.drug_shape,
+            color_classes: item.color_classes,
+            print_front: item.print_front,
+            print_back: item.print_back,
+            leng_long: item.leng_long,
+            leng_short: item.leng_short,
+            thick: item.thick,
+            efcy_qesitm: item.indications,
+            use_method_qesitm: item.dosage,
+            deposit_method_qesitm: item.storage_method,
+            atpn_qesitm: item.precautions,
+            se_qesitm: item.side_effects,
+          };
+          
+          setMedicine(fullMappedMedicine);
+        }
+      });
     }
   }, [item]);
 
   // 비슷한 약
   useEffect(() => {
-    if (medicine) {
-      getSimilarMedicines({
-        medicine_id: medicine.item_id,
-        page: 1,
-        size: 10,
-      })
-        .then(response => {
-          if (response.data && response.data.body) {
+    if (!medicine || !medicine.item_id) return;
+    
+    let isCancelled = false;
+    
+    // 비슷한 약 로딩은 UI 렌더링 후에 진행
+    const loadSimilarMedicines = async () => {
+      try {
+        const response = await getSimilarMedicines({
+          medicine_id: medicine.item_id,
+          page: 1,
+          size: 10,
+        });
+        
+        if (isCancelled) return;
+        
+        if (response.data && response.data.body) {
+          // 데이터 매핑을 별도 스레드에서 처리
+          setTimeout(() => {
+            if (isCancelled) return;
+            
             const mappedSimilarMedicines = response.data.body.map(item => ({
               item_id: item.medicine_id,
               entp_name: item.entp_name,
@@ -74,15 +100,30 @@ const MedicineDetailScreen = ({route, navigation}) => {
               class_name: item.class_name,
               item_image: item.item_image,
             }));
-            setSimilarMedicines(mappedSimilarMedicines);
-          }
-        })
-        .catch(error => {
-          console.error('비슷한 약 정보 가져오기 실패:', error);
+            
+            // UI 업데이트를 requestAnimationFrame으로 래핑
+            requestAnimationFrame(() => {
+              if (!isCancelled) {
+                setSimilarMedicines(mappedSimilarMedicines);
+              }
+            });
+          }, 0);
+        }
+      } catch (error) {
+        console.error('비슷한 약 정보 가져오기 실패:', error);
+        if (!isCancelled) {
           setSimilarMedicines([]);
-        });
-    }
-  }, [medicine]);
+        }
+      }
+    };
+    
+    // 상세 정보가 로드된 후 비슷한 약 정보 로드
+    InteractionManager.runAfterInteractions(loadSimilarMedicines);
+    
+    return () => {
+      isCancelled = true;
+    };
+  }, [medicine?.item_id]);
 
   useFocusEffect(
     React.useCallback(() => {

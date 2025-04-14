@@ -6,11 +6,12 @@ import {
   ActivityIndicator, 
   StatusBar, 
   Platform,
-  Image as RNImage
+  Image as RNImage,
+  Alert,
 } from 'react-native';
 import {Header, ModalHeader, Button} from '../../components';
 import {themes} from '../../styles';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import ImageSize from 'react-native-image-size';
 
 const { width, height } = Dimensions.get('window');
@@ -20,8 +21,10 @@ const PhotoPreviewScreen = ({route}) => {
   const [photo, setPhoto] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [imageSize, setImageSize] = useState(null);
+  const [isNavigating, setIsNavigating] = useState(false); // 네비게이션 상태 추가
   const navigation = useNavigation();
   const imageRef = useRef(null);
+  const isMounted = useRef(true);
 
   // 이미지 크기를 기반으로 화면에 최적화된 크기 계산
   const optimizedImageSize = React.useMemo(() => {
@@ -74,37 +77,47 @@ const PhotoPreviewScreen = ({route}) => {
       // 이미지 경로 정규화
       const properUri = uri.startsWith('file://') ? uri : `file://${uri}`;
       
+      console.log('[PhotoPreview] 이미지 로드 시작:', properUri);
+      
       // 이미지 크기 가져오기
       const size = await ImageSize.getSize(properUri);
-      console.log('프리뷰 이미지 크기:', size);
+      console.log('[PhotoPreview] 이미지 크기 계산 완료:', size);
+      
+      if (!isMounted.current) return;
       
       setImageSize(size);
       setPhoto(properUri);
-    } catch (error) {
-      console.error('이미지 로드 중 오류 발생:', error);
-    } finally {
       setIsLoading(false);
+      
+    } catch (error) {
+      console.error('[PhotoPreview] 이미지 로드 오류:', error);
+      if (isMounted.current) {
+        setIsLoading(false);
+        Alert.alert('오류', '이미지를 로드할 수 없습니다.');
+      }
     }
   };
 
-  // 화면 포커스 시 이미지 로드 (딜레이 방지)
-  useFocusEffect(
-    React.useCallback(() => {
-      if (photoUri) {
-        loadImage(photoUri);
-      } else {
-        console.error('사진 URI를 찾을 수 없습니다.');
-        setIsLoading(false);
-      }
-      
-      return () => {
-        // 화면에서 벗어날 때 메모리 관리
-        setPhoto(null);
-        setImageSize(null);
-      };
-    }, [photoUri])
-  );
+  // 컴포넌트 마운트/언마운트 처리
+  useEffect(() => {
+    console.log('[PhotoPreview] 컴포넌트 마운트');
+    
+    // 이미지 로드
+    if (photoUri) {
+      loadImage(photoUri);
+    } else {
+      console.error('[PhotoPreview] 사진 URI가 없음');
+      setIsLoading(false);
+    }
+    
+    // 언마운트 시 정리
+    return () => {
+      console.log('[PhotoPreview] 컴포넌트 언마운트');
+      isMounted.current = false;
+    };
+  }, [photoUri]);
 
+  // 헤더 컴포넌트 선택
   const HeaderComponent = ({isModal = false, ...props}) => {
     if (isModal) {
       return <ModalHeader {...props} />;
@@ -112,20 +125,28 @@ const PhotoPreviewScreen = ({route}) => {
     return <Header {...props} />;
   };
 
+  // 검색 처리 - 개선된 버전
   const handleNavigateToSearch = () => {
-    if (!photo) return;
-
-    if (isPrescription) {
-      // 처방전 모드인 경우 처방전 분석 결과 화면으로 이동
-      navigation.navigate('PrescriptionSearchResults', {
-        photoUri: photo,
-      });
-    } else {
-      // 알약 모드인 경우 기존 검색 결과 화면으로 이동
-      navigation.navigate('CameraSearchResults', {
-        photoUri: photo,
-      });
+    if (!photo || isLoading || isNavigating) {
+      console.log('[PhotoPreview] 검색 불가: 사진 로드 중이거나 이미 네비게이션 중');
+      return;
     }
+    
+    console.log('[PhotoPreview] 검색 버튼 클릭, 대상:', isPrescription ? 'Prescription' : 'Camera');
+    
+    // 중복 클릭 방지
+    setIsNavigating(true);
+    
+    // 단순한 네비게이션 즉시 수행
+    const targetScreen = isPrescription ? 'PrescriptionSearchResults' : 'CameraSearchResults';
+    
+    console.log(`[PhotoPreview] ${targetScreen}로 네비게이션 시작`);
+    
+    // 네비게이션 직접 수행
+    navigation.navigate(targetScreen, {
+      photoUri: photo,
+      timestamp: new Date().getTime(), // 중복 방지용 타임스탬프 추가
+    });
   };
 
   return (
@@ -133,7 +154,10 @@ const PhotoPreviewScreen = ({route}) => {
       <StatusBar barStyle="dark-content" backgroundColor={themes.light.bgColor.bgPrimary} />
       <HeaderComponent 
         isModal={isModal} 
-        onBackPress={() => navigation.goBack()}
+        onBackPress={() => {
+          console.log('[PhotoPreview] 뒤로가기 버튼 클릭');
+          navigation.goBack();
+        }}
       >
         {isPrescription ? '처방전 미리보기' : '사진 미리보기'}
       </HeaderComponent>
@@ -165,7 +189,7 @@ const PhotoPreviewScreen = ({route}) => {
         <Button 
           title={isPrescription ? "처방전 분석하기" : "검색하기"} 
           onPress={handleNavigateToSearch} 
-          disabled={isLoading || !photo}
+          disabled={isLoading || !photo || isNavigating}
         />
       </ButtonContainer>
     </Container>
