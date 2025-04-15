@@ -20,6 +20,7 @@ import { FilterModal } from './SearchResult/FilterModal';
 import { FilterButton } from './SearchResult/FilterButton';
 import { SearchScreenHeader } from './SearchResult/SearchScreenHeader';
 import { MedicineListItem } from './MedicineListItem';
+import { InputWithDelete } from './Input';
 
 export {
   Button,
@@ -46,4 +47,5 @@ export {
   FilterButton,
   SearchScreenHeader,
   MedicineListItem,
+  InputWithDelete,
 };
