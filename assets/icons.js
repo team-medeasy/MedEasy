@@ -59,6 +59,19 @@ import HardCapsuleIcon from './icons/pills/hard_capsule.svg';
 import SoftCapsuleIcon from './icons/pills/soft_capsule.svg';
 import OtherPillIcon from './icons/pills/etc.svg';
 
+// 도형 아이콘
+import CircleIcon from './icons/shapes/circle.svg';
+import OvalIcon from './icons/shapes/oval.svg';
+import OblongIcon from './icons/shapes/oblong.svg';
+import TriangleIcon from './icons/shapes/triangle.svg';
+import RectangleIcon from './icons/shapes/rectangle.svg';
+import DiamondIcon from './icons/shapes/diamond.svg';
+import PentagonIcon from './icons/shapes/pentagon.svg';
+import HexagonIcon from './icons/shapes/hexagon.svg';
+import CapsuleIcon from './icons/shapes/capsule.svg';
+import HalfMoonIcon from './icons/shapes/half_moon.svg';
+import OtherShapeIcon from './icons/shapes/other.svg';
+
 // 기타 아이콘
 import ChatIcon from './icons/chat.svg';
 import DeleteCircleIcon from './icons/delete_circle.svg';
@@ -141,6 +154,20 @@ export const PillsIcon = {
   hard_capsule: HardCapsuleIcon,
   soft_capsule: SoftCapsuleIcon,
   etc: OtherPillIcon,
+};
+
+export const ShapeIcons = {
+  circle: CircleIcon,
+  oval: OvalIcon,
+  oblong: OblongIcon,
+  triangle: TriangleIcon,
+  rectangle: RectangleIcon,
+  diamond: DiamondIcon,
+  pentagon: PentagonIcon,
+  hexagon: HexagonIcon,
+  capsule: CapsuleIcon,
+  half_moon: HalfMoonIcon,
+  other: OtherShapeIcon,
 };
 
 export const OtherIcons = {
