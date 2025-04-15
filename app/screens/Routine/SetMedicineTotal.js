@@ -1,9 +1,13 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components/native';
 import {View, ScrollView, Platform} from 'react-native';
 import {themes} from './../../styles';
-import {HeaderIcons, OtherIcons} from '../../../assets/icons';
-import {ModalHeader, ProgressBar, Button} from '../../components';
+import {
+    ModalHeader, 
+    ProgressBar, 
+    Button, 
+    InputWithDelete
+} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { createRoutine } from '../../api/routine';
 
@@ -90,38 +94,6 @@ const SetMedicineTotal = ({route, navigation}) => {
     );
 };
 
-// 입력 필드 컴포넌트
-const InputWithDelete = ({
-    value,
-    onChangeText,
-    placeholder,
-    keyboardType = 'default',
-    returnKeyType = 'done',
-    onSubmitEditing
-}) => {
-    return (
-        <InputContainer>
-            <StyledInput
-                placeholder={placeholder}
-                value={value}
-                onChangeText={onChangeText}
-                keyboardType={keyboardType}
-                returnKeyType={returnKeyType}
-                onSubmitEditing={onSubmitEditing}
-            />
-            {value.length > 0 && (
-                <DeleteButton onPress={() => onChangeText('')}>
-                    <OtherIcons.deleteCircle
-                        width={15}
-                        height={15}
-                        style={{ color: themes.light.textColor.Primary20 }}
-                    />
-                </DeleteButton>
-            )}
-        </InputContainer>
-    );
-};
-
 const Container = styled.KeyboardAvoidingView`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
@@ -145,26 +117,6 @@ const SmallText = styled.Text`
 
 const Section = styled.View`
     padding: 0 20px;
-`;
-
-const InputContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  border-radius: 10px;
-  padding: 0 15px;
-`;
-
-const StyledInput = styled.TextInput`
-  flex: 1;
-  padding: 18px 0;
-  font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const DeleteButton = styled.TouchableOpacity`
-  padding: 5px;
 `;
 
 export default SetMedicineTotal;
