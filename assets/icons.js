@@ -68,8 +68,8 @@ import RectangleIcon from './icons/shapes/rectangle.svg';
 import DiamondIcon from './icons/shapes/diamond.svg';
 import PentagonIcon from './icons/shapes/pentagon.svg';
 import HexagonIcon from './icons/shapes/hexagon.svg';
-import CapsuleIcon from './icons/shapes/capsule.svg';
 import HalfMoonIcon from './icons/shapes/half_moon.svg';
+import OctagonIcon from './icons/shapes/octagon.svg';
 import OtherShapeIcon from './icons/shapes/other.svg';
 
 // 기타 아이콘
@@ -165,7 +165,7 @@ export const ShapeIcons = {
   diamond: DiamondIcon,
   pentagon: PentagonIcon,
   hexagon: HexagonIcon,
-  capsule: CapsuleIcon,
+  octagon: OctagonIcon,
   half_moon: HalfMoonIcon,
   other: OtherShapeIcon,
 };

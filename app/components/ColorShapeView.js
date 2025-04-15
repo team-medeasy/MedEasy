@@ -34,7 +34,7 @@ const shapeCodes = {
   마름모형: 'diamond',
   오각형: 'pentagon',
   육각형: 'hexagon',
-  캡슐형: 'capsule',
+  팔각형: 'octagon',
   반원형: 'half_moon',
   기타: 'other',
 };
