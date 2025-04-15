@@ -74,7 +74,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       마름모형: 'DIAMOND',
       오각형: 'PENTAGON',
       육각형: 'HEXAGON',
-      캡슐형: 'CAPSULE',
+      팔각형: 'OCTAGON',
       반원형: 'HALF_MOON',
       기타: 'OTHER',
     };
@@ -90,19 +90,19 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       }
 
       setNoResults(false);
-      
+
       // 400ms 후에 로딩 상태를 true로 설정하는 타이머 생성
       const timer = setTimeout(() => {
         setLoading(true);
       }, 400);
-      
+
       setLoadingTimer(timer);
       loadingTimerRef.current = timer;
-      
+
       setPage(0);
       setHasMore(true);
     }
-  
+
     try {
       let response;
       let requestParams = {
@@ -111,24 +111,24 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         size: 10,
       };
       console.log('검색 요청 파라미터:', requestParams);
-  
+
       if (selectedColors.length > 0 || selectedShapes.length > 0) {
         const mappedColors = selectedColors.map(mapColorToApiValue);
         const mappedShapes = selectedShapes.map(mapShapeToApiValue);
-  
+
         requestParams = {
           ...requestParams,
           colors: mappedColors,
           shape: mappedShapes,
         };
-  
+
         response = await searchMedicineWithFilters(requestParams);
       } else {
         response = await searchMedicine(requestParams);
       }
-  
+
       const responseData = response.data?.body ?? [];
-  
+
       // 검색 결과가 없는 경우
       if (responseData.length === 0) {
         if (isLoadMore) {
@@ -141,11 +141,11 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         }
         return;
       }
-  
+
       setOriginalResponseData(prev =>
         isLoadMore ? [...prev, ...responseData] : responseData,
       );
-  
+
       const formattedResults = responseData.map((item, index) => ({
         item_name: item.item_name,
         entp_name: item.entp_name,
@@ -155,17 +155,17 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         original_id: item.id,
         uniqueKey: `${item.id}_${index}`,
       }));
-  
+
       setSearchResults(prev =>
         isLoadMore ? [...prev, ...formattedResults] : formattedResults,
       );
-  
+
       setNoResults(false);
-  
+
       if (isLoadMore) {
         setPage(page + 1);
       }
-  
+
       setHasMore(formattedResults.length === 10);
     } catch (err) {
       console.error('검색 중 오류:', err);
@@ -208,7 +208,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         </View>
       );
     }
-  
+
     // 검색이 시작되었지만 아직 로딩 중이 아닌 상태 처리
     if (loadingTimerRef.current && !loading && !noResults) {
       // 빈 화면 또는 이전 결과를 그대로 표시
@@ -226,11 +226,11 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
         </View>
       );
     }
-  
+
     if (noResults || searchResults.length === 0) {
       return <NoSearchResults />;
     }
-  
+
     return (
       <SearchResultsList
         searchResults={searchResults}
@@ -247,7 +247,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
     if (searchQuery) {
       fetchSearchResults(false);
     }
-    
+
     // 컴포넌트 언마운트 시 타이머 정리
     return () => {
       if (loadingTimerRef.current) {
@@ -285,7 +285,7 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
       '마름모형',
       '오각형',
       '육각형',
-      '캡슐형',
+      '팔각형',
       '반원형',
       '기타',
     ],
