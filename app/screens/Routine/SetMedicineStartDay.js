@@ -3,8 +3,8 @@ import styled from 'styled-components/native';
 import { View, ScrollView, Platform } from 'react-native';
 import { themes } from './../../styles';
 import { ModalHeader, Button, ProgressBar } from '../../components';
+import { DateTimePickerModal } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 const SetMedicineStartDay = ({ route, navigation }) => {
     const { medicine_id, nickname, day_of_weeks } = route.params;
@@ -13,12 +13,28 @@ const SetMedicineStartDay = ({ route, navigation }) => {
     
     const progress = '50%';
     const [startDate, setStartDate] = useState(new Date());
-    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false); 
     
-    const handleDateChange = (event, selectedDate) => {
-        const currentDate = selectedDate || startDate;
-        setShowDatePicker(Platform.OS === 'ios');
-        setStartDate(currentDate);
+    const handleDateChange = (value) => {
+        let dateObj;
+    
+        if (value && typeof value === 'object' && value.date) {
+            dateObj = new Date(value.date);
+        } else if (typeof value === 'string') {
+            dateObj = new Date(value);
+        } else {
+            dateObj = value;
+        }
+    
+        if (!isNaN(dateObj)) {
+            setStartDate(dateObj);
+        }
+    };
+    
+    
+    // 모달 확인 버튼 핸들러
+    const handleConfirm = () => {
+        setShowDatePicker(false);
     };
     
     const handleNext = () => {
@@ -26,7 +42,7 @@ const SetMedicineStartDay = ({ route, navigation }) => {
             medicine_id,
             nickname,
             day_of_weeks,
-            routine_start_date: startDate.toISOString().split('T')[0], // YYYY-MM-DD 형식
+            routine_start_date: formatDate(startDate), // YYYY-MM-DD 형식
         });
     };
     
@@ -54,19 +70,20 @@ const SetMedicineStartDay = ({ route, navigation }) => {
                         <DateButton onPress={() => setShowDatePicker(true)}>
                             <DateText>{formatDate(startDate)}</DateText>
                         </DateButton>
-                        
-                        {showDatePicker && (
-                            <DateTimePicker
-                                value={startDate}
-                                mode="date"
-                                display="default"
-                                onChange={handleDateChange}
-                                minimumDate={new Date()} // 오늘 이전 날짜는 선택 불가
-                            />
-                        )}
                     </DateSection>
                 </View>
             </ScrollView>
+            
+            {/* DateTimePickerModal 컴포넌트 사용 */}
+            <DateTimePickerModal
+                visible={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+                onConfirm={handleConfirm}
+                mode="date"
+                date={startDate}
+                onChange={handleDateChange}
+                title="복용 시작일"
+            />
             
             <View
                 style={{
@@ -90,6 +107,7 @@ const SetMedicineStartDay = ({ route, navigation }) => {
     );
 };
 
+// 스타일 컴포넌트들은 그대로 유지
 const Container = styled.KeyboardAvoidingView`
     flex: 1;
     background-color: ${themes.light.bgColor.bgPrimary};
