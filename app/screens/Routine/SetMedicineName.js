@@ -11,7 +11,7 @@ const SetMedicineName = ({route, navigation}) => {
   const [medicine, setMedicine] = useState(null);
   const [medicineName, setMedicineName] = useState('');
 
-  const progress = '20%';
+  const progress = '16.66%';
 
   const handleNext = () => {
     if (!medicine || !medicine.item_id) {

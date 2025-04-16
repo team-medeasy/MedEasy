@@ -11,10 +11,10 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import { getUserSchedule } from '../../api/user';
 
 const SetMedicineTime = ({ route, navigation }) => {
-    const { medicine_id, nickname, day_of_weeks } = route.params;
-    console.log("day_of_weeks:", day_of_weeks);
+    const { medicine_id, nickname, day_of_weeks, routine_start_date } = route.params;
+    console.log("routine_start_date:", routine_start_date);
 
-    const progress = '60%';
+    const progress = '66.66%';
 
     // 여러 시간대 선택을 위해 배열로 변경
     const [selectedOptions, setSelectedOptions] = useState([]);
@@ -97,6 +97,7 @@ const SetMedicineTime = ({ route, navigation }) => {
             medicine_id: medicine_id,
             nickname: nickname,
             day_of_weeks: day_of_weeks,
+            routine_start_date: routine_start_date,
             user_schedule_ids: user_schedule_ids
         });
     };

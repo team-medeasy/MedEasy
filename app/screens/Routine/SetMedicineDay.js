@@ -19,7 +19,7 @@ const SetMedicineDay = ({ route, navigation }) => {
     const { medicine_id, nickname } = route.params;
     console.log("medicine_id:", medicine_id);
     console.log("nickname:", nickname);
-    const progress = '40%';
+    const progress = '33.33%';
 
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedDays, setSelectedDays] = useState([]);
@@ -46,7 +46,7 @@ const SetMedicineDay = ({ route, navigation }) => {
             day_of_weeks = [1, 3, 5, 7];
         }
 
-        navigation.navigate('SetMedicineTime', {
+        navigation.navigate('SetMedicineStartDay', {
             medicine_id,
             nickname,
             day_of_weeks,

@@ -14,16 +14,17 @@ import {
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const SetMedicineDose = ({route, navigation}) => {
-    const { medicine_id, nickname, day_of_weeks, user_schedule_ids } = route.params;
+    const { medicine_id, nickname, day_of_weeks, routine_start_date, user_schedule_ids } = route.params;
     console.log("user_schedule_ids:",user_schedule_ids);
     const [dose, setDose] = useState('');
-    const progress = '80%';
+    const progress = '83.33%';
 
     const handleNext = () => {
         navigation.navigate('SetMedicineTotal', {
             medicine_id: medicine_id,
             nickname: nickname,
             day_of_weeks: day_of_weeks,
+            routine_start_date: routine_start_date,
             user_schedule_ids: user_schedule_ids,
             dose: parseInt(dose) || 1 // 기본값 1 설정
         });
