@@ -5,6 +5,7 @@ import { MedicineOverview } from './MedicineInfo/MedicineOverview';
 import { NoSearchResults } from './SearchResult/NoSearchResults';
 import { SearchResultsList } from './SearchResult/SearchResultsList';
 import { SearchResultItem } from './SearchResult/SearchResultItem';
+import { SimilarMedicineItem } from './SearchResult/SimilarMedicineItem';
 import { CameraSearchResultsList } from './CameraSearchResult/CameraSearchResultsList'
 import { CameraSearchResultItem } from './CameraSearchResult/CameraSearchResultItem'
 import { PrescriptionSearchResultsList } from './PrescriptionSearchResult/PrescriptionSearchResultsList';
@@ -39,6 +40,7 @@ export {
   NoSearchResults,
   SearchResultsList,
   SearchResultItem,
+  SimilarMedicineItem,
   CameraSearchResultsList,
   CameraSearchResultItem,
   PrescriptionSearchResultsList,
