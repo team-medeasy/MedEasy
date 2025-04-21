@@ -18,6 +18,7 @@ import {
   MedicineOverview,
   MedicineAppearance,
   Button,
+  SimilarMedicineItem,
 } from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {OtherIcons} from '../../../assets/icons';
@@ -395,65 +396,6 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
         {shortenedText}
       </Text>
     </View>
-  );
-};
-
-const SimilarMedicineItem = ({item, navigation, isModal}) => {
-  const handlePressMedicine = async () => {
-    try {
-      const response = await getMedicineById(item.item_id);
-      const medicineData = response.data.body;
-
-      navigation.push('MedicineDetail', {
-        item: medicineData,
-        isModal: isModal,
-      });
-    } catch (error) {
-      console.error('약 정보 불러오기 실패:', error);
-    }
-  };
-
-  return (
-    <TouchableOpacity
-      style={{marginRight: 15, width: 138.75}}
-      onPress={handlePressMedicine}>
-      <Image
-        source={{uri: item.item_image}}
-        style={{
-          width: 138.75,
-          height: 74,
-          borderRadius: 10,
-          resizeMode: 'contain',
-        }}
-      />
-      <View style={{marginTop: 15, gap: 8}}>
-        <Text
-          style={{
-            fontFamily: 'Pretendard-SemiBold',
-            fontSize: FontSizes.caption.default,
-            color: themes.light.textColor.Primary50,
-          }}>
-          {item.entp_name}
-        </Text>
-        <Text
-          style={{
-            fontFamily: 'Pretendard-Bold',
-            fontSize: FontSizes.body.default,
-            color: themes.light.textColor.textPrimary,
-          }}
-          numberOfLines={1}
-          ellipsizeMode="tail">
-          {item.item_name}
-        </Text>
-        <Tag
-          sizeType="small"
-          colorType="resultPrimary"
-          overflowMode="ellipsis"
-          maxLength="14">
-          {item.class_name || '약품 구분'}
-        </Tag>
-      </View>
-    </TouchableOpacity>
   );
 };
 
