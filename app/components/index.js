@@ -22,6 +22,7 @@ import { FilterButton } from './SearchResult/FilterButton';
 import { SearchScreenHeader } from './SearchResult/SearchScreenHeader';
 import { MedicineListItem } from './MedicineListItem';
 import { InputWithDelete } from './Input';
+import { CustomCalendar } from './CustomCalendar';
 
 export {
   Button,
@@ -50,4 +51,5 @@ export {
   SearchScreenHeader,
   MedicineListItem,
   InputWithDelete,
+  CustomCalendar,
 };
