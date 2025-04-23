@@ -2,55 +2,34 @@ import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { View, ScrollView, Platform } from 'react-native';
 import { themes } from './../../styles';
-import { ModalHeader, Button, ProgressBar } from '../../components';
-import { DateTimePickerModal } from '../../components';
+import { ModalHeader, Button, ProgressBar, CustomCalendar } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const SetMedicineStartDay = ({ route, navigation }) => {
-    const { medicine_id, nickname, day_of_weeks } = route.params;
+    const { medicine_id, nickname, day_of_weeks } = route.params || { medicine_id: '', nickname: '', day_of_weeks: [] };
 
     console.log("day_of_weeks:", day_of_weeks);
     
     const progress = '50%';
     const [startDate, setStartDate] = useState(new Date());
-    const [showDatePicker, setShowDatePicker] = useState(false); 
     
-    const handleDateChange = (value) => {
-        let dateObj;
-    
-        if (value && typeof value === 'object' && value.date) {
-            dateObj = new Date(value.date);
-        } else if (typeof value === 'string') {
-            dateObj = new Date(value);
-        } else {
-            dateObj = value;
-        }
-    
-        if (!isNaN(dateObj)) {
-            setStartDate(dateObj);
-        }
-    };
-    
-    
-    // 모달 확인 버튼 핸들러
-    const handleConfirm = () => {
-        setShowDatePicker(false);
+    const handleDateChange = (date) => {
+        setStartDate(date);
     };
     
     const handleNext = () => {
+        // 한국 시간대로 날짜 형식 (YYYY-MM-DD)으로 변환
+        const year = startDate.getFullYear();
+        const month = String(startDate.getMonth() + 1).padStart(2, '0');
+        const day = String(startDate.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+            
         navigation.navigate('SetMedicineTime', {
             medicine_id,
             nickname,
             day_of_weeks,
-            routine_start_date: formatDate(startDate), // YYYY-MM-DD 형식
+            routine_start_date: formattedDate,
         });
-    };
-    
-    const formatDate = (date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}년 ${month}월 ${day}일`;
     };
     
     return (
@@ -62,52 +41,33 @@ const SetMedicineStartDay = ({ route, navigation }) => {
             <ScrollView>
                 <View>
                     <TextContainer>
-                        <LargeText>복용 시작일을 설정해주세요</LargeText>
-                        <SmallText>언제부터 약을 복용하기 시작하나요?</SmallText>
+                        <LargeText>복용 시작일을 선택해주세요.</LargeText>
+                        <SmallText>일정에 맞춰 복약 알림을 보내드릴게요!</SmallText>
                     </TextContainer>
                     
                     <DateSection>
-                        <DateButton onPress={() => setShowDatePicker(true)}>
-                            <DateText>{formatDate(startDate)}</DateText>
-                        </DateButton>
+                        {/* 캘린더 컴포넌트 */}
+                        <CustomCalendar
+                            mode='single'
+                            selectedDate={startDate}
+                            onDateChange={handleDateChange}
+                        />
                     </DateSection>
                 </View>
             </ScrollView>
             
-            {/* DateTimePickerModal 컴포넌트 사용 */}
-            <DateTimePickerModal
-                visible={showDatePicker}
-                onClose={() => setShowDatePicker(false)}
-                onConfirm={handleConfirm}
-                mode="date"
-                date={startDate}
-                onChange={handleDateChange}
-                title="복용 시작일"
-            />
-            
-            <View
-                style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    paddingBottom: 30,
-                    alignItems: 'center',
-                }}>
+            <ButtonContainer>
                 <Button
                     title="다음"
                     onPress={handleNext}
                     bgColor={themes.light.boxColor.buttonPrimary}
                     textColor={themes.light.textColor.buttonText}
                 />
-            </View>
+            </ButtonContainer>
         </Container>
     );
 };
 
-// 스타일 컴포넌트들은 그대로 유지
 const Container = styled.KeyboardAvoidingView`
     flex: 1;
     background-color: ${themes.light.bgColor.bgPrimary};
@@ -126,7 +86,7 @@ const LargeText = styled.Text`
 
 const SmallText = styled.Text`
     font-size: ${FontSizes.body.default};
-    font-family: ${'Pretendard-Midium'};
+    font-family: ${'Pretendard-Medium'};
     color: ${themes.light.textColor.Primary50};
 `;
 
@@ -135,18 +95,14 @@ const DateSection = styled.View`
     align-items: center;
 `;
 
-const DateButton = styled.TouchableOpacity`
-    background-color: ${themes.light.boxColor.inputSecondary};
-    padding: 15px 20px;
-    border-radius: 10px;
-    width: 90%;
+const ButtonContainer = styled.View`
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    padding-bottom: 30px;
     align-items: center;
-`;
-
-const DateText = styled.Text`
-    font-size: ${FontSizes.body.large};
-    font-family: 'Pretendard-SemiBold';
-    color: ${themes.light.textColor.Primary30};
 `;
 
 export default SetMedicineStartDay;
