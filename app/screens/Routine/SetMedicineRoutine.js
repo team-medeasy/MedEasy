@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { Alert, View, ScrollView } from 'react-native';
 import { themes } from './../../styles';
@@ -7,13 +6,13 @@ import { HeaderIcons } from '../../../assets/icons';
 import {
   ModalHeader,
   Button,
-  SelectTimeButton,
   MedicineOverview,
-  InputWithDelete
+  InputWithDelete,
+  ScheduleSelector,
 } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { createRoutine, deleteRoutineGroup, getRoutineByDate } from '../../api/routine';
-import { getUserMedicinesCurrent, getUserMedicinesPast, getUserSchedule } from '../../api/user';
+import { getUserMedicinesCurrent, getUserMedicinesPast } from '../../api/user';
 import { getMedicineById } from '../../api/medicine';
 
 const SetMedicineRoutine = ({ route, navigation }) => {
@@ -219,8 +218,18 @@ const SetMedicineRoutine = ({ route, navigation }) => {
   };
 
   const convertDaysToNumbers = selectedDays.map(day => days.indexOf(day) + 1);
-  const convertTimingsToIds = selectedTimings.map(timing => scheduleMapping[timing] || (timings.indexOf(timing) + 1));
-
+  const convertTimingsToIds = selectedTimings.map(timing => {
+    // 시간대 이름을 이모지 키로 변환
+    const timingToEmojiMap = {
+      '아침': '🐥️ 아침',
+      '점심': '🥪️ 점심',
+      '저녁': '🌙️ 저녁',
+      '자기 전': '🛏️️ 자기 전'
+    };
+    
+    const emojiKey = timingToEmojiMap[timing];
+    return scheduleMapping[emojiKey] || (timings.indexOf(timing) + 1);
+  });
   // 수정 버튼 클릭 시 실행할 함수
   const handleModifyRoutine = async () => {
     await handleDeleteRoutineGroup();
@@ -259,51 +268,6 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchUserSchedule = async () => {
-        try {
-          const getData = await getUserSchedule();
-          const scheduleData = getData.data;
-          console.log('사용자 일정 데이터:', scheduleData);
-
-          if (scheduleData && scheduleData.body && Array.isArray(scheduleData.body)) {
-            // 매핑을 위한 객체
-            const mapping = {};
-            // 시간 표시를 위한 객체
-            const formattedSchedule = {};
-
-            scheduleData.body.forEach((item) => {
-              // 매핑 설정
-              if (item.name.includes('아침')) {
-                mapping['🐥️ 아침'] = item.user_schedule_id;
-                formattedSchedule['아침 식사 후'] = formatTime(item.take_time);
-              } else if (item.name.includes('점심')) {
-                mapping['🥪️ 점심'] = item.user_schedule_id;
-                formattedSchedule['점심 식사 후'] = formatTime(item.take_time);
-              } else if (item.name.includes('저녁')) {
-                mapping['🌙️ 저녁'] = item.user_schedule_id;
-                formattedSchedule['저녁 식사 후'] = formatTime(item.take_time);
-              } else if (item.name.includes('자기 전')) {
-                mapping['🛏️️ 자기 전'] = item.user_schedule_id;
-                formattedSchedule['자기 전'] = formatTime(item.take_time);
-              }
-            });
-
-            setScheduleMapping(mapping);
-            setScheduleData(formattedSchedule);
-            console.log('시간대 매핑:', mapping);
-            console.log('시간 데이터:', formattedSchedule);
-          }
-        } catch (error) {
-          console.error('사용자 일정 가져오기 실패:', error);
-        }
-      };
-
-      fetchUserSchedule();
-    }, [])
-  );
-
   const handlePressEnlarge = () => {
     navigation.navigate('MedicineImageDetail', { item: medicine, isModal: true });
   };
@@ -314,26 +278,8 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     );
   };
 
-  const toggleTiming = timing => {
-    setSelectedTimings(prev =>
-      prev.includes(timing)
-        ? prev.filter(t => t !== timing)
-        : [...prev, timing],
-    );
-  };
-
   const handleSetTimings = () => {
     navigation.navigate('SetRoutineTime');
-  };
-
-  const formatTime = (timeString) => {
-    const [hour, minute] = timeString.split(':').map(Number);
-    const period = hour < 12 ? '오전' : '오후';
-    const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-
-    return minute === 0
-      ? `${period} ${formattedHour}시`
-      : `${period} ${formattedHour}시 ${minute}분`;
   };
 
   if (!medicine) { // 렌더링 전 error 방지
@@ -436,34 +382,11 @@ const SetMedicineRoutine = ({ route, navigation }) => {
               onButtonPress={handleSetTimings}
             />
             <SelectTime>
-              <SelectTimeButton
-                title={'🐥️ 아침'}
-                timeText={scheduleData['아침 식사 후'] || '오전 7시'}
-                onPress={() => toggleTiming('아침')}
-                bgColor={selectedTimings.includes('아침') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
-                textColor={selectedTimings.includes('아침') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-              />
-              <SelectTimeButton
-                title={'🥪️ 점심'}
-                timeText={scheduleData['점심 식사 후'] || '오후 12시'}
-                onPress={() => toggleTiming('점심')}
-                bgColor={selectedTimings.includes('점심') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
-                textColor={selectedTimings.includes('점심') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-              />
-              <SelectTimeButton
-                title={'🌙️ 저녁'}
-                timeText={scheduleData['저녁 식사 후'] || '오후 7시'}
-                onPress={() => toggleTiming('저녁')}
-                bgColor={selectedTimings.includes('저녁') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
-                textColor={selectedTimings.includes('저녁') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-              />
-              <SelectTimeButton
-                title={'🛏️️ 자기 전'}
-                timeText={scheduleData['자기 전'] || '오후 10시 30분'}
-                onPress={() => toggleTiming('자기 전')}
-                bgColor={selectedTimings.includes('자기 전') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
-                textColor={selectedTimings.includes('자기 전') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-              />
+            <ScheduleSelector
+              selectedTimings={selectedTimings}
+              setSelectedTimings={setSelectedTimings}
+              onScheduleMappingChange={setScheduleMapping}
+            />
             </SelectTime>
           </Section>
 
@@ -564,26 +487,6 @@ const HeaderButtonText = styled.Text`
   font-family: 'Pretendard-Medium';
   font-size: ${FontSizes.body.default};
   color: ${themes.light.textColor.Primary30};
-`;
-
-const ToggleButton = styled.TouchableOpacity`
-  background-color: ${props =>
-    props.selected
-      ? themes.light.pointColor.Primary
-      : themes.light.boxColor.inputPrimary};
-  border-radius: 5px;
-  padding: ${props => `${props.paddingVertical || 8}px 
-                         ${props.paddingHorizontal || 10}px`};
-`;
-
-const ToggleButtonText = styled.Text`
-  color: ${props =>
-    props.selected
-      ? themes.light.textColor.buttonText
-      : themes.light.textColor.Primary50};
-  font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
-  text-align: center;
 `;
 
 const SelectDay = styled.View`

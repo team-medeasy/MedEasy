@@ -23,6 +23,7 @@ import { SearchScreenHeader } from './SearchResult/SearchScreenHeader';
 import { MedicineListItem } from './MedicineListItem';
 import { InputWithDelete } from './Input';
 import { CustomCalendar } from './CustomCalendar';
+import { ScheduleSelector } from './ScheduleSelector';
 
 export {
   Button,
@@ -52,4 +53,5 @@ export {
   MedicineListItem,
   InputWithDelete,
   CustomCalendar,
+  ScheduleSelector,
 };
