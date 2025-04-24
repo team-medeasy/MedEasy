@@ -12,7 +12,7 @@ import {
   InputWithDelete
 } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { createRoutine, deleteRoutine, getRoutineByDate } from '../../api/routine';
+import { createRoutine, deleteRoutineGroup, getRoutineByDate } from '../../api/routine';
 import { getUserMedicinesCurrent, getUserMedicinesPast, getUserSchedule } from '../../api/user';
 import { getMedicineById } from '../../api/medicine';
 
@@ -101,26 +101,26 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     fetchRoutineData();
   }, [medicineId]);
 
-  const handleDeleteRoutine = async () => {
+  const handleDeleteRoutineGroup = async () => {
     try {
       if (!relatedRoutineIds || relatedRoutineIds.length === 0) {
         console.log('삭제할 루틴이 없습니다.');
         Alert.alert('안내', '삭제할 루틴이 없습니다.');
         return;
       }
-
-      await Promise.all(
-        relatedRoutineIds.map(id => deleteRoutine(id))
-      );
-
-      console.log('✅ 루틴 삭제 완료:', relatedRoutineIds);
-      Alert.alert('삭제 완료', '선택한 약의 모든 루틴이 삭제되었습니다.');
+  
+      const firstId = relatedRoutineIds[0]; // 첫 번째 ID만 사용
+      console.log(firstId);
+      await deleteRoutineGroup(firstId);
+  
+      console.log('✅ 루틴 삭제 완료:', firstId + '을 포함한 루틴 그룹');
+      Alert.alert('삭제 완료', '선택한 약의 전체 루틴이 삭제되었습니다.');
       navigation.goBack();
     } catch (error) {
       console.error('❌ 루틴 삭제 실패:', error);
       Alert.alert('삭제 실패', '루틴 삭제 중 오류가 발생했습니다.');
     }
-  };
+  };  
 
   useEffect(() => {
     if (medicineId) {
@@ -223,7 +223,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
 
   // 수정 버튼 클릭 시 실행할 함수
   const handleModifyRoutine = async () => {
-    await handleDeleteRoutine();
+    await handleDeleteRoutineGroup();
 
     // 필수 입력값 검증
     if (!medicineName || selectedDays.length === 0 || selectedTimings.length === 0 || !dosage || !totalCount) {
@@ -348,7 +348,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
       <ModalHeader
         showDelete="true"
         DeleteColor={themes.light.pointColor.Secondary}
-        onDeletePress={() => handleDeleteRoutine()}
+        onDeletePress={() => handleModifyRoutine()}
       >
         루틴 수정
       </ModalHeader>
@@ -493,7 +493,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
 
           <Button
             title="루틴 삭제하기"
-            onPress={handleDeleteRoutine}
+            onPress={handleDeleteRoutineGroup}
             bgColor={themes.light.pointColor.Secondary}
           />
 
