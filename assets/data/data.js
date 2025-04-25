@@ -1,13 +1,6 @@
 // data.js
 import dayjs from 'dayjs';
 
-// 시간 매핑에 시간값 추가 (정렬을 위한 숫자값 포함)
-export const timeMapping = {
-  MORNING: { label: '아침', time: '오전 8:00', sortValue: 800 },
-  LUNCH: { label: '점심', time: '오후 12:30', sortValue: 1230 },
-  DINNER: { label: '저녁', time: '오후 6:30', sortValue: 1830 },
-  BEDTIME: { label: '자기 전', time: '오후 10:00', sortValue: 2200 }
-};
 
 // 병원 시간을 숫자값으로 변환하는 함수
 export const getTimeValue = (timeString) => {
@@ -20,25 +13,6 @@ export const getTimeValue = (timeString) => {
   return hour * 100 + minute;
 };
 
-// 약 복용 루틴 임시 데이터
-// export const initialMedicineRoutines = [
-//   {
-//     medicine_id: 3594,
-//     nickname: '아스피린',
-//     dose: 1,
-//     total_quantity: 30,
-//     day_of_weeks: [1, 2, 3],
-//     types: ['MORNING', 'LUNCH', 'DINNER', 'BEDTIME']
-//   },
-//   {
-//     medicine_id: 9876,
-//     nickname: '타이레놀',
-//     dose: 2,
-//     total_quantity: 20,
-//     day_of_weeks: [2, 4, 6],
-//     types: ['MORNING', 'DINNER']
-//   }
-// ];
 
 // 병원 방문 루틴 임시 데이터
 export const initialHospitalRoutines = [
