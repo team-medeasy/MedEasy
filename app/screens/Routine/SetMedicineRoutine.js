@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import { Alert, View, ScrollView } from 'react-native';
+import { Alert, View, ScrollView, Platform } from 'react-native';
 import { themes } from './../../styles';
 import { HeaderIcons } from '../../../assets/icons';
 import {
@@ -8,16 +8,27 @@ import {
   Button,
   MedicineOverview,
   InputWithDelete,
-  ScheduleSelector,
 } from '../../components';
+import { ScheduleSelector } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { createRoutine, deleteRoutineGroup, getRoutineByDate } from '../../api/routine';
+import { 
+  createRoutine, 
+  deleteRoutineGroup, 
+  getRoutineByDate, 
+  getRoutineGroup,
+  updateRoutine
+} from '../../api/routine';
 import { getUserMedicinesCurrent, getUserMedicinesPast } from '../../api/user';
 import { getMedicineById } from '../../api/medicine';
 
 const SetMedicineRoutine = ({ route, navigation }) => {
+  // 네비게이션 파라미터 확인 및 로깅
+  console.log('🔍 route.params:', JSON.stringify(route.params));
+  
   const { medicineId } = route.params;
   const [relatedRoutineIds, setRelatedRoutineIds] = useState([]);
+  const [routineId, setRoutineId] = useState(null);
+  const [routineGroupId, setRoutineGroupId] = useState(null);
   const [medicine, setMedicine] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicineName, setMedicineName] = useState('');
@@ -26,129 +37,295 @@ const SetMedicineRoutine = ({ route, navigation }) => {
   const [selectedTimings, setSelectedTimings] = useState([]);
   const [dosage, setDosage] = useState('');
   const [totalCount, setTotalCount] = useState('');
-  const [scheduleData, setScheduleData] = useState([]);
+  const [intervalDays, setIntervalDays] = useState('1');
   const [scheduleMapping, setScheduleMapping] = useState({});
+  const [userScheduleIds, setUserScheduleIds] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const days = ['월', '화', '수', '목', '금', '토', '일'];
   const timings = ['아침', '점심', '저녁', '자기 전'];
 
-  // medicineId로 약 정보 가져오기
+  // 초기 데이터 로딩
   useEffect(() => {
-    const fetchMedicineData = async () => {
+    const loadInitialData = async () => {
+      console.log('🔍 초기 데이터 로딩 시작');
+      console.log('🔍 medicineId:', medicineId);
+      
+      setIsLoading(true);
+      
       try {
-        console.log('요청하는 medicineId:', medicineId);
-        const response = await getMedicineById(medicineId);
-        console.log('API 응답:', response);
-
-        // API 응답 구조에 따라 적절히 데이터 추출
-        const medicineData = response.data?.body || response.data || response;
-
-        if (medicineData) {
-          console.log('약 데이터:', medicineData);
-          setMedicine(medicineData);
-          // 약 이름으로 기본 별명 설정
-          setMedicineName(medicineData.item_name || medicineData.name || '');
-        } else {
-          console.error('약 정보를 찾을 수 없습니다.');
-        }
+        // 해당 약의 관련 루틴 ID 가져오기
+        await fetchRelatedRoutineIds();
+        
+        // 약 정보 로딩
+        await fetchMedicineData();
       } catch (error) {
-        console.error('약 정보 가져오기 실패:', error);
+        console.error('❌ 초기 데이터 로딩 실패:', error);
+        Alert.alert('오류', '데이터를 불러오는 중 오류가 발생했습니다.');
+      } finally {
+        setIsLoading(false);
+        console.log('🟢 초기 데이터 로딩 완료');
       }
     };
+    
+    loadInitialData();
+  }, []);
 
-    if (medicineId) {
-      fetchMedicineData();
-    }
-  }, [medicineId]);
+  // 관련 루틴 ID 가져오기
+  const fetchRelatedRoutineIds = async () => {
+    try {
+      console.log('🔍 관련 루틴 ID 가져오기 시작');
+      const startDate = '2025-03-01';
+      const endDate = '2025-12-31';
+      const response = await getRoutineByDate(startDate, endDate);
 
-  useEffect(() => {
-    const fetchRoutineData = async () => {
-      try {
-        const startDate = '2025-03-01';
-        const endDate = '2025-12-31';
-        const response = await getRoutineByDate(startDate, endDate);
+      console.log('🟢 루틴 데이터 불러오기 성공');
 
-        console.log('루틴 데이터 불러오기 성공:', response.data);
+      const data = response.data.body;
+      const medicineIdMap = {};
 
-        const data = response.data.body;
-
-        const medicineIdMap = {};
-
-        data.forEach(({ user_schedule_dtos }) => {
-          user_schedule_dtos.forEach(({ routine_dtos }) => {
-            routine_dtos.forEach(({ medicine_id, routine_id }) => {
-              if (!medicineIdMap[medicine_id]) {
-                medicineIdMap[medicine_id] = [];
-              }
-              medicineIdMap[medicine_id].push(routine_id);
-            });
+      data.forEach(({ user_schedule_dtos }) => {
+        user_schedule_dtos.forEach(({ routine_dtos }) => {
+          routine_dtos.forEach(({ medicine_id, routine_id }) => {
+            if (!medicineIdMap[medicine_id]) {
+              medicineIdMap[medicine_id] = [];
+            }
+            medicineIdMap[medicine_id].push(routine_id);
           });
         });
+      });
 
-        console.log('routine_id 목록:', medicineIdMap);
+      console.log('🔍 약별 routine_id 매핑:', medicineIdMap);
 
-        const relatedRoutineIds = medicineIdMap[medicineId] || [];
-        setRelatedRoutineIds(relatedRoutineIds);
+      const relatedIds = medicineIdMap[medicineId] || [];
+      setRelatedRoutineIds(relatedIds);
 
-        console.log(`'${medicineId}'에 해당하는 routine_id 목록:`, relatedRoutineIds);
+      console.log(`🟢 '${medicineId}'에 해당하는 routine_id 목록:`, relatedIds);
 
-      } catch (error) {
-        console.error('루틴 데이터 불러오기 실패:', error);
+      // 관련 루틴 ID가 있으면 첫 번째 ID를 routineId로 설정하고 루틴 그룹 데이터 로드
+      if (relatedIds.length > 0) {
+        const firstRoutineId = relatedIds[0];
+        console.log('🟢 첫 번째 routineId 설정:', firstRoutineId);
+        setRoutineId(firstRoutineId);
+        setIsEditing(true);
+        
+        // 루틴 그룹 데이터 로드
+        await fetchRoutineGroupData(firstRoutineId);
       }
-    };
-
-    fetchRoutineData();
-  }, [medicineId]);
-
-  const handleDeleteRoutineGroup = async () => {
-    try {
-      if (!relatedRoutineIds || relatedRoutineIds.length === 0) {
-        console.log('삭제할 루틴이 없습니다.');
-        Alert.alert('안내', '삭제할 루틴이 없습니다.');
-        return;
-      }
-  
-      const firstId = relatedRoutineIds[0]; // 첫 번째 ID만 사용
-      console.log(firstId);
-      await deleteRoutineGroup(firstId);
-  
-      console.log('✅ 루틴 삭제 완료:', firstId + '을 포함한 루틴 그룹');
-      Alert.alert('삭제 완료', '선택한 약의 전체 루틴이 삭제되었습니다.');
-      navigation.goBack();
     } catch (error) {
-      console.error('❌ 루틴 삭제 실패:', error);
-      Alert.alert('삭제 실패', '루틴 삭제 중 오류가 발생했습니다.');
+      console.error('❌ 관련 루틴 ID 가져오기 실패:', error);
     }
-  };  
+  };
 
-  useEffect(() => {
-    if (medicineId) {
-      fetchMedicineData();
-    }
-  }, [medicineId]);
-
+  // medicineId로 약 정보 가져오기
   const fetchMedicineData = async () => {
     try {
+      console.log('🔍 약 정보 요청 중, medicineId:', medicineId);
+      const response = await getMedicineById(medicineId);
+      
+      // API 응답 구조에 따라 적절히 데이터 추출
+      const medicineData = response.data?.body || response.data || response;
+
+      if (medicineData) {
+        console.log('🟢 약 데이터 로드 성공');
+        setMedicine(medicineData);
+        
+        // 약 이름으로 기본 별명 설정 (수정 모드가 아니고 별명이 아직 설정되지 않았을 때만)
+        if (!isEditing && !medicineName) {
+          console.log('🟢 기본 약 이름으로 별명 설정:', medicineData.item_name || medicineData.medicine_name);
+          setMedicineName(medicineData.item_name || medicineData.medicine_name || '');
+        }
+      } else {
+        console.error('❌ 약 정보를 찾을 수 없습니다.');
+        Alert.alert('오류', '약 정보를 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('❌ 약 정보 가져오기 실패:', error);
+      Alert.alert('오류', '약 정보를 가져오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 루틴 그룹 정보 가져오기
+  const fetchRoutineGroupData = async (routineId) => {
+    if (!routineId) {
+      console.error('❌ 루틴 그룹 데이터 요청 실패: routineId가 없습니다');
+      return;
+    }
+    
+    try {
+      console.log('🔍 루틴 그룹 데이터 요청 중, routineId:', routineId);
+      const response = await getRoutineGroup(routineId);
+      
+      console.log('🔍 API 응답 구조:', JSON.stringify(response, null, 2));
+      
+      // 응답 구조에 따라 데이터 추출
+      const routineData = response.data?.body || response.data || response;
+      
+      console.log('🔍 추출된 루틴 데이터:', JSON.stringify(routineData, null, 2));
+      
+      if (routineData) {
+        // 루틴 그룹 ID 저장
+        if (routineData.routine_group_id) {
+          setRoutineGroupId(routineData.routine_group_id);
+          console.log('🟢 루틴 그룹 ID 설정:', routineData.routine_group_id);
+        }
+        
+        // 별명 설정
+        if (routineData.nickname) {
+          console.log('🟢 별명 설정:', routineData.nickname);
+          setMedicineName(routineData.nickname);
+        }
+        
+        // 복용량 설정
+        if (routineData.dose !== undefined && routineData.dose !== null) {
+          console.log('🟢 복용량 설정:', routineData.dose);
+          setDosage(String(routineData.dose));
+        }
+        
+        // 총 개수 설정 (API 필드명 확인: total_quantity 또는 remaining_quantity)
+        if (routineData.total_quantity !== undefined && routineData.total_quantity !== null) {
+          console.log('🟢 총 개수 설정:', routineData.total_quantity);
+          setTotalCount(String(routineData.total_quantity));
+        } else if (routineData.remaining_quantity !== undefined && routineData.remaining_quantity !== null) {
+          console.log('🟢 남은 개수 설정:', routineData.remaining_quantity);
+          setTotalCount(String(routineData.remaining_quantity));
+        }
+        
+        // 날짜 간격 설정
+        if (routineData.interval_days !== undefined && routineData.interval_days !== null) {
+          console.log('🟢 interval_days 설정:', routineData.interval_days);
+          setIntervalDays(String(routineData.interval_days));
+          
+          // interval_days에 따라 기본 복용 주기 설정
+          if (routineData.interval_days === 1) {
+            // 매일로 설정
+            console.log('🟢 복용 주기 "매일"로 설정');
+            setSelectedOption('매일');
+            setSelectedDays(days);
+          } else {
+            // 1일 이상 간격은 주기 설정으로 처리
+            console.log('🟢 복용 주기 "주기 설정"으로 설정, 간격:', routineData.interval_days);
+            setSelectedOption('주기 설정');
+            // 주기 설정에 맞는 기본 요일 설정
+            const defaultDays = ['월', '수', '금', '일']; 
+            setSelectedDays(defaultDays);
+          }
+        }
+        
+        // 스케줄 정보 설정
+        if (routineData.schedule_responses && Array.isArray(routineData.schedule_responses)) {
+          console.log('🔍 스케줄 정보:', routineData.schedule_responses);
+          
+          // API 응답 구조에서 선택 여부를 확인할 필드명 결정
+          // selected, is_selected, 또는 다른 이름일 수 있음
+          let selectionField = null;
+          
+          // 첫 번째 스케줄 항목에서 선택 여부 필드 확인
+          if (routineData.schedule_responses.length > 0) {
+            const firstSchedule = routineData.schedule_responses[0];
+            if ('selected' in firstSchedule) selectionField = 'selected';
+            else if ('is_selected' in firstSchedule) selectionField = 'is_selected';
+            
+            console.log('🔍 선택 여부 필드명 결정:', selectionField || '필드를 찾을 수 없음');
+          }
+          
+          // 선택된 스케줄 IDs 추출
+          const selectedIds = routineData.schedule_responses
+            .filter(schedule => {
+              // 선택 필드가 있으면 그 값 사용, 없으면 모든 항목을 선택된 것으로 간주
+              if (!selectionField) return true;
+              return schedule[selectionField] === true;
+            })
+            .map(schedule => schedule.user_schedule_id);
+          
+          console.log('🟢 선택된 스케줄 IDs:', selectedIds);
+          setUserScheduleIds(selectedIds);
+          
+          // 스케줄 매핑 설정 (이모지 키와 ID 매핑)
+          const mapping = {};
+          const selectedScheduleNames = [];
+          
+          routineData.schedule_responses.forEach(schedule => {
+            // 이모지 키로 매핑 (시간대 이름 추출)
+            let timingName = '';
+            
+            if (schedule.name) {
+              if (schedule.name.includes('아침')) {
+                timingName = '아침';
+                mapping['🐥️ 아침'] = schedule.user_schedule_id;
+              } else if (schedule.name.includes('점심')) {
+                timingName = '점심';
+                mapping['🥪️ 점심'] = schedule.user_schedule_id;
+              } else if (schedule.name.includes('저녁')) {
+                timingName = '저녁';
+                mapping['🌙️ 저녁'] = schedule.user_schedule_id;
+              } else if (schedule.name.includes('자기')) {
+                timingName = '자기 전';
+                mapping['🛏️️ 자기 전'] = schedule.user_schedule_id;
+              }
+            }
+            
+            console.log(`🔍 스케줄 항목 처리: ID=${schedule.user_schedule_id}, 이름=${schedule.name}, 추출된 시간대=${timingName}`);
+            
+            // 선택 여부 확인
+            const isSelected = selectionField ? 
+              schedule[selectionField] === true : 
+              true;
+            
+            // 선택된 스케줄인 경우 배열에 추가
+            if (isSelected && timingName) {
+              console.log(`🟢 선택된 시간대로 추가: ${timingName}`);
+              selectedScheduleNames.push(timingName);
+            }
+          });
+          
+          console.log('🟢 스케줄 매핑 설정:', mapping);
+          setScheduleMapping(mapping);
+          
+          console.log('🟢 선택된 시간대 이름:', selectedScheduleNames);
+          
+          // 중요: 여기서 setSelectedTimings 직접 호출
+          if (selectedScheduleNames.length > 0) {
+            console.log('🟢 선택된 시간대 상태 설정:', selectedScheduleNames);
+            setSelectedTimings(selectedScheduleNames);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ 루틴 그룹 데이터 가져오기 실패:', error);
+      console.error('❌ 에러 상세 정보:', error.response ? error.response.data : error.message);
+      Alert.alert('오류', '루틴 데이터를 불러오는 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 현재 복용 중인 약, 과거 복용 약 정보도 활용
+  const fetchAdditionalMedicineData = async () => {
+    try {
+      console.log('🔍 추가 약 데이터 가져오기 시작');
+      
       // 1. 현재 복용 중인 약 데이터 가져오기
       const currentResponse = await getUserMedicinesCurrent();
       const currentRoutines = currentResponse.data?.body || [];
-      console.log('현재 복용 중인 약: ', currentRoutines);
+      console.log('🔍 현재 복용 중인 약:', currentRoutines.length);
       
       // 2. 이전에 복용한 약 데이터 가져오기
       const pastResponse = await getUserMedicinesPast();
       const pastRoutines = pastResponse.data?.body || [];
-      console.log('과거 복용 약: ', pastRoutines);
+      console.log('🔍 과거 복용 약:', pastRoutines.length);
       
       // 3. 현재 복용 중인 약에서 medicineId와 일치하는 정보 찾기
       const currentMatch = currentRoutines.find(item => String(item.medicine_id) === String(medicineId));
       if (currentMatch) {
-        console.log('현재 복용 중인 약에서 일치하는 정보:', currentMatch);
+        console.log('🟢 현재 복용 중인 약에서 일치하는 정보 발견:', currentMatch);
         
-        // dose 값 설정
-        setDosage(String(currentMatch.dose));
+        // 정보가 아직 설정되지 않은 경우에만 설정
+        if (!dosage) {
+          setDosage(String(currentMatch.dose || ''));
+        }
         
-        // 복용 주기(day_of_weeks) 설정
-        if (currentMatch.day_of_weeks && Array.isArray(currentMatch.day_of_weeks)) {
+        // 요일 정보가 없는 경우에만 설정
+        if (selectedDays.length === 0 && currentMatch.day_of_weeks && Array.isArray(currentMatch.day_of_weeks)) {
           // day_of_weeks를 이용해 선택된 요일 설정 (숫자->요일 변환)
           const selectedDaysList = currentMatch.day_of_weeks.map(dayNum => days[dayNum - 1]);
           setSelectedDays(selectedDaysList);
@@ -166,59 +343,95 @@ const SetMedicineRoutine = ({ route, navigation }) => {
             setSelectedOption('특정 요일');
           }
         }
+      } else {
+        console.log('🔍 현재 복용 중인 약에서 일치하는 정보 없음');
       }
       
-      // 4. 이전에 복용한 약에서 medicineId와 일치하는 정보 찾기
-      const pastMatches = pastRoutines.filter(item => String(item.medicine_id) === String(medicineId));
-      if (pastMatches.length > 0 && !currentMatch) {
-        console.log('과거 복용 약에서 일치하는 정보:', pastMatches);
-        // 현재 복용 정보가 없는 경우에만 과거 정보 사용
-        const recentPastMatch = pastMatches[0]; // 가장 최근 정보
-        
-        setDosage(String(recentPastMatch.dose));
-        
-        // 복용 주기 설정
-        if (recentPastMatch.day_of_weeks && Array.isArray(recentPastMatch.day_of_weeks)) {
-          const selectedDaysList = recentPastMatch.day_of_weeks.map(dayNum => days[dayNum - 1]);
-          setSelectedDays(selectedDaysList);
+      // 4. 현재 정보가 없고, 과거 정보가 있는 경우 활용
+      if (!currentMatch && !dosage) {
+        const pastMatches = pastRoutines.filter(item => String(item.medicine_id) === String(medicineId));
+        if (pastMatches.length > 0) {
+          console.log('🟢 과거 복용 약에서 일치하는 정보 발견:', pastMatches[0]);
+          const recentPastMatch = pastMatches[0]; // 가장 최근 정보
           
-          if (selectedDaysList.length === 7) {
-            setSelectedOption('매일');
-          } else if (selectedDaysList.length === 4 && 
-                   selectedDaysList.includes('월') && 
-                   selectedDaysList.includes('수') && 
-                   selectedDaysList.includes('금') && 
-                   selectedDaysList.includes('일')) {
-            setSelectedOption('주기 설정');
-          } else {
-            setSelectedOption('특정 요일');
+          setDosage(String(recentPastMatch.dose || ''));
+          
+          // 복용 주기 설정 (아직 설정되지 않은 경우)
+          if (selectedDays.length === 0 && recentPastMatch.day_of_weeks && Array.isArray(recentPastMatch.day_of_weeks)) {
+            const selectedDaysList = recentPastMatch.day_of_weeks.map(dayNum => days[dayNum - 1]);
+            setSelectedDays(selectedDaysList);
+            
+            if (selectedDaysList.length === 7) {
+              setSelectedOption('매일');
+            } else if (selectedDaysList.length === 4 && 
+                     selectedDaysList.includes('월') && 
+                     selectedDaysList.includes('수') && 
+                     selectedDaysList.includes('금') && 
+                     selectedDaysList.includes('일')) {
+              setSelectedOption('주기 설정');
+            } else {
+              setSelectedOption('특정 요일');
+            }
           }
+        } else {
+          console.log('🔍 과거 복용 약에서도 일치하는 정보 없음');
         }
       }
-      
     } catch (error) {
-      console.error('약 데이터 불러오기 실패:', error);
+      console.error('❌ 추가 약 데이터 불러오기 실패:', error);
     }
   };
 
+  // 옵션 선택 핸들러
   const handleSelect = (option) => {
+    console.log('🔍 옵션 선택:', option);
     setSelectedOption((prev) => (prev === option ? null : option));
 
     // 선택된 옵션에 따라 day_of_weeks 설정
     if (option === '매일') {
       // 매일: 월화수목금토일
+      console.log('🟢 "매일" 옵션 - 모든 요일 선택');
       setSelectedDays(days);
+      setIntervalDays('1');
     } else if (option === '특정 요일') {
+      // 특정 요일 선택 모드일 때는 기존 선택된 요일 유지
+      if (selectedOption !== '특정 요일') {
+        console.log('🟢 "특정 요일" 옵션 - 요일 초기화');
+        setSelectedDays([]);
+      }
+      setIntervalDays('1');
     } else if (option === '주기 설정') {
       // 2일 간격: 월수금일 예시
+      console.log('🟢 "주기 설정" 옵션 - 기본 요일 설정');
       setSelectedDays(['월', '수', '금', '일']);
+      setIntervalDays('2');
     } else {
       setSelectedDays([]);
+      setIntervalDays('1');
     }
   };
 
-  const convertDaysToNumbers = selectedDays.map(day => days.indexOf(day) + 1);
-  const convertTimingsToIds = selectedTimings.map(timing => {
+  // 요일 토글 핸들러
+  const toggleDay = day => {
+    console.log('🔍 요일 토글:', day);
+    setSelectedDays(prev => {
+      const newDays = prev.includes(day) 
+        ? prev.filter(d => d !== day) 
+        : [...prev, day];
+      console.log('🟢 선택된 요일 업데이트:', newDays);  
+      return newDays;
+    });
+  };
+
+  // 요일을 숫자로 변환 (API 요청용)
+  const convertDaysToNumbers = () => {
+    const dayNumbers = selectedDays.map(day => days.indexOf(day) + 1);
+    console.log('🔍 선택 요일 -> 숫자 변환:', dayNumbers);
+    return dayNumbers;
+  };
+
+  // 시간대를 ID로 변환 (API 요청용)
+  const convertTimingsToIds = () => {
     // 시간대 이름을 이모지 키로 변환
     const timingToEmojiMap = {
       '아침': '🐥️ 아침',
@@ -227,68 +440,151 @@ const SetMedicineRoutine = ({ route, navigation }) => {
       '자기 전': '🛏️️ 자기 전'
     };
     
-    const emojiKey = timingToEmojiMap[timing];
-    return scheduleMapping[emojiKey] || (timings.indexOf(timing) + 1);
-  });
-  // 수정 버튼 클릭 시 실행할 함수
-  const handleModifyRoutine = async () => {
-    await handleDeleteRoutineGroup();
+    const ids = selectedTimings
+      .map(timing => {
+        const emojiKey = timingToEmojiMap[timing];
+        const id = scheduleMapping[emojiKey];
+        console.log(`🔍 시간대 변환: ${timing} -> ${emojiKey} -> ID ${id}`);
+        return id;
+      })
+      .filter(id => id !== undefined && id !== null);
+    
+    console.log('🔍 변환된 스케줄 IDs:', ids);
+    return ids;
+  };
 
+  // 루틴 수정/등록 핸들러
+  const handleModifyRoutine = async () => {
+    console.log('🔍 루틴 저장/수정 요청');
+    console.log('🔍 현재 상태:', {
+      medicineName,
+      selectedDays,
+      selectedTimings,
+      dosage,
+      totalCount,
+      intervalDays,
+      isEditing,
+      routineId
+    });
+    
     // 필수 입력값 검증
     if (!medicineName || selectedDays.length === 0 || selectedTimings.length === 0 || !dosage || !totalCount) {
-      // 여기에 적절한 오류 메시지 표시 로직 추가
-      console.error('모든 필드를 채워주세요');
+      console.error('❌ 필수 입력값 누락');
+      Alert.alert('입력 오류', '모든 필드를 채워주세요.');
       return;
     }
 
     try {
       // API 요청에 맞게 데이터 형식 변환
+      const dayNumbers = convertDaysToNumbers();
+      const scheduleIds = convertTimingsToIds();
+      
+      // 루틴 데이터 준비 (API 명세에 맞게 필드 이름 설정)
       const routineData = {
         medicine_id: medicineId,
         nickname: medicineName,
         dose: parseInt(dosage, 10),
         total_quantity: parseInt(totalCount, 10),
-        day_of_weeks: convertDaysToNumbers,
-        user_schedule_ids: convertTimingsToIds
+        interval_days: parseInt(intervalDays, 10),
+        user_schedule_ids: scheduleIds
       };
 
-      console.log('전송 데이터:', routineData);
+      // 신규 생성 시 day_of_weeks 추가 (수정 시에는 불필요)
+      if (!isEditing) {
+        routineData.day_of_weeks = dayNumbers;
+      } else if (routineId) {
+        // 수정 시 routineId 추가
+        routineData.routine_id = routineId;
+      }
 
-      // API 호출
-      const response = await createRoutine(routineData);
-      console.log('루틴 저장 성공:', response);
+      console.log('🔍 API 요청 데이터:', routineData);
+
+      // 기존 루틴이 있으면 업데이트, 없으면 신규 생성
+      let response;
+      if (isEditing && routineId) {
+        response = await updateRoutine(routineData);
+        console.log('🟢 루틴 업데이트 성공:', response);
+        Alert.alert('성공', '루틴이 성공적으로 수정되었습니다.');
+      } else {
+        response = await createRoutine(routineData);
+        console.log('🟢 루틴 저장 성공:', response);
+        Alert.alert('성공', '루틴이 성공적으로 등록되었습니다.');
+      }
 
       // 성공 시 이전 화면으로 이동
       navigation.goBack();
-
-      // 성공 메시지 표시 (필요시 추가)
     } catch (error) {
-      console.error('루틴 저장 실패:', error);
-      // 오류 처리 (사용자에게 오류 메시지 표시)
+      console.error('❌ 루틴 저장 실패:', error);
+      console.error('❌ 에러 상세 정보:', error.response ? error.response.data : error.message);
+      Alert.alert('오류', '루틴 저장 중 오류가 발생했습니다.');
     }
   };
 
+  // 루틴 삭제 핸들러
+  const handleDeleteRoutineGroup = async () => {
+    // 삭제할 루틴 ID 결정 (routineId 또는 relatedRoutineIds 중 첫 번째)
+    const idToDelete = routineId || (relatedRoutineIds.length > 0 ? relatedRoutineIds[0] : null);
+    
+    if (!idToDelete) {
+      console.log('❌ 삭제할 루틴이 없습니다.');
+      Alert.alert('안내', '삭제할 루틴이 없습니다.');
+      return;
+    }
+
+    Alert.alert(
+      '루틴 삭제',
+      '정말로 이 루틴을 삭제하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              console.log('🔍 루틴 삭제 요청, ID:', idToDelete);
+              await deleteRoutineGroup(idToDelete);
+              console.log('🟢 루틴 삭제 완료');
+              Alert.alert('삭제 완료', '선택한 약의 전체 루틴이 삭제되었습니다.');
+              navigation.goBack();
+            } catch (error) {
+              console.error('❌ 루틴 삭제 실패:', error);
+              console.error('❌ 에러 상세 정보:', error.response ? error.response.data : error.message);
+              Alert.alert('삭제 실패', '루틴 삭제 중 오류가 발생했습니다.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  // 이미지 확대 핸들러
   const handlePressEnlarge = () => {
     navigation.navigate('MedicineImageDetail', { item: medicine, isModal: true });
   };
 
-  const toggleDay = day => {
-    setSelectedDays(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day],
-    );
-  };
-
+  // 시간 설정 핸들러
   const handleSetTimings = () => {
     navigation.navigate('SetRoutineTime');
   };
 
-  if (!medicine) { // 렌더링 전 error 방지
+  // 매핑 정보 변경 핸들러
+  const handleScheduleMappingChange = (mapping) => {
+    console.log('🔍 스케줄 매핑 변경됨:', mapping);
+    setScheduleMapping(mapping);
+  };
+
+  // 로딩 중 표시
+  if (isLoading || !medicine) {
     return (
       <Container>
         <ModalHeader>약 정보를 불러오는 중...</ModalHeader>
       </Container>
     );
   }
+
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ModalHeader
@@ -296,7 +592,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
         DeleteColor={themes.light.pointColor.Secondary}
         onDeletePress={() => handleModifyRoutine()}
       >
-        루틴 수정
+        {isEditing ? '루틴 수정' : '루틴 등록'}
       </ModalHeader>
 
       <ScrollView
@@ -382,11 +678,12 @@ const SetMedicineRoutine = ({ route, navigation }) => {
               onButtonPress={handleSetTimings}
             />
             <SelectTime>
-            <ScheduleSelector
-              selectedTimings={selectedTimings}
-              setSelectedTimings={setSelectedTimings}
-              onScheduleMappingChange={setScheduleMapping}
-            />
+              <ScheduleSelector
+                selectedTimings={selectedTimings}
+                setSelectedTimings={setSelectedTimings}
+                onScheduleMappingChange={handleScheduleMappingChange}
+                initialData={selectedTimings}
+              />
             </SelectTime>
           </Section>
 
@@ -414,12 +711,14 @@ const SetMedicineRoutine = ({ route, navigation }) => {
             />
           </Section>
 
-          <Button
-            title="루틴 삭제하기"
-            onPress={handleDeleteRoutineGroup}
-            bgColor={themes.light.pointColor.Secondary}
-          />
-
+          {/* 루틴 삭제 버튼 (수정 모드일 때만 표시) */}
+          {isEditing && (
+            <Button
+              title="루틴 삭제하기"
+              onPress={handleDeleteRoutineGroup}
+              bgColor={themes.light.pointColor.Secondary}
+            />
+          )}
         </View>
       </ScrollView>
 
@@ -434,7 +733,10 @@ const SetMedicineRoutine = ({ route, navigation }) => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-        <Button title="수정하기" onPress={handleModifyRoutine} />
+        <Button 
+          title={isEditing ? "수정하기" : "등록하기"} 
+          onPress={handleModifyRoutine} 
+        />
       </View>
     </Container>
   );
