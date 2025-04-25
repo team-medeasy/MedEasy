@@ -32,6 +32,26 @@ const Routine = ({ route }) => {
     BEDTIME: { label: '자기 전', time: '', sortValue: '' }
   });
 
+  const getTimeTypeFromScheduleName = (scheduleName) => {
+    const lowerName = scheduleName.toLowerCase();
+  
+    if (lowerName.includes('아침')) return 'MORNING';
+    if (lowerName.includes('점심')) return 'LUNCH';
+    if (lowerName.includes('저녁')) return 'DINNER';
+    if (lowerName.includes('취침') || lowerName.includes('자기 전')) return 'BEDTIME';
+  
+    return null;
+  };
+  
+  const getTimeTypeFromTime = (timeString) => {
+    const hour = parseInt(timeString.split(':')[0], 10);
+  
+    if (hour >= 5 && hour < 10) return 'MORNING';
+    if (hour >= 10 && hour < 14) return 'LUNCH';
+    if (hour >= 14 && hour < 20) return 'DINNER';
+    return 'BEDTIME';
+  };  
+
   useEffect(() => {
     const fetchUserSchedule = async () => {
       try {
@@ -113,7 +133,7 @@ const Routine = ({ route }) => {
     return weeks;
   };
 
-  const [weeks, setWeeks] = useState(() => generateWeeks(today));
+  const weeks = generateWeeks(today);
 
   // 파라미터 날짜가 있으면 해당 주의 인덱스 계산, 없으면 4(중앙)
   const calculateInitialPage = (initDate) => {
@@ -303,17 +323,6 @@ const Routine = ({ route }) => {
     return { routineMap, checkedMap };
   };
 
-  const getTimeTypeFromScheduleName = scheduleName => {
-    const lowerName = scheduleName.toLowerCase();
-
-    if (lowerName.includes('아침')) return 'MORNING';
-    if (lowerName.includes('점심')) return 'LUNCH';
-    if (lowerName.includes('저녁')) return 'DINNER';
-    if (lowerName.includes('취침') || lowerName.includes('자기 전')) return 'BEDTIME';
-
-    return null;
-  };
-
   // 루틴 데이터를 원하는 형식으로 가공하는 함수
   const processRoutineData = routineData => {
     // 약물 ID 기준으로 데이터를 그룹화할 객체
@@ -324,30 +333,6 @@ const Routine = ({ route }) => {
     const getDayOfWeek = dateString => {
       const date = dayjs(dateString);
       return date.day() === 0 ? 7 : date.day();
-    };
-
-    // 스케줄 이름에 따른 시간대 매핑
-    const getTimeTypeFromScheduleName = scheduleName => {
-      const lowerName = scheduleName.toLowerCase();
-
-      if (lowerName.includes('아침')) return 'MORNING';
-      if (lowerName.includes('점심')) return 'LUNCH';
-      if (lowerName.includes('저녁')) return 'DINNER';
-      if (lowerName.includes('취침') || lowerName.includes('자기 전'))
-        return 'BEDTIME';
-
-      // 이름으로 판단할 수 없는 경우 시간으로 판단
-      return null;
-    };
-
-    // 시간대 매핑 (시간 -> MORNING, LUNCH, DINNER, BEDTIME)
-    const getTimeTypeFromTime = timeString => {
-      const hour = parseInt(timeString.split(':')[0]);
-
-      if (hour >= 5 && hour < 10) return 'MORNING';
-      if (hour >= 10 && hour < 14) return 'LUNCH';
-      if (hour >= 14 && hour < 20) return 'DINNER';
-      return 'BEDTIME';
     };
 
     // 각 날짜별로 데이터 처리
@@ -403,27 +388,33 @@ const Routine = ({ route }) => {
       // 시간대 정렬 (MORNING, LUNCH, DINNER, BEDTIME 순)
       const timeOrder = {MORNING: 0, LUNCH: 1, DINNER: 2, BEDTIME: 3};
       medicine.types.sort((a, b) => timeOrder[a] - timeOrder[b]);
-
       return medicine;
     });
-
     return processedRoutines;
   };
 
   // 모든 루틴 (약 복용 + 병원 방문)을 시간순으로 정렬
   const getAllRoutinesByTime = () => {
-    // 오늘 날짜에 해당하는 약 복용 아이템 생성
     const todayMedicineItems = [];
     const dateKey = selectedDate.fullDate.format('YYYY-MM-DD');
-
+  
     Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
       const medicinesForTime = medicineRoutines.filter(medicine => {
         const dayMatch = medicine.day_of_weeks.includes(
-          selectedDate.fullDate.day() === 0 ? 7 : selectedDate.fullDate.day(),
+          selectedDate.fullDate.day() === 0 ? 7 : selectedDate.fullDate.day()
         );
-        return medicine.types.includes(timeKey) && dayMatch;
+        const timeMatch = medicine.types.includes(timeKey);
+  
+        if (!dayMatch || !timeMatch) {
+          return false;
+        }
+  
+        // ⭐ 그리고 mapRoutineData에 저장된 routineMedicineMap에도 있어야 진짜 루틴임
+        const routineExist = routineMedicineMap[dateKey]?.[timeKey]?.[medicine.medicine_id];
+  
+        return Boolean(routineExist);
       });
-
+  
       if (medicinesForTime.length > 0) {
         todayMedicineItems.push({
           id: `medicine-${timeKey}`,
@@ -436,8 +427,7 @@ const Routine = ({ route }) => {
         });
       }
     });
-
-    // 오늘 날짜에 해당하는 병원 방문 아이템 생성
+  
     const todayHospitalItems = hospitalRoutines
       .filter(hospital =>
         hospital.day_of_weeks.includes(selectedDate.fullDate.day() + 1),
@@ -450,13 +440,13 @@ const Routine = ({ route }) => {
         type: 'hospital',
         hospital,
       }));
-
-    // 모든 아이템 합치고 시간순 정렬
+  
     return [...todayMedicineItems, ...todayHospitalItems].sort(
       (a, b) => a.sortValue - b.sortValue,
     );
   };
-
+  
+  
   const allRoutines = getAllRoutinesByTime();
 
   // 페이지 변경 감지
