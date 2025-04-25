@@ -9,7 +9,7 @@ import { Button } from '../../components/Button';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const SetMedicineTime = ({ route, navigation }) => {
-    const { medicine_id, nickname, day_of_weeks, routine_start_date } = route.params;
+    const { medicine_id, nickname, day_of_weeks, interval_days, routine_start_date } = route.params;
     console.log("routine_start_date:", routine_start_date);
 
     const progress = '66.66%';
@@ -36,11 +36,12 @@ const SetMedicineTime = ({ route, navigation }) => {
         console.log('선택된 시간대 ID:', user_schedule_ids);
 
         navigation.navigate('SetMedicineDose', {
-            medicine_id: medicine_id,
-            nickname: nickname,
-            day_of_weeks: day_of_weeks,
-            routine_start_date: routine_start_date,
-            user_schedule_ids: user_schedule_ids
+            medicine_id,
+            nickname,
+            day_of_weeks,
+            routine_start_date,
+            user_schedule_ids,
+            interval_days: parseInt(interval_days)
         });
     };
 
