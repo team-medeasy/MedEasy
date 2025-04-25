@@ -10,6 +10,8 @@ export const InputWithDelete = ({
     placeholder,
     keyboardType = 'default',
     style,
+    autoCapitalize = 'none',
+    secureTextEntry = false,
 }) => {
     return (
         <InputContainer style={style}>
@@ -19,6 +21,8 @@ export const InputWithDelete = ({
             onChangeText={onChangeText}
             keyboardType={keyboardType}
             returnKeyType="done"
+            autoCapitalize={autoCapitalize}
+            secureTextEntry={secureTextEntry}
         />
         {value && value.length > 0 && (
             <DeleteButton onPress={() => onChangeText('')}>
@@ -38,7 +42,7 @@ const InputContainer = styled.View`
     align-items: center;
     background-color: ${themes.light.boxColor.inputPrimary};
     border-radius: 10px;
-    padding: 0 15px;
+    padding: 0 5px 0 20px;
 `;
 
 const StyledInput = styled.TextInput`
