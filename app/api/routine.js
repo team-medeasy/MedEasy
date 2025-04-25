@@ -11,6 +11,10 @@ export const checkRoutine = data =>
         is_taken: data.is_taken,
       },
     });
+
+// 루틴 그룹 조회
+export const getRoutineGroup = routineId =>
+  api.get(`/routine/group/${routineId}`);
     
 export const getRoutineByDate = (startDate, endDate) =>
     api.get(`/routine`, { params: { start_date: startDate, end_date: endDate } });
