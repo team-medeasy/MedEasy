@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { View, ScrollView, Platform } from 'react-native';
 import { themes } from './../../styles';
-import { ModalHeader, Button, ProgressBar } from '../../components';
+import { ModalHeader, Button, ProgressBar, InputWithDelete } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const DAYS = [
@@ -102,14 +102,17 @@ const SetMedicineDay = ({ route, navigation }) => {
               fontSize={FontSizes.body.default}
             />
             {selectedOption === '주기 설정' && (
-              <IntervalSection>
-                <IntervalInput
-                  keyboardType="numeric"
-                  placeholder="예: 2"
+              <InputWithDelete
                   value={intervalDays}
-                  onChangeText={setIntervalDays}
-                />
-              </IntervalSection>
+                  onChangeText={(text) => {
+                      // 숫자만 입력되도록 처리
+                      if (/^\d*$/.test(text)) {
+                          setIntervalDays(text);
+                      }
+                  }}
+                  placeholder="예: 2"
+                  keyboardType="numeric"
+              />
             )}
           </SelectDay>
         </View>
@@ -193,25 +196,6 @@ const DayText = styled.Text`
   color: ${(props) => (props.selected ? themes.light.textColor.buttonText : themes.light.textColor.Primary30)};
   font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
-`;
-
-const IntervalSection = styled.View`
-  padding: 10px 0;
-`;
-
-const IntervalLabel = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Medium';
-  color: ${themes.light.textColor.Primary50};
-  margin-bottom: 5px;
-`;
-
-const IntervalInput = styled.TextInput`
-  background-color: ${themes.light.boxColor.inputSecondary};
-  border-radius: 10px;
-  padding: 20px;
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.textPrimary};
 `;
 
 export default SetMedicineDay;
