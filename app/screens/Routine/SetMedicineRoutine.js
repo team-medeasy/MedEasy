@@ -14,11 +14,9 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import { 
   createRoutine, 
   deleteRoutineGroup, 
-  getRoutineByDate, 
-  getRoutineGroup,
-  updateRoutine
+  updateRoutine,
+  getRoutineGroupByMedicineId,
 } from '../../api/routine';
-import { getUserMedicinesCurrent, getUserMedicinesPast } from '../../api/user';
 import { getMedicineById } from '../../api/medicine';
 
 const SetMedicineRoutine = ({ route, navigation }) => {
@@ -75,100 +73,31 @@ const SetMedicineRoutine = ({ route, navigation }) => {
   // 관련 루틴 ID 가져오기
   const fetchRelatedRoutineIds = async () => {
     try {
-      console.log('🔍 관련 루틴 ID 가져오기 시작');
-      const startDate = '2025-03-01';
-      const endDate = '2025-12-31';
-      const response = await getRoutineByDate(startDate, endDate);
-
-      console.log('🟢 루틴 데이터 불러오기 성공');
-
-      const data = response.data.body;
-      const medicineIdMap = {};
-
-      data.forEach(({ user_schedule_dtos }) => {
-        user_schedule_dtos.forEach(({ routine_dtos }) => {
-          routine_dtos.forEach(({ medicine_id, routine_id }) => {
-            if (!medicineIdMap[medicine_id]) {
-              medicineIdMap[medicine_id] = [];
-            }
-            medicineIdMap[medicine_id].push(routine_id);
-          });
-        });
-      });
-
-      console.log('🔍 약별 routine_id 매핑:', medicineIdMap);
-
-      const relatedIds = medicineIdMap[medicineId] || [];
-      setRelatedRoutineIds(relatedIds);
-
-      console.log(`🟢 '${medicineId}'에 해당하는 routine_id 목록:`, relatedIds);
-
-      // 관련 루틴 ID가 있으면 첫 번째 ID를 routineId로 설정하고 루틴 그룹 데이터 로드
-      if (relatedIds.length > 0) {
-        const firstRoutineId = relatedIds[0];
-        console.log('🟢 첫 번째 routineId 설정:', firstRoutineId);
-        setRoutineId(firstRoutineId);
-        setIsEditing(true);
-        
-        // 루틴 그룹 데이터 로드
-        await fetchRoutineGroupData(firstRoutineId);
-      }
-    } catch (error) {
-      console.error('❌ 관련 루틴 ID 가져오기 실패:', error);
-    }
-  };
-
-  // medicineId로 약 정보 가져오기
-  const fetchMedicineData = async () => {
-    try {
-      console.log('🔍 약 정보 요청 중, medicineId:', medicineId);
-      const response = await getMedicineById(medicineId);
+      console.log('🔍 약 관련 루틴 그룹 데이터 가져오기 시작');
+      const response = await getRoutineGroupByMedicineId(medicineId);
       
-      // API 응답 구조에 따라 적절히 데이터 추출
-      const medicineData = response.data?.body || response.data || response;
-
-      if (medicineData) {
-        console.log('🟢 약 데이터 로드 성공');
-        setMedicine(medicineData);
-        
-        // 약 이름으로 기본 별명 설정 (수정 모드가 아니고 별명이 아직 설정되지 않았을 때만)
-        if (!isEditing && !medicineName) {
-          console.log('🟢 기본 약 이름으로 별명 설정:', medicineData.item_name || medicineData.medicine_name);
-          setMedicineName(medicineData.item_name || medicineData.medicine_name || '');
-        }
-      } else {
-        console.error('❌ 약 정보를 찾을 수 없습니다.');
-        Alert.alert('오류', '약 정보를 찾을 수 없습니다.');
-      }
-    } catch (error) {
-      console.error('❌ 약 정보 가져오기 실패:', error);
-      Alert.alert('오류', '약 정보를 가져오는 중 오류가 발생했습니다.');
-    }
-  };
-
-  // 루틴 그룹 정보 가져오기
-  const fetchRoutineGroupData = async (routineId) => {
-    if (!routineId) {
-      console.error('❌ 루틴 그룹 데이터 요청 실패: routineId가 없습니다');
-      return;
-    }
-    
-    try {
-      console.log('🔍 루틴 그룹 데이터 요청 중, routineId:', routineId);
-      const response = await getRoutineGroup(routineId);
-      
+      console.log('🟢 약 관련 루틴 그룹 데이터 불러오기 성공');
       console.log('🔍 API 응답 구조:', JSON.stringify(response, null, 2));
       
-      // 응답 구조에 따라 데이터 추출
       const routineData = response.data?.body || response.data || response;
-      
-      console.log('🔍 추출된 루틴 데이터:', JSON.stringify(routineData, null, 2));
       
       if (routineData) {
         // 루틴 그룹 ID 저장
         if (routineData.routine_group_id) {
           setRoutineGroupId(routineData.routine_group_id);
           console.log('🟢 루틴 그룹 ID 설정:', routineData.routine_group_id);
+        }
+        
+        // 루틴 IDs 저장 
+        if (routineData.routine_ids && Array.isArray(routineData.routine_ids) && routineData.routine_ids.length > 0) {
+          setRelatedRoutineIds(routineData.routine_ids);
+          console.log('🟢 관련 루틴 IDs:', routineData.routine_ids);
+          
+          // 마지막 루틴 ID를 선택 (수정을 위해)
+          const lastRoutineId = routineData.routine_ids[routineData.routine_ids.length - 1];
+          setRoutineId(lastRoutineId);
+          console.log('🟢 선택된 루틴 ID 설정 (마지막 ID):', lastRoutineId);
+          setIsEditing(true);
         }
         
         // 별명 설정
@@ -293,92 +222,36 @@ const SetMedicineRoutine = ({ route, navigation }) => {
         }
       }
     } catch (error) {
-      console.error('❌ 루틴 그룹 데이터 가져오기 실패:', error);
+      console.error('❌ 관련 루틴 그룹 데이터 가져오기 실패:', error);
       console.error('❌ 에러 상세 정보:', error.response ? error.response.data : error.message);
-      Alert.alert('오류', '루틴 데이터를 불러오는 중 오류가 발생했습니다.');
     }
   };
 
-  // 현재 복용 중인 약, 과거 복용 약 정보도 활용
-  const fetchAdditionalMedicineData = async () => {
+  // medicineId로 약 정보 가져오기
+  const fetchMedicineData = async () => {
     try {
-      console.log('🔍 추가 약 데이터 가져오기 시작');
+      console.log('🔍 약 정보 요청 중, medicineId:', medicineId);
+      const response = await getMedicineById(medicineId);
       
-      // 1. 현재 복용 중인 약 데이터 가져오기
-      const currentResponse = await getUserMedicinesCurrent();
-      const currentRoutines = currentResponse.data?.body || [];
-      console.log('🔍 현재 복용 중인 약:', currentRoutines.length);
-      
-      // 2. 이전에 복용한 약 데이터 가져오기
-      const pastResponse = await getUserMedicinesPast();
-      const pastRoutines = pastResponse.data?.body || [];
-      console.log('🔍 과거 복용 약:', pastRoutines.length);
-      
-      // 3. 현재 복용 중인 약에서 medicineId와 일치하는 정보 찾기
-      const currentMatch = currentRoutines.find(item => String(item.medicine_id) === String(medicineId));
-      if (currentMatch) {
-        console.log('🟢 현재 복용 중인 약에서 일치하는 정보 발견:', currentMatch);
+      // API 응답 구조에 따라 적절히 데이터 추출
+      const medicineData = response.data?.body || response.data || response;
+
+      if (medicineData) {
+        console.log('🟢 약 데이터 로드 성공');
+        setMedicine(medicineData);
         
-        // 정보가 아직 설정되지 않은 경우에만 설정
-        if (!dosage) {
-          setDosage(String(currentMatch.dose || ''));
-        }
-        
-        // 요일 정보가 없는 경우에만 설정
-        if (selectedDays.length === 0 && currentMatch.day_of_weeks && Array.isArray(currentMatch.day_of_weeks)) {
-          // day_of_weeks를 이용해 선택된 요일 설정 (숫자->요일 변환)
-          const selectedDaysList = currentMatch.day_of_weeks.map(dayNum => days[dayNum - 1]);
-          setSelectedDays(selectedDaysList);
-          
-          // 요일 패턴에 따라 적절한 옵션 선택
-          if (selectedDaysList.length === 7) {
-            setSelectedOption('매일');
-          } else if (selectedDaysList.length === 4 && 
-                   selectedDaysList.includes('월') && 
-                   selectedDaysList.includes('수') && 
-                   selectedDaysList.includes('금') && 
-                   selectedDaysList.includes('일')) {
-            setSelectedOption('주기 설정');
-          } else {
-            setSelectedOption('특정 요일');
-          }
+        // 약 이름으로 기본 별명 설정 (수정 모드가 아니고 별명이 아직 설정되지 않았을 때만)
+        if (!isEditing && !medicineName) {
+          console.log('🟢 기본 약 이름으로 별명 설정:', medicineData.item_name || medicineData.medicine_name);
+          setMedicineName(medicineData.item_name || medicineData.medicine_name || '');
         }
       } else {
-        console.log('🔍 현재 복용 중인 약에서 일치하는 정보 없음');
-      }
-      
-      // 4. 현재 정보가 없고, 과거 정보가 있는 경우 활용
-      if (!currentMatch && !dosage) {
-        const pastMatches = pastRoutines.filter(item => String(item.medicine_id) === String(medicineId));
-        if (pastMatches.length > 0) {
-          console.log('🟢 과거 복용 약에서 일치하는 정보 발견:', pastMatches[0]);
-          const recentPastMatch = pastMatches[0]; // 가장 최근 정보
-          
-          setDosage(String(recentPastMatch.dose || ''));
-          
-          // 복용 주기 설정 (아직 설정되지 않은 경우)
-          if (selectedDays.length === 0 && recentPastMatch.day_of_weeks && Array.isArray(recentPastMatch.day_of_weeks)) {
-            const selectedDaysList = recentPastMatch.day_of_weeks.map(dayNum => days[dayNum - 1]);
-            setSelectedDays(selectedDaysList);
-            
-            if (selectedDaysList.length === 7) {
-              setSelectedOption('매일');
-            } else if (selectedDaysList.length === 4 && 
-                     selectedDaysList.includes('월') && 
-                     selectedDaysList.includes('수') && 
-                     selectedDaysList.includes('금') && 
-                     selectedDaysList.includes('일')) {
-              setSelectedOption('주기 설정');
-            } else {
-              setSelectedOption('특정 요일');
-            }
-          }
-        } else {
-          console.log('🔍 과거 복용 약에서도 일치하는 정보 없음');
-        }
+        console.error('❌ 약 정보를 찾을 수 없습니다.');
+        Alert.alert('오류', '약 정보를 찾을 수 없습니다.');
       }
     } catch (error) {
-      console.error('❌ 추가 약 데이터 불러오기 실패:', error);
+      console.error('❌ 약 정보 가져오기 실패:', error);
+      Alert.alert('오류', '약 정보를 가져오는 중 오류가 발생했습니다.');
     }
   };
 
