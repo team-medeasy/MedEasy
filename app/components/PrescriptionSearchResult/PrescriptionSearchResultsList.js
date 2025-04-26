@@ -7,20 +7,24 @@ import { PrescriptionSearchResultItem } from './PrescriptionSearchResultItem';
 export const PrescriptionSearchResultsList = ({ 
   searchResults,
   handleSearchResultPress,
+  handleModifyRoutine,
   onEndReached,
   onEndReachedThreshold = 0.5,
   refreshing
- }) => {
+}) => {
   return (
     <ResultsContainer>
       <FlatList
         data={searchResults}
         keyExtractor={(item, index) => item.uniqueKey || `item_${item.original_id}_${index}`}
         renderItem={({item}) => (
-          <PrescriptionSearchResultItem item={item} onPress={handleSearchResultPress} />
+          <PrescriptionSearchResultItem 
+            item={item} 
+            onPress={handleSearchResultPress} 
+            onModifyRoutine={handleModifyRoutine}
+          />
         )}
         showsVerticalScrollIndicator={false}
-
         onEndReached={onEndReached}
         onEndReachedThreshold={onEndReachedThreshold}
         ListFooterComponent={() => (
