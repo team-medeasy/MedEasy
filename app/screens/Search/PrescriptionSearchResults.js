@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { View, ActivityIndicator, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, ActivityIndicator, Text, Alert } from 'react-native';
 import { themes } from './../../styles';
 import {
   Header,
@@ -10,6 +10,7 @@ import {
 } from '../../components';
 import { searchPrescriptionByImage } from '../../api/prescriptionSearch';
 import { getMedicineDetailByMedicineId } from '../../api/search';
+import { createRoutineList } from '../../api/routine';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
@@ -188,35 +189,78 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
   
       navigation.navigate('MedicineDetail', { item: fallbackItem });
     }
-  };  
+  };
 
-  // 루틴 등록 처리
-  const handleRegisterRoutines = () => {
-    if (searchResults.length === 0) return;
+  // 약품 루틴 수정 처리 함수
+  const handleModifyRoutine = (item) => {
+    // 원본 API 응답에서 medicine_id를 기준으로 항목 찾기
+    const originalItem = originalResponseData.find(
+      original => original.medicine_id === item.original_id
+    );
 
-    const routineRequests = originalResponseData.map(medicine => ({
-      medicine_id: medicine.medicine_id,
-      nickname: medicine.medicine_name,
-      dose: medicine.dose,
-      total_days: medicine.total_days || 0,
-      total_quantity: medicine.total_quantity || 0,
-      day_of_weeks: medicine.day_of_weeks || [1, 2, 3, 4, 5, 6, 7],
-      user_schedule_ids: medicine.user_schedules
-        .filter(schedule => schedule.recommended === true)
-        .map(schedule => schedule.user_schedule_id)
-    }));
+    if (!originalItem) {
+      Alert.alert('오류', '약 정보를 불러올 수 없습니다.');
+      return;
+    }
 
-    navigation.navigate('RoutineRegister', {
-      routineRequests,
+    // SetMedicineRoutine 화면으로 이동하며 필요한 데이터 전달
+    navigation.navigate('SetMedicineRoutine', {
+      medicineId: originalItem.medicine_id,
+      medicineName: originalItem.medicine_name,
+      dose: originalItem.dose,
+      total_quantity: originalItem.total_quantity,
+      total_days: originalItem.total_days,
+      day_of_weeks: originalItem.day_of_weeks,
+      user_schedules: originalItem.user_schedules,
       fromPrescription: true
     });
   };
 
-  // 내용 수정 처리
-  const handleModifyContent = () => {
-    navigation.navigate('ModifyPrescription', {
-      prescriptionData: originalResponseData
-    });
+  // 루틴 등록 처리
+  const handleRegisterRoutines = async () => {
+    if (searchResults.length === 0) return;
+
+    try {
+      const routineRequests = originalResponseData.map(medicine => ({
+        medicine_id: medicine.medicine_id,
+        nickname: medicine.medicine_name,
+        dose: medicine.dose,
+        total_quantity: medicine.total_quantity || (medicine.dose * medicine.total_days) || 0,
+        day_of_weeks: medicine.day_of_weeks || [1, 2, 3, 4, 5, 6, 7],
+        user_schedule_ids: medicine.user_schedules
+          .filter(schedule => schedule.recommended === true)
+          .map(schedule => schedule.user_schedule_id),
+        interval_days: 1 // 기본값 1일로 설정
+      }));
+      
+      // API 명세에 따라 /routine/list 엔드포인트 호출하여 루틴 리스트 등록
+      const response = await createRoutineList(routineRequests);
+      
+      // 성공 메시지 표시
+      Alert.alert(
+        '등록 완료', 
+        '루틴이 성공적으로 등록되었습니다.',
+        [{ 
+          text: '확인', 
+          onPress: () => {
+            // 루틴 등록 이후 홈화면으로 이동
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'NavigationBar' }]
+            });
+          } 
+        }]
+      );
+    } catch (error) {
+      console.error('루틴 등록 실패:', error);
+      
+      // 오류 메시지 표시
+      Alert.alert(
+        '등록 실패',
+        '루틴 등록 중 오류가 발생했습니다. 다시 시도해주세요.',
+        [{ text: '확인' }]
+      );
+    }
   };
 
   return (
@@ -254,6 +298,7 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
           <PrescriptionSearchResultsList
             searchResults={searchResults}
             handleSearchResultPress={handleSearchResultPress}
+            handleModifyRoutine={handleModifyRoutine}
             onEndReachedThreshold={0.5}
           />
         )}
@@ -271,9 +316,6 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
         backgroundColor: themes.light.bgColor.bgPrimary
       }}>
         <Button title='확인' onPress={handleRegisterRoutines} disabled={loading || noResults || searchResults.length === 0} />
-        <ModifyButton onPress={handleModifyContent}>
-          <ModifyText>내용을 수정하고 싶어요.</ModifyText>
-        </ModifyButton>
       </View>
     </Container>
   );
@@ -289,17 +331,6 @@ const SearchResultContainer = styled.View`
   margin-top: 37px;
   margin-bottom: 120px;
   background-color: ${themes.light.bgColor.bgPrimary};
-`;
-
-const ModifyButton = styled(TouchableOpacity)`
-`;
-
-const ModifyText = styled.Text`
-  font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.Primary50};
-  text-decoration: underline;
-  text-decoration-color: ${themes.light.textColor.Primary50}; 
 `;
 
 export default PrescriptionSearchResultsScreen;

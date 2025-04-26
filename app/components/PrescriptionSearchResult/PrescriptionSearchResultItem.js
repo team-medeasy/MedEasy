@@ -5,58 +5,60 @@ import { Tag } from './../index';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { themes } from '../../styles';
 
-export const PrescriptionSearchResultItem = ({ item, onPress }) => {
+export const PrescriptionSearchResultItem = ({ item, onPress, onModifyRoutine }) => {
   // 이미지가 없는 경우를 위한 기본 이미지 처리 로직 추가
   const handleImageError = (error) => {
     console.error('이미지 로드 오류:', error);
   };
 
   return (
-    <ItemContainer onPress={() => onPress(item)}>
-      <View style={{ flexDirection: 'row', gap: 15 }}>
-        {item.item_image ? (
-          <MedicineImage 
-            source={{ uri: item.item_image }} 
-            resizeMode="cover" 
-            onError={handleImageError}
-          />
-        ) : (
-          <PlaceholderImage>
-            <Text style={{ color: '#aaa', fontSize: 12 }}>이미지 없음</Text>
-          </PlaceholderImage>
-        )}
+    <ItemContainer>
+      <TouchableOpacity onPress={() => onPress(item)}>
+        <View style={{ flexDirection: 'row', gap: 15 }}>
+          {item.item_image ? (
+            <MedicineImage 
+              source={{ uri: item.item_image }} 
+              resizeMode="cover" 
+              onError={handleImageError}
+            />
+          ) : (
+            <PlaceholderImage>
+              <Text style={{ color: '#aaa', fontSize: 12 }}>이미지 없음</Text>
+            </PlaceholderImage>
+          )}
 
-        <InfoContainer>
-          <View style={{ gap: 7 }}>
-            <Description numberOfLines={2} ellipsizeMode="tail">
-              {item.entp_name || '정보 없음'}
-            </Description>
-            <MedicineName numberOfLines={1} ellipsizeMode="tail">
-              {item.item_name || '정보 없음'}
-            </MedicineName>
+          <InfoContainer>
+            <View style={{ gap: 7 }}>
+              <Description numberOfLines={2} ellipsizeMode="tail">
+                {item.entp_name || '정보 없음'}
+              </Description>
+              <MedicineName numberOfLines={1} ellipsizeMode="tail">
+                {item.item_name || '정보 없음'}
+              </MedicineName>
 
-            <View style={{ flexDirection: 'row', gap: 11 }}>
-              <Tag 
-                sizeType="small" 
-                colorType="resultPrimary"
-                overflowMode='scroll'
-                maxWidth='66'
-              >
-                {item.etc_otc_name || '정보 없음'}
-              </Tag>
-              <Tag 
-                sizeType="small" 
-                colorType="resultSecondary"
-                overflowMode='scroll'
-                maxWidth='130'
-                maxLength={10}
-              >
-                {item.class_name || '정보 없음'}
-              </Tag>
+              <View style={{ flexDirection: 'row', gap: 11 }}>
+                <Tag 
+                  sizeType="small" 
+                  colorType="resultPrimary"
+                  overflowMode='scroll'
+                  maxWidth='66'
+                >
+                  {item.etc_otc_name || '정보 없음'}
+                </Tag>
+                <Tag 
+                  sizeType="small" 
+                  colorType="resultSecondary"
+                  overflowMode='scroll'
+                  maxWidth='130'
+                  maxLength={10}
+                >
+                  {item.class_name || '정보 없음'}
+                </Tag>
+              </View>
             </View>
-          </View>
-        </InfoContainer>
-      </View>
+          </InfoContainer>
+        </View>
+      </TouchableOpacity>
 
       <View
         style={{
@@ -65,6 +67,7 @@ export const PrescriptionSearchResultItem = ({ item, onPress }) => {
           paddingVertical: 20,
           gap: 16,
           borderRadius: 10,
+          marginTop: 15
         }}
       >
         <Routine 
@@ -80,6 +83,11 @@ export const PrescriptionSearchResultItem = ({ item, onPress }) => {
           value={item.total_days ? `${item.total_days}일간` : '2일간'} 
         />
       </View>
+      
+      {/* 루틴 수정 버튼 추가 */}
+      <ModifyRoutineButton onPress={() => onModifyRoutine(item)}>
+        <ModifyRoutineText>이 약의 루틴을 수정하고 싶어요</ModifyRoutineText>
+      </ModifyRoutineButton>
     </ItemContainer>
   );
 };
@@ -125,9 +133,9 @@ const Routine = ({ label, value }) => {
   );
 };
 
-const ItemContainer = styled(TouchableOpacity)`
+const ItemContainer = styled.View`
   margin-bottom: 28px;
-  gap: 15px;
+  gap: 10px;
 `;
 
 const MedicineImage = styled.Image`
@@ -159,4 +167,19 @@ const Description = styled.Text`
   font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-medium';
   color: ${themes.light.textColor.Primary50};
+`;
+
+// 루틴 수정 버튼 스타일
+const ModifyRoutineButton = styled.TouchableOpacity`
+  align-items: flex-end;
+  padding: 5px 10px;
+  margin-top: 5px;
+`;
+
+const ModifyRoutineText = styled.Text`
+  font-family: 'Pretendard-Medium';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.pointColor.Primary};
+  text-decoration: underline;
+  text-decoration-color: ${themes.light.pointColor.Primary};
 `;
