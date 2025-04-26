@@ -24,3 +24,6 @@ export const deleteRoutine = routineId => api.delete(`/routine/${routineId}`);
 export const deleteRoutineGroup = routineId => api.delete(`/routine/group/${routineId}`);
 
 export const updateRoutine = data => api.put('/routine', data);
+
+export const getRoutineGroupByMedicineId = medicineId => 
+  api.get(`/routine/group/medicine_id/${medicineId}`);
