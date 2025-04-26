@@ -1,6 +1,10 @@
 import api from './index';
 
+// 단일 루틴 생성
 export const createRoutine = data => api.post('/routine', data);
+
+// 루틴 리스트 등록
+export const createRoutineList = routineList => api.post('/routine/list', routineList);
 
 export const registerOcrRoutine = data => api.post('/routine/ocr', data);
 
