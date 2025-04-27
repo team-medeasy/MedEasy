@@ -89,7 +89,9 @@ const SetMedicineTotal = ({route, navigation}) => {
                 <Button 
                     title="저장하기" 
                     onPress={handleSaveRoutine}
-                    disabled={!total} // 총 개수가 입력되지 않으면 버튼 비활성화
+                    disabled={!total}
+                    bgColor={total ? themes.light.boxColor.buttonPrimary : themes.light.boxColor.inputSecondary}
+                    textColor={total ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
                 />
             </View>
         </Container>
