@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {
     View, 
     ScrollView,
+    Platform
 } from 'react-native';
 import {themes} from './../../styles';
 import {
@@ -15,8 +16,8 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 
 const SetMedicineDose = ({route, navigation}) => {
     const { medicine_id, nickname, day_of_weeks, routine_start_date, interval_days, user_schedule_ids } = route.params;
-    console.log("user_schedule_ids:",user_schedule_ids);
-    const [dose, setDose] = useState('');
+    console.log("user_schedule_ids:", user_schedule_ids);
+    const [dose, setDose] = useState('1'); // 기본값 1로 설정
     const progress = '83.33%';
 
     const handleNext = () => {
@@ -27,7 +28,7 @@ const SetMedicineDose = ({route, navigation}) => {
             routine_start_date: routine_start_date,
             user_schedule_ids: user_schedule_ids,
             interval_days: parseInt(interval_days),
-            dose: parseInt(dose) || 1 // 기본값 1 설정
+            dose: parseInt(dose) || 1
         });
     };
 
@@ -71,7 +72,13 @@ const SetMedicineDose = ({route, navigation}) => {
                     paddingBottom: 30,
                     alignItems: 'center',
                 }}>
-                <Button title="다음" onPress={handleNext} />
+                <Button 
+                    title="다음" 
+                    onPress={handleNext} 
+                    disabled={dose.trim() === ''}
+                    bgColor={dose.trim() != '' ? themes.light.boxColor.buttonPrimary : themes.light.boxColor.inputSecondary}
+                    textColor={dose.trim() != '' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
+                />
             </View>
         </Container>
     );
