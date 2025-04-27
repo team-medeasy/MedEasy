@@ -24,6 +24,9 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
 
   // API 응답 데이터를 저장할 상태 변수
   const [originalResponseData, setOriginalResponseData] = useState([]);
+  
+  // 수정된 루틴 정보를 추적하는 상태 변수 추가
+  const [modifiedRoutines, setModifiedRoutines] = useState({});
 
   // 처방전 분석 함수
   const analyzePrescription = async () => {
@@ -59,7 +62,9 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
             total_days: item.total_days,
             total_quantity: item.total_quantity,
             day_of_weeks: item.day_of_weeks,
-            user_schedules: item.user_schedules
+            user_schedules: item.user_schedules,
+            // 수정 여부 표시를 위한 플래그 추가
+            isModified: false
           };
           return formatted;
         });
@@ -203,17 +208,51 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
       return;
     }
 
+    // 기존에 수정된 정보가 있다면 그것을 우선 사용
+    const modifiedItem = modifiedRoutines[item.original_id] || originalItem;
+
     // SetMedicineRoutine 화면으로 이동하며 필요한 데이터 전달
     navigation.navigate('SetMedicineRoutine', {
       medicineId: originalItem.medicine_id,
-      medicineName: originalItem.medicine_name,
-      dose: originalItem.dose,
-      total_quantity: originalItem.total_quantity,
-      total_days: originalItem.total_days,
-      day_of_weeks: originalItem.day_of_weeks,
-      user_schedules: originalItem.user_schedules,
-      fromPrescription: true
+      medicineName: modifiedItem.medicine_name || originalItem.medicine_name,
+      dose: modifiedItem.dose || originalItem.dose,
+      total_quantity: modifiedItem.total_quantity || originalItem.total_quantity,
+      total_days: modifiedItem.total_days || originalItem.total_days,
+      day_of_weeks: modifiedItem.day_of_weeks || originalItem.day_of_weeks,
+      user_schedules: modifiedItem.user_schedules || originalItem.user_schedules,
+      fromPrescription: true,
+      onRoutineUpdate: (updatedRoutine) => handleRoutineUpdate(originalItem.medicine_id, updatedRoutine)
     });
+  };
+
+  // 루틴 수정 결과 처리 함수
+  const handleRoutineUpdate = (medicineId, updatedRoutine) => {
+    console.log('루틴 수정 결과:', medicineId, updatedRoutine);
+    
+    // 수정된 루틴 정보 저장
+    setModifiedRoutines(prev => ({
+      ...prev,
+      [medicineId]: updatedRoutine
+    }));
+
+    // 검색 결과에 수정 상태 반영
+    setSearchResults(prevResults => 
+      prevResults.map(item => {
+        if (item.original_id === medicineId) {
+          return {
+            ...item,
+            isModified: true,
+            // 변경된 정보 반영
+            item_name: updatedRoutine.nickname || item.item_name,
+            dose: updatedRoutine.dose,
+            total_quantity: updatedRoutine.total_quantity,
+            day_of_weeks: updatedRoutine.day_of_weeks,
+            user_schedules: updatedRoutine.user_schedules
+          };
+        }
+        return item;
+      })
+    );
   };
 
   // 루틴 등록 처리
@@ -221,17 +260,25 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
     if (searchResults.length === 0) return;
 
     try {
-      const routineRequests = originalResponseData.map(medicine => ({
-        medicine_id: medicine.medicine_id,
-        nickname: medicine.medicine_name,
-        dose: medicine.dose,
-        total_quantity: medicine.total_quantity || (medicine.dose * medicine.total_days) || 0,
-        day_of_weeks: medicine.day_of_weeks || [1, 2, 3, 4, 5, 6, 7],
-        user_schedule_ids: medicine.user_schedules
-          .filter(schedule => schedule.recommended === true)
-          .map(schedule => schedule.user_schedule_id),
-        interval_days: 1 // 기본값 1일로 설정
-      }));
+      // 원본 데이터를 기반으로 수정된 정보가 있으면 적용하여 요청 데이터 구성
+      const routineRequests = originalResponseData.map(medicine => {
+        // 수정된 정보가 있는지 확인
+        const modifiedData = modifiedRoutines[medicine.medicine_id];
+        
+        return {
+          medicine_id: medicine.medicine_id,
+          nickname: modifiedData?.nickname || modifiedData?.medicine_name || medicine.medicine_name,
+          dose: modifiedData?.dose || medicine.dose,
+          total_quantity: modifiedData?.total_quantity || medicine.total_quantity || (medicine.dose * medicine.total_days) || 0,
+          day_of_weeks: modifiedData?.day_of_weeks || medicine.day_of_weeks || [1, 2, 3, 4, 5, 6, 7],
+          user_schedule_ids: (modifiedData?.user_schedules || medicine.user_schedules)
+            .filter(schedule => schedule.recommended === true)
+            .map(schedule => schedule.user_schedule_id),
+          interval_days: modifiedData?.interval_days || 1 // 기본값 1일로 설정
+        };
+      });
+      
+      console.log('최종 루틴 등록 요청 데이터:', routineRequests);
       
       // API 명세에 따라 /routine/list 엔드포인트 호출하여 루틴 리스트 등록
       const response = await createRoutineList(routineRequests);
