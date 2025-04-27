@@ -470,6 +470,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
           nickname: medicineName,
           dose: parseInt(dosage, 10),
           total_quantity: parseInt(totalCount, 10),
+          total_days: Math.ceil(parseInt(totalCount, 10) / (parseInt(dosage, 10) * selectedTimings.length)), // 약 먹는 일수 계산
           interval_days: parseInt(intervalDays, 10),
           day_of_weeks: dayNumbers,
           user_schedules: updatedSchedules

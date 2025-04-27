@@ -246,6 +246,7 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
             item_name: updatedRoutine.nickname || item.item_name,
             dose: updatedRoutine.dose,
             total_quantity: updatedRoutine.total_quantity,
+            total_days: updatedRoutine.total_days,
             day_of_weeks: updatedRoutine.day_of_weeks,
             user_schedules: updatedRoutine.user_schedules
           };
