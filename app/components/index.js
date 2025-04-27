@@ -10,7 +10,7 @@ import { CameraSearchResultsList } from './CameraSearchResult/CameraSearchResult
 import { CameraSearchResultItem } from './CameraSearchResult/CameraSearchResultItem'
 import { PrescriptionSearchResultsList } from './PrescriptionSearchResult/PrescriptionSearchResultsList';
 import { PrescriptionSearchResultItem } from './PrescriptionSearchResult/PrescriptionSearchResultItem';
-import { Button, BackAndNextButtons, SelectTimeButton } from './Button';
+import { Button, BackAndNextButtons, DualTextButton, } from './Button';
 import { ProgressBar } from './ProgressBar';
 import { SearchBar } from './SearchBar';
 import { Footer } from './Footer';
@@ -28,7 +28,7 @@ import { ScheduleSelector } from './ScheduleSelector';
 export {
   Button,
   BackAndNextButtons,
-  SelectTimeButton,
+  DualTextButton,
   ProgressBar,
   SearchBar,
   Header,
