@@ -409,7 +409,6 @@ const Routine = ({ route }) => {
           return false;
         }
   
-        // ⭐ 그리고 mapRoutineData에 저장된 routineMedicineMap에도 있어야 진짜 루틴임
         const routineExist = routineMedicineMap[dateKey]?.[timeKey]?.[medicine.medicine_id];
   
         return Boolean(routineExist);
@@ -428,6 +427,7 @@ const Routine = ({ route }) => {
       }
     });
   
+    // 오늘 날짜에 해당하는 병원 방문 아이템 생성
     const todayHospitalItems = hospitalRoutines
       .filter(hospital =>
         hospital.day_of_weeks.includes(selectedDate.fullDate.day() + 1),
@@ -441,11 +441,11 @@ const Routine = ({ route }) => {
         hospital,
       }));
   
+    // 모든 아이템 합치고 시간순 정렬
     return [...todayMedicineItems, ...todayHospitalItems].sort(
       (a, b) => a.sortValue - b.sortValue,
     );
   };
-  
   
   const allRoutines = getAllRoutinesByTime();
 
