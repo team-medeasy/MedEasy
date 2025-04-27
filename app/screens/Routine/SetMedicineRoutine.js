@@ -6,6 +6,7 @@ import { HeaderIcons } from '../../../assets/icons';
 import {
   ModalHeader,
   Button,
+  DualTextButton,
   MedicineOverview,
   InputWithDelete,
 } from '../../components';
@@ -500,21 +501,17 @@ const SetMedicineRoutine = ({ route, navigation }) => {
           <Section>
             <SectionHeader title="복용 주기" />
             <SelectDay>
-              <Button
+              <DualTextButton
                 title={'매일'}
                 onPress={() => handleSelect('매일')}
-                fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedOption === '매일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedOption === '매일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default}
               />
-              <Button
+              <DualTextButton
                 title={'특정 요일마다 (예: 월, 수, 금)'}
                 onPress={() => handleSelect('특정 요일')}
-                fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedOption === '특정 요일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedOption === '특정 요일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default}
               />
 
               {/* 특정 요일 선택 시 요일 선택 버튼 표시 */}
@@ -532,13 +529,11 @@ const SetMedicineRoutine = ({ route, navigation }) => {
                 </DaySelection>
               )}
 
-              <Button
+              <DualTextButton
                 title={'주기 설정 (예: 2일 간격으로)'}
                 onPress={() => handleSelect('주기 설정')}
-                fontFamily={'Pretendard-SemiBold'}
                 bgColor={selectedOption === '주기 설정' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedOption === '주기 설정' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-                fontSize={FontSizes.body.default}
               />
             </SelectDay>
           </Section>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { View, ScrollView, Platform } from 'react-native';
 import { themes } from './../../styles';
-import { ModalHeader, Button, ProgressBar, InputWithDelete } from '../../components';
+import { ModalHeader, Button, ProgressBar, InputWithDelete, DualTextButton } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const DAYS = [
@@ -68,21 +68,17 @@ const SetMedicineDay = ({ route, navigation }) => {
             <SmallText>일정에 맞춰 복약 알림을 보내드릴게요!</SmallText>
           </TextContainer>
           <SelectDay>
-            <Button
+            <DualTextButton
               title={'매일'}
               onPress={() => handleSelect('매일')}
-              fontFamily={'Pretendard-SemiBold'}
               bgColor={selectedOption === '매일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
               textColor={selectedOption === '매일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-              fontSize={FontSizes.body.default}
             />
-            <Button
+            <DualTextButton
               title={'특정 요일마다 (예: 월, 수, 금)'}
               onPress={() => handleSelect('특정 요일')}
-              fontFamily={'Pretendard-SemiBold'}
               bgColor={selectedOption === '특정 요일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
               textColor={selectedOption === '특정 요일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-              fontSize={FontSizes.body.default}
             />
             {selectedOption === '특정 요일' && (
               <DaySelection>
@@ -93,13 +89,11 @@ const SetMedicineDay = ({ route, navigation }) => {
                 ))}
               </DaySelection>
             )}
-            <Button
+            <DualTextButton
               title={'주기 설정 (예: 2일 간격으로)'}
               onPress={() => handleSelect('주기 설정')}
-              fontFamily={'Pretendard-SemiBold'}
               bgColor={selectedOption === '주기 설정' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
               textColor={selectedOption === '주기 설정' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-              fontSize={FontSizes.body.default}
             />
             {selectedOption === '주기 설정' && (
               <InputWithDelete

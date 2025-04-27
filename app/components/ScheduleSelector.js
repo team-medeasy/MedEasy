@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { themes } from '../styles';
-import { SelectTimeButton } from '../components';
+import { DualTextButton } from '../components';
 import { getUserSchedule } from '../api/user';
 
 export const ScheduleSelector = ({ 
@@ -147,30 +147,30 @@ export const ScheduleSelector = ({
 
   return (
     <SelectTime>
-      <SelectTimeButton
+      <DualTextButton
         title={'🐥️ 아침'}
-        timeText={scheduleData['아침 식사 후'] || '오전 7시'}
+        messageText={scheduleData['아침 식사 후'] || '오전 7시'}
         onPress={() => toggleTiming('아침')}
         bgColor={selectedTimings.includes('아침') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
         textColor={selectedTimings.includes('아침') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-      />
-      <SelectTimeButton
+  />
+      <DualTextButton
         title={'🥪️ 점심'}
-        timeText={scheduleData['점심 식사 후'] || '오후 12시'}
+        messageText={scheduleData['점심 식사 후'] || '오후 12시'}
         onPress={() => toggleTiming('점심')}
         bgColor={selectedTimings.includes('점심') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
         textColor={selectedTimings.includes('점심') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
       />
-      <SelectTimeButton
+      <DualTextButton
         title={'🌙️ 저녁'}
-        timeText={scheduleData['저녁 식사 후'] || '오후 7시'}
+        messageText={scheduleData['저녁 식사 후'] || '오후 7시'}
         onPress={() => toggleTiming('저녁')}
         bgColor={selectedTimings.includes('저녁') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
         textColor={selectedTimings.includes('저녁') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
       />
-      <SelectTimeButton
+      <DualTextButton
         title={'🛏️️ 자기 전'}
-        timeText={scheduleData['자기 전'] || '오후 10시 30분'}
+        messageText={scheduleData['자기 전'] || '오후 10시 30분'}
         onPress={() => toggleTiming('자기 전')}
         bgColor={selectedTimings.includes('자기 전') ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
         textColor={selectedTimings.includes('자기 전') ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
