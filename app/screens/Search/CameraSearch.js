@@ -47,7 +47,7 @@ const CameraSearchScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const {hasPermission, requestPermission} = useCameraPermission();
-  
+
   // --- State ---
   const [activeIndex, setActiveIndex] = useState(0);
   const [cameraPosition, setCameraPosition] = useState('back');
@@ -73,12 +73,12 @@ const CameraSearchScreen = () => {
   const isPrescriptionMode = activeIndex === 1;
   const device = useCameraDevice(cameraPosition);
 
-// --- Clean up on unmount ---
+  // --- Clean up on unmount ---
   useEffect(() => {
     return () => {
       // 화면이 unmount될 때 즉시 카메라 비활성화
       setIsCameraActive(false);
-      
+
       // 약간의 지연 후 메모리 정리 작업
       setTimeout(() => {
         if (isMounted.current) {
@@ -87,7 +87,7 @@ const CameraSearchScreen = () => {
           focusAreaHeight.stopAnimation();
           focusIndicatorOpacity.stopAnimation();
           focusIndicatorScale.stopAnimation();
-          
+
           isMounted.current = false;
         }
       }, 100);
@@ -102,7 +102,7 @@ const CameraSearchScreen = () => {
           setIsCameraActive(true);
         }
       }, 100); // 약간의 지연으로 렌더링 완료 보장
-      
+
       return () => clearTimeout(timer);
     } else {
       setIsCameraActive(false);
@@ -112,10 +112,10 @@ const CameraSearchScreen = () => {
   // --- Permission Handling ---
   const checkAndRequestCameraPermission = useCallback(async () => {
     if (hasPermission) return true;
-    
+
     console.log('Requesting camera permission...');
     const granted = await requestPermission();
-    
+
     if (!granted && isMounted.current) {
       Alert.alert(
         '카메라 권한 필요',
@@ -132,7 +132,7 @@ const CameraSearchScreen = () => {
         ],
       );
     }
-    
+
     return granted;
   }, [hasPermission, requestPermission, navigation]);
 
@@ -149,50 +149,55 @@ const CameraSearchScreen = () => {
     if (isMounted.current) {
       setIsCameraActive(false); // 먼저 비활성화 (카메라 해제)
     }
-  
+
     // 네비게이션 이동은 약간 delay
     setTimeout(() => {
       navigation.goBack();
     }, 50);
-  }, [navigation]);  
+  }, [navigation]);
 
   const toggleFlash = useCallback(() => {
     setFlash(prev => (prev === 'off' ? 'on' : 'off'));
   }, []);
 
-  const handleToggle = useCallback((index) => {
-    setActiveIndex(index);
-    const isPrescription = index === 1;
-    const targetHeight = isPrescription ? (PREVIEW_SIZE * 4) / 3 : PREVIEW_SIZE;
-    const targetTranslateX = index * TOGGLE_WIDTH + TOGGLE_PADDING;
+  const handleToggle = useCallback(
+    index => {
+      setActiveIndex(index);
+      const isPrescription = index === 1;
+      const targetHeight = isPrescription
+        ? (PREVIEW_SIZE * 4) / 3
+        : PREVIEW_SIZE;
+      const targetTranslateX = index * TOGGLE_WIDTH + TOGGLE_PADDING;
 
-    Animated.parallel([
-      Animated.spring(focusAreaHeight, {
-        toValue: targetHeight,
-        useNativeDriver: false,
-        friction: 8,
-        tension: 50,
-      }),
-      Animated.spring(translateX, {
-        toValue: targetTranslateX,
-        useNativeDriver: true,
-        friction: 8,
-        tension: 50,
-      }),
-    ]).start();
-  }, [focusAreaHeight, translateX]);
+      Animated.parallel([
+        Animated.spring(focusAreaHeight, {
+          toValue: targetHeight,
+          useNativeDriver: false,
+          friction: 8,
+          tension: 50,
+        }),
+        Animated.spring(translateX, {
+          toValue: targetTranslateX,
+          useNativeDriver: true,
+          friction: 8,
+          tension: 50,
+        }),
+      ]).start();
+    },
+    [focusAreaHeight, translateX],
+  );
 
   const openGallery = useCallback(async () => {
     if (isProcessing) return;
 
-    const isPrescriptionNow = activeIndex === 1; 
+    const isPrescriptionNow = activeIndex === 1;
 
     setIsProcessing(true);
 
     try {
       // 갤러리 열기 전에 카메라 비활성화 (리소스 해제)
       setIsCameraActive(false);
-      
+
       const result = await launchImageLibrary({
         mediaType: 'photo',
         selectionLimit: 1,
@@ -212,7 +217,11 @@ const CameraSearchScreen = () => {
         console.error('ImagePicker Error: ', result.errorMessage);
         Alert.alert('오류', '갤러리를 여는 데 실패했습니다.');
         setIsCameraActive(true);
-      } else if (result.assets && result.assets.length > 0 && result.assets[0].uri) {
+      } else if (
+        result.assets &&
+        result.assets.length > 0 &&
+        result.assets[0].uri
+      ) {
         // 화면 전환을 메인 스레드 작업 후로 지연
         requestAnimationFrame(() => {
           InteractionManager.runAfterInteractions(() => {
@@ -237,10 +246,15 @@ const CameraSearchScreen = () => {
       }
     }
   }, [navigation, isProcessing, activeIndex]);
-  
 
   const handleCapture = useCallback(async () => {
-    if (isProcessing || !cameraRef.current || !hasPermission || !cameraLayout.width || !cameraLayout.height) {
+    if (
+      isProcessing ||
+      !cameraRef.current ||
+      !hasPermission ||
+      !cameraLayout.width ||
+      !cameraLayout.height
+    ) {
       // 기존 권한 체크 코드 유지
       return;
     }
@@ -255,20 +269,24 @@ const CameraSearchScreen = () => {
         enableAutoStabilization: true,
         skipMetadata: false,
       });
-      
+
       if (!isMounted.current) return;
-      
+
       console.log('Photo taken:', photo.path);
 
       // 사진이 찍히면 즉시 UI 피드백을 주기 위해 카메라 비활성화
       setIsCameraActive(false);
-      
+
       console.log('Cropping photo...');
       // 크롭 작업은 비동기로 계속 진행
-      const croppedUri = await cropCenterArea(photo.path, isPrescriptionMode, cameraLayout);
-      
+      const croppedUri = await cropCenterArea(
+        photo.path,
+        isPrescriptionMode,
+        cameraLayout,
+      );
+
       if (!isMounted.current) return;
-      
+
       console.log('Cropped URI:', croppedUri);
 
       if (croppedUri) {
@@ -278,7 +296,7 @@ const CameraSearchScreen = () => {
             if (isMounted.current) {
               navigation.navigate('PhotoPreview', {
                 photoUri: croppedUri,
-                isPrescription: isPrescriptionMode
+                isPrescription: isPrescriptionMode,
               });
             }
           });
@@ -300,7 +318,15 @@ const CameraSearchScreen = () => {
         setIsProcessing(false);
       }
     }
-  }, [hasPermission, isProcessing, cameraLayout, flash, isPrescriptionMode, navigation, checkAndRequestCameraPermission]);
+  }, [
+    hasPermission,
+    isProcessing,
+    cameraLayout,
+    flash,
+    isPrescriptionMode,
+    navigation,
+    checkAndRequestCameraPermission,
+  ]);
 
   const animateFocusIndicator = useCallback(() => {
     setShowFocusIndicator(true);
@@ -328,44 +354,53 @@ const CameraSearchScreen = () => {
     });
   }, [focusIndicatorOpacity, focusIndicatorScale]);
 
-  const handleCameraScreenTouch = useCallback(async (event) => {
-    if (!cameraRef.current || !isFocused || !device?.supportsFocus) {
-      console.log('Focus not supported or camera not ready.');
-      return;
-    }
+  const handleCameraScreenTouch = useCallback(
+    async event => {
+      if (!cameraRef.current || !isFocused || !device?.supportsFocus) {
+        console.log('Focus not supported or camera not ready.');
+        return;
+      }
 
-    try {
-      const {locationX, locationY} = event.nativeEvent;
-      const point = {
-        x: Math.round(locationX),
-        y: Math.round(locationY),
-      };
+      try {
+        const {locationX, locationY} = event.nativeEvent;
+        const point = {
+          x: Math.round(locationX),
+          y: Math.round(locationY),
+        };
 
-      console.log('Focus tapped at:', point);
-      setFocusPoint(point);
-      animateFocusIndicator();
+        console.log('Focus tapped at:', point);
+        setFocusPoint(point);
+        animateFocusIndicator();
 
-      await cameraRef.current.focus(point);
-      console.log('Focus successful');
+        await cameraRef.current.focus(point);
+        console.log('Focus successful');
+      } catch (error) {
+        console.error('Failed to focus:', error);
+      }
+    },
+    [isFocused, device?.supportsFocus, animateFocusIndicator],
+  );
 
-    } catch (error) {
-      console.error('Failed to focus:', error);
-    }
-  }, [isFocused, device?.supportsFocus, animateFocusIndicator]);
-
-  const onCameraLayout = useCallback((event) => {
-    const {width: layoutWidth, height: layoutHeight} = event.nativeEvent.layout;
-    if (layoutWidth !== cameraLayout.width || layoutHeight !== cameraLayout.height) {
-      console.log('Camera layout updated:', layoutWidth, layoutHeight);
-      setCameraLayout({width: layoutWidth, height: layoutHeight});
-    }
-  }, [cameraLayout.width, cameraLayout.height]);
+  const onCameraLayout = useCallback(
+    event => {
+      const {width: layoutWidth, height: layoutHeight} =
+        event.nativeEvent.layout;
+      if (
+        layoutWidth !== cameraLayout.width ||
+        layoutHeight !== cameraLayout.height
+      ) {
+        console.log('Camera layout updated:', layoutWidth, layoutHeight);
+        setCameraLayout({width: layoutWidth, height: layoutHeight});
+      }
+    },
+    [cameraLayout.width, cameraLayout.height],
+  );
 
   // --- Memoized Values ---
   const animatedCenterY = useMemo(() => {
     return Animated.divide(
       Animated.subtract(cameraLayout.height, focusAreaHeight),
-      2
+      2,
     );
   }, [cameraLayout.height, focusAreaHeight]);
 
@@ -377,10 +412,17 @@ const CameraSearchScreen = () => {
   if (!hasPermission) {
     return (
       <LoadingContainer>
-        <LoadingText style={{textAlign: 'center', paddingHorizontal: 20, marginBottom: 15}}>
+        <LoadingText
+          style={{
+            textAlign: 'center',
+            paddingHorizontal: 20,
+            marginBottom: 15,
+          }}>
           카메라 사용 권한이 필요합니다. {'\n'}앱 설정에서 권한을 허용해주세요.
         </LoadingText>
-        <TouchableOpacity onPress={() => Linking.openSettings()} style={styles.settingsButton}>
+        <TouchableOpacity
+          onPress={() => Linking.openSettings()}
+          style={styles.settingsButton}>
           <Text style={styles.settingsButtonText}>설정 열기</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
@@ -393,7 +435,10 @@ const CameraSearchScreen = () => {
   if (!device) {
     return (
       <LoadingContainer>
-        <ActivityIndicator size="large" color={themes.light.pointColor.Primary} />
+        <ActivityIndicator
+          size="large"
+          color={themes.light.pointColor.Primary}
+        />
         <LoadingText>사용 가능한 카메라를 찾을 수 없습니다.</LoadingText>
       </LoadingContainer>
     );
@@ -405,7 +450,10 @@ const CameraSearchScreen = () => {
       {/* Header */}
       <Header>
         <HeaderTopRow>
-          <HeaderButtonWrapper onPress={handleGoBack} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} disabled={isProcessing}>
+          <HeaderButtonWrapper
+            onPress={handleGoBack}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            disabled={isProcessing}>
             <HeaderButton>
               <HeaderIcons.chevron
                 width={20}
@@ -415,16 +463,25 @@ const CameraSearchScreen = () => {
             </HeaderButton>
           </HeaderButtonWrapper>
           <Title>사진으로 검색하기</Title>
-          <HeaderButtonWrapper onPress={toggleFlash} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}} disabled={isProcessing}>
+          <HeaderButtonWrapper
+            onPress={toggleFlash}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            disabled={isProcessing}>
             <HeaderButton
               style={{
-                backgroundColor: flash === 'on' ? 'rgba(255, 215, 0, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                backgroundColor:
+                  flash === 'on'
+                    ? 'rgba(255, 215, 0, 0.3)'
+                    : 'rgba(0, 0, 0, 0.3)',
               }}>
               <CameraIcons.flash
                 width={24}
                 height={24}
                 style={{
-                  color: flash === 'on' ? '#FFD700' : themes.light.textColor.buttonText,
+                  color:
+                    flash === 'on'
+                      ? '#FFD700'
+                      : themes.light.textColor.buttonText,
                 }}
               />
             </HeaderButton>
@@ -434,19 +491,22 @@ const CameraSearchScreen = () => {
         <HeaderBottomRow>
           <ToggleContainer>
             <Animated.View
-              style={[
-                styles.toggleBackground,
-                { transform: [{ translateX }] },
-              ]}
+              style={[styles.toggleBackground, {transform: [{translateX}]}]}
             />
-            <ToggleOption onPress={() => handleToggle(0)} disabled={isProcessing}>
+            <ToggleOption
+              onPress={() => handleToggle(0)}
+              disabled={isProcessing}>
               <ToggleButton>
                 <ToggleText isActive={activeIndex === 0}>알약 촬영</ToggleText>
               </ToggleButton>
             </ToggleOption>
-            <ToggleOption onPress={() => handleToggle(1)} disabled={isProcessing}>
+            <ToggleOption
+              onPress={() => handleToggle(1)}
+              disabled={isProcessing}>
               <ToggleButton>
-                <ToggleText isActive={activeIndex === 1}>처방전 촬영</ToggleText>
+                <ToggleText isActive={activeIndex === 1}>
+                  처방전 촬영
+                </ToggleText>
               </ToggleButton>
             </ToggleOption>
           </ToggleContainer>
@@ -458,8 +518,7 @@ const CameraSearchScreen = () => {
         style={styles.cameraPreviewTouchable}
         activeOpacity={1}
         onPress={handleCameraScreenTouch}
-        disabled={isProcessing}
-      >
+        disabled={isProcessing}>
         {isFocused && hasPermission && device && (
           <Camera
             ref={cameraRef}
@@ -546,7 +605,8 @@ const CameraSearchScreen = () => {
       <BottomContainer pointerEvents="box-none">
         {/* Hint (Pill mode only) */}
         {!isPrescriptionMode && (
-          <Animated.View style={{opacity: activeIndex === 0 ? 1 : 0, marginBottom: 25}}>
+          <Animated.View
+            style={{opacity: activeIndex === 0 ? 1 : 0, marginBottom: 25}}>
             <Hint>
               <HintIconWrapper>
                 <CameraIcons.tip
@@ -568,17 +628,16 @@ const CameraSearchScreen = () => {
         {/* Buttons */}
         <ButtonContainer>
           <ButtonItem onPress={openGallery} disabled={isProcessing}>
-            <MaterialCommunityIcons 
-              name="image" 
-              size={28} 
-              color={isProcessing ? "rgba(255,255,255,0.5)" : "#fff"} 
+            <MaterialCommunityIcons
+              name="image"
+              size={28}
+              color={isProcessing ? 'rgba(255,255,255,0.5)' : '#fff'}
             />
           </ButtonItem>
-          <CaptureButton 
-            onPress={handleCapture} 
+          <CaptureButton
+            onPress={handleCapture}
             disabled={isProcessing}
-            style={isProcessing ? {opacity: 0.7} : {}}
-          >
+            style={isProcessing ? {opacity: 0.7} : {}}>
             <CaptureButtonInner />
           </CaptureButton>
           <ButtonItem
@@ -590,9 +649,9 @@ const CameraSearchScreen = () => {
               width={28}
               height={28}
               style={{
-                color: isProcessing 
-                  ? "rgba(255,255,255,0.5)" 
-                  : themes.light.textColor.buttonText
+                color: isProcessing
+                  ? 'rgba(255,255,255,0.5)'
+                  : themes.light.textColor.buttonText,
               }}
             />
           </ButtonItem>
@@ -760,8 +819,6 @@ const BottomContainer = styled.View`
 const Hint = styled.View`
   flex-direction: row;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.4);
-  padding: 10px 15px;
   border-radius: 12px;
   max-width: ${windowWidth - 80}px;
 `;
