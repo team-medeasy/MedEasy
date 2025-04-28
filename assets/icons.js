@@ -52,6 +52,7 @@ import LogoutIcon from './icons/settings/logout.svg';
 import NotificationsIcon from './icons/settings/notifications.svg';
 import ProfileSettingsIcon from './icons/settings/profile_settings.svg';
 import TextSizeIcon from './icons/settings/text_size.svg';
+import MegaphoneIcon from './icons/settings/megaphone.svg'
 
 // 알약 이미지
 import TabletIcon from './icons/pills/tablet.svg';
@@ -147,6 +148,7 @@ export const SettingsIcons = {
   notifications: NotificationsIcon,
   profileSettings: ProfileSettingsIcon,
   textSize: TextSizeIcon,
+  megaphone: MegaphoneIcon,
 };
 
 export const PillsIcon = {
