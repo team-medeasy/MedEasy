@@ -6,7 +6,7 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import { Header } from '../../components';
 import { OtherIcons, SettingsIcons } from '../../../assets/icons';
 
-const Profile = () => {
+const Announcement = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -38,8 +38,7 @@ const Profile = () => {
 
       {isExpanded && (
         <NewsContent>
-          안녕하세요. 팀 메디지입니다. 
-          많은 기대와 응원 속에 드디어 메디지가 앱스토어에 정식 출시되었습니다. 앞으로도 유저 여러분의 건강한 일상을 만들어 나가기 위해 항상 노력하겠습니다 💪 사용 중 불편한 점이나 개선이 필요한 점이 있다면 앱 내 문의하기 기능을 통해 언제든지 의견 남겨주세요! 감사합니다. 팀 메디지 드림
+          안녕하세요. 팀 메디지입니다. 많은 기대와 응원 속에 드디어 메디지가 앱스토어에 정식 출시되었습니다. 앞으로도 유저 여러분의 건강한 일상을 만들어 나가기 위해 항상 노력하겠습니다 💪 사용 중 불편한 점이나 개선이 필요한 점이 있다면 앱 내 문의하기 기능을 통해 언제든지 의견 남겨주세요! 감사합니다. 팀 메디지 드림
         </NewsContent>
       )}
     </Container>
@@ -71,7 +70,7 @@ const NewsContainer = styled.View`
 `;
 
 const NewsTitle = styled.Text`
-  font-family: 'Pretendard-Bold';
+  font-family: 'Pretendard-SemiBold';
   font-size: ${FontSizes.body.default};
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -90,4 +89,4 @@ const NewsContent = styled.Text`
   background-color: ${themes.light.bgColor.bgSecondary};
 `;
 
-export default Profile;
+export default Announcement;
