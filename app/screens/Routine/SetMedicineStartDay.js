@@ -6,9 +6,8 @@ import { ModalHeader, Button, ProgressBar, CustomCalendar } from '../../componen
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const SetMedicineStartDay = ({ route, navigation }) => {
-    const { medicine_id, nickname, day_of_weeks, interval_days } = route.params;
+    const { medicine_id, nickname, interval_days } = route.params;
 
-    console.log("day_of_weeks:", day_of_weeks);
     console.log("interval_days:", interval_days);
     
     const progress = '50%';
@@ -28,7 +27,6 @@ const SetMedicineStartDay = ({ route, navigation }) => {
         navigation.navigate('SetMedicineTime', {
             medicine_id,
             nickname,
-            day_of_weeks,
             interval_days: parseInt(interval_days),
             routine_start_date: formattedDate,
         });

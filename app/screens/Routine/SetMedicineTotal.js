@@ -12,7 +12,7 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import { createRoutine } from '../../api/routine';
 
 const SetMedicineTotal = ({route, navigation}) => {
-    const { medicine_id, nickname, day_of_weeks, routine_start_date, interval_days, user_schedule_ids, dose } = route.params;
+    const { medicine_id, nickname, routine_start_date, interval_days, user_schedule_ids, dose } = route.params;
     console.log("dose:", dose);
     
     const [total, setTotal] = useState('');
@@ -25,7 +25,6 @@ const SetMedicineTotal = ({route, navigation}) => {
             nickname,
             dose: parseInt(dose),
             total_quantity: parseInt(total),
-            day_of_weeks,
             user_schedule_ids,
             routine_start_date,
             interval_days: parseInt(interval_days)
