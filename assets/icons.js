@@ -46,6 +46,7 @@ import AnnouncementIcon from './icons/settings/announcement.svg';
 import AppVersionIcon from './icons/settings/app_version.svg';
 import TrashcanIcon from './icons/settings/delete.svg';
 import FAQIcon from './icons/settings/faq.svg';
+import FAQ2Icon from './icons/settings/faq2.svg';
 import FavoritesIcon from './icons/settings/favorites.svg';
 import FeedbackIcon from './icons/settings/feedback.svg';
 import LogoutIcon from './icons/settings/logout.svg';
@@ -142,6 +143,7 @@ export const SettingsIcons = {
   appVersion: AppVersionIcon,
   trashcan: TrashcanIcon,
   faq: FAQIcon,
+  faq2: FAQ2Icon,
   favorites: FavoritesIcon,
   feedback: FeedbackIcon,
   logout: LogoutIcon,
