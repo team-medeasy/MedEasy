@@ -5,7 +5,7 @@ import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { Header } from '../../components';
 
-const Profile = () => {
+const Favorites = () => {
   return (
     <Container>
       <Header>관심 목록</Header>
@@ -18,4 +18,4 @@ const Container = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-export default Profile;
+export default Favorites;
