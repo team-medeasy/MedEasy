@@ -42,7 +42,6 @@ const SetMedicineRoutine = ({ route, navigation }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [medicineName, setMedicineName] = useState(initialMedicineName || '');
   const [selectedOption, setSelectedOption] = useState(null);
-  const [selectedDays, setSelectedDays] = useState([]);
   const [selectedTimings, setSelectedTimings] = useState([]);
   const [dosage, setDosage] = useState(initialDose ? String(initialDose) : '');
   const [totalCount, setTotalCount] = useState(initialTotalQuantity ? String(initialTotalQuantity) : '');
@@ -55,7 +54,6 @@ const SetMedicineRoutine = ({ route, navigation }) => {
   // 처방전에서 왔는지 확인하여 모드 설정
   const [isPrescriptionMode] = useState(fromPrescription);
 
-  const days = ['월', '화', '수', '목', '금', '토', '일'];
   const timings = ['아침', '점심', '저녁', '자기 전'];
 
   // 초기 데이터 로딩
@@ -95,30 +93,6 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     console.log('🔍 처방전 데이터 처리 시작');
     
     try {
-      // 초기 요일 데이터가 있으면 사용
-      if (initialDayOfWeeks && Array.isArray(initialDayOfWeeks) && initialDayOfWeeks.length > 0) {
-        console.log('🟢 초기 요일 데이터 설정:', initialDayOfWeeks);
-        
-        // 숫자 값을 요일 텍스트로 변환
-        const dayTexts = initialDayOfWeeks.map(dayNum => {
-          // 1(월)~7(일)을 배열 인덱스로 변환 (0부터 시작하므로 -1)
-          const index = dayNum - 1;
-          if (index >= 0 && index < days.length) {
-            return days[index];
-          }
-          return null;
-        }).filter(day => day !== null);
-        
-        setSelectedDays(dayTexts);
-        
-        // 옵션 자동 선택
-        if (dayTexts.length === 7) {
-          setSelectedOption('매일');
-        } else if (dayTexts.length > 0) {
-          setSelectedOption('특정 요일');
-        }
-      }
-      
       // 초기 스케줄 데이터 사용
       if (initialUserSchedules && Array.isArray(initialUserSchedules)) {
         console.log('🟢 초기 스케줄 데이터 설정:', initialUserSchedules);
@@ -224,14 +198,10 @@ const SetMedicineRoutine = ({ route, navigation }) => {
             // 매일로 설정
             console.log('🟢 복용 주기 "매일"로 설정');
             setSelectedOption('매일');
-            setSelectedDays(days);
           } else {
             // 1일 이상 간격은 주기 설정으로 처리
             console.log('🟢 복용 주기 "주기 설정"으로 설정, 간격:', routineData.interval_days);
             setSelectedOption('주기 설정');
-            // 주기 설정에 맞는 기본 요일 설정
-            const defaultDays = ['월', '수', '금', '일']; 
-            setSelectedDays(defaultDays);
           }
         }
         
@@ -353,47 +323,16 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     console.log('🔍 옵션 선택:', option);
     setSelectedOption((prev) => (prev === option ? null : option));
 
-    // 선택된 옵션에 따라 day_of_weeks 설정
+    // 선택된 옵션에 따라 interval_days 설정
     if (option === '매일') {
-      // 매일: 월화수목금토일
-      console.log('🟢 "매일" 옵션 - 모든 요일 선택');
-      setSelectedDays(days);
-      setIntervalDays('1');
-    } else if (option === '특정 요일') {
-      // 특정 요일 선택 모드일 때는 기존 선택된 요일 유지
-      if (selectedOption !== '특정 요일') {
-        console.log('🟢 "특정 요일" 옵션 - 요일 초기화');
-        setSelectedDays([]);
-      }
+      // 매일: interval_days = 1
+      console.log('🟢 "매일" 옵션 - interval_days를 1로 설정');
       setIntervalDays('1');
     } else if (option === '주기 설정') {
-      // 2일 간격: 월수금일 예시
-      console.log('🟢 "주기 설정" 옵션 - 기본 요일 설정');
-      setSelectedDays(['월', '수', '금', '일']);
+      // 주기 설정 시 기본값 2로 설정
+      console.log('🟢 "주기 설정" 옵션 - interval_days를 2로 설정');
       setIntervalDays('2');
-    } else {
-      setSelectedDays([]);
-      setIntervalDays('1');
     }
-  };
-
-  // 요일 토글 핸들러
-  const toggleDay = day => {
-    console.log('🔍 요일 토글:', day);
-    setSelectedDays(prev => {
-      const newDays = prev.includes(day) 
-        ? prev.filter(d => d !== day) 
-        : [...prev, day];
-      console.log('🟢 선택된 요일 업데이트:', newDays);  
-      return newDays;
-    });
-  };
-
-  // 요일을 숫자로 변환 (API 요청용)
-  const convertDaysToNumbers = () => {
-    const dayNumbers = selectedDays.map(day => days.indexOf(day) + 1);
-    console.log('🔍 선택 요일 -> 숫자 변환:', dayNumbers);
-    return dayNumbers;
   };
 
   // 시간대를 ID로 변환 (API 요청용)
@@ -424,7 +363,6 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     console.log('🔍 루틴 저장/수정 요청');
     console.log('🔍 현재 상태:', {
       medicineName,
-      selectedDays,
       selectedTimings,
       dosage,
       totalCount,
@@ -434,15 +372,14 @@ const SetMedicineRoutine = ({ route, navigation }) => {
     });
     
     // 필수 입력값 검증
-    if (!medicineName || selectedDays.length === 0 || selectedTimings.length === 0 || !dosage || !totalCount) {
+    if (!medicineName || selectedTimings.length === 0 || !dosage || !totalCount || !intervalDays) {
       console.error('❌ 필수 입력값 누락');
       Alert.alert('입력 오류', '모든 필드를 채워주세요.');
       return;
     }
 
     try {
-      // 요일과 스케줄 변환
-      const dayNumbers = convertDaysToNumbers();
+      // 스케줄 변환
       const scheduleIds = convertTimingsToIds();
       
       // 처방전 모드에서는 변경사항을 부모 화면으로 전달
@@ -473,7 +410,6 @@ const SetMedicineRoutine = ({ route, navigation }) => {
           total_quantity: parseInt(totalCount, 10),
           total_days: Math.ceil(parseInt(totalCount, 10) / (parseInt(dosage, 10) * selectedTimings.length)), // 약 먹는 일수 계산
           interval_days: parseInt(intervalDays, 10),
-          day_of_weeks: dayNumbers,
           user_schedules: updatedSchedules
         };
         
@@ -505,10 +441,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
         user_schedule_ids: scheduleIds
       };
 
-      // 신규 생성 시 day_of_weeks 추가 (수정 시에는 불필요)
-      if (!isEditing) {
-        routineData.day_of_weeks = dayNumbers;
-      } else if (routineId) {
+      if (routineId) {
         // 수정 시 routineId 추가
         routineData.routine_id = routineId;
       }
@@ -650,33 +583,24 @@ const SetMedicineRoutine = ({ route, navigation }) => {
                 textColor={selectedOption === '매일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
               />
               <DualTextButton
-                title={'특정 요일마다 (예: 월, 수, 금)'}
-                onPress={() => handleSelect('특정 요일')}
-                bgColor={selectedOption === '특정 요일' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
-                textColor={selectedOption === '특정 요일' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
-              />
-
-              {/* 특정 요일 선택 시 요일 선택 버튼 표시 */}
-              {selectedOption === '특정 요일' && (
-                <DaySelection>
-                  {days.map((day) => (
-                    <DayButton
-                      key={day}
-                      selected={selectedDays.includes(day)}
-                      onPress={() => toggleDay(day)}
-                    >
-                      <DayText selected={selectedDays.includes(day)}>{day}</DayText>
-                    </DayButton>
-                  ))}
-                </DaySelection>
-              )}
-
-              <DualTextButton
                 title={'주기 설정 (예: 2일 간격으로)'}
                 onPress={() => handleSelect('주기 설정')}
                 bgColor={selectedOption === '주기 설정' ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary}
                 textColor={selectedOption === '주기 설정' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
               />
+              {selectedOption === '주기 설정' && (
+                <InputWithDelete
+                  value={intervalDays}
+                  onChangeText={(text) => {
+                    // 숫자만 입력되도록 처리
+                    if (/^\d*$/.test(text)) {
+                      setIntervalDays(text);
+                    }
+                  }}
+                  placeholder="예: 2"
+                  keyboardType="numeric"
+                />
+              )}
             </SelectDay>
           </Section>
 
