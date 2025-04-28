@@ -6,6 +6,7 @@ import {RoutineIcons} from '../../../assets/icons';
 import {Tag} from '..';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {PlaceholderImage} from '../SearchResult/PlaceholderImage';
+import {updateInterestedMedicine} from '../../api/interestedMedicine';
 
 const {heartOff: HeartOffIcon, heartOn: HeartOnIcon} = RoutineIcons;
 
@@ -16,6 +17,16 @@ const MedicineOverview = ({
   onPressEnlarge,
 }) => {
   const hasImage = !!medicine.item_image;
+
+  const handleFavoritePress = async () => {
+    try {
+      console.log('보낼 medicine_id:', medicine.id);
+      await updateInterestedMedicine(medicine.id);
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error('관심 의약품 등록 실패:', error);
+    }
+  };
 
   return (
     <MedicineInfoContainer source={{uri: medicine.item_image}} blurRadius={15}>
@@ -68,7 +79,7 @@ const MedicineOverview = ({
             </Tag>
           </View>
 
-          <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
+          <TouchableOpacity onPress={handleFavoritePress}>
             {isFavorite ? (
               <HeartOnIcon
                 width={24}
@@ -133,4 +144,4 @@ const MedicineInfoName = styled.Text`
   color: ${themes.light.textColor.buttonText};
 `;
 
-export {MedicineOverview};
+export { MedicineOverview };
