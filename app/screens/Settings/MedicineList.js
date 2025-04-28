@@ -103,7 +103,9 @@ const MedicineList = () => {
         return (
             <FlatList
                 data={data}
-                keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+                keyExtractor={(item, index) => 
+                    item.routineInfo?.routine_id?.toString() || `${item.id}-${index}`
+                  }                  
                 renderItem={({ item }) => <MedicineListItem item={item} routineInfo={item.routineInfo} />}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={

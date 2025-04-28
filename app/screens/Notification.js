@@ -52,19 +52,24 @@ const Notification = () => {
     try {
       setLoading(true);
       const res = await getNotificationList({ page: page, size: PAGE_SIZE });
-      const notiData = res.data.body;
-      console.log(`알림 목록 (페이지 ${page}): `, notiData);
+      const notificationData = res.data.body;
+      console.log(`알림 목록 (페이지 ${page}): `, notificationData);
       
-      const formattedNotifications = notiData.map(item => ({
-        id: item.notification_id,
-        title: item.title,
-        message: item.content,
-        time: formatDate(item.sent_at),
-        type: 'medicine', // 모든 알림을 medicine 타입으로 설정
-        is_read: item.is_read,
-        routine_id: item.routine_id,
-        routine_date: item.routine_date
-      }));
+      const formattedNotifications = notificationData.map(item => {
+        // sent_at에서 날짜 부분만 추출 (YYYY-MM-DD 형식)
+        const routineDate = item.sent_at ? item.sent_at.split('T')[0] : null;
+        
+        return {
+          notification_id: item.notification_id,
+          title: item.title,
+          content: item.content,
+          sent_at: item.sent_at,
+          formatted_time: formatDate(item.sent_at),
+          is_read: item.is_read,
+          routine_date: routineDate,
+          type: "medicine", // 모두
+        };
+      });
       
       if (refresh) {
         setNotifications(formattedNotifications);
@@ -112,7 +117,7 @@ const Notification = () => {
   const handlePress = async (item) => {
     try {
       console.log("📖 읽으려는 알림: ", item);
-      await markNotificationAsRead(item.id); // ✅ 알림 읽음 처리
+      await markNotificationAsRead(item.notification_id); // ✅ 알림 읽음 처리
       resetNavigate('NavigationBar', {
         screen: 'TabNavigator',
         params: {
@@ -148,10 +153,10 @@ const Notification = () => {
           ) : null}
           <NotiTextContainer>
             <NotificationTitle>{item.title}</NotificationTitle>
-            <NotificationMessage>{item.message}</NotificationMessage>
+            <NotificationMessage>{item.content}</NotificationMessage>
           </NotiTextContainer>
         </NotiContainer>
-        <NotiTime>{item.time}</NotiTime>
+        <NotiTime>{item.formatted_time}</NotiTime>
       </NotificationItem>
     </TouchableOpacity>
   );
@@ -181,7 +186,7 @@ const Notification = () => {
       <FlatList
         data={notifications}
         renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={item => item.notification_id.toString()}
         contentContainerStyle={{paddingBottom: 100}}
         refreshing={refreshing}
         onRefresh={onRefresh}

@@ -2,10 +2,9 @@ import React, {useState} from 'react';
 import {SafeAreaView, Text, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
-import {BackAndNextButtons} from './../../components';
+import {Button, InputWithDelete} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
 import {handleLogin} from '../../api/services/authService';
-import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -22,26 +21,13 @@ const Container2 = styled.View`
   margin-left: 25px;
   margin-right: 25px;
   margin-top: 37px;
-`;
-
-const InputContainer = styled.View`
-  width: 100%;
-  margin-top: ${props => props.marginTop || '0px'};
-  margin-bottom: ${props => props.marginBottom || '0px'};
+  gap: 10px;
 `;
 
 const BtnContainer = styled.View`
   margin-top: auto;
   padding-left: 20px;
   padding-right: 20px;
-`;
-
-const TextInput = styled.TextInput`
-  height: 60px;
-  border-radius: 10px;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  padding: 20px;
-  font-size: ${FontSizes.body.default};
 `;
 
 const SignInScreen = ({navigation, route}) => {
@@ -121,31 +107,25 @@ const SignInScreen = ({navigation, route}) => {
         </Container1>
 
         <Container2>
-          <InputContainer marginBottom="5px">
-            <TextInput
-              placeholder="이메일 입력"
-              placeholderTextColor={themes.light.textColor.placeholder}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </InputContainer>
-          <InputContainer marginBottom="5px">
-            <TextInput
-              placeholder="비밀번호 입력"
-              placeholderTextColor={themes.light.textColor.placeholder}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={true}
-            />
-          </InputContainer>
+          <InputWithDelete
+            value={email}
+            onChangeText={setEmail}
+            placeholder="이메일 입력"
+            keyboardType="email-address"
+            autoCapitalize='none'
+          />
+          <InputWithDelete
+            value={password}
+            onChangeText={setPassword}
+            placeholder="비밀번호 입력"
+            keyboardType="email-address"
+            secureTextEntry={true}
+          />
         </Container2>
-
         <BtnContainer>
-          <BackAndNextButtons
-            onPressPrev={() => navigation.goBack()}
-            onPressNext={handleNext}
+          <Button
+            title="로그인하기"
+            onPress={handleNext}
           />
         </BtnContainer>
       </Container>

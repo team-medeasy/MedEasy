@@ -3,12 +3,20 @@ import styled from 'styled-components/native';
 import {Tag} from './../index';
 import {themes} from './../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {LogoIcons} from '../../../assets/icons';
+import {PlaceholderImage} from './PlaceholderImage';
 
 export const SearchResultItem = ({item, onPress}) => {
+  const hasImage = !!item.item_image;
+
   return (
     <ItemContainer onPress={() => onPress(item)}>
       <ImageContainer>
-        <MedicineImage source={{uri: item.item_image}} />
+        {hasImage ? (
+          <MedicineImage source={{uri: item.item_image}} />
+        ) : (
+          <PlaceholderImage />
+        )}
       </ImageContainer>
       <InfoContainer>
         <ManufacturerText>{item.entp_name || '정보 없음'}</ManufacturerText>
@@ -25,7 +33,12 @@ export const SearchResultItem = ({item, onPress}) => {
             maxWidth="66">
             {item.etc_otc_name || '정보 없음'}
           </Tag>
-          <Tag sizeType="small" colorType="resultSecondary" overflowMode='ellipsis' maxWidth='128' maxLength='14'>
+          <Tag
+            sizeType="small"
+            colorType="resultSecondary"
+            overflowMode="ellipsis"
+            maxWidth="128"
+            maxLength="14">
             {item.class_name || '정보 없음'}
           </Tag>
         </TypeContainer>

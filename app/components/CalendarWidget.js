@@ -36,8 +36,8 @@ const CalendarWidget = ({
   const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [routineMarkedDates, setRoutineMarkedDates] = useState({});
-  const [selectedDate, setSelectedDate] = useState('');
   const [today, setToday] = useState(dayjs().format('YYYY-MM-DD'));
+  const [selectedDate, setSelectedDate] = useState(today);
 
   // 현재 보여지는 월의 루틴 데이터 가져오기
   const fetchMonthlyRoutine = async (month) => {
@@ -57,14 +57,14 @@ const CalendarWidget = ({
         
         // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
         const hasRoutineMedicines = item.user_schedule_dtos.some(schedule => 
-          schedule.routine_medicine_dtos.length > 0
+          schedule.routine_dtos.length > 0
         );
     
         if (hasRoutineMedicines) {
           // 모든 약이 복용 완료되었는지 확인
           const allTaken = item.user_schedule_dtos.every(schedule => 
-            schedule.routine_medicine_dtos.length === 0 || 
-            schedule.routine_medicine_dtos.every(medicine => medicine.is_taken)
+            schedule.routine_dtos.length === 0 || 
+            schedule.routine_dtos.every(medicine => medicine.is_taken)
           );
           
           acc[dateString] = {
@@ -89,7 +89,22 @@ const CalendarWidget = ({
 
   useEffect(() => {
     // 오늘 날짜 초기화
-    setToday(dayjs().format('YYYY-MM-DD'));
+    const currentToday = dayjs().format('YYYY-MM-DD');
+    setToday(currentToday);
+    
+    // 컴포넌트 마운트 시 오늘 날짜를 기본 선택 상태로 설정
+    setSelectedDate(currentToday);
+    
+    // 오늘 날짜에 대한 onDateChange 호출
+    const todayDayjs = dayjs(currentToday);
+    const todayData = {
+      day: koreanDays[todayDayjs.day()],
+      date: todayDayjs.date(),
+      month: todayDayjs.month() + 1,
+      year: todayDayjs.year(),
+      fullDate: todayDayjs
+    };
+    onDateChange(todayData);
     
     // 자정에 오늘 날짜 업데이트하는 타이머 설정
     const updateTodayDate = () => {
@@ -217,7 +232,13 @@ const CalendarWidget = ({
         )}
         markedDates={{
           ...markedDates,
-          ...routineMarkedDates
+          ...routineMarkedDates,
+          // 선택된 날짜도 표시
+          [selectedDate]: {
+            ...(markedDates[selectedDate] || {}),
+            ...(routineMarkedDates[selectedDate] || {}),
+            selected: true
+          }
         }}
       />
     </CalendarContainer>

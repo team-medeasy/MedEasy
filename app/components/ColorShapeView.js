@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import {themes} from '../styles';
+import {ShapeIcons} from '../../assets/icons';
 
 // 색상 코드
 const colorCodes = {
@@ -25,37 +26,25 @@ const colorCodes = {
 
 // 모양 코드
 const shapeCodes = {
-  원형: '',
-  타원형: '',
-  장방형: '',
-  삼각형: '',
-  사각형: '',
-  마름모형: '',
-  오각형: '',
-  육각형: '',
-  캡슐형: '',
-  반원형: '',
-  기타: '',
+  원형: 'circle',
+  타원형: 'oval',
+  장방형: 'oblong',
+  삼각형: 'triangle',
+  사각형: 'rectangle',
+  마름모형: 'diamond',
+  오각형: 'pentagon',
+  육각형: 'hexagon',
+  팔각형: 'octagon',
+  반원형: 'half_moon',
+  기타: 'other',
 };
 
-const ColorShapeView = ({ type, value, marginRight, width, height }) => {
+const ColorShapeView = ({type, value, marginRight, width, height}) => {
   if (type === 'color') {
     return (
-      <ColorView 
-        style={{ 
+      <ColorView
+        style={{
           backgroundColor: colorCodes[value],
-          marginRight : marginRight || 7,
-          width: width || 14,
-          height: height || 14,
-        }} 
-      />
-    );
-  }
-  
-  if (type === 'shape') {
-    return (
-      <ShapeView 
-        style={{ 
           marginRight: marginRight || 7,
           width: width || 14,
           height: height || 14,
@@ -63,7 +52,26 @@ const ColorShapeView = ({ type, value, marginRight, width, height }) => {
       />
     );
   }
-  
+
+  if (type === 'shape') {
+    const shapeKey = shapeCodes[value];
+    const ShapeIcon = ShapeIcons[shapeKey];
+
+    if (ShapeIcon) {
+      return <ShapeIcon style={{marginRight: marginRight || 7}} />;
+    }
+
+    return (
+      <ShapeView
+        style={{
+          marginRight: marginRight || 7,
+          width: width || 14,
+          height: height || 14,
+        }}
+      />
+    );
+  }
+
   return null;
 };
 
@@ -78,5 +86,5 @@ const ColorView = styled.View`
   border-width: 1.5px;
   border-color: ${themes.light.borderColor.borderCircle};
 `;
-  
-export { ColorShapeView };
+
+export {ColorShapeView};

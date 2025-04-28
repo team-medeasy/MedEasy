@@ -1,27 +1,33 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {
     View, 
     ScrollView,
+    Platform
 } from 'react-native';
 import {themes} from './../../styles';
-import {OtherIcons} from '../../../assets/icons';
-import {ModalHeader, ProgressBar, Button} from '../../components';
+import {
+    ModalHeader, 
+    ProgressBar, 
+    Button, 
+    InputWithDelete
+} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const SetMedicineDose = ({route, navigation}) => {
-    const { medicine_id, nickname, day_of_weeks, user_schedule_ids } = route.params;
-    console.log("user_schedule_ids:",user_schedule_ids);
-    const [dose, setDose] = useState('');
-    const progress = '80%';
+    const { medicine_id, nickname, routine_start_date, interval_days, user_schedule_ids } = route.params;
+    console.log("user_schedule_ids:", user_schedule_ids);
+    const [dose, setDose] = useState('1'); // 기본값 1로 설정
+    const progress = '83.33%';
 
     const handleNext = () => {
         navigation.navigate('SetMedicineTotal', {
             medicine_id: medicine_id,
             nickname: nickname,
-            day_of_weeks: day_of_weeks,
+            routine_start_date: routine_start_date,
             user_schedule_ids: user_schedule_ids,
-            dose: parseInt(dose) || 1 // 기본값 1 설정
+            interval_days: parseInt(interval_days),
+            dose: parseInt(dose) || 1
         });
     };
 
@@ -65,41 +71,15 @@ const SetMedicineDose = ({route, navigation}) => {
                     paddingBottom: 30,
                     alignItems: 'center',
                 }}>
-                <Button title="다음" onPress={handleNext} />
+                <Button 
+                    title="다음" 
+                    onPress={handleNext} 
+                    disabled={dose.trim() === ''}
+                    bgColor={dose.trim() != '' ? themes.light.boxColor.buttonPrimary : themes.light.boxColor.inputSecondary}
+                    textColor={dose.trim() != '' ? themes.light.textColor.buttonText : themes.light.textColor.Primary30}
+                />
             </View>
         </Container>
-    );
-};
-
-// 입력 필드 컴포넌트
-const InputWithDelete = ({
-    value,
-    onChangeText,
-    placeholder,
-    keyboardType = 'default',
-    returnKeyType = 'done',
-    onSubmitEditing
-}) => {
-    return (
-        <InputContainer>
-            <StyledInput
-                placeholder={placeholder}
-                value={value}
-                onChangeText={onChangeText}
-                keyboardType={keyboardType}
-                returnKeyType={returnKeyType}
-                onSubmitEditing={onSubmitEditing}
-            />
-            {value.length > 0 && (
-                <DeleteButton onPress={() => onChangeText('')}>
-                    <OtherIcons.deleteCircle
-                        width={15}
-                        height={15}
-                        style={{ color: themes.light.textColor.Primary20 }}
-                    />
-                </DeleteButton>
-            )}
-        </InputContainer>
     );
 };
 
@@ -128,23 +108,4 @@ const Section = styled.View`
     padding: 0 20px;
 `;
 
-const InputContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  border-radius: 10px;
-  padding: 0 15px;
-`;
-
-const StyledInput = styled.TextInput`
-  flex: 1;
-  padding: 18px 0;
-  font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const DeleteButton = styled.TouchableOpacity`
-  padding: 5px;
-`;
 export default SetMedicineDose;

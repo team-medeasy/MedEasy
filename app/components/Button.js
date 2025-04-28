@@ -22,6 +22,17 @@ const ButtonText = styled(Text)`
   font-family: ${props => props.fontFamily || 'KimjungchulGothic-Bold'};
 `;
 
+const ButtonInner = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+const IconWrapper = styled.View`
+  justify-content: center;
+  align-items: center;
+`;
+
 const Button = ({
   title,
   onPress,
@@ -32,7 +43,8 @@ const Button = ({
   width,
   height,
   flex,
-  disabled
+  disabled,
+  icon
 }) => {
   return (
     <ButtonContainer
@@ -42,18 +54,21 @@ const Button = ({
       height={height}
       flex={flex}
       disabled={disabled}>
-      <ButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
-        {title}
-      </ButtonText>
+      <ButtonInner>
+        {icon && <IconWrapper>{icon}</IconWrapper>} {/* ✅ 아이콘 렌더링 */}
+        <ButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
+          {title}
+        </ButtonText>
+      </ButtonInner>
     </ButtonContainer>
   );
 };
 
-// 시간 선택 버튼
-const SelectTimeButtonContainer = styled(TouchableOpacity)`
+// 양 옆에 두 메시지를 띄우는 버튼
+const DualTextButtonContainer = styled(TouchableOpacity)`
   flex: ${({ flex }) => flex ?? '0 1 auto'};
   width: ${({ width }) => width || '100%'};
-  height: ${({ height }) => height ?? '60px'};
+  height: ${({ height }) => height ?? '55px'};
   background-color: ${props =>
     props.bgColor || themes.light.boxColor.buttonPrimary};
   justify-content: space-between;
@@ -63,15 +78,15 @@ const SelectTimeButtonContainer = styled(TouchableOpacity)`
   border-radius: 10px;
 `;
 
-const SelectTimeButtonText = styled(Text)`
+const DualTextButtonText = styled(Text)`
   font-size: ${props => props.fontSize || FontSizes.body.default};
   font-family: ${props => props.fontFamily || 'Pretendard-SemiBold'};
   color: ${props => props.color || themes.light.textColor.buttonText};
 `;
 
-const SelectTimeButton = ({
+const DualTextButton = ({
   title,
-  timeText,
+  messageText,
   onPress,
   bgColor,
   textColor,
@@ -82,22 +97,21 @@ const SelectTimeButton = ({
   flex,
 }) => {
   return (
-    <SelectTimeButtonContainer
+    <DualTextButtonContainer
       onPress={onPress}
       bgColor={bgColor}
       width={width}
       height={height}
       flex={flex}>
-      <SelectTimeButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
+      <DualTextButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
         {title}
-      </SelectTimeButtonText>
-      <SelectTimeButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
-        {timeText}
-      </SelectTimeButtonText>
-    </SelectTimeButtonContainer>
+      </DualTextButtonText>
+      <DualTextButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
+        {messageText}
+      </DualTextButtonText>
+    </DualTextButtonContainer>
   );
 };
-
 
 // 회원가입 시 이전 ・ 다음 버튼
 const ButtonsContainer = styled(View)`
@@ -121,4 +135,4 @@ const BackAndNextButtons = ({onPressPrev, onPressNext, nextTitle = '다음'}) =>
   );
 };
 
-export {Button, BackAndNextButtons, SelectTimeButton};
+export {Button, BackAndNextButtons, DualTextButton};

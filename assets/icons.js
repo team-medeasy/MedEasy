@@ -46,18 +46,33 @@ import AnnouncementIcon from './icons/settings/announcement.svg';
 import AppVersionIcon from './icons/settings/app_version.svg';
 import TrashcanIcon from './icons/settings/delete.svg';
 import FAQIcon from './icons/settings/faq.svg';
+import FAQ2Icon from './icons/settings/faq2.svg';
 import FavoritesIcon from './icons/settings/favorites.svg';
 import FeedbackIcon from './icons/settings/feedback.svg';
 import LogoutIcon from './icons/settings/logout.svg';
 import NotificationsIcon from './icons/settings/notifications.svg';
 import ProfileSettingsIcon from './icons/settings/profile_settings.svg';
 import TextSizeIcon from './icons/settings/text_size.svg';
+import MegaphoneIcon from './icons/settings/megaphone.svg'
 
 // 알약 이미지
 import TabletIcon from './icons/pills/tablet.svg';
 import HardCapsuleIcon from './icons/pills/hard_capsule.svg';
 import SoftCapsuleIcon from './icons/pills/soft_capsule.svg';
 import OtherPillIcon from './icons/pills/etc.svg';
+
+// 도형 아이콘
+import CircleIcon from './icons/shapes/circle.svg';
+import OvalIcon from './icons/shapes/oval.svg';
+import OblongIcon from './icons/shapes/oblong.svg';
+import TriangleIcon from './icons/shapes/triangle.svg';
+import RectangleIcon from './icons/shapes/rectangle.svg';
+import DiamondIcon from './icons/shapes/diamond.svg';
+import PentagonIcon from './icons/shapes/pentagon.svg';
+import HexagonIcon from './icons/shapes/hexagon.svg';
+import HalfMoonIcon from './icons/shapes/half_moon.svg';
+import OctagonIcon from './icons/shapes/octagon.svg';
+import OtherShapeIcon from './icons/shapes/other.svg';
 
 // 기타 아이콘
 import ChatIcon from './icons/chat.svg';
@@ -128,12 +143,14 @@ export const SettingsIcons = {
   appVersion: AppVersionIcon,
   trashcan: TrashcanIcon,
   faq: FAQIcon,
+  faq2: FAQ2Icon,
   favorites: FavoritesIcon,
   feedback: FeedbackIcon,
   logout: LogoutIcon,
   notifications: NotificationsIcon,
   profileSettings: ProfileSettingsIcon,
   textSize: TextSizeIcon,
+  megaphone: MegaphoneIcon,
 };
 
 export const PillsIcon = {
@@ -141,6 +158,20 @@ export const PillsIcon = {
   hard_capsule: HardCapsuleIcon,
   soft_capsule: SoftCapsuleIcon,
   etc: OtherPillIcon,
+};
+
+export const ShapeIcons = {
+  circle: CircleIcon,
+  oval: OvalIcon,
+  oblong: OblongIcon,
+  triangle: TriangleIcon,
+  rectangle: RectangleIcon,
+  diamond: DiamondIcon,
+  pentagon: PentagonIcon,
+  hexagon: HexagonIcon,
+  octagon: OctagonIcon,
+  half_moon: HalfMoonIcon,
+  other: OtherShapeIcon,
 };
 
 export const OtherIcons = {

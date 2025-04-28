@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
-import { View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, Text, Alert } from 'react-native';
 import { themes } from './../../styles';
 import {
   Header,
@@ -8,141 +8,307 @@ import {
   NoSearchResults,
   Button
 } from '../../components';
-import { searchMedicine } from '../../api/medicine';
+import { searchPrescriptionByImage } from '../../api/prescriptionSearch';
+import { getMedicineDetailByMedicineId } from '../../api/search';
+import { createRoutineList } from '../../api/routine';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
-const PrescriptionSearchResultsScreen = ({ navigation }) => {
-  const testSearchQuery = "술"; // 테스트용 검색어
+const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
+  // route.params에서 photoUri 가져오기
+  const { photoUri } = route.params || {};
   
   const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
 
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [dataSize, setDataSize] = useState(10);
-  const [allDataLoaded, setAllDataLoaded] = useState(false);
-  
   // API 응답 데이터를 저장할 상태 변수
   const [originalResponseData, setOriginalResponseData] = useState([]);
+  
+  // 수정된 루틴 정보를 추적하는 상태 변수 추가
+  const [modifiedRoutines, setModifiedRoutines] = useState({});
 
-  // 검색 결과 가져오기
-  const fetchSearchResults = async (isLoadMore = false) => {
-    if (!isLoadMore) {
-      setLoading(true);
-      setDataSize(10); // 새 검색시 데이터 크기 초기화
-      setAllDataLoaded(false);
-    } else {
-      setLoadingMore(true);
+  // 처방전 분석 함수
+  const analyzePrescription = async () => {
+    if (!photoUri) {
+      setNoResults(true);
+      setLoading(false);
+      return;
     }
-    setError(null);
-  
-    console.log('카메라 검색 요청 파라미터:', {
-      searchQuery: testSearchQuery,
-      size: isLoadMore ? dataSize + 10 : 10 // 데이터 크기 증가
-    });
-  
+
     try {
-      // 기본 검색 실행
-      const requestParams = {
-        name: testSearchQuery,
-        size: isLoadMore ? dataSize + 10 : 10 // 로드 시마다 10개씩 증가
-      };
-      
-      console.log('검색 요청:', requestParams);
-      const response = await searchMedicine(requestParams);
-  
+      const response = await searchPrescriptionByImage(photoUri);
       console.log('API 응답 전체:', response);
-  
-      // API 응답에서 데이터 추출
-      if (response.data && response.data.result && response.data.result.result_code === 200) {
-        console.log('API 응답 데이터:', response.data.body);
-  
-        // 이전 데이터 크기와 새 데이터 크기 비교하여 모든 데이터 로드 여부 확인
-        if (!response.data.body || response.data.body.length === 0) {
-          setNoResults(true);
-          setAllDataLoaded(true);
-          setSearchResults([]);
-        } else if (isLoadMore && response.data.body.length <= dataSize) {
-          // 추가 로드 요청했는데 데이터가 더 안 늘어났으면 모든 데이터 로드 완료
-          setAllDataLoaded(true);
-        }
-  
+
+      // API 응답 확인
+      if (response && response.body && response.body.length > 0 && response.result && response.result.result_code === 200) {
         // 원본 응답 데이터 저장
-        setOriginalResponseData(response.data.body);
-  
+        setOriginalResponseData(response.body);
+
         // API 응답 데이터를 기존 앱 구조에 맞게 변환
-        const formattedResults = response.data.body.map((item, index) => {
+        const formattedResults = response.body.map((item, index) => {
           const formatted = {
             // 기본 정보
-            item_name: item.item_name,
-            entp_name: item.entp_name,
-            item_image: item.item_image,
-            class_name: item.class_name,
-            etc_otc_name: item.etc_otc_name,
+            item_name: item.medicine_name,
+            entp_name: item.entp_name || '정보 없음',
+            item_image: item.image_url,
+            class_name: item.class_name || '일반의약품',
+            etc_otc_name: item.etc_otc_name || '일반의약품',
             // id
-            original_id: item.id,
-            uniqueKey: `${item.id}_${index}` // 고유 키 생성
+            original_id: item.medicine_id,
+            uniqueKey: `${item.medicine_id}_${index}`, // 고유 키 생성
+            // 복용 정보
+            dose: item.dose,
+            total_days: item.total_days,
+            total_quantity: item.total_quantity,
+            day_of_weeks: item.day_of_weeks,
+            user_schedules: item.user_schedules,
+            // 수정 여부 표시를 위한 플래그 추가
+            isModified: false
           };
           return formatted;
         });
-  
+
         console.log('변환된 검색 결과:', formattedResults);
-  
+
         // 검색 결과 설정
         setSearchResults(formattedResults);
-        
-        // 데이터 크기 업데이트 (추가 로드인 경우)
-        if (isLoadMore) {
-          setDataSize(dataSize + 10);
-        }
-        
         setNoResults(false);
       } else {
         console.error('API 에러 응답:', response);
-        setError('검색 결과를 가져오는데 실패했습니다.');
+        setSearchResults([]);
         setNoResults(true);
       }
-    } catch (err) {
-      console.error('검색 중 오류:', err);
-      if (err.response) {
-        console.error('에러 응답:', err.response.data);
-        console.error('에러 상태:', err.response.status);
-      } else if (err.request) {
-        console.error('요청 에러:', err.request);
+    } catch (e) {
+      console.error('분석 오류:', e);
+      if (e.response) {
+        console.error('에러 응답:', e.response.data);
+        console.error('에러 상태:', e.response.status);
+      } else if (e.request) {
+        console.error('요청 에러:', e.request);
       } else {
-        console.error('에러 메시지:', err.message);
+        console.error('에러 메시지:', e.message);
       }
-      setError('검색 중 오류가 발생했습니다.');
+      setError('처방전 분석 중 오류가 발생했습니다.');
       setNoResults(true);
     } finally {
       setLoading(false);
-      setLoadingMore(false);
-    }
-  };
-
-  // 스크롤 이벤트 핸들러
-  const handleLoadMore = () => {
-    if (!loading && !loadingMore && !allDataLoaded) {
-      fetchSearchResults(true);
     }
   };
 
   // 컴포넌트 마운트 시 API 호출
   useEffect(() => {
-    fetchSearchResults(false);
-  }, []);
+    analyzePrescription();
+  }, [photoUri]);
 
-  const handleSearchResultPress = item => {
-    // API 원본 데이터 찾기
+  // 약 상세 정보로 이동 처리
+  const handleSearchResultPress = async (item) => {
+    try {
+      // 원본 API 응답에서 medicine_id를 기준으로 항목 찾기
+      const originalItem = originalResponseData.find(
+        original => original.medicine_id === item.original_id
+      );
+  
+      if (!originalItem) {
+        console.error('원본 약 데이터를 찾을 수 없습니다.');
+        Alert.alert('오류', '약 정보를 불러올 수 없습니다.');
+        return;
+      }
+  
+      // 상세 정보 API 호출
+      const detailResponse = await getMedicineDetailByMedicineId(originalItem.medicine_id);
+      const detail = detailResponse?.body;
+  
+      if (!detail) {
+        console.warn('상세 정보가 없어서 기본 정보만 전달합니다.');
+        const fallbackItem = {
+          id: originalItem.medicine_id,
+          item_id: originalItem.medicine_id,
+          item_name: originalItem.medicine_name,
+          entp_name: originalItem.entp_name || '정보 없음',
+          item_image: originalItem.image_url,
+          class_name: originalItem.class_name || '일반의약품',
+          etc_otc_name: originalItem.etc_otc_name || '일반의약품',
+          dose: originalItem.dose,
+          total_days: originalItem.total_days,
+          total_quantity: originalItem.total_quantity,
+          day_of_weeks: originalItem.day_of_weeks,
+          user_schedules: originalItem.user_schedules,
+        };
+  
+        navigation.navigate('MedicineDetail', { item: fallbackItem });
+        return;
+      }
+  
+      // 상세 정보가 있을 경우 병합하여 전달
+      const fullItem = {
+        // 기본 정보
+        id: detail.id || originalItem.medicine_id,
+        item_id: detail.id || originalItem.medicine_id,
+        item_name: detail.item_name || originalItem.medicine_name,
+        entp_name: detail.entp_name || originalItem.entp_name || '정보 없음',
+        item_image: detail.item_image || originalItem.image_url,
+        class_name: detail.class_name || originalItem.class_name || '일반의약품',
+        etc_otc_name: detail.etc_otc_name || originalItem.etc_otc_name || '일반의약품',
+  
+        // 외형 정보
+        drug_shape: detail.drug_shape || '',
+        color_classes: detail.color_classes || '',
+        print_front: detail.print_front || '',
+        print_back: detail.print_back || '',
+        leng_long: detail.leng_long || '',
+        leng_short: detail.leng_short || '',
+        thick: detail.thick || '',
+        chart: detail.chart || '',
+  
+        // 복용 정보 (처방전에서 온 것 유지)
+        dose: originalItem.dose,
+        total_days: originalItem.total_days,
+        total_quantity: originalItem.total_quantity,
+        day_of_weeks: originalItem.day_of_weeks,
+        user_schedules: originalItem.user_schedules,
+  
+        // 부가 정보
+        indications: detail.indications || '',
+        dosage: detail.dosage || originalItem.dose || '',
+        storage_method: detail.storage_method || '',
+        precautions: detail.precautions || '',
+        side_effects: detail.side_effects || '',
+      };
+  
+      navigation.navigate('MedicineDetail', { item: fullItem });
+    } catch (error) {
+      console.error('약 상세 정보 가져오기 실패:', error);
+      Alert.alert('오류', '약 정보를 가져오는 중 문제가 발생했습니다.');
+  
+      // 에러 시 기본 정보만 전달
+      const fallbackItem = {
+        id: item.original_id,
+        item_id: item.original_id,
+        item_name: item.item_name,
+        entp_name: item.entp_name || '정보 없음',
+        item_image: item.item_image,
+        class_name: item.class_name || '일반의약품',
+        etc_otc_name: item.etc_otc_name || '일반의약품',
+      };
+  
+      navigation.navigate('MedicineDetail', { item: fallbackItem });
+    }
+  };
+
+  // 약품 루틴 수정 처리 함수
+  const handleModifyRoutine = (item) => {
+    // 원본 API 응답에서 medicine_id를 기준으로 항목 찾기
     const originalItem = originalResponseData.find(
-      originalItem => originalItem.id === item.original_id
+      original => original.medicine_id === item.original_id
     );
-    
-    // 원본 데이터 전달
-    navigation.navigate('MedicineDetail', { 
-      item: originalItem,
+
+    if (!originalItem) {
+      Alert.alert('오류', '약 정보를 불러올 수 없습니다.');
+      return;
+    }
+
+    // 기존에 수정된 정보가 있다면 그것을 우선 사용
+    const modifiedItem = modifiedRoutines[item.original_id] || originalItem;
+
+    // SetMedicineRoutine 화면으로 이동하며 필요한 데이터 전달
+    navigation.navigate('SetMedicineRoutine', {
+      medicineId: originalItem.medicine_id,
+      medicineName: modifiedItem.medicine_name || originalItem.medicine_name,
+      dose: modifiedItem.dose || originalItem.dose,
+      total_quantity: modifiedItem.total_quantity || originalItem.total_quantity,
+      total_days: modifiedItem.total_days || originalItem.total_days,
+      day_of_weeks: modifiedItem.day_of_weeks || originalItem.day_of_weeks,
+      user_schedules: modifiedItem.user_schedules || originalItem.user_schedules,
+      fromPrescription: true,
+      onRoutineUpdate: (updatedRoutine) => handleRoutineUpdate(originalItem.medicine_id, updatedRoutine)
     });
+  };
+
+  // 루틴 수정 결과 처리 함수
+  const handleRoutineUpdate = (medicineId, updatedRoutine) => {
+    console.log('루틴 수정 결과:', medicineId, updatedRoutine);
+    
+    // 수정된 루틴 정보 저장
+    setModifiedRoutines(prev => ({
+      ...prev,
+      [medicineId]: updatedRoutine
+    }));
+
+    // 검색 결과에 수정 상태 반영
+    setSearchResults(prevResults => 
+      prevResults.map(item => {
+        if (item.original_id === medicineId) {
+          return {
+            ...item,
+            isModified: true,
+            // 변경된 정보 반영
+            item_name: updatedRoutine.nickname || item.item_name,
+            dose: updatedRoutine.dose,
+            total_quantity: updatedRoutine.total_quantity,
+            total_days: updatedRoutine.total_days,
+            day_of_weeks: updatedRoutine.day_of_weeks,
+            user_schedules: updatedRoutine.user_schedules
+          };
+        }
+        return item;
+      })
+    );
+  };
+
+  // 루틴 등록 처리
+  const handleRegisterRoutines = async () => {
+    if (searchResults.length === 0) return;
+
+    try {
+      // 원본 데이터를 기반으로 수정된 정보가 있으면 적용하여 요청 데이터 구성
+      const routineRequests = originalResponseData.map(medicine => {
+        // 수정된 정보가 있는지 확인
+        const modifiedData = modifiedRoutines[medicine.medicine_id];
+        
+        return {
+          medicine_id: medicine.medicine_id,
+          nickname: modifiedData?.nickname || modifiedData?.medicine_name || medicine.medicine_name,
+          dose: modifiedData?.dose || medicine.dose,
+          total_quantity: modifiedData?.total_quantity || medicine.total_quantity || (medicine.dose * medicine.total_days) || 0,
+          day_of_weeks: modifiedData?.day_of_weeks || medicine.day_of_weeks || [1, 2, 3, 4, 5, 6, 7],
+          user_schedule_ids: (modifiedData?.user_schedules || medicine.user_schedules)
+            .filter(schedule => schedule.recommended === true)
+            .map(schedule => schedule.user_schedule_id),
+          interval_days: modifiedData?.interval_days || 1 // 기본값 1일로 설정
+        };
+      });
+      
+      console.log('최종 루틴 등록 요청 데이터:', routineRequests);
+      
+      // API 명세에 따라 /routine/list 엔드포인트 호출하여 루틴 리스트 등록
+      const response = await createRoutineList(routineRequests);
+      
+      // 성공 메시지 표시
+      Alert.alert(
+        '등록 완료', 
+        '루틴이 성공적으로 등록되었습니다.',
+        [{ 
+          text: '확인', 
+          onPress: () => {
+            // 루틴 등록 이후 홈화면으로 이동
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'NavigationBar' }]
+            });
+          } 
+        }]
+      );
+    } catch (error) {
+      console.error('루틴 등록 실패:', error);
+      
+      // 오류 메시지 표시
+      Alert.alert(
+        '등록 실패',
+        '루틴 등록 중 오류가 발생했습니다. 다시 시도해주세요.',
+        [{ text: '확인' }]
+      );
+    }
   };
 
   return (
@@ -180,9 +346,8 @@ const PrescriptionSearchResultsScreen = ({ navigation }) => {
           <PrescriptionSearchResultsList
             searchResults={searchResults}
             handleSearchResultPress={handleSearchResultPress}
-            onEndReached={handleLoadMore}
+            handleModifyRoutine={handleModifyRoutine}
             onEndReachedThreshold={0.5}
-            refreshing={loadingMore}
           />
         )}
       </SearchResultContainer>
@@ -198,10 +363,7 @@ const PrescriptionSearchResultsScreen = ({ navigation }) => {
         alignItems: 'center',
         backgroundColor: themes.light.bgColor.bgPrimary
       }}>
-        <Button title='확인' onPress={() => {}} />
-        <ModifyButton>
-          <ModifyText>내용을 수정하고 싶어요.</ModifyText>
-        </ModifyButton>
+        <Button title='확인' onPress={handleRegisterRoutines} disabled={loading || noResults || searchResults.length === 0} />
       </View>
     </Container>
   );
@@ -217,17 +379,6 @@ const SearchResultContainer = styled.View`
   margin-top: 37px;
   margin-bottom: 120px;
   background-color: ${themes.light.bgColor.bgPrimary};
-`;
-
-const ModifyButton = styled(TouchableOpacity)`
-`;
-
-const ModifyText = styled.Text`
-  font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.Primary50};
-  text-decoration: underline;
-  text-decoration-color: ${themes.light.textColor.Primary50}; 
 `;
 
 export default PrescriptionSearchResultsScreen;

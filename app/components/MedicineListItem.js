@@ -8,17 +8,17 @@ import { useNavigation } from '@react-navigation/native';
 
 export const MedicineListItem = ({ item, routineInfo }) => {
   const navigation = useNavigation();
-  
+
   // 종료일이 오늘을 지났는지 확인
   const isPastMedicine = () => {
     if (!routineInfo || !routineInfo.routine_end_date) return false;
-    
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const endDate = new Date(routineInfo.routine_end_date);
     endDate.setHours(0, 0, 0, 0);
-    
+
     return endDate < today;
   };
 
@@ -31,11 +31,11 @@ export const MedicineListItem = ({ item, routineInfo }) => {
     const date = new Date(dateString);
     return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
   };
-  
+
   // 요일 숫자 배열을 텍스트로 변환하는 함수 (1=월, 2=화, ..., 7=일)
   const getDayOfWeekText = (dayOfWeeks) => {
     if (!dayOfWeeks || dayOfWeeks.length === 0) return '정보 없음';
-    
+
     const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
     return dayOfWeeks.map(day => dayNames[(day - 1) % 7]).join(', ');
   };
@@ -46,9 +46,9 @@ export const MedicineListItem = ({ item, routineInfo }) => {
     <ItemContainer onPress={handlePress}>
       <View style={{ flexDirection: 'row', gap: 15 }}>
         {/* API 응답과 일치하도록 속성명 변경 */}
-        <MedicineImage 
-          source={{ uri: item.medicine_image || item.item_image }} 
-          resizeMode="cover" 
+        <MedicineImage
+          source={{ uri: item.medicine_image || item.item_image }}
+          resizeMode="cover"
         />
 
         <InfoContainer>
@@ -96,7 +96,7 @@ export const MedicineListItem = ({ item, routineInfo }) => {
           value={
             isPast && routineInfo && routineInfo.routine_start_date && routineInfo.routine_end_date
               ? `${formatDate(routineInfo.routine_start_date)} ~ ${formatDate(routineInfo.routine_end_date)}`
-              : routineInfo && routineInfo.routine_start_date 
+              : routineInfo && routineInfo.routine_start_date
                 ? formatDate(routineInfo.routine_start_date)
                 : '정보 없음'
           }
@@ -109,11 +109,13 @@ export const MedicineListItem = ({ item, routineInfo }) => {
               : '정보 없음'
           }
         />
-        <Routine 
-          label={'복용 주기    '} 
-          value={routineInfo && routineInfo.day_of_weeks 
-            ? getDayOfWeekText(routineInfo.day_of_weeks) 
-            : '정보 없음'} 
+        <Routine
+          label={'복용 주기    '}
+          value={routineInfo && routineInfo.interval_days != null
+            ? (routineInfo.interval_days === 1
+              ? '매일'
+              : `${routineInfo.interval_days}일`)
+            : '정보 없음'}
         />
       </View>
     </ItemContainer>

@@ -1,27 +1,43 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { ImageBackground, TouchableOpacity, View } from 'react-native';
-import { themes } from '../../styles';
-import { RoutineIcons } from '../../../assets/icons';
-import { Tag } from '..';
+import {ImageBackground, TouchableOpacity, View} from 'react-native';
+import {themes} from '../../styles';
+import {RoutineIcons} from '../../../assets/icons';
+import {Tag} from '..';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {PlaceholderImage} from '../SearchResult/PlaceholderImage';
+import {updateInterestedMedicine} from '../../api/interestedMedicine';
 
-const { heartOff: HeartOffIcon, heartOn: HeartOnIcon } = RoutineIcons;
+const {heartOff: HeartOffIcon, heartOn: HeartOnIcon} = RoutineIcons;
 
-const MedicineOverview = ({ 
-  medicine, 
-  isFavorite, 
-  setIsFavorite, 
-  onPressEnlarge 
+const MedicineOverview = ({
+  medicine,
+  isFavorite,
+  setIsFavorite,
+  onPressEnlarge,
 }) => {
+  const hasImage = !!medicine.item_image;
+
+  const handleFavoritePress = async () => {
+    try {
+      console.log('보낼 medicine_id:', medicine.id);
+      await updateInterestedMedicine(medicine.id);
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error('관심 의약품 등록 실패:', error);
+    }
+  };
+
   return (
-    <MedicineInfoContainer
-      source={{ uri: medicine.item_image }}
-      blurRadius={15}>
+    <MedicineInfoContainer source={{uri: medicine.item_image}} blurRadius={15}>
       <Overlay />
 
       <ImageContainer>
-        <MedicineImage source={{ uri: medicine.item_image }} />
+        {hasImage ? (
+          <MedicineImage source={{uri: medicine.item_image}} />
+        ) : (
+          <PlaceholderImage />
+        )}
         <TouchableOpacity
           onPress={() => onPressEnlarge(medicine.item_seq)}
           style={{
@@ -54,27 +70,27 @@ const MedicineOverview = ({
             justifyContent: 'space-between',
             width: '100%',
           }}>
-          <View style={{ flexDirection: 'row', gap: 11 }}>
-            <Tag sizeType="large" colorType="detailPrimary" maxWidth='85'>
+          <View style={{flexDirection: 'row', gap: 11}}>
+            <Tag sizeType="large" colorType="detailPrimary" maxWidth="85">
               {medicine.etc_otc_name || '정보 없음'}
             </Tag>
-            <Tag sizeType="large" colorType="detailSecondary" maxWidth='185'>
+            <Tag sizeType="large" colorType="detailSecondary" maxWidth="185">
               {medicine.class_name || '정보 없음'}
             </Tag>
           </View>
 
-          <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
+          <TouchableOpacity onPress={handleFavoritePress}>
             {isFavorite ? (
               <HeartOnIcon
                 width={24}
                 height={24}
-                style={{ color: themes.light.textColor.buttonText }}
+                style={{color: themes.light.textColor.buttonText}}
               />
             ) : (
               <HeartOffIcon
                 width={24}
                 height={24}
-                style={{ color: themes.light.textColor.buttonText }}
+                style={{color: themes.light.textColor.buttonText}}
               />
             )}
           </TouchableOpacity>
@@ -128,4 +144,4 @@ const MedicineInfoName = styled.Text`
   color: ${themes.light.textColor.buttonText};
 `;
 
-export {MedicineOverview};
+export { MedicineOverview };

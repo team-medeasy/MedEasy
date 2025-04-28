@@ -26,12 +26,14 @@ import SearchMedicineScreen from './screens/Search/SearchMedicine';
 import SearchMedicineResultsScreen from './screens/Search/SearchMedicineResults';
 import MedicineDetailScreen from './screens/Search/MedicineDetail';
 import MedicineImageDetailScreen from './screens/Search/MedicineImageDetail';
+import PrescriptionSearchResults from './screens/Search/PrescriptionSearchResults';
 import SettingStack from './screens/Settings/SettingStack';
 import NotificationScreen from './screens/Notification';
 import AddMedicineRoutineScreen from './screens/Routine/AddMedicineRoutine';
 import AddHospitalVisitScreen from './screens/Routine/AddHospitalVisit';
 import SetMedicineRoutineScreen from './screens/Routine/SetMedicineRoutine';
 import SetMedicineNameScreen from './screens/Routine/SetMedicineName';
+import SetMedicineStartDayScreen from './screens/Routine/SetMedicineStartDay';
 import SetMedicineDayScreen from './screens/Routine/SetMedicineDay';
 import SetMedicineTimeScreen from './screens/Routine/SetMedicineTime';
 import SetMedicineDoseScreen from './screens/Routine/SetMedicineDose';
@@ -73,6 +75,10 @@ const RoutineModalNavigator = () => {
       <RoutineModalStack.Screen
         name="SetMedicineName"
         component={SetMedicineNameScreen}
+      />
+      <RoutineModalStack.Screen
+        name="SetMedicineStartDay"
+        component={SetMedicineStartDayScreen}
       />
       <RoutineModalStack.Screen
         name="SetMedicineDay"
@@ -266,6 +272,10 @@ const App = () => {
               <RootStack.Screen
                 name="MedicineImageDetail"
                 component={MedicineImageDetailScreen}
+              />
+              <RootStack.Screen
+                name="PrescriptionSearchResults"
+                component={PrescriptionSearchResults}
               />
               <RootStack.Screen
                 name="Notification"
