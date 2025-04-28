@@ -46,12 +46,14 @@ import AnnouncementIcon from './icons/settings/announcement.svg';
 import AppVersionIcon from './icons/settings/app_version.svg';
 import TrashcanIcon from './icons/settings/delete.svg';
 import FAQIcon from './icons/settings/faq.svg';
+import FAQ2Icon from './icons/settings/faq2.svg';
 import FavoritesIcon from './icons/settings/favorites.svg';
 import FeedbackIcon from './icons/settings/feedback.svg';
 import LogoutIcon from './icons/settings/logout.svg';
 import NotificationsIcon from './icons/settings/notifications.svg';
 import ProfileSettingsIcon from './icons/settings/profile_settings.svg';
 import TextSizeIcon from './icons/settings/text_size.svg';
+import MegaphoneIcon from './icons/settings/megaphone.svg'
 
 // 알약 이미지
 import TabletIcon from './icons/pills/tablet.svg';
@@ -141,12 +143,14 @@ export const SettingsIcons = {
   appVersion: AppVersionIcon,
   trashcan: TrashcanIcon,
   faq: FAQIcon,
+  faq2: FAQ2Icon,
   favorites: FavoritesIcon,
   feedback: FeedbackIcon,
   logout: LogoutIcon,
   notifications: NotificationsIcon,
   profileSettings: ProfileSettingsIcon,
   textSize: TextSizeIcon,
+  megaphone: MegaphoneIcon,
 };
 
 export const PillsIcon = {
