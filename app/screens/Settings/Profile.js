@@ -6,11 +6,11 @@ import Dialog from 'react-native-dialog';
 
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { Header, InputWithDelete } from '../../components';
+import { Button, Header, InputWithDelete } from '../../components';
 import { SettingsIcons } from '../../../assets/icons';
 
 
-import { deleteUser, getUser } from '../../api/user';
+import { deleteUser, getUser, updateUserName } from '../../api/user';
 import { useSignUp } from '../../api/context/SignUpContext';
 import { clearAuthData, removeAccessToken, removeRefreshToken, removeUserInfo } from '../../api/storage';
 
@@ -37,6 +37,21 @@ const Profile = () => {
     };
     fetchUser();
   }, []);
+
+  const handleUpdateUserName = async () => {
+    if (!userName.trim()) {
+      Alert.alert('오류', '이름을 입력해주세요.');
+      return;
+    }
+    try {
+      console.log('서버에 보낼 이름:', userName);  
+      await updateUserName({ name: userName });   
+      Alert.alert('완료', '이름이 성공적으로 수정되었습니다.'); 
+    } catch (error) {
+      console.error('이름 수정 오류:', error);
+      Alert.alert('오류', error.response?.data?.message || '이름 수정에 실패했습니다.');
+    }
+  };  
 
   const handleLogout = async () => {
     try {
@@ -119,6 +134,13 @@ const Profile = () => {
       </Section>
 
       <ButtonContainer>
+        <Button
+          onPress={handleUpdateUserName}
+          title="수정하기"
+          fontFamily={'Pretendard-Medium'}
+          fontSize={FontSizes.body.default}
+          bgColor={themes.light.pointColor.Secondary}
+        />
         <LogoutBtn onPress={handleLogout}>
           <SettingsIcons.logout width={16} height={16} color={themes.light.textColor.buttonText} />
           <BtnTitle>로그아웃</BtnTitle>
