@@ -22,17 +22,6 @@ const ButtonText = styled(Text)`
   font-family: ${props => props.fontFamily || 'KimjungchulGothic-Bold'};
 `;
 
-const ButtonInner = styled.View`
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-`;
-
-const IconWrapper = styled.View`
-  justify-content: center;
-  align-items: center;
-`;
-
 const Button = ({
   title,
   onPress,
@@ -54,12 +43,9 @@ const Button = ({
       height={height}
       flex={flex}
       disabled={disabled}>
-      <ButtonInner>
-        {icon && <IconWrapper>{icon}</IconWrapper>} {/* ✅ 아이콘 렌더링 */}
         <ButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
           {title}
         </ButtonText>
-      </ButtonInner>
     </ButtonContainer>
   );
 };
