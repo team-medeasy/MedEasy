@@ -15,6 +15,7 @@ const RoutineCard = ({
   toggleCheck,
   isInModal = false,
   selectedDateString,
+  backgroundColor,
 }) => {
   const navigation = useNavigation();
 
@@ -35,7 +36,7 @@ const RoutineCard = ({
         </>
       )}
 
-      <RoutineContainer isInModal={isInModal}>
+      <RoutineContainer isInModal={isInModal} backgroundColor={backgroundColor}>
         {routine.type === 'medicine' ? (
           <TimeContainer>
             <IconContainer>
@@ -188,8 +189,10 @@ const TimelinePoint = styled.View`
 `;
 
 const RoutineContainer = styled.View`
-  background-color: ${({isInModal}) =>
-    isInModal
+  background-color: ${({isInModal, backgroundColor}) =>
+    backgroundColor
+      ? backgroundColor
+      : isInModal
       ? themes.light.pointColor.Primary10
       : themes.light.bgColor.bgPrimary};
   padding: 0 20px;
@@ -225,7 +228,9 @@ const IconContainer = styled.View`
   padding-right: 15px;
 `;
 
-const TextContainer = styled.View``;
+const TextContainer = styled.View`
+  gap: 5px;
+`;
 
 const TypeText = styled.Text`
   font-size: ${FontSizes.heading.default};
