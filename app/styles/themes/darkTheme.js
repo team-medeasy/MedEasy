@@ -9,6 +9,7 @@ export const darkTheme = {
   textColor: {
     textPrimary: 'rgba(255, 255, 255, 1)',
     Primary6: 'rgba(255, 255, 255, 0.06)',
+    Primary10: 'rgba(0, 0, 0, 0.1)',
     Primary20: 'rgba(255, 255, 255, 0.2)',
     Primary30: 'rgba(255, 255, 255, 0.3)',
     Primary50: 'rgba(255, 255, 255, 0.5)',
