@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Linking } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import Dialog from 'react-native-dialog';
@@ -22,6 +22,24 @@ const SettingList = () => {
 
   const { resetSignUpData } = useSignUp();
 
+  // 의견 남기기 기능
+  const handleFeedback = async () => {
+    const email = 'team.medeasy@gmail.com';
+    const subject = '메디지 앱 의견';
+    const body = '안녕하세요, 메디지 앱에 대한 의견을 남깁니다:\n\n';
+    
+    const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // 이메일 앱을 열 수 있는지 확인
+    const canOpen = await Linking.canOpenURL(url);
+    
+    if (canOpen) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert('오류', '이메일 앱을 열 수 없습니다.');
+    }
+  };
+
   const handlePress = name => {
     switch (name) {
       case 'Profile':
@@ -33,7 +51,7 @@ const SettingList = () => {
         navigation.navigate('SettingStack', { screen: name });
         break;
       case 'Feedback':
-        Alert.alert('의견 남기기', '의견을 남길 수 있는 화면이 준비 중입니다.');
+        handleFeedback();
         break;
       case 'AppVersion':
         // 기능 없음

@@ -54,5 +54,6 @@ export const getMedicineById = (medicine_id) => {
   return api.get(`/medicine/medicine_id/${medicine_id}`);
 };
 
+// 약 정보 오디오 생성
 export const getMedicineAudioUrl = (medicineId) =>
   api.get(`/medicine/${medicineId}/audio-url`);
