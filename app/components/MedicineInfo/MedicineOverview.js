@@ -161,36 +161,38 @@ const MedicineOverview = ({
             <Tag sizeType="large" colorType="detailPrimary" maxWidth="85">
               {medicine.etc_otc_name || '정보 없음'}
             </Tag>
-            <Tag sizeType="large" colorType="detailSecondary" maxWidth="185">
+            <Tag sizeType="large" colorType="detailSecondary" maxWidth="160">
               {medicine.class_name || '정보 없음'}
             </Tag>
           </View>
-          <TouchableOpacity onPress={() => handleAudioPress(medicine.item_id)}>
-            <ChatIcons.mike
-              width={24}
-              height={24}
-              style={{ 
-                color: isPlaying 
-                  ? themes.light.textColor.buttonText  // 재생 중일 때 색상
-                  : themes.light.textColor.buttonText60 // 재생 중 아닐 때 색상
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleFavoritePress}>
-            {isFavorite ? (
-              <HeartOnIcon
+          <View style={{ flexDirection: 'row', gap: 11 }}>
+            <TouchableOpacity onPress={() => handleAudioPress(medicine.item_id)}>
+              <ChatIcons.mike
                 width={24}
                 height={24}
-                style={{ color: themes.light.textColor.buttonText }}
+                style={{ 
+                  color: isPlaying 
+                    ? themes.light.textColor.buttonText  // 재생 중일 때 색상
+                    : themes.light.textColor.buttonText60 // 재생 중 아닐 때 색상
+                }}
               />
-            ) : (
-              <HeartOffIcon
-                width={24}
-                height={24}
-                style={{ color: themes.light.textColor.buttonText }}
-              />
-            )}
-          </TouchableOpacity>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleFavoritePress}>
+              {isFavorite ? (
+                <HeartOnIcon
+                  width={24}
+                  height={24}
+                  style={{ color: themes.light.textColor.buttonText }}
+                />
+              ) : (
+                <HeartOffIcon
+                  width={24}
+                  height={24}
+                  style={{ color: themes.light.textColor.buttonText }}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </MedicineInfoContainer>
