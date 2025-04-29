@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
-import {themes} from '../../styles';
+import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { Button, Header, InputWithDelete } from '../../components';
 import { getUser } from '../../api/user';
@@ -16,7 +16,7 @@ const Profile = () => {
       try {
         const response = await getUser();
         const userData = response.data.body;
-        console.log('받아온 유저 데이터:', userData); // 여기 콘솔 출력!
+        console.log('받아온 유저 데이터:', userData);
         setUserName(userData.name || '');
         setUserEmail(userData.email || '');
       } catch (error) {
@@ -52,19 +52,18 @@ const Profile = () => {
       </Section>
 
       <ButtonContainer>
-        <Button
-          title="로그아웃"
-          fontFamily={'Pretendard-Medium'}
-          fontSize={FontSizes.body.default}
-          icon={<SettingsIcons.logout width={16} height={16} style={{color: themes.light.textColor.buttonText}}/>}
-        />
-        <Button
-          title="계정 삭제"
-          bgColor={themes.light.textColor.Primary30}
-          fontFamily={'Pretendard-Medium'}
-          fontSize={FontSizes.body.default}
-          icon={<SettingsIcons.trashcan width={16} height={16} style={{color: themes.light.textColor.buttonText}}/>}
-        />
+        <LogoutBtn>
+          <SettingsIcons.logout width={16} height={16} style={{ color: themes.light.textColor.buttonText }} />
+          <BtnTitle>
+            로그아웃
+          </BtnTitle>
+        </LogoutBtn>
+        <DeleteUserBtn>
+          <SettingsIcons.trashcan width={16} height={16} style={{ color: themes.light.textColor.buttonText }} />
+          <BtnTitle>
+            계정 삭제
+          </BtnTitle>
+        </DeleteUserBtn>
       </ButtonContainer>
     </Container>
   );
@@ -94,4 +93,32 @@ const ButtonContainer = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
   gap: 12px;
 `;
+
+const LogoutBtn = styled(TouchableOpacity)`
+  background-color: ${themes.light.boxColor.buttonPrimary};
+  border-radius: 10px;
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 20px;
+`;
+
+const DeleteUserBtn = styled(TouchableOpacity)`
+  background-color: ${themes.light.textColor.Primary30};
+  border-radius: 10px;
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 20px;
+`;
+
+const BtnTitle = styled.Text`
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.buttonText};
+`;
+
+
 export default Profile;
