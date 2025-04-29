@@ -5,23 +5,6 @@ import {themes} from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
 
 // 기본 버튼
-const ButtonContainer = styled(TouchableOpacity)`
-  flex: ${({flex}) => flex ?? '0 1 auto'};
-  width: ${({width}) => width || '100%'};
-  height: ${({height}) => height ?? '60px'};
-  background-color: ${props =>
-    props.bgColor || themes.light.boxColor.buttonPrimary};
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-`;
-
-const ButtonText = styled(Text)`
-  color: ${props => props.color || themes.light.textColor.buttonText};
-  font-size: ${props => props.fontSize || FontSizes.heading.default};
-  font-family: ${props => props.fontFamily || 'KimjungchulGothic-Bold'};
-`;
-
 const Button = ({
   title,
   onPress,
@@ -51,25 +34,6 @@ const Button = ({
 };
 
 // 양 옆에 두 메시지를 띄우는 버튼
-const DualTextButtonContainer = styled(TouchableOpacity)`
-  flex: ${({ flex }) => flex ?? '0 1 auto'};
-  width: ${({ width }) => width || '100%'};
-  height: ${({ height }) => height ?? '55px'};
-  background-color: ${props =>
-    props.bgColor || themes.light.boxColor.buttonPrimary};
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: row;
-  padding: 0 20px;
-  border-radius: 10px;
-`;
-
-const DualTextButtonText = styled(Text)`
-  font-size: ${props => props.fontSize || FontSizes.body.default};
-  font-family: ${props => props.fontFamily || 'Pretendard-SemiBold'};
-  color: ${props => props.color || themes.light.textColor.buttonText};
-`;
-
 const DualTextButton = ({
   title,
   messageText,
@@ -121,4 +85,94 @@ const BackAndNextButtons = ({onPressPrev, onPressNext, nextTitle = '다음'}) =>
   );
 };
 
-export {Button, BackAndNextButtons, DualTextButton};
+// 아이콘 + 텍스트 버튼
+const IconTextButton = ({
+  onPress,
+  icon,
+  title,
+  bgColor,
+  textColor,
+  fontSize,
+  fontFamily,
+  width,
+  height,
+  gap,
+  disabled
+}) => {
+  return (
+    <IconTextButtonContainer
+      onPress={disabled ? null : onPress}
+      bgColor={bgColor}
+      width={width}
+      height={height}
+      gap={gap}
+      disabled={disabled}
+    >
+      {icon}
+      <IconTextButtonText
+        color={textColor}
+        fontSize={fontSize}
+        fontFamily={fontFamily}
+      >
+        {title}
+      </IconTextButtonText>
+    </IconTextButtonContainer>
+  );
+};
+
+const ButtonContainer = styled(TouchableOpacity)`
+  flex: ${({flex}) => flex ?? '0 1 auto'};
+  width: ${({width}) => width || '100%'};
+  height: ${({height}) => height ?? '60px'};
+  background-color: ${props =>
+    props.bgColor || themes.light.boxColor.buttonPrimary};
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+`;
+
+const ButtonText = styled(Text)`
+  color: ${props => props.color || themes.light.textColor.buttonText};
+  font-size: ${props => props.fontSize || FontSizes.heading.default};
+  font-family: ${props => props.fontFamily || 'KimjungchulGothic-Bold'};
+`;
+
+const DualTextButtonContainer = styled(TouchableOpacity)`
+  flex: ${({ flex }) => flex ?? '0 1 auto'};
+  width: ${({ width }) => width || '100%'};
+  height: ${({ height }) => height ?? '55px'};
+  background-color: ${props =>
+    props.bgColor || themes.light.boxColor.buttonPrimary};
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  padding: 0 20px;
+  border-radius: 10px;
+`;
+
+const DualTextButtonText = styled(Text)`
+  font-size: ${props => props.fontSize || FontSizes.body.default};
+  font-family: ${props => props.fontFamily || 'Pretendard-SemiBold'};
+  color: ${props => props.color || themes.light.textColor.buttonText};
+`;
+
+const IconTextButtonContainer = styled(TouchableOpacity)`
+  padding: 16px 0;
+  width: ${({ width }) => width || '100%'};
+  height: ${({ height }) => height || 'auto'};
+  background-color: ${({ bgColor }) =>
+    bgColor || themes.light.boxColor.buttonPrimary};
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  flex-direction: row;
+  gap: ${({ gap }) => gap || '20px'};
+`;
+
+const IconTextButtonText = styled(Text)`
+  color: ${({ color }) => color || themes.light.textColor.buttonText};
+  font-size: ${({ fontSize }) => fontSize || FontSizes.body.default};
+  font-family: ${({ fontFamily }) => fontFamily || 'Pretendard-SemiBold'};
+`;
+
+export {Button, BackAndNextButtons, DualTextButton, IconTextButton};

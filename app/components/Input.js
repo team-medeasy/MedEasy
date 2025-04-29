@@ -4,6 +4,7 @@ import { OtherIcons } from '../../assets/icons';
 import { themes } from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
 
+// 삭제 버튼이 있는 입력창
 export const InputWithDelete = ({
     value,
     onChangeText,
@@ -37,6 +38,15 @@ export const InputWithDelete = ({
     )
 };
   
+// 읽기 전용 입력창
+export const ReadOnlyInput = ({ text }) => {
+    return (
+      <InputContainer>
+        <LabelText numberOfLines={1}>{text}</LabelText>
+      </InputContainer>
+    );
+  };
+
 const InputContainer = styled.View`
     flex-direction: row;
     align-items: center;
@@ -55,4 +65,12 @@ const StyledInput = styled.TextInput`
 
 const DeleteButton = styled.TouchableOpacity`
     padding: 15px;
+`;
+
+const LabelText = styled.Text`
+  flex: 1;
+  padding: 18px 0;
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${FontSizes.body.default};
+  color: ${themes.light.textColor.textPrimary};
 `;

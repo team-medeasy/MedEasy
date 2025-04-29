@@ -1,18 +1,17 @@
 import React from 'react';
-import {SafeAreaView, Image, TouchableOpacity, Text, View} from 'react-native';
+import {SafeAreaView, TouchableOpacity, Text, View} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { IconTextButton } from '../../components';
 import {themes, fonts} from './../../styles';
 import {OtherIcons} from './../../../assets/icons';
 const {kakao: KakaoIcon} = OtherIcons;
 
-import LogoSvg from './../../../assets/images/logo.svg';
 import FontSizes from '../../../assets/fonts/fontSizes';
-const currentTheme = themes.light;
 
 const Container = styled(SafeAreaView)`
   flex: 1;
-  background-color: #fff;
+  background-color: ${themes.light.bgColor.bgPrimary};
   justify-content: space-between;
 `;
 
@@ -21,31 +20,9 @@ const TitleContainer = styled.View`
   margin-left: 40px;
 `;
 
-const LogoContainer = styled.View`
-  align-items: center;
-`;
-
 const ButtonContainer = styled.View`
   align-items: center;
   padding: 0 20px;
-`;
-
-const SignUpBtn = styled(TouchableOpacity)`
-  padding: 16px 0;
-  width: 100%;
-  background-color: ${themes.light.boxColor.buttonPrimary};
-  justify-content: center;
-  align-items: center;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  flex-direction: row;
-  gap: 20px;
-`;
-
-const BtnText = styled(Text)`
-  color: ${themes.light.textColor.buttonText};
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-SemiBold';
 `;
 
 const EmailBtn = styled(TouchableOpacity)`
@@ -57,8 +34,9 @@ const EmailBtn = styled(TouchableOpacity)`
 const EmailBtnText = styled.Text`
   font-size: ${FontSizes.body.default};
   font-family: 'Pretendard-SemiBold';
-  color: #0006;
+  color: ${themes.light.textColor.Primary50};
 `;
+
 const SignUpContainer = styled.View`
   flex-direction: row;
   margin-top: 2px;
@@ -78,22 +56,40 @@ const SignUpStartScreen = ({navigation}) => {
           메디지와 함께{'\n'}규칙적인 복약 습관{'\n'}만들어 가요!
         </Text>
       </TitleContainer>
-      <LogoContainer>
-        <LogoSvg width={250} height={250} />
-      </LogoContainer>
+
       <ButtonContainer>
-        <SignUpBtn onPress={() => navigation.navigate('NavigationBar')}>
-          <KakaoIcon
-            height={18}
-            width={18}
-            style={{color: themes.light.textColor.buttonText}}
-          />
-          <BtnText>카카오톡으로 시작하기</BtnText>
-        </SignUpBtn>
-        <SignUpBtn onPress={() => console.log('Google 로그인')}>
-          <FontAwesome name="google" size={20} color="#ffffff" />
-          <BtnText>Google로 시작하기</BtnText>
-        </SignUpBtn>
+        <View style={{
+            position: 'absolute',
+            bottom: 40,
+            left: 0,
+            right: 0,
+            padding: 20,
+            gap: 12
+        }}>
+        <IconTextButton
+          onPress={() => navigation.navigate('NavigationBar')}
+          icon={
+            <KakaoIcon
+              height={18}
+              width={18}
+              style={{color: themes.light.textColor.buttonText}}
+            />
+          }
+          title="카카오톡으로 시작하기"
+        />
+        <IconTextButton
+          onPress={() => console.log('Google 로그인')}
+          icon={
+            <FontAwesome 
+              name="google" 
+              size={20} 
+              color={themes.light.textColor.buttonText}
+            />
+          }
+          title="Google로 시작하기"
+        />
+        </View>
+
         <SignUpContainer>
           <EmailBtn
             style={{padding: 8}}

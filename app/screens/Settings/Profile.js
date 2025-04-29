@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, TouchableOpacity } from 'react-native';
+import { Alert, TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import Dialog from 'react-native-dialog';
 
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { Button, Header, InputWithDelete } from '../../components';
+import { Header, InputWithDelete, ReadOnlyInput, IconTextButton } from '../../components';
 import { SettingsIcons } from '../../../assets/icons';
 
 
@@ -21,7 +21,7 @@ const Profile = () => {
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [password, setPassword] = useState('');
 
-  const { resetSignUpData } = useSignUp();
+  const { resetSignUpData, updateSignUpData } = useSignUp();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -45,7 +45,13 @@ const Profile = () => {
     }
     try {
       console.log('서버에 보낼 이름:', userName);  
-      await updateUserName({ name: userName });   
+      await updateUserName({ name: userName });
+
+      // SignUpContext 업데이트
+      updateSignUpData({
+        firstName: userName,
+      })
+
       Alert.alert('완료', '이름이 성공적으로 수정되었습니다.'); 
     } catch (error) {
       console.error('이름 수정 오류:', error);
@@ -117,38 +123,52 @@ const Profile = () => {
 
       <Section>
         <Title>이름</Title>
-        <InputWithDelete
-          value={userName}
-          onChangeText={text => setUserName(text)}
-          keyboardType="default"
-        />
+        <View style={{
+          flexDirection: 'row',
+          gap: 15,
+        }}>
+          <View style={{flex: 1}}>
+            <InputWithDelete
+              value={userName}
+              onChangeText={text => setUserName(text)}
+              keyboardType="default"
+            />
+          </View>
+          <TestBtn onPress={handleUpdateUserName}>
+            <BtnTitle>변경하기</BtnTitle>
+          </TestBtn>
+        </View>
       </Section>
 
       <Section>
         <Title>이메일</Title>
-        <InputWithDelete
-          value={userEmail}
-          onChangeText={text => setUserEmail(text)}
-          keyboardType="default"
-        />
+        <ReadOnlyInput text={userEmail}/>
       </Section>
 
       <ButtonContainer>
-        <Button
-          onPress={handleUpdateUserName}
-          title="수정하기"
-          fontFamily={'Pretendard-Medium'}
-          fontSize={FontSizes.body.default}
-          bgColor={themes.light.pointColor.Secondary}
+        <IconTextButton
+          onPress={handleLogout}
+          icon={
+            <SettingsIcons.logout 
+              width={16} 
+              height={16} 
+              color={themes.light.textColor.buttonText} 
+            />
+          }
+          title="로그아웃"
         />
-        <LogoutBtn onPress={handleLogout}>
-          <SettingsIcons.logout width={16} height={16} color={themes.light.textColor.buttonText} />
-          <BtnTitle>로그아웃</BtnTitle>
-        </LogoutBtn>
-        <DeleteUserBtn onPress={() => setDialogVisible(true)}>
-          <SettingsIcons.trashcan width={16} height={16} color={themes.light.textColor.buttonText} />
-          <BtnTitle>계정 삭제</BtnTitle>
-        </DeleteUserBtn>
+        <IconTextButton
+          onPress={() => setDialogVisible(true)}
+          icon={
+            <SettingsIcons.trashcan 
+              width={16} 
+              height={16} 
+              color={themes.light.textColor.buttonText} 
+            />
+          }
+          title="계정 삭제"
+          bgColor={themes.light.textColor.Primary30}
+        />
       </ButtonContainer>
 
       <Dialog.Container visible={isDialogVisible}>
@@ -188,22 +208,11 @@ const ButtonContainer = styled.View`
   left: 0;
   right: 0;
   padding: 20px;
-  background-color: ${themes.light.bgColor.bgPrimary};
   gap: 12px;
 `;
 
-const LogoutBtn = styled(TouchableOpacity)`
+const TestBtn = styled(TouchableOpacity)`
   background-color: ${themes.light.boxColor.buttonPrimary};
-  border-radius: 10px;
-  padding: 20px;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  gap: 20px;
-`;
-
-const DeleteUserBtn = styled(TouchableOpacity)`
-  background-color: ${themes.light.textColor.Primary30};
   border-radius: 10px;
   padding: 20px;
   justify-content: center;
