@@ -3,6 +3,9 @@ import api from './index';
 export const updateUserSchedule = data =>
   api.patch('/user/schedule/update', data);
 
+export const updateUserName = name =>
+  api.patch('/user/name', name);
+
 export const getUser = () => api.get('/user');
 
 export const deleteUser = (password) => api.post('/user', { password });
