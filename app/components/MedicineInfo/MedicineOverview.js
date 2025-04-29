@@ -1,14 +1,17 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {ImageBackground, TouchableOpacity, View} from 'react-native';
-import {themes} from '../../styles';
-import {RoutineIcons} from '../../../assets/icons';
-import {Tag} from '..';
+import { ImageBackground, TouchableOpacity, View } from 'react-native';
+import { themes } from '../../styles';
+import { ChatIcons, RoutineIcons } from '../../../assets/icons';
+import { Tag } from '..';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import {PlaceholderImage} from '../SearchResult/PlaceholderImage';
-import {updateInterestedMedicine} from '../../api/interestedMedicine';
+import { PlaceholderImage } from '../SearchResult/PlaceholderImage';
+import { updateInterestedMedicine } from '../../api/interestedMedicine';
+import { getMedicineAudioUrl } from '../../api/medicine';
 
-const {heartOff: HeartOffIcon, heartOn: HeartOnIcon} = RoutineIcons;
+import Sound from 'react-native-sound';
+
+const { heartOff: HeartOffIcon, heartOn: HeartOnIcon } = RoutineIcons;
 
 const MedicineOverview = ({
   medicine,
@@ -18,10 +21,42 @@ const MedicineOverview = ({
 }) => {
   const hasImage = !!medicine.item_image;
 
+  const handleAudioPress = async (medicineId) => {
+    try {
+      console.log('음성 파일 요청 시작:', medicineId);
+      const response = await getMedicineAudioUrl(medicineId);
+      const audioUrl = response.data.body;
+
+      if (audioUrl) {
+        console.log('받아온 음성 URL:', audioUrl);
+        // const sound = new Sound(audioUrl, undefined, (error) => {
+        //   if (error) {
+        //     console.error('오디오 로딩 실패:', error);
+        //     return;
+        //   }
+        //   sound.play((success) => {
+        //     if (success) {
+        //       console.log('오디오 재생 성공');
+        //     } else {
+        //       console.error('오디오 재생 실패');
+        //     }
+        //     // 재생 끝나면 해제
+        //     sound.release();
+        //   });
+        // });
+      } else {
+        console.warn('음성 파일이 존재하지 않습니다.');
+      }
+    } catch (error) {
+      console.error('음성 파일 요청 중 오류 발생:', error);
+      Alert.alert('오류', '음성 파일을 가져오는 데 실패했습니다.');
+    }
+  };
+
   const handleFavoritePress = async () => {
     try {
-      console.log('보낼 medicine_id:', medicine.id);
-      await updateInterestedMedicine(medicine.id);
+      console.log('보낼 medicine_id:', medicine.item_id);
+      await updateInterestedMedicine(medicine.item_id);
       setIsFavorite(!isFavorite);
     } catch (error) {
       console.error('관심 의약품 등록 실패:', error);
@@ -29,12 +64,12 @@ const MedicineOverview = ({
   };
 
   return (
-    <MedicineInfoContainer source={{uri: medicine.item_image}} blurRadius={15}>
+    <MedicineInfoContainer source={{ uri: medicine.item_image }} blurRadius={15}>
       <Overlay />
 
       <ImageContainer>
         {hasImage ? (
-          <MedicineImage source={{uri: medicine.item_image}} />
+          <MedicineImage source={{ uri: medicine.item_image }} />
         ) : (
           <PlaceholderImage />
         )}
@@ -70,7 +105,7 @@ const MedicineOverview = ({
             justifyContent: 'space-between',
             width: '100%',
           }}>
-          <View style={{flexDirection: 'row', gap: 11}}>
+          <View style={{ flexDirection: 'row', gap: 11 }}>
             <Tag sizeType="large" colorType="detailPrimary" maxWidth="85">
               {medicine.etc_otc_name || '정보 없음'}
             </Tag>
@@ -78,19 +113,25 @@ const MedicineOverview = ({
               {medicine.class_name || '정보 없음'}
             </Tag>
           </View>
-
+          <TouchableOpacity onPress={() => handleAudioPress(medicine.item_id)}>
+            <ChatIcons.mike
+              width={24}
+              height={24}
+              style={{ color: themes.light.textColor.buttonText }}
+            />
+          </TouchableOpacity>
           <TouchableOpacity onPress={handleFavoritePress}>
             {isFavorite ? (
               <HeartOnIcon
                 width={24}
                 height={24}
-                style={{color: themes.light.textColor.buttonText}}
+                style={{ color: themes.light.textColor.buttonText }}
               />
             ) : (
               <HeartOffIcon
                 width={24}
                 height={24}
-                style={{color: themes.light.textColor.buttonText}}
+                style={{ color: themes.light.textColor.buttonText }}
               />
             )}
           </TouchableOpacity>
