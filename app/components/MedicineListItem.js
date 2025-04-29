@@ -114,7 +114,7 @@ export const MedicineListItem = ({ item, routineInfo }) => {
           value={routineInfo && routineInfo.interval_days != null
             ? (routineInfo.interval_days === 1
               ? '매일'
-              : `${routineInfo.interval_days}일`)
+              : `${routineInfo.interval_days}일에 한 번`)
             : '정보 없음'}
         />
       </View>
