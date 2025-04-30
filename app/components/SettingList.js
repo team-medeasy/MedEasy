@@ -30,14 +30,28 @@ const SettingList = () => {
     
     const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    // 이메일 앱을 열 수 있는지 확인
-    const canOpen = await Linking.canOpenURL(url);
-    
-    if (canOpen) {
-      await Linking.openURL(url);
-    } else {
-      Alert.alert('오류', '이메일 앱을 열 수 없습니다.');
-    }
+    // 먼저 경고창을 통해 사용자에게 확인
+    Alert.alert(
+      '📨 외부 메일 앱으로 이동해요',
+      '여러분의 소중한 의견이 사용성 개선에 큰 힘이 됩니다.',
+      [
+        { text: '취소', style: 'cancel' },
+        { 
+          text: '이동하기', 
+          onPress: async () => {
+            // 이메일 앱을 열 수 있는지 확인
+            const canOpen = await Linking.canOpenURL(url);
+            
+            if (canOpen) {
+              await Linking.openURL(url);
+            } else {
+              Alert.alert('오류', '이메일 앱을 열 수 없습니다.');
+            }
+          }
+        }
+      ],
+      { cancelable: true }
+    );
   };
 
   const handlePress = name => {

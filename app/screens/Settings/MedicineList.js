@@ -4,11 +4,12 @@ import { FlatList, View, Text, ActivityIndicator } from 'react-native';
 import { Header, MedicineListItem } from '../../components';
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useNavigation } from '@react-navigation/native';
 
-import { getMedicineById } from '../../api/medicine';
 import { getUserMedicinesCurrent, getUserMedicinesPast } from '../../api/user';
 
 const MedicineList = () => {
+    const navigation = useNavigation();
     const [activeTab, setActiveTab] = useState('current'); // 'current' or 'previous'
     const [medicineCount, setMedicineCount] = useState(0);
     const [currentMedicines, setCurrentMedicines] = useState([]);
@@ -25,50 +26,25 @@ const MedicineList = () => {
             
             // 1. 현재 복용 중인 약 데이터 가져오기
             const currentResponse = await getUserMedicinesCurrent();
-            const currentRoutines = currentResponse.data?.body || [];
+            const currentMedicines = currentResponse.data?.body || [];
             
             // 2. 이전에 복용한 약 데이터 가져오기
             const pastResponse = await getUserMedicinesPast();
-            const pastRoutines = pastResponse.data?.body || [];
+            const pastMedicines = pastResponse.data?.body || [];
             
-            // 3. 모든 약 ID 목록 추출
-            const allMedicineIds = [
-                ...new Set([
-                    ...currentRoutines.map(item => item.medicine_id),
-                    ...pastRoutines.map(item => item.medicine_id)
-                ])
-            ];
+            // 3. 약 개수 계산
+            const uniqueMedicineIds = new Set([
+                ...currentMedicines.map(item => item.medicine_id),
+                ...pastMedicines.map(item => item.medicine_id)
+            ]);
+            setMedicineCount(uniqueMedicineIds.size);
             
-            // 4. 약 개수 업데이트
-            setMedicineCount(allMedicineIds.length);
+            // 4. 각각 설정
+            setCurrentMedicines(currentMedicines);
+            setPreviousMedicines(pastMedicines);
             
-            // 5. 각 약의 상세 정보 가져오기
-            const medicineDataPromises = allMedicineIds.map(id => getMedicineById(id));
-            const medicineResponses = await Promise.all(medicineDataPromises);
-            const medicinesMap = {};
-            
-            medicineResponses.forEach(response => {
-                const medicine = response.data?.body || response.data;
-                if (medicine && medicine.id) {
-                    medicinesMap[medicine.id] = medicine;
-                }
-            });
-            
-            // 6. 현재 복용 중인 약과 이전에 복용한 약 목록 생성
-            const current = currentRoutines.map(routine => ({
-                ...medicinesMap[routine.medicine_id],
-                routineInfo: routine
-            })).filter(item => item.id); // id가 있는 항목만 필터링
-            
-            const previous = pastRoutines.map(routine => ({
-                ...medicinesMap[routine.medicine_id],
-                routineInfo: routine
-            })).filter(item => item.id); // id가 있는 항목만 필터링
-            
-            setCurrentMedicines(current);
-            setPreviousMedicines(previous);
-            console.log('현재 복용 중인 약:', current.length);
-            console.log('이전에 복용한 약:', previous.length);
+            console.log('현재 복용 중인 약:', currentMedicines.length);
+            console.log('이전에 복용한 약:', pastMedicines.length);
             
         } catch (error) {
             console.error('약 데이터 불러오기 실패:', error);
@@ -104,9 +80,25 @@ const MedicineList = () => {
             <FlatList
                 data={data}
                 keyExtractor={(item, index) => 
-                    item.routineInfo?.routine_id?.toString() || `${item.id}-${index}`
-                  }                  
-                renderItem={({ item }) => <MedicineListItem item={item} routineInfo={item.routineInfo} />}
+                    item.medicine_id?.toString() || `medicine-${index}`
+                }                  
+                renderItem={({ item }) => (
+                    <MedicineListItem 
+                        item={item} 
+                        routineInfo={item} 
+                        onPress={() => navigation.navigate('MedicineDetail', { 
+                            medicineId: item.medicine_id,
+                            title: item.medicine_name,
+                            basicInfo: {
+                                item_name: item.medicine_name,
+                                entp_name: item.entp_name,
+                                class_name: item.class_name,
+                                etc_otc_name: item.etc_otc_name,
+                                item_image: item.medicine_image
+                            }
+                        })}
+                    />
+                )}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
                     <NoResultContainer>
@@ -116,6 +108,8 @@ const MedicineList = () => {
             />
         );
     };
+
+
 
     return (
         <Container>
