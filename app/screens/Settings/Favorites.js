@@ -119,8 +119,8 @@ const Container = styled.View`
 `;
 
 const ListContainer = styled.View`
-flex: 1;
-  padding: 10px 0 20px 0;
+  flex: 1;
+  margin: 10px 0 20px 0;
 `;
 
 const EmptyContainer = styled.View`

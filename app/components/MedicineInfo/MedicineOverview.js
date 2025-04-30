@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
 import { Alert, ImageBackground, TouchableOpacity, View } from 'react-native';
 import { themes } from '../../styles';
@@ -6,7 +6,7 @@ import { ChatIcons, RoutineIcons } from '../../../assets/icons';
 import { Tag } from '..';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { PlaceholderImage } from '../SearchResult/PlaceholderImage';
-import { updateInterestedMedicine } from '../../api/interestedMedicine';
+import { updateInterestedMedicine, getInterestedMedicineStatus } from '../../api/interestedMedicine';
 import { getMedicineAudioUrl } from '../../api/medicine';
 
 import Sound from 'react-native-sound';
@@ -18,13 +18,27 @@ const { heartOff: HeartOffIcon, heartOn: HeartOnIcon } = RoutineIcons;
 
 const MedicineOverview = ({
   medicine,
-  isFavorite,
-  setIsFavorite,
   onPressEnlarge,
 }) => {
   const hasImage = !!medicine.item_image;
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSound, setCurrentSound] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // 컴포넌트 마운트 시 관심 약품 상태 확인
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      try {
+        const response = await getInterestedMedicineStatus(medicine.item_id);
+        console.log('🤍 관심 약품 상태 응답:', response.data.body);
+        setIsFavorite(response.data.body.is_interested_medicine);
+      } catch (error) {
+        console.error('관심 의약품 상태 확인 실패:', error);
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [medicine.item_id]);
 
   const handleAudioPress = async (medicineId) => {
     // 이미 재생 중이면 중지
@@ -96,7 +110,7 @@ const MedicineOverview = ({
   };
 
   // 컴포넌트 언마운트 시 오디오 정리
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (currentSound) {
         currentSound.stop();
@@ -107,11 +121,11 @@ const MedicineOverview = ({
 
   const handleFavoritePress = async () => {
     try {
-      console.log('보낼 medicine_id:', medicine.item_id);
+      console.log('❤️ 관심 의약품 등록 medicine_id:', medicine.item_id);
       await updateInterestedMedicine(medicine.item_id);
       setIsFavorite(!isFavorite);
     } catch (error) {
-      console.error('관심 의약품 등록 실패:', error);
+      console.error('💔 관심 의약품 등록 실패:', error);
     }
   };
 
