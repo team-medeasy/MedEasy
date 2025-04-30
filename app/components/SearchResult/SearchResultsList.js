@@ -11,6 +11,7 @@ export const SearchResultsList = ({
   onEndReached,
   onEndReachedThreshold = 0.5,
   refreshing,
+  footer = true,
 }) => {
   return (
     <Container>
@@ -35,7 +36,9 @@ export const SearchResultsList = ({
                   />
                 </LoadingContainer>
               )}
-              <Footer />
+              {footer && (
+                 <Footer />
+              )}
             </>
           )}
         />
