@@ -28,7 +28,6 @@ import {getUserMedicineCount} from '../../api/user';
 const MedicineDetailScreen = ({route, navigation}) => {
   const {medicineId, isModal, basicInfo, item, title} = route.params;
   
-  const [isFavorite, setIsFavorite] = useState(false);
   const [medicine, setMedicine] = useState(basicInfo || item || null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -301,8 +300,6 @@ const MedicineDetailScreen = ({route, navigation}) => {
       <ScrollView>
         <MedicineOverview
           medicine={medicine}
-          isFavorite={isFavorite}
-          setIsFavorite={setIsFavorite}
           onPressEnlarge={handlePressEnlarge}
         />
 
