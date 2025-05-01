@@ -5,7 +5,7 @@ import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { Header } from '../../components';
 
-const Profile = () => {
+const Notification = () => {
   return (
     <Container>
       <Header>알림 설정</Header>
@@ -18,4 +18,4 @@ const Container = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-export default Profile;
+export default Notification;
