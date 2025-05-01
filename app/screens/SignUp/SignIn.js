@@ -1,5 +1,11 @@
 import React, {useState} from 'react';
-import {SafeAreaView, Text, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {
+  SafeAreaView, 
+  Text, 
+  TouchableWithoutFeedback, 
+  Keyboard, 
+  ActivityIndicator
+} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
 import {Button, InputWithDelete} from './../../components';
@@ -30,10 +36,24 @@ const BtnContainer = styled.View`
   padding-right: 20px;
 `;
 
+// 로딩 오버레이 컴포넌트 스타일
+const LoadingOverlay = styled.View`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+`;
+
 const SignInScreen = ({navigation, route}) => {
   const {updateSignUpData} = useSignUp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleNext = async () => {
     if (!email) {
@@ -44,6 +64,9 @@ const SignInScreen = ({navigation, route}) => {
       alert('비밀번호를 입력하세요.');
       return;
     }
+
+    // 로딩 시작
+    setIsLoading(true);
 
     try {
       const userData = await handleLogin({email, password});
@@ -81,6 +104,9 @@ const SignInScreen = ({navigation, route}) => {
     } catch (error) {
       console.error('로그인 실패:', error);
       alert(error.message || '로그인에 실패했습니다.');
+    } finally {
+      // 로딩 종료 (성공/실패 상관없이)
+      setIsLoading(false);
     }
   };
 
@@ -113,6 +139,7 @@ const SignInScreen = ({navigation, route}) => {
             placeholder="이메일 입력"
             keyboardType="email-address"
             autoCapitalize='none'
+            editable={!isLoading}
           />
           <InputWithDelete
             value={password}
@@ -120,14 +147,22 @@ const SignInScreen = ({navigation, route}) => {
             placeholder="비밀번호 입력"
             keyboardType="email-address"
             secureTextEntry={true}
+            editable={!isLoading}
           />
         </Container2>
         <BtnContainer>
           <Button
             title="로그인하기"
             onPress={handleNext}
+            disabled={isLoading}
           />
         </BtnContainer>
+
+        {isLoading && (
+          <LoadingOverlay>
+            <ActivityIndicator size="large" color={themes.light.pointColor.Primary} />
+          </LoadingOverlay>
+        )}
       </Container>
     </TouchableWithoutFeedback>
   );
