@@ -41,43 +41,38 @@ const Notification = () => {
   return (
     <Container>
       <Header>알림 설정</Header>
-      <Main>
-        <TitleContainer>
-          <LargeText>복약 알림 설정</LargeText>
-          <SmallText>약을 잊지 않도록 정해진 시간에 알려드릴게요.</SmallText>
-        </TitleContainer>
-
-        <MockImageArea>
-          <PhoneMockup />
-          <NotificationContainer>
-            <View height={50} />
-            <MockNotification
-              title="아침에 복용하지 않은 약이 있어요."
-              sub="혈압약, 두통약 외 1건"
-            />
-            <MockNotification
-              title="아침에 복용해야 하는 약이 있어요."
-              sub="혈압약, 두통약 외 1건"
-            />
-          </NotificationContainer>
-        </MockImageArea>
-
-        <SwitchWrapper>
-          <Label>복약 알림</Label>
-          <StyledSwitch
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-            trackColor={{false: '#ccc', true: themes.light.pointColor.Primary}}
+      <TitleContainer>
+        <LargeText>복약 알림 설정</LargeText>
+        <SmallText>약을 잊지 않도록 정해진 시간에 알려드릴게요.</SmallText>
+      </TitleContainer>
+      <MockImageArea>
+        <PhoneMockup />
+        <NotificationContainer>
+          <View height={50} />
+          <MockNotification
+            title="아침에 복용하지 않은 약이 있어요."
+            sub="혈압약, 두통약 외 1건"
           />
-        </SwitchWrapper>
-      </Main>
+          <MockNotification
+            title="아침에 복용해야 하는 약이 있어요."
+            sub="혈압약, 두통약 외 1건"
+          />
+        </NotificationContainer>
+      </MockImageArea>
+      <SwitchWrapper>
+        <Label>복약 알림</Label>
+        <StyledSwitch
+          onValueChange={toggleSwitch}
+          value={isEnabled}
+          trackColor={{false: '#ccc', true: themes.light.pointColor.Primary}}
+        />
+      </SwitchWrapper>
     </Container>
   );
 };
 
 const Container = styled.View`
   flex: 1;
-  justify-content: space-between;
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 const Main = styled.View`
@@ -86,7 +81,7 @@ const Main = styled.View`
 `;
 
 const TitleContainer = styled.View`
-  padding: 35px 30px 20px;
+  padding: 35px 30px 0;
   gap: 10px;
 `;
 
@@ -103,7 +98,7 @@ const SmallText = styled.Text`
 `;
 
 const MockImageArea = styled.View`
-  margin: 0 20px;
+  margin: 36px 20px;
   padding: 30px 30px 0 30px;
   align-items: center;
   justify-content: center;
@@ -174,7 +169,7 @@ const NotificationSub = styled.Text`
 `;
 
 const SwitchWrapper = styled.View`
-  padding: 70px 30px;
+  padding: 0 30px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
