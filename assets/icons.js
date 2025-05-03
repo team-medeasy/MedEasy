@@ -28,6 +28,7 @@ import LogoEnIcon from './icons/logo/logo_en.svg';
 import LogoKrIcon from './icons/logo/logo_kr.svg';
 import LogoIcon from './icons/logo/logo.svg';
 import ChatCautionIcon from './icons/logo/logo_chat_caution.svg';
+import AppIcon from './icons/logo/appicon.svg';
 
 // 루틴 아이콘
 import CheckOffIcon from './icons/routine/checkOff.svg';
@@ -53,7 +54,7 @@ import LogoutIcon from './icons/settings/logout.svg';
 import NotificationsIcon from './icons/settings/notifications.svg';
 import ProfileSettingsIcon from './icons/settings/profile_settings.svg';
 import TextSizeIcon from './icons/settings/text_size.svg';
-import MegaphoneIcon from './icons/settings/megaphone.svg'
+import MegaphoneIcon from './icons/settings/megaphone.svg';
 
 // 알약 이미지
 import TabletIcon from './icons/pills/tablet.svg';
@@ -121,6 +122,7 @@ export const LogoIcons = {
   logoKr: LogoKrIcon,
   logo: LogoIcon,
   chatCaution: ChatCautionIcon,
+  app: AppIcon,
 };
 
 export const RoutineIcons = {

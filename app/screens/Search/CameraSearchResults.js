@@ -30,7 +30,7 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
   // 컴포넌트 마운트/언마운트 처리
   useEffect(() => {
     console.log('[CameraResults] 컴포넌트 마운트');
-    
+
     // 언마운트 시 정리
     return () => {
       console.log('[CameraResults] 컴포넌트 언마운트');
@@ -43,7 +43,7 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
     const unsubscribe = navigation.addListener('focus', () => {
       console.log('[CameraResults] 화면에 포커스됨');
     });
-    
+
     return unsubscribe;
   }, [navigation]);
 
@@ -54,32 +54,44 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
       console.log('[CameraResults] API 호출이 이미 진행 중입니다');
       return;
     }
-    
+
     console.log('[CameraResults] photoUri 확인:', !!photoUri);
-    
+
     if (!photoUri) {
       console.error('[CameraResults] 사진 URI가 없음');
       setLoading(false);
       setError(true);
       return;
     }
-    
+
     // API 호출 시작 표시
     apiCallStarted.current = true;
-    
+
     const fetchSearchResults = async () => {
       console.log('[CameraResults] API 호출 시작');
-      
+
+      const startTime = Date.now();
+
       try {
         // API 호출
         const response = await searchPillByImage(photoUri);
-        console.log('[CameraResults] 알약 검색 API 응답 받음:', response?.length || 0);
-        
+
+        const endTime = Date.now(); // ← 응답 받은 시간 저장
+        const elapsedTime = (endTime - startTime) / 1000; // 초 단위로 변환
+        console.log(
+          `[CameraResults] 알약 검색 API 응답 시간: ${elapsedTime}초`,
+        );
+
+        console.log(
+          '[CameraResults] 알약 검색 API 응답 받음:',
+          response?.length || 0,
+        );
+
         if (!isMounted.current) {
           console.log('[CameraResults] 마운트 해제됨, 작업 취소');
           return;
         }
-        
+
         // 검색 결과가 있는지 확인
         if (!response || response.length === 0 || !response[0].searchResults) {
           console.log('[CameraResults] 검색 결과 없음');
@@ -87,31 +99,36 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
           setLoading(false);
           return;
         }
-        
+
         // 모든 검색 결과 처리
         const allItems = response.flatMap(item => item.searchResults);
         console.log('[CameraResults] 총 검색 결과 수:', allItems.length);
-        
+
         // 모든 상세 정보 가져오기
         const detailedResults = await Promise.all(
           allItems.map(async (result, index) => {
-            console.log(`[CameraResults] 상세 정보 로딩 중 (${index + 1}/${allItems.length})`);
+            console.log(
+              `[CameraResults] 상세 정보 로딩 중 (${index + 1}/${
+                allItems.length
+              })`,
+            );
             try {
               const detail = await getMedicineDetailByItemSeq(result.itemSeq);
-              return detail?.body
-                ? { ...result, detail: detail.body }
-                : result;
+              return detail?.body ? {...result, detail: detail.body} : result;
             } catch (error) {
-              console.error(`[CameraResults] 항목 ${result.itemSeq} 상세 정보 로드 실패:`, error);
+              console.error(
+                `[CameraResults] 항목 ${result.itemSeq} 상세 정보 로드 실패:`,
+                error,
+              );
               return result;
             }
           }),
         );
-        
+
         if (!isMounted.current) return;
-        
+
         console.log('[CameraResults] 모든 상세 정보 로드 완료');
-        
+
         // 결과 매핑
         const mappedResults = detailedResults.map(result => {
           if (result.detail) {
@@ -153,9 +170,12 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
             score: result.score || 0,
           };
         });
-        
-        console.log('[CameraResults] 결과 매핑 완료, 항목 수:', mappedResults.length);
-        
+
+        console.log(
+          '[CameraResults] 결과 매핑 완료, 항목 수:',
+          mappedResults.length,
+        );
+
         if (isMounted.current) {
           setSearchResults(mappedResults);
           setInitialDataLoaded(true);
@@ -163,7 +183,7 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
         }
       } catch (err) {
         console.error('[CameraResults] 검색 실패:', err);
-        
+
         if (isMounted.current) {
           Alert.alert('검색 실패', '문제가 발생했습니다. 다시 시도해주세요.');
           setError(true);
@@ -171,19 +191,21 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
         }
       }
     };
-    
+
     // API 호출 즉시 시작
     console.log('[CameraResults] API 호출 함수 시작');
     fetchSearchResults();
-    
   }, [photoUri, timestamp]);
 
   return (
     <Container>
-      <Header onBackPress={() => {
-        console.log('[CameraResults] 뒤로가기 버튼 클릭');
-        navigation.goBack();
-      }}>약 검색 결과</Header>
+      <Header
+        onBackPress={() => {
+          console.log('[CameraResults] 뒤로가기 버튼 클릭');
+          navigation.goBack();
+        }}>
+        약 검색 결과
+      </Header>
 
       <SearchResultContainer>
         {loading ? (
