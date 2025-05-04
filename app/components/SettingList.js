@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Linking } from 'react-native';
+import { Alert, Linking, View } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import Dialog from 'react-native-dialog';
@@ -19,6 +19,7 @@ const SettingList = () => {
   const navigation = useNavigation();
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [password, setPassword] = useState('');
+  const appVersion = "1.0.0"; // 앱 버전 정보
 
   const { resetSignUpData } = useSignUp();
 
@@ -154,6 +155,16 @@ const SettingList = () => {
     }
   };
 
+  const renderSettingItem = (item) => (
+    <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
+      {item.icon}
+      <SettingText>{item.label}</SettingText>
+      {item.name === 'AppVersion' && (
+        <VersionText>v{appVersion}</VersionText>
+      )}
+    </SettingItem>
+  );
+
   return (
     <Container>
       <SettingCategory lastItem={false}>
@@ -162,12 +173,7 @@ const SettingList = () => {
           { name: 'Notification', label: '알림 설정', icon: <SettingsIcons.notifications width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
           { name: 'FontSize', label: '글자 크기 설정', icon: <SettingsIcons.textSize width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
           { name: 'Favorites', label: '관심 목록', icon: <SettingsIcons.favorites width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
-        ].map(item => (
-          <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
-            {item.icon}
-            <SettingText>{item.label}</SettingText>
-          </SettingItem>
-        ))}
+        ].map(item => renderSettingItem(item))}
       </SettingCategory>
 
       <SettingCategory lastItem={false}>
@@ -176,24 +182,14 @@ const SettingList = () => {
           { name: 'Feedback', label: '의견 남기기', icon: <SettingsIcons.feedback width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
           { name: 'FAQ', label: '자주 하는 질문', icon: <SettingsIcons.faq width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
           { name: 'AppVersion', label: '앱 버전', icon: <SettingsIcons.appVersion width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
-        ].map(item => (
-          <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
-            {item.icon}
-            <SettingText>{item.label}</SettingText>
-          </SettingItem>
-        ))}
+        ].map(item => renderSettingItem(item))}
       </SettingCategory>
 
       <SettingCategory lastItem={true}>
         {[
           { name: 'Logout', label: '로그아웃', icon: <SettingsIcons.logout width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
           { name: 'DeleteAccount', label: '계정 삭제', icon: <SettingsIcons.trashcan width={20} height={20} style={{ color: themes.light.textColor.Primary30 }} /> },
-        ].map(item => (
-          <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
-            {item.icon}
-            <SettingText>{item.label}</SettingText>
-          </SettingItem>
-        ))}
+        ].map(item => renderSettingItem(item))}
       </SettingCategory>
 
       {/* 비밀번호 입력 다이얼로그 */}
@@ -234,6 +230,14 @@ const SettingText = styled.Text`
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
   margin-left: 20px;
+  flex: 1;
+`;
+
+const VersionText = styled.Text`
+  font-size: ${FontSizes.body.default};
+  font-family: 'Pretendard-Medium';
+  color: ${themes.light.textColor.Primary50};
+  margin-left: auto;
 `;
 
 export default SettingList;
