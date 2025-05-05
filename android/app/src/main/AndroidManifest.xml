@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.nfc" android:required="false" />   
 
-
     <!-- AOS 13 이상에 대응하기 위한 권한 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATION" />
 
@@ -22,6 +21,20 @@
         android:supportsRtl="true">
 
         <!-- 직접 선언하지 마세요: react-native-firebase가 자동 설정합니다 -->
+
+        <!-- 카카오 로그인 액티비티 추가 -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao9779801f476eafda8410589c1fb3fc92" />
+            </intent-filter>
+        </activity>
 
         <!-- 메인 액티비티 -->
         <activity
