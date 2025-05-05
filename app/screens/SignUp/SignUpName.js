@@ -97,11 +97,8 @@ const SignUpNameScreen = ({navigation}) => {
               placeholderTextColor={themes.light.textColor.placeholder}
               value={name}
               onChangeText={setName}
-              returnKeyType="next"
-              onSubmitEditing={() => {
-                // focus next input
-                secondInput.current.focus();
-              }}
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
             />
           </InputContainer>
         </Container2>
