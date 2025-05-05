@@ -606,7 +606,7 @@ const Routine = ({ route }) => {
   );
 };
 
-const Container = styled.View`
+const Container = styled.SafeAreaView`
   flex: 1;
   background-color: ${themes.light.pointColor.Primary};
 `;
@@ -615,9 +615,7 @@ const Header = styled.View`
   background-color: ${themes.light.pointColor.Primary};
   flex-direction: row;
   padding: 0px 20px;
-
-  ${Platform.OS === 'ios' && `padding-top: 70px;`}
-  ${Platform.OS === 'android' && `padding-top: 30px;`}
+  padding-top: 10px;
   justify-content: space-between;
 `;
 
