@@ -1,33 +1,37 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const SignUpContext = createContext({
   signUpData: {
-    firstName: '',
-    lastName: '',
     email: '',
     password: '',
     birthday: '',
     gender: '',
+    name: '', 
   },
   updateSignUpData: () => {},
   resetSignUpData: () => {},
 });
 
-export const SignUpProvider = ({children}) => {
+export const SignUpProvider = ({ children }) => {
   const [signUpData, setSignUpData] = useState({
-    firstName: '',
-    lastName: '',
     email: '',
     password: '',
     birthday: '',
     gender: '',
+    name: '', 
   });
-  
+
   const updateSignUpData = newData => {
     console.log('Updating SignUp Data:', newData);
-    setSignUpData(prev => ({...prev, ...newData}));
+    setSignUpData(prev => {
+      const updated = { ...prev, ...newData };
+      return {
+        ...updated,
+        name: `${updated.lastName}${updated.firstName}`, 
+      };
+    });
   };
-  
+
   const resetSignUpData = () => {
     console.log('Resetting SignUp Data');
     setSignUpData({
@@ -37,13 +41,21 @@ export const SignUpProvider = ({children}) => {
       password: '',
       birthday: '',
       gender: '',
+      name: '', 
     });
   };
-  
+
+  useEffect(() => {
+    setSignUpData(prev => ({
+      ...prev,
+      name: `${prev.lastName}${prev.firstName}`,
+    }));
+  }, [signUpData.lastName, signUpData.firstName]);
+
   console.log('Current SignUp Data:', signUpData);
-  
+
   return (
-    <SignUpContext.Provider value={{signUpData, updateSignUpData, resetSignUpData}}>
+    <SignUpContext.Provider value={{ signUpData, updateSignUpData, resetSignUpData }}>
       {children}
     </SignUpContext.Provider>
   );

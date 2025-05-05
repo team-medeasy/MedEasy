@@ -62,7 +62,7 @@ const SignUpNameScreen = ({navigation}) => {
   const handleNext = () => {
     if (firstName && lastName) {
       // Context에 상태 저장
-      updateSignUpData({firstName, lastName});
+      updateSignUpData({name: `${lastName}${firstName}`});
       navigation.navigate('SignUpEmail');
     } else {
       alert('성을 포함한 이름을 모두 입력하세요.');
