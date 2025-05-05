@@ -54,15 +54,14 @@ const TextInput = styled.TextInput`
 
 const SignUpNameScreen = ({navigation}) => {
   const {signUpData, updateSignUpData} = useSignUp();
-  const [firstName, setFirstName] = useState(signUpData.firstName || '');
-  const [lastName, setLastName] = useState(signUpData.lastName || '');
+  const [name, setName] = useState(signUpData.name || '');
   const progress = '25%';
   const secondInput = React.useRef();
 
   const handleNext = () => {
-    if (firstName && lastName) {
+    if (name) {
       // Context에 상태 저장
-      updateSignUpData({name: `${lastName}${firstName}`});
+      updateSignUpData({name});
       navigation.navigate('SignUpEmail');
     } else {
       alert('성을 포함한 이름을 모두 입력하세요.');
@@ -94,26 +93,15 @@ const SignUpNameScreen = ({navigation}) => {
         <Container2>
           <InputContainer marginRight="5px">
             <TextInput
-              placeholder="성"
+              placeholder="이름"
               placeholderTextColor={themes.light.textColor.placeholder}
-              value={lastName}
-              onChangeText={setLastName}
+              value={name}
+              onChangeText={setName}
               returnKeyType="next"
               onSubmitEditing={() => {
                 // focus next input
                 secondInput.current.focus();
               }}
-            />
-          </InputContainer>
-          <InputContainer marginLeft="5px">
-            <TextInput
-              placeholder="이름"
-              placeholderTextColor={themes.light.textColor.placeholder}
-              value={firstName}
-              onChangeText={setFirstName}
-              returnKeyType="done"
-              onSubmitEditing={Keyboard.dismiss}
-              ref={secondInput}
             />
           </InputContainer>
         </Container2>
