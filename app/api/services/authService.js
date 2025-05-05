@@ -73,7 +73,7 @@ export const handleLogin = async credentials => {
 
 export const handleSignUp = async (data, navigation) => {
   try {
-    const name = `${data.lastName || ''}${data.firstName || ''}`;
+    const name = data.name;
     
     const requestData = {
       email: data.email,
