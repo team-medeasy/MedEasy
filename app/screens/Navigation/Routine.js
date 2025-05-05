@@ -52,38 +52,43 @@ const Routine = ({ route }) => {
     return 'BEDTIME';
   };  
 
-  useEffect(() => {
-    const fetchUserSchedule = async () => {
-      try {
-        const response = await getUserSchedule();
-        const scheduleData = response.data.body;
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUserSchedule = async () => {
+        try {
+          const response = await getUserSchedule();
+          const scheduleData = response.data.body;
+    
+          console.log("사용자 스케줄: ", scheduleData);
+    
+          const updatedMapping = { ...timeMapping };
+    
+          scheduleData.forEach(item => {
+            const key = Object.keys(updatedMapping).find(
+              k => updatedMapping[k].label === item.name
+            );
+    
+            if (key) {
+              updatedMapping[key] = {
+                ...updatedMapping[key],
+                time: convertToPrettyTime(item.take_time),
+                sortValue: convertToSortValue(item.take_time)
+              };
+            }
+          });
+    
+          setTimeMapping(updatedMapping);
+        } catch (error) {
+          console.error('스케줄 불러오기 오류:', error);
+        }
+      };
   
-        console.log("사용자 스케줄: ", scheduleData);
+      fetchUserSchedule();
   
-        const updatedMapping = { ...timeMapping };
-  
-        scheduleData.forEach(item => {
-          const key = Object.keys(updatedMapping).find(
-            k => updatedMapping[k].label === item.name
-          );
-  
-          if (key) {
-            updatedMapping[key] = {
-              ...updatedMapping[key],
-              time: convertToPrettyTime(item.take_time),
-              sortValue: convertToSortValue(item.take_time)
-            };
-          }
-        });
-  
-        setTimeMapping(updatedMapping);
-      } catch (error) {
-        console.error('스케줄 불러오기 오류:', error);
-      }
-    };
-  
-    fetchUserSchedule();
-  }, []);
+      return () => {
+      };
+    }, [])
+  );
   
 
   const convertToPrettyTime = (time24) => {
