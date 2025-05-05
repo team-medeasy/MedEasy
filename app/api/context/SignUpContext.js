@@ -23,20 +23,12 @@ export const SignUpProvider = ({ children }) => {
 
   const updateSignUpData = newData => {
     console.log('Updating SignUp Data:', newData);
-    setSignUpData(prev => {
-      const updated = { ...prev, ...newData };
-      return {
-        ...updated,
-        name: `${updated.lastName}${updated.firstName}`, 
-      };
-    });
+    setSignUpData(prev => ({...prev, ...newData}));
   };
 
   const resetSignUpData = () => {
     console.log('Resetting SignUp Data');
     setSignUpData({
-      firstName: '',
-      lastName: '',
       email: '',
       password: '',
       birthday: '',
@@ -44,13 +36,6 @@ export const SignUpProvider = ({ children }) => {
       name: '', 
     });
   };
-
-  useEffect(() => {
-    setSignUpData(prev => ({
-      ...prev,
-      name: `${prev.lastName}${prev.firstName}`,
-    }));
-  }, [signUpData.lastName, signUpData.firstName]);
 
   console.log('Current SignUp Data:', signUpData);
 

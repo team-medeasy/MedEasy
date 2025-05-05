@@ -94,7 +94,7 @@ const SignUpPasswordScreen = ({navigation}) => {
               fontFamily: fonts.title.fontFamily,
               fontSize: fonts.title.fontSize,
             }}>
-            {signUpData.firstName}님, 반가워요!
+            {signUpData.name}님, 반가워요!
           </Text>
           <Text
             style={{
@@ -137,7 +137,7 @@ const SignUpPasswordScreen = ({navigation}) => {
             <TxtLabel>{signUpData.email}</TxtLabel>
           </InputContainer>
           <InputContainer marginTop="5px">
-            <TxtLabel>{signUpData.lastName + signUpData.firstName}</TxtLabel>
+            <TxtLabel>{signUpData.name}</TxtLabel>
           </InputContainer>
         </Container2>
         <BtnContainer>
