@@ -48,11 +48,11 @@ const MyPage = () => {
         {/* 약 챙겨먹은 일수 */}
         <MedicationInfo days={32} medicationCount={5} />
         {/* 설정 리스트 */}
-        <VSpacer height={24} />
         <SettingList />
-        <VSpacer height={48} />
         {/* Footer */}
-        <Footer />
+        <FooterContainer>
+          <Footer />
+        </FooterContainer>
       </ScrollContent>
     </Container>
   );
@@ -66,8 +66,7 @@ const Container = styled.SafeAreaView`
 const HeaderContainer = styled.View`
   justify-content: flex-end;
   background-color: ${themes.light.boxColor.buttonPrimary};
-  padding-top: 10px;
-  padding-left: 20px;
+  padding: 10px 20px;
 `;
 
 const Title = styled.Text`
@@ -106,5 +105,7 @@ const SmallText = styled.Text`
   color: ${themes.light.textColor.buttonText60};
 `;
 
-const VSpacer = styled.View``;
+const FooterContainer = styled.View`
+  background-color: ${themes.light.bgColor.bgPrimary};
+`;
 export default MyPage;
