@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {View, TouchableOpacity} from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
@@ -19,6 +19,7 @@ dayjs.locale('ko');
 
 import {useSignUp} from '../../api/context/SignUpContext';
 import {getRoutineByDate} from '../../api/routine';
+import { getUser } from '../../api/user';
 
 const Home = () => {
   const navigation = useNavigation();
@@ -28,6 +29,25 @@ const Home = () => {
   const [todayRoutine, setTodayRoutine] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [userName, setUserName] = useState('');
+  
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUser = async () => {
+        try {
+          const response = await getUser();
+          const userData = response.data.body;
+          console.log('받아온 유저 데이터:', userData);
+          setUserName(userData.name || '');
+        } catch (error) {
+          console.error('유저 정보 불러오기 실패:', error);
+        }
+      };
+      fetchUser();
+    }, [])
+  );
+
   // 한국어 요일 매핑
   const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -212,7 +232,7 @@ const Home = () => {
         <PillReminderContainer>
           <TextContainer>
             <ReminderText>
-              {signUpData.firstName}님, {'\n'}까먹은 약이 있어요.
+              {userName}님, {'\n'}까먹은 약이 있어요.
             </ReminderText>
             <LogoIcons.logo
               width={70}
