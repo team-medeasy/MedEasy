@@ -6,11 +6,13 @@ import {Footer} from '../../components';
 import MedicationInfo from '../../components/MedicationInfo';
 import SettingList from '../../components/SettingList';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
 import { getUser } from '../../api/user';
 import { useFocusEffect } from '@react-navigation/native';
 
 const MyPage = () => {
+  const {fontSizeMode} = useFontSize();
   const [userName, setUserName] = useState('');
 
   useFocusEffect(
@@ -34,15 +36,17 @@ const MyPage = () => {
       <ScrollContent>
         {/* 헤더 */}
         <HeaderContainer>
-          <Title>내 정보</Title>
+          <Title fontSizeMode={fontSizeMode}>내 정보</Title>
         </HeaderContainer>
         {/* 웰컴 메시지, 프로필 설정 */}
         <ProfileContainer>
           <TextContainer>
-            <UserText>
+            <UserText fontSizeMode={fontSizeMode}>
               안녕하세요, {userName}님🩵
             </UserText>
-            <SmallText>오늘도 건강한 하루 되세요!</SmallText>
+            <SmallText fontSizeMode={fontSizeMode}>
+              오늘도 건강한 하루 되세요!
+            </SmallText>
           </TextContainer>
         </ProfileContainer>
         {/* 약 챙겨먹은 일수 */}
@@ -70,7 +74,7 @@ const HeaderContainer = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Bold';
   font-weight: bold;
   color: ${themes.light.textColor.buttonText};
@@ -94,13 +98,13 @@ const TextContainer = styled.View`
 `;
 
 const UserText = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
 `;
 
 const SmallText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Regular';
   color: ${themes.light.textColor.buttonText60};
 `;

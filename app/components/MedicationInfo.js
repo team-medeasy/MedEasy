@@ -4,12 +4,14 @@ import { pointColor, themes } from '../styles';
 import KarteIcon from '../../assets/icons/karte.svg';
 import LogoIcon from '../../assets/icons/logo/logo.svg';
 import FontSizes from '../../assets/fonts/fontSizes';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 import { getUserUsageDays } from '../api/user';
 import { getUserMedicineCount } from '../api/user';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const MedicationInfo = () => {
   const navigation = useNavigation();
+  const {fontSizeMode} = useFontSize();
   const [daysSinceJoin, setDaysSinceJoin] = useState(0);
   const [medicineCount, setMedicineCount] = useState(0);
   
@@ -49,9 +51,9 @@ const MedicationInfo = () => {
     <Container>
       <BGStyle />
       <DaysSinceMedication>
-        <WithMedeasy>메디지와 함께</WithMedeasy>
-        <InfoText>약 챙겨먹은지 </InfoText>
-        <InfoNum>{daysSinceJoin}일째</InfoNum>
+        <WithMedeasy fontSizeMode={fontSizeMode}>메디지와 함께</WithMedeasy>
+        <InfoText fontSizeMode={fontSizeMode}>약 챙겨먹은지 </InfoText>
+        <InfoNum fontSizeMode={fontSizeMode}>{daysSinceJoin}일째</InfoNum>
         <IconWrapper>
           <KarteIcon
             width={90}
@@ -61,9 +63,9 @@ const MedicationInfo = () => {
         </IconWrapper>
       </DaysSinceMedication>
       <MedicationCount onPress={handleMedicineList}>
-        <WithMedeasy>메디지와 함께</WithMedeasy>
-        <InfoText>복용중인 약 </InfoText>
-        <InfoNum>{medicineCount}개</InfoNum>
+        <WithMedeasy fontSizeMode={fontSizeMode}>메디지와 함께</WithMedeasy>
+        <InfoText fontSizeMode={fontSizeMode}>복용중인 약 </InfoText>
+        <InfoNum fontSizeMode={fontSizeMode}>{medicineCount}개</InfoNum>
         <IconWrapper>
           <LogoIcon style={{ color: themes.light.boxColor.tagDetailPrimary }} />
         </IconWrapper>
@@ -119,19 +121,19 @@ const IconWrapper = styled.View`
 
 const WithMedeasy = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
   padding-bottom: 10px;
 `;
 
 const InfoText = styled.Text`
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText70};
 `;
 
 const InfoNum = styled.Text`
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
 `;
