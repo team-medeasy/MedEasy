@@ -5,6 +5,7 @@ import { themes } from '../../styles';
 import { ChatIcons, RoutineIcons } from '../../../assets/icons';
 import { Tag } from '..';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { PlaceholderImage } from '../SearchResult/PlaceholderImage';
 import { updateInterestedMedicine, getInterestedMedicineStatus } from '../../api/interestedMedicine';
 import { getMedicineAudioUrl } from '../../api/medicine';
@@ -20,6 +21,7 @@ const MedicineOverview = ({
   medicine,
   onPressEnlarge,
 }) => {
+  const {fontSizeMode} = useFontSize();
   const hasImage = !!medicine.item_image;
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSound, setCurrentSound] = useState(null);
@@ -160,9 +162,15 @@ const MedicineOverview = ({
           marginHorizontal: 7,
           gap: 10,
         }}>
-        <MedicineInfoSub>{medicine.entp_name || '정보 없음'}</MedicineInfoSub>
-        <MedicineInfoName>{medicine.item_name || '정보 없음'}</MedicineInfoName>
-        <MedicineInfoSub>{medicine.chart || '정보 없음'}</MedicineInfoSub>
+        <MedicineInfoSub fontSizeMode={fontSizeMode}>
+          {medicine.entp_name || '정보 없음'}
+        </MedicineInfoSub>
+        <MedicineInfoName fontSizeMode={fontSizeMode}>
+          {medicine.item_name || '정보 없음'}
+        </MedicineInfoName>
+        <MedicineInfoSub fontSizeMode={fontSizeMode}>
+          {medicine.chart || '정보 없음'}
+        </MedicineInfoSub>
 
         <View
           style={{
@@ -252,14 +260,14 @@ const MedicineImage = styled.Image.attrs({
 const MedicineInfoSub = styled.Text`
   flex: 1;
   font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText70};
 `;
 
 const MedicineInfoName = styled.Text`
   flex: 1;
   font-family: 'Pretendard-Bold';
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
 `;
 

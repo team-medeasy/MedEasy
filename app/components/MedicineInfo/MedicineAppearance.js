@@ -1,10 +1,13 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {ColorShapeView} from '../ColorShapeView';
 
-const MedicineAppearance = ({ item, size = 'small' }) => {
+const MedicineAppearance = ({item, size = 'small'}) => {
+  const {fontSizeMode} = useFontSize();
+  
   if (!item.print_front && !item.print_back && !item.drug_shape && !item.color_classes && !(item.leng_long && item.leng_short && item.thick)) {
     return null; // 값이 하나도 없으면 렌더링하지 않음
   }
@@ -13,21 +16,16 @@ const MedicineAppearance = ({ item, size = 'small' }) => {
   const colors = item.color_classes ? item.color_classes.split(',').map(color => color.trim()) : [];
   
   return (
-    <View
-      style={{
-        backgroundColor: themes.light.boxColor.inputPrimary,
-        padding: 10,
-        gap: 8,
-        borderRadius: 10,
-      }}>
-      {item.print_front && <Appearance label={'표시(앞) '} value={item.print_front} size={size} />}
-      {item.print_back && <Appearance label={'표시(뒤) '} value={item.print_back} size={size} />}
+    <AppearanceContainer>
+      {item.print_front && <Appearance label={'표시(앞) '} value={item.print_front} size={size} fontSizeMode={fontSizeMode} />}
+      {item.print_back && <Appearance label={'표시(뒤) '} value={item.print_back} size={size} fontSizeMode={fontSizeMode} />}
       {item.drug_shape && (
         <Appearance
           label={'모양       '}
           value={item.drug_shape}
           icon={<ColorShapeView type="shape" value={item.drug_shape} width={10} height={10}/>}
           size={size}
+          fontSizeMode={fontSizeMode}
         />
       )}
       {item.color_classes && (
@@ -36,6 +34,7 @@ const MedicineAppearance = ({ item, size = 'small' }) => {
           value={colors}
           isColorArray={true}
           size={size}
+          fontSizeMode={fontSizeMode}
         />
       )}
       {item.leng_long && item.leng_short && item.thick && (
@@ -43,57 +42,87 @@ const MedicineAppearance = ({ item, size = 'small' }) => {
           label={'크기       '}
           value={`${item.leng_long} X ${item.leng_short} X ${item.thick} (mm)`}
           size={size}
+          fontSizeMode={fontSizeMode}
         />
       )}
-    </View>
+    </AppearanceContainer>
   );
 };
 
-const Appearance = ({ label, value, icon, isColorArray = false, size = 'large' }) => {
-  // 폰트 사이즈 결정 로직
-  const fontSize = size === 'large' ? FontSizes.body.default : FontSizes.caption.default;
-  
+const Appearance = ({label, value, icon, isColorArray = false, size = 'large', fontSizeMode}) => {
   return (
-    <View style={{ flexDirection: 'row', gap: 18, alignItems: 'center' }}>
-      <Text
-        style={{
-          color: themes.light.textColor.Primary50,
-          fontFamily: 'Pretendard-Medium',
-          fontSize: fontSize,
-        }}>
+    <AppearanceRow>
+      <AppearanceLabel fontSizeMode={fontSizeMode} size={size}>
         {label}
-      </Text>
+      </AppearanceLabel>
+      
       {isColorArray ? (
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <ColorContainer>
           {value.map((color, index) => (
-            <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <ColorItem key={index}>
               <ColorShapeView type="color" value={color} width={10} height={10}/>
-              <Text
-                style={{
-                  color: themes.light.pointColor.Primary,
-                  fontFamily: 'Pretendard-Bold',
-                  fontSize: fontSize,
-                }}>
+              <AppearanceValue fontSizeMode={fontSizeMode} size={size}>
                 {color}
-              </Text>
-            </View>
+              </AppearanceValue>
+            </ColorItem>
           ))}
-        </View>
+        </ColorContainer>
       ) : (
-        <View style={{flexDirection: 'row', alignItems: 'center' }}>
-          {icon && <View>{icon}</View>}
-          <Text
-            style={{
-              color: themes.light.pointColor.Primary,
-              fontFamily: 'Pretendard-Bold',
-              fontSize: fontSize,
-            }}>
+        <ValueContainer>
+          {icon && <IconWrapper>{icon}</IconWrapper>}
+          <AppearanceValue fontSizeMode={fontSizeMode} size={size}>
             {value}
-          </Text>
-        </View>
+          </AppearanceValue>
+        </ValueContainer>
       )}
-    </View>
+    </AppearanceRow>
   );
 };
+
+const AppearanceContainer = styled.View`
+  background-color: ${themes.light.boxColor.inputPrimary};
+  padding: 10px;
+  gap: 8px;
+  border-radius: 10px;
+`;
+
+const AppearanceRow = styled.View`
+  flex-direction: row;
+  gap: 18px;
+  align-items: center;
+`;
+
+const AppearanceLabel = styled.Text`
+  color: ${themes.light.textColor.Primary50};
+  font-family: 'Pretendard-Medium';
+  font-size: ${({fontSizeMode, size}) => 
+    size === 'large' ? FontSizes.body[fontSizeMode] : FontSizes.caption[fontSizeMode]}px;
+`;
+
+const AppearanceValue = styled.Text`
+  color: ${themes.light.pointColor.Primary};
+  font-family: 'Pretendard-Bold';
+  font-size: ${({fontSizeMode, size}) => 
+    size === 'large' ? FontSizes.body[fontSizeMode] : FontSizes.caption[fontSizeMode]}px;
+`;
+
+const ColorContainer = styled.View`
+  flex-direction: row;
+  gap: 10px;
+`;
+
+const ColorItem = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const ValueContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const IconWrapper = styled.View`
+  margin-right: 5px;
+`;
 
 export {MedicineAppearance};
