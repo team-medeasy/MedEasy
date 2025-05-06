@@ -15,32 +15,32 @@ export const getTimeValue = (timeString) => {
 
 
 // 병원 방문 루틴 임시 데이터
-export const initialHospitalRoutines = [
-  {
-    hospital_id: 1001,
-    name: '한성대병원 외래 진료',
-    time: 'MORNING',
-    specific_time: '오전 10:30',
-    sortValue: 1030,
-    day_of_weeks: [1, 3, 5]
-  },
-  {
-    hospital_id: 1002,
-    name: '연세세브란스병원',
-    time: 'AFTERNOON',
-    specific_time: '오후 2:00',
-    sortValue: 1400,
-    day_of_weeks: [2, 4]
-  },
-  {
-    hospital_id: 1003,
-    name: '고려대학병원',
-    time: 'MORNING',
-    specific_time: '오전 11:00',
-    sortValue: 1100,
-    day_of_weeks: [3, 6]
-  }
-];
+// export const initialHospitalRoutines = [
+//   {
+//     hospital_id: 1001,
+//     name: '한성대병원 외래 진료',
+//     time: 'MORNING',
+//     specific_time: '오전 10:30',
+//     sortValue: 1030,
+//     day_of_weeks: [1, 3, 5]
+//   },
+//   {
+//     hospital_id: 1002,
+//     name: '연세세브란스병원',
+//     time: 'AFTERNOON',
+//     specific_time: '오후 2:00',
+//     sortValue: 1400,
+//     day_of_weeks: [2, 4]
+//   },
+//   {
+//     hospital_id: 1003,
+//     name: '고려대학병원',
+//     time: 'MORNING',
+//     specific_time: '오전 11:00',
+//     sortValue: 1100,
+//     day_of_weeks: [3, 6]
+//   }
+// ];
 
 // 요일 배열
 export const weekDays = ['일', '월', '화', '수', '목', '금', '토'];

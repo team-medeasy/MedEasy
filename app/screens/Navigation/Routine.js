@@ -10,7 +10,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {getRoutineByDate, checkRoutine} from '../../api/routine';
 // data.js에서 데이터 import
 import {
-  initialHospitalRoutines,
+  //initialHospitalRoutines,
   weekDays,
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -222,12 +222,12 @@ const Routine = ({ route }) => {
     }
   };
 
-  const toggleHospitalCheck = hospitalId => {
-    setCheckedItems(prev => ({
-      ...prev,
-      [`hospital-${hospitalId}`]: !prev[`hospital-${hospitalId}`],
-    }));
-  };
+  // const toggleHospitalCheck = hospitalId => {
+  //   setCheckedItems(prev => ({
+  //     ...prev,
+  //     [`hospital-${hospitalId}`]: !prev[`hospital-${hospitalId}`],
+  //   }));
+  // };
 
   const toggleTimeCheck = time => {
     const dateKey = selectedDate.fullDate.format('YYYY-MM-DD');
@@ -269,9 +269,9 @@ const Routine = ({ route }) => {
 
   const [medicineRoutines, setMedicineRoutines] = useState([]);
   //임시 데이터 사용
-  const [hospitalRoutines, setHospitalRoutines] = useState(
-    initialHospitalRoutines,
-  );
+  // const [hospitalRoutines, setHospitalRoutines] = useState(
+  //   initialHospitalRoutines,
+  // );
 
   useFocusEffect(
     useCallback(() => {
@@ -433,23 +433,21 @@ const Routine = ({ route }) => {
     });
   
     // 오늘 날짜에 해당하는 병원 방문 아이템 생성
-    const todayHospitalItems = hospitalRoutines
-      .filter(hospital =>
-        hospital.day_of_weeks.includes(selectedDate.fullDate.day() + 1),
-      )
-      .map(hospital => ({
-        id: `hospital-${hospital.hospital_id}`,
-        label: hospital.name,
-        time: hospital.specific_time,
-        sortValue: hospital.sortValue,
-        type: 'hospital',
-        hospital,
-      }));
+    // const todayHospitalItems = hospitalRoutines
+    //   .filter(hospital =>
+    //     hospital.day_of_weeks.includes(selectedDate.fullDate.day() + 1),
+    //   )
+    //   .map(hospital => ({
+    //     id: `hospital-${hospital.hospital_id}`,
+    //     label: hospital.name,
+    //     time: hospital.specific_time,
+    //     sortValue: hospital.sortValue,
+    //     type: 'hospital',
+    //     hospital,
+    //   }));
   
     // 모든 아이템 합치고 시간순 정렬
-    return [...todayMedicineItems, ...todayHospitalItems].sort(
-      (a, b) => a.sortValue - b.sortValue,
-    );
+    return [...todayMedicineItems].sort((a, b) => a.sortValue - b.sortValue);
   };
   
   const allRoutines = getAllRoutinesByTime();
@@ -593,7 +591,7 @@ const Routine = ({ route }) => {
                   allLength={allRoutines.length}
                   checkedItems={checkedItems}
                   toggleTimeCheck={toggleTimeCheck}
-                  toggleHospitalCheck={toggleHospitalCheck}
+                  //toggleHospitalCheck={toggleHospitalCheck}
                   toggleCheck={toggleCheck}
                   selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
                 />
@@ -606,7 +604,7 @@ const Routine = ({ route }) => {
   );
 };
 
-const Container = styled.View`
+const Container = styled.SafeAreaView`
   flex: 1;
   background-color: ${themes.light.pointColor.Primary};
 `;
@@ -615,9 +613,7 @@ const Header = styled.View`
   background-color: ${themes.light.pointColor.Primary};
   flex-direction: row;
   padding: 0px 20px;
-
-  ${Platform.OS === 'ios' && `padding-top: 70px;`}
-  ${Platform.OS === 'android' && `padding-top: 30px;`}
+  padding-top: 10px;
   justify-content: space-between;
 `;
 
