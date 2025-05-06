@@ -4,12 +4,14 @@ import { FlatList, View, Text, ActivityIndicator } from 'react-native';
 import { Header, MedicineListItem } from '../../components';
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { useNavigation } from '@react-navigation/native';
 
 import { getUserMedicinesCurrent, getUserMedicinesPast } from '../../api/user';
 
 const MedicineList = () => {
     const navigation = useNavigation();
+    const {fontSizeMode} = useFontSize();
     const [activeTab, setActiveTab] = useState('current'); // 'current' or 'previous'
     const [medicineCount, setMedicineCount] = useState(0);
     const [currentMedicines, setCurrentMedicines] = useState([]);
@@ -68,7 +70,7 @@ const MedicineList = () => {
                 />
                 <Text style={{
                   marginTop: 10,
-                  fontSize: FontSizes.caption.default,
+                  fontSize: FontSizes.caption[fontSizeMode],
                   color: themes.light.textColor.Primary50,
                   fontFamily: 'Pretendard-Medium'
                 }}>검색 중...</Text>
@@ -102,7 +104,7 @@ const MedicineList = () => {
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
                     <NoResultContainer>
-                        <NoResultText>{emptyMessage}</NoResultText>
+                        <NoResultText fontSizeMode={fontSizeMode}>{emptyMessage}</NoResultText>
                     </NoResultContainer>
                 }
             />
@@ -121,13 +123,23 @@ const MedicineList = () => {
                     active={activeTab === 'current'}
                     onPress={() => setActiveTab('current')}
                 >
-                    <TabText active={activeTab === 'current'}>현재 복용중인 약</TabText>
+                    <TabText 
+                        active={activeTab === 'current'}
+                        fontSizeMode={fontSizeMode}
+                    >
+                        현재 복용중인 약
+                    </TabText>
                 </TabButton>
                 <TabButton 
                     active={activeTab === 'previous'}
                     onPress={() => setActiveTab('previous')}
                 >
-                    <TabText active={activeTab === 'previous'}>이전에 복용한 약</TabText>
+                    <TabText 
+                        active={activeTab === 'previous'}
+                        fontSizeMode={fontSizeMode}
+                    >
+                        이전에 복용한 약
+                    </TabText>
                 </TabButton>
             </TabContainer>
             
@@ -159,14 +171,14 @@ const TabButton = styled.TouchableOpacity`
 
 const TabText = styled.Text`
     font-family: 'Pretendard-SemiBold';
-    font-size: ${FontSizes.body.default};
+    font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
     color: ${props => props.active ? themes.light.textColor.textPrimary : themes.light.textColor.Primary30};
 `;
 
 const ListContainer = styled.View`
     flex: 1;
     background-color: ${themes.light.bgColor.bgPrimary};
-    padding: 15px;
+    padding: 15px 15px 15px 0;
 `;
 
 const NoResultContainer = styled.View`
@@ -179,7 +191,7 @@ const NoResultContainer = styled.View`
 const NoResultText = styled.Text`
     text-align: center;
     font-family: 'Pretendard-Medium';
-    font-size: ${FontSizes.body.default};
+    font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
     color: ${themes.light.textColor.Primary50};
 `;
 

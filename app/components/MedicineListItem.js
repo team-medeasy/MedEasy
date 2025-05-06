@@ -114,6 +114,7 @@ const ItemContainer = styled.View`
 const RoutineInfoContainer = styled.View`
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 10px;
+  margin-left: 15px;
   gap: 8px;
   border-radius: 10px;
   margin-top: 15px;
