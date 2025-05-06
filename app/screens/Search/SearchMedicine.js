@@ -268,7 +268,7 @@ const ChevronAndSearchContainer = styled.View`
 const ChevronIconButton = styled(TouchableOpacity)``;
 
 const SearchesContainer = styled.View`
-  margin-top: 25px;
+  margin-top: 16px;
 `;
 
 const SearchSectionHeader = styled.View`
@@ -302,12 +302,12 @@ const NoRecentSearchesText = styled.Text`
 
 const RecentSearchListContainer = styled.ScrollView`
   padding-left: 20px;
-  padding-top: 20px;
+  padding-top: 8px;
   padding-bottom: 40px;
 `;
 
 const PopularSearchListContainer = styled.View`
-  margin-top: 20px;
+  margin-top: 12px;
 `;
 
 const RecentSearchItemButton = styled(TouchableOpacity)`
