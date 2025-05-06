@@ -5,10 +5,12 @@ import {useNavigation} from '@react-navigation/native';
 import {HeaderIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
 const Header = ({children, onBackPress}) => {
   const navigation = useNavigation();
   const handleBackPress = onBackPress || (() => navigation.goBack());
+  const { fontSizeMode } = useFontSize();
 
   return (
     <HeaderContainer>
@@ -20,7 +22,12 @@ const Header = ({children, onBackPress}) => {
             style={{color: themes.light.textColor.textPrimary}}
           />
         </TouchableOpacity>
-        <Title>{children}</Title>
+        <Title 
+          fontSizeMode={fontSizeMode}
+          numberOfLines={1}
+          ellipsizeMode="tail">
+          {children}
+        </Title>
         <View width={41} height={41} />
       </BackAndTitleContainer>
     </HeaderContainer>
@@ -44,7 +51,6 @@ const HeaderContainer = styled.View`
 
 const BackAndTitleContainer = styled.View`
   flex-direction: row;
-  padding: 0 15px;
   align-items: center;
 `;
 
@@ -52,7 +58,7 @@ const Title = styled.Text`
   flex: 1;
   text-align: center;
   font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.textPrimary};
 `;
 

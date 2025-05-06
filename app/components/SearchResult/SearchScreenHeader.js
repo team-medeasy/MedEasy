@@ -1,10 +1,11 @@
 import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import {FilterButton} from './FilterButton';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const {chevron: ChevronIcon} = HeaderIcons;
 
@@ -21,6 +22,8 @@ export const SearchScreenHeader = ({
   getFilterButtonText,
   renderFilterButtonIcon,
 }) => {
+  const { fontSizeMode } = useFontSize();
+  
   return (
     <HeaderContainer>
       <ChevronAndSearchContainer>
@@ -32,7 +35,7 @@ export const SearchScreenHeader = ({
           />
         </ChevronIconButton>
         <SearchBarTouchable onPress={onSearchPress}>
-          <SearchQueryText>{searchQuery}</SearchQueryText>
+          <SearchQueryText fontSizeMode={fontSizeMode}>{searchQuery}</SearchQueryText>
           <SearchIconContainer>
             <OtherIcons.search
               width={17.5}
@@ -45,7 +48,7 @@ export const SearchScreenHeader = ({
 
       {searchQuery && (
         <FeatureSearchContainer>
-          <FeatureSearchText>특징 검색</FeatureSearchText>
+          <FeatureSearchText fontSizeMode={fontSizeMode}>특징 검색</FeatureSearchText>
           <ScrollableFilterContainer
             horizontal={true}
             showsHorizontalScrollIndicator={false}>
@@ -98,7 +101,7 @@ const SearchBarTouchable = styled(TouchableOpacity)`
 `;
 
 const SearchQueryText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -118,7 +121,7 @@ const FeatureSearchContainer = styled.View`
 `;
 
 const FeatureSearchText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-SemiBold';
   margin-right: 11px;
 `;

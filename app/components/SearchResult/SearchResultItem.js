@@ -3,10 +3,11 @@ import styled from 'styled-components/native';
 import {Tag} from './../index';
 import {themes} from './../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import {LogoIcons} from '../../../assets/icons';
 import {PlaceholderImage} from './PlaceholderImage';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
-export const SearchResultItem = ({item, onPress, fontSizeMode}) => {
+export const SearchResultItem = ({item, onPress}) => {
+  const { fontSizeMode } = useFontSize(); // useContext를 통해 fontSizeMode 가져오기
   const hasImage = !!item.item_image;
 
   return (
@@ -19,7 +20,10 @@ export const SearchResultItem = ({item, onPress, fontSizeMode}) => {
         )}
       </ImageContainer>
       <InfoContainer>
-        <ManufacturerText fontSizeMode={fontSizeMode}>
+        <ManufacturerText 
+          numberOfLines={1} // 한 줄로 제한
+          ellipsizeMode="tail"
+          fontSizeMode={fontSizeMode}>
           {item.entp_name || '정보 없음'}</ManufacturerText>
         <MedicineNameText
           numberOfLines={1} // 한 줄로 제한
@@ -32,7 +36,7 @@ export const SearchResultItem = ({item, onPress, fontSizeMode}) => {
             sizeType="small"
             colorType="resultPrimary"
             overflowMode="ellipsis"
-            maxWidth="66"
+            maxWidth="80"
             fontSizeMode={fontSizeMode}>
             {item.etc_otc_name || '정보 없음'}
           </Tag>
@@ -41,7 +45,6 @@ export const SearchResultItem = ({item, onPress, fontSizeMode}) => {
             colorType="resultSecondary"
             overflowMode="ellipsis"
             maxWidth="128"
-            maxLength="14"
             fontSizeMode={fontSizeMode}>
             {item.class_name || '정보 없음'}
           </Tag>
@@ -81,13 +84,13 @@ const InfoContainer = styled.View`
 `;
 
 const ManufacturerText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary50};
 `;
 
 const MedicineNameText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;
