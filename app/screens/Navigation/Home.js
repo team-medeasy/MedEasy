@@ -203,7 +203,7 @@ const Home = () => {
         try {
           const response = await getUnreadNotification();
           console.log('안읽은 알림 여부 응답:', response.data.body);
-          setIsUnreadNotification(response.data.body);
+          setIsUnreadNotification(response.data.body.is_unread);
         } catch (error) {
           console.error('안읽은 알림 확인 실패:', error);
           setIsUnreadNotification(false);
