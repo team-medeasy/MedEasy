@@ -6,9 +6,9 @@ import Dialog from 'react-native-dialog';
 
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { Header, InputWithDelete, ReadOnlyInput, IconTextButton } from '../../components';
 import { SettingsIcons } from '../../../assets/icons';
-
 
 import { deleteUser, getUser, updateUserName } from '../../api/user';
 import { useSignUp } from '../../api/context/SignUpContext';
@@ -16,6 +16,7 @@ import { clearAuthData, removeAccessToken, removeRefreshToken, removeUserInfo } 
 
 const Profile = () => {
   const navigation = useNavigation();
+  const {fontSizeMode} = useFontSize();
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isDialogVisible, setDialogVisible] = useState(false);
@@ -122,7 +123,7 @@ const Profile = () => {
       <Header>프로필 설정</Header>
 
       <Section>
-        <Title>이름</Title>
+        <Title fontSizeMode={fontSizeMode}>이름</Title>
         <View style={{
           flexDirection: 'row',
           gap: 15,
@@ -135,13 +136,13 @@ const Profile = () => {
             />
           </View>
           <TestBtn onPress={handleUpdateUserName}>
-            <BtnTitle>변경하기</BtnTitle>
+            <BtnTitle fontSizeMode={fontSizeMode}>변경하기</BtnTitle>
           </TestBtn>
         </View>
       </Section>
 
       <Section>
-        <Title>이메일</Title>
+        <Title fontSizeMode={fontSizeMode}>이메일</Title>
         <ReadOnlyInput text={userEmail}/>
       </Section>
 
@@ -198,7 +199,7 @@ const Section = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   font-family: 'Pretendard-Bold';
 `;
 
@@ -223,7 +224,7 @@ const TestBtn = styled(TouchableOpacity)`
 
 const BtnTitle = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
 `;
 
