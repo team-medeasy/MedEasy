@@ -16,6 +16,7 @@ import {
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
 import RoutineCard from '../../components/RoutineCard';
+import EmptyState from '../../components/\bEmptyState';
 
 const {width} = Dimensions.get('window');
 
@@ -598,13 +599,15 @@ const Routine = ({route}) => {
               {/* 모든 루틴을 시간순으로 렌더링 */}
 
               {allRoutines.length === 0 ? (
-                <EmptyImageWrapper>
-                  <Images.emptyRoutine style={{marginBottom: 24}} />
-                  <NoResultTitle>루틴이 없습니다.</NoResultTitle>
-                  <NoResultText>
-                    복용 중인 약을 검색하고{'\n'}루틴을 추가해 보세요.
-                  </NoResultText>
-                </EmptyImageWrapper>
+                <EmptyState
+                  image={
+                    <Images.emptyRoutine
+                      style={{marginBottom: 32, marginTop: 80}}
+                    />
+                  }
+                  title="루틴이 없습니다."
+                  description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
+                />
               ) : (
                 allRoutines.map((routine, index) => (
                   <RoutineCard
@@ -749,23 +752,4 @@ const TimelineLine = styled.View`
   background-color: ${themes.light.pointColor.Primary};
 `;
 
-const EmptyImageWrapper = styled.View`
-  margin-top: 80px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const NoResultTitle = styled.Text`
-  font-size: ${FontSizes.heading.default};
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const NoResultText = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.Primary30};
-  margin-top: 18px;
-  text-align: center;
-`;
 export default Routine;

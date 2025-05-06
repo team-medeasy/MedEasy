@@ -14,6 +14,7 @@ import {Header} from '../components/Header/Header';
 import {RoutineIcons, Images} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
 import {getNotificationList, markNotificationAsRead} from '../api/notification';
+import EmptyState from '../components/\bEmptyState';
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 // 날짜 형식 변환 함수
@@ -206,13 +207,11 @@ const Notification = () => {
         ListFooterComponent={renderFooter}
         ListEmptyComponent={
           !loading && (
-            <EmptyImageWrapper>
-              <Images.emptyNotification style={{marginBottom: 48}} />
-              <NoResultTitle>알림이 없습니다.</NoResultTitle>
-              <NoResultText>
-                복용 중인 약을 검색하고{'\n'}루틴을 추가해 보세요.
-              </NoResultText>
-            </EmptyImageWrapper>
+            <EmptyState
+              image={<Images.emptyNotification style={{marginBottom: 32}} />}
+              title="알림이 없습니다."
+              description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
+            />
           )
         }
       />
@@ -261,26 +260,6 @@ const NotiTime = styled.Text`
   font-size: ${FontSizes.caption.default};
   color: ${themes.light.textColor.Primary30};
   font-family: 'Pretendard-SemiBold';
-`;
-
-const EmptyImageWrapper = styled.View`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-`;
-
-const NoResultTitle = styled.Text`
-  font-size: ${FontSizes.heading.default};
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const NoResultText = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.Primary30};
-  margin-top: 18px;
-  text-align: center;
 `;
 
 export default Notification;

@@ -7,6 +7,7 @@ import {Header, SearchResultsList} from '../../components';
 import {getInteresedMedicine} from '../../api/interestedMedicine';
 import {useNavigation} from '@react-navigation/native';
 import {Images} from '../../../assets/icons';
+import EmptyState from '../../components/\bEmptyState';
 
 const Favorites = () => {
   const navigation = useNavigation();
@@ -228,13 +229,11 @@ const Favorites = () => {
           {error ? (
             <EmptyText>{error}</EmptyText>
           ) : (
-            <EmptyImageWrapper>
-              <Images.emptyNotification style={{marginBottom: 48}} />
-              <NoResultTitle>관심 목록에 의약품이 없습니다.</NoResultTitle>
-              <NoResultText>
-                약을 검색하고{'\n'}관심 목록에 추가해 보세요.
-              </NoResultText>
-            </EmptyImageWrapper>
+            <EmptyState
+              image={<Images.emptyLike style={{marginBottom: 32}} />}
+              title="관심 목록에 의약품이 없습니다."
+              description={`약을 검색하고\n관심 목록에 추가해 보세요.`}
+            />
           )}
 
           {error && (
@@ -329,24 +328,6 @@ const LoadingText = styled.Text`
   font-family: 'Pretendard-Medium';
   font-size: ${FontSizes.body.small};
   color: ${themes.light.textColor.Primary50};
-`;
-
-const EmptyImageWrapper = styled.View`
-  align-items: center;
-`;
-
-const NoResultTitle = styled.Text`
-  font-size: ${FontSizes.heading.default};
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const NoResultText = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.textColor.Primary30};
-  margin-top: 18px;
-  text-align: center;
 `;
 
 export default Favorites;
