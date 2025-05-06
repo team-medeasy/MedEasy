@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
 import {resetNavigate} from './Navigation/NavigationRef';
 import styled from 'styled-components/native';
 import {
@@ -13,7 +12,8 @@ import {themes} from '../styles';
 import {Header} from '../components/Header/Header';
 import {RoutineIcons, Images} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
-import {getNotificationList, markNotificationAsRead} from '../api/notification';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
+import {getNotificationList, markNotificationAsRead, markAllNotificationsAsRead} from '../api/notification';
 import EmptyState from '../components/\bEmptyState';
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
@@ -42,7 +42,7 @@ const formatDate = dateString => {
 };
 
 const Notification = () => {
-  const navigation = useNavigation();
+  const {fontSizeMode} = useFontSize();
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -135,6 +135,18 @@ const Notification = () => {
     }
   };
 
+  const handleMarkAllAsRead = async () => {
+    try {
+      setLoading(true);
+      await markAllNotificationsAsRead();
+      onRefresh(); // 알림 목록 새로고침
+    } catch (error) {
+      console.error('전체 알림 읽음 처리 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderItem = ({item}) => (
     <TouchableOpacity onPress={() => handlePress(item)}>
       <NotificationItem isRead={item.is_read}>
@@ -155,11 +167,11 @@ const Notification = () => {
             />
           ) : null}
           <NotiTextContainer>
-            <NotificationTitle>{item.title}</NotificationTitle>
-            <NotificationMessage>{item.content}</NotificationMessage>
+            <NotificationTitle fontSizeMode={fontSizeMode}>{item.title}</NotificationTitle>
+            <NotificationMessage fontSizeMode={fontSizeMode}>{item.content}</NotificationMessage>
           </NotiTextContainer>
         </NotiContainer>
-        <NotiTime>{item.formatted_time}</NotiTime>
+        <NotiTime fontSizeMode={fontSizeMode}>{item.formatted_time}</NotiTime>
       </NotificationItem>
     </TouchableOpacity>
   );
@@ -224,6 +236,12 @@ const Container = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
+const RightButtonText = styled.Text`
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  color: ${themes.light.textColor.Primary30};
+`;
+
 const NotificationItem = styled.View`
   flex-direction: row;
   justify-content: space-between;
@@ -243,7 +261,7 @@ const NotiTextContainer = styled.View`
 `;
 
 const NotificationTitle = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
   margin-bottom: 10px;
@@ -251,13 +269,13 @@ const NotificationTitle = styled.Text`
 
 const NotificationMessage = styled.Text`
   width: 80%;
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
 `;
 
 const NotiTime = styled.Text`
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   color: ${themes.light.textColor.Primary30};
   font-family: 'Pretendard-SemiBold';
 `;
