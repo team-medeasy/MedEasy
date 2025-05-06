@@ -2,9 +2,9 @@ import React from 'react';
 import {SafeAreaView, TouchableOpacity, Text, View} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { IconTextButton } from '../../components';
+import {IconTextButton} from '../../components';
 import {themes, fonts} from './../../styles';
-import {OtherIcons} from './../../../assets/icons';
+import {OtherIcons, Images} from './../../../assets/icons';
 const {kakao: KakaoIcon} = OtherIcons;
 
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -20,9 +20,15 @@ const TitleContainer = styled.View`
   margin-left: 40px;
 `;
 
+const ImageContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+`;
+
 const ButtonContainer = styled.View`
   align-items: center;
   padding: 0 20px;
+  gap: 12px;
 `;
 
 const EmailBtn = styled(TouchableOpacity)`
@@ -56,16 +62,11 @@ const SignUpStartScreen = ({navigation}) => {
           메디지와 함께{'\n'}규칙적인 복약 습관{'\n'}만들어 가요!
         </Text>
       </TitleContainer>
+      <ImageContainer>
+        <Images.signIn />
+      </ImageContainer>
 
       <ButtonContainer>
-        <View style={{
-            position: 'absolute',
-            bottom: 40,
-            left: 0,
-            right: 0,
-            padding: 20,
-            gap: 12
-        }}>
         <IconTextButton
           onPress={() => navigation.navigate('NavigationBar')}
           icon={
@@ -80,15 +81,14 @@ const SignUpStartScreen = ({navigation}) => {
         <IconTextButton
           onPress={() => console.log('Google 로그인')}
           icon={
-            <FontAwesome 
-              name="google" 
-              size={20} 
+            <FontAwesome
+              name="google"
+              size={20}
               color={themes.light.textColor.buttonText}
             />
           }
           title="Google로 시작하기"
         />
-        </View>
 
         <SignUpContainer>
           <EmailBtn
