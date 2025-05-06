@@ -14,8 +14,9 @@ import PhotoPreviewScreen from '../screens/Search/PhotoPreview.js';
 import Chat from '../screens/Chat/Chat.js';
 import {pointColor, themes} from './../styles';
 import {TabIcons, CameraIcons, OtherIcons} from './../../assets/icons';
-import FontSizes from '../../assets/fonts/fontSizes.js';
-import useNfcListener from '../services/nfcListener.js';
+import FontSizes from '../../assets/fonts/fontSizes';
+import useRoutineUrl from '../hooks/useRoutineUrl'
+import RoutineCheckModal from './RoutineCheckModal';
 
 // 카메라 버튼
 const CameraButton = ({onPress}) => {
@@ -48,7 +49,8 @@ const TabNavigator = () => {
     navigation.navigate('Chat');
   }, [navigation]);
 
-  const {ModalComponent} = useNfcListener();
+  // useNfcListener 대신 useRoutineUrlHandler 사용
+  const { routineData, isModalVisible, closeModal } = useRoutineUrl();
 
   return (
     <MainContainer>
@@ -143,7 +145,13 @@ const TabNavigator = () => {
           />
         </ChatButton>
       </ChatContainer> */}
-      <ModalComponent />
+      
+      {/* ModalComponent 대신 RoutineCheckModal 사용 */}
+      <RoutineCheckModal 
+        visible={isModalVisible} 
+        onClose={closeModal} 
+        routineData={routineData}
+      />
     </MainContainer>
   );
 };

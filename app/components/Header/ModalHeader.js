@@ -4,7 +4,8 @@ import {TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native'; 
 import {HeaderIcons} from '../../../assets/icons'; 
 import {themes} from '../../styles'; 
-import FontSizes from '../../../assets/fonts/fontSizes';  
+import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const ModalHeader = ({
   children, 
@@ -14,7 +15,8 @@ const ModalHeader = ({
   onDeletePress
 }) => {   
   const navigation = useNavigation();   
-  const handleBackPress = onBackPress || (() => navigation.goBack());    
+  const handleBackPress = onBackPress || (() => navigation.goBack());
+  const { fontSizeMode } = useFontSize();
   
   return (     
     <HeaderContainer>       
@@ -26,7 +28,12 @@ const ModalHeader = ({
             style={{color: themes.light.textColor.textPrimary}}           
           />         
         </TouchableOpacity>         
-        <Title>{children}</Title>         
+        <Title 
+          fontSizeMode={fontSizeMode}
+          numberOfLines={1}
+          ellipsizeMode="tail">
+          {children}
+        </Title>         
         {showDelete ? (
           <TouchableOpacity onPress={onDeletePress}>
             <HeaderIcons.trash
@@ -61,7 +68,7 @@ const Title = styled.Text`
   flex: 1;   
   text-align: center;   
   font-family: 'Pretendard-SemiBold';   
-  font-size: ${FontSizes.body.default};   
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.textPrimary}; 
 `;  
 

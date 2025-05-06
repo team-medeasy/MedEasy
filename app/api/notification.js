@@ -7,3 +7,6 @@ export const getNotificationList = ({ page = 0, size = 10 } = {}) =>
   
   export const markNotificationAsRead = notificationId =>
     notificationApi.patch(`/notification/${notificationId}`);
+
+  export const getUnreadNotification = () =>
+    notificationApi.get('/notification/is_unread');

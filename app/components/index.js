@@ -10,7 +10,11 @@ import { CameraSearchResultsList } from './CameraSearchResult/CameraSearchResult
 import { CameraSearchResultItem } from './CameraSearchResult/CameraSearchResultItem'
 import { PrescriptionSearchResultsList } from './PrescriptionSearchResult/PrescriptionSearchResultsList';
 import { PrescriptionSearchResultItem } from './PrescriptionSearchResult/PrescriptionSearchResultItem';
-import { Button, BackAndNextButtons, DualTextButton, } from './Button';
+import { 
+  Button, 
+  BackAndNextButtons, 
+  DualTextButton,
+  IconTextButton, } from './Button';
 import { ProgressBar } from './ProgressBar';
 import { SearchBar } from './SearchBar';
 import { Footer } from './Footer';
@@ -21,7 +25,7 @@ import { FilterModal } from './SearchResult/FilterModal';
 import { FilterButton } from './SearchResult/FilterButton';
 import { SearchScreenHeader } from './SearchResult/SearchScreenHeader';
 import { MedicineListItem } from './MedicineListItem';
-import { InputWithDelete } from './Input';
+import { InputWithDelete, ReadOnlyInput } from './Input';
 import { CustomCalendar } from './CustomCalendar';
 import { ScheduleSelector } from './ScheduleSelector';
 
@@ -29,6 +33,7 @@ export {
   Button,
   BackAndNextButtons,
   DualTextButton,
+  IconTextButton,
   ProgressBar,
   SearchBar,
   Header,
@@ -52,6 +57,7 @@ export {
   SearchScreenHeader,
   MedicineListItem,
   InputWithDelete,
+  ReadOnlyInput,
   CustomCalendar,
   ScheduleSelector,
 };

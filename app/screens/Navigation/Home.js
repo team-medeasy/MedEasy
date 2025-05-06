@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {View, TouchableOpacity} from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
@@ -19,6 +19,8 @@ dayjs.locale('ko');
 
 import {useSignUp} from '../../api/context/SignUpContext';
 import {getRoutineByDate} from '../../api/routine';
+import { getUser } from '../../api/user';
+import { getUnreadNotification } from '../../api/notification';
 
 const Home = () => {
   const navigation = useNavigation();
@@ -28,6 +30,26 @@ const Home = () => {
   const [todayRoutine, setTodayRoutine] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [userName, setUserName] = useState('');
+  const [isUnreadNotification, setIsUnreadNotification] = useState(false);
+  
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUser = async () => {
+        try {
+          const response = await getUser();
+          const userData = response.data.body;
+          console.log('받아온 유저 데이터:', userData);
+          setUserName(userData.name || '');
+        } catch (error) {
+          console.error('유저 정보 불러오기 실패:', error);
+        }
+      };
+      fetchUser();
+    }, [])
+  );
+
   // 한국어 요일 매핑
   const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -171,9 +193,27 @@ const Home = () => {
     navigation.navigate('AddMedicineRoutine'); // 복용 루틴 추가 화면으로 이동
   };
 
-  const handleAddHospitalVisit = () => {
-    navigation.navigate('AddHospitalVisit'); // 병원 진료 추가 화면으로 이동
-  };
+  // const handleAddHospitalVisit = () => {
+  //   navigation.navigate('AddHospitalVisit'); // 병원 진료 추가 화면으로 이동
+  // };
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUnreadNotification = async () => {
+        try {
+          const response = await getUnreadNotification();
+          console.log('안읽은 알림 여부 응답:', response.data.body);
+          setIsUnreadNotification(response.data.body);
+        } catch (error) {
+          console.error('안읽은 알림 확인 실패:', error);
+          setIsUnreadNotification(false);
+        }
+      };
+
+      fetchUnreadNotification();
+    }, [])
+  );
+
 
   return (
     <View
@@ -205,6 +245,9 @@ const Home = () => {
               width={22}
               style={{color: themes.light.textColor.textPrimary}}
             />
+            {isUnreadNotification && (
+              <UnreadDot />
+            )}
           </TouchableOpacity>
         </Header>
 
@@ -212,7 +255,7 @@ const Home = () => {
         <PillReminderContainer>
           <TextContainer>
             <ReminderText>
-              {signUpData.firstName}님, {'\n'}까먹은 약이 있어요.
+              {userName}님, {'\n'}까먹은 약이 있어요.
             </ReminderText>
             <LogoIcons.logo
               width={70}
@@ -270,7 +313,7 @@ const Home = () => {
                 />
               </ButtonContent>
             </AddButton>
-            <AddButton onPress={handleAddHospitalVisit}>
+            {/* <AddButton onPress={handleAddHospitalVisit}>
               <ButtonContent>
                 <ButtonInfo>
                   <RoutineIcons.hospital
@@ -291,7 +334,7 @@ const Home = () => {
                   }}
                 />
               </ButtonContent>
-            </AddButton>
+            </AddButton> */}
           </ButtonContainer>
         </PillReminderContainer>
 
@@ -310,12 +353,12 @@ const Home = () => {
             style={{color: themes.light.textColor.Primary20}}
           />
           <EventText>미복용</EventText>
-          <RoutineIcons.hospital
+          {/* <RoutineIcons.hospital
             width={16}
             height={16}
             style={{color: themes.light.pointColor.Secondary}}
           />
-          <EventText>병원 진료</EventText>
+          <EventText>병원 진료</EventText> */}
         </EventIcons>
 
         <RoutineListContainer>
@@ -496,5 +539,16 @@ const RoutineTime = styled.Text`
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
 `;
+
+const UnreadDot = styled.View`
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 4px;
+  background-color: red;
+`;
+
 
 export default Home;

@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.nfc" android:required="false" />   
 
-
     <!-- AOS 13 이상에 대응하기 위한 권한 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATION" />
 
@@ -21,7 +20,19 @@
         android:theme="@style/AppTheme"
         android:supportsRtl="true">
 
-        <!-- 직접 선언하지 마세요: react-native-firebase가 자동 설정합니다 -->
+        <!-- 카카오 로그인 액티비티 추가 -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao9779801f476eafda8410589c1fb3fc92" />
+            </intent-filter>
+        </activity>
 
         <!-- 메인 액티비티 -->
         <activity
@@ -35,6 +46,34 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
+            <!-- NFC 인텐트 필터 추가 -->
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="medeasy" android:host="openroutine" />
+            </intent-filter>
+            
+            <!-- 일반 텍스트 NFC 태그도 처리할 수 있도록 추가 -->
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            
+            <!-- TECH 타입 태그 처리 (기본 텍스트 없이 기술 유형만 탐지) -->
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED"/>
+            </intent-filter>
+            
+            <!-- 포맷되지 않은 태그 처리 -->
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+            </intent-filter>
+            
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
         </activity>
     </application>
 </manifest>

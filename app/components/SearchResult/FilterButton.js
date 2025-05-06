@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 import {themes} from './../../styles';
 import {OtherIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const {chevronDown: ChevronDownIcon, delete: Delete} = OtherIcons;
 
@@ -15,11 +16,13 @@ export const FilterButton = ({
   getFilterButtonText,
   renderFilterButtonIcon,
 }) => {
+  const { fontSizeMode } = useFontSize();
+  
   return (
     <FilterBtn onPress={onFilterPress} selected={selectedItems.length > 0}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         {renderFilterButtonIcon(type, selectedItems)}
-        <FilterButtonText selected={selectedItems.length > 0}>
+        <FilterButtonText selected={selectedItems.length > 0} fontSizeMode={fontSizeMode}>
           {getFilterButtonText(type, selectedItems)}
         </FilterButtonText>
       </View>
@@ -62,7 +65,7 @@ const FilterBtn = styled(TouchableOpacity)`
 `;
 
 const FilterButtonText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;

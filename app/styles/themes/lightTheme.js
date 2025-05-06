@@ -10,6 +10,7 @@ export const lightTheme = {
   textColor: {
     textPrimary: 'rgba(0, 0, 0, 1)',
     Primary6: 'rgba(0, 0, 0, 0.06)',
+    Primary10: 'rgba(0, 0, 0, 0.1)',
     Primary20: 'rgba(0, 0, 0, 0.2)',
     Primary30: 'rgba(0, 0, 0, 0.3)',
     Primary50: 'rgba(128, 128, 128, 1)',

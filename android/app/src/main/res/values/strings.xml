@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">메디지</string>
+    <string name="kakao_app_key">9779801f476eafda8410589c1fb3fc92</string>
 </resources>

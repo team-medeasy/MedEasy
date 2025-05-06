@@ -182,7 +182,7 @@ const SignUpDOBGenderScreen = ({navigation}) => {
                 fontFamily: fonts.title.fontFamily,
                 fontSize: fonts.title.fontSize,
               }}>
-              {signUpData.firstName}님, 반가워요!
+              {signUpData.name}님, 반가워요!
             </Text>
             <Text
               style={{
