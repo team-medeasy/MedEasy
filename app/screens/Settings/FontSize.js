@@ -1,14 +1,22 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import {themes} from '../../styles';
+import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { Header, SearchResultItem } from '../../components';
 import RoutineCard from '../../components/RoutineCard';
 import Slider from '@react-native-community/slider';
 
-const Profile = () => {
+const FontSize = () => {
   const [checkedItems, setCheckedItems] = useState({});
-  const [fontSizeValue, setFontSizeValue] = useState(1); // 슬라이더 값 (0: 기본, 1: 보통, 2: 크게)
+  const [fontSizeValue, setFontSizeValue] = useState(0); // 0: default, 1: medium, 2: large
+
+  const getFontSizeMode = (value) => {
+    if (value < 0.5) return 'default';
+    if (value < 1.5) return 'medium';
+    return 'large';
+  };
+
+  const fontSizeMode = getFontSizeMode(fontSizeValue);
 
   const exampleItem = {
     item_image: '',
@@ -31,7 +39,7 @@ const Profile = () => {
   };
 
   const toggleCheck = (medicineId, timeKey) => {
-    setCheckedItems(prev => {
+    setCheckedItems((prev) => {
       const key = `0000-00-00-${timeKey}-${medicineId}`;
       return {
         ...prev,
@@ -41,38 +49,22 @@ const Profile = () => {
   };
 
   const toggleTimeCheck = (timeKey, routine) => {
-    setCheckedItems(prev => {
-      const newChecked = {...prev};
+    setCheckedItems((prev) => {
+      const newChecked = { ...prev };
       const selectedDate = '0000-00-00';
-  
-      // 약들의 키 목록 생성
-      const keys = routine.medicines.map(({medicine_id}) =>
-        `${selectedDate}-${timeKey}-${medicine_id}`
+      const keys = routine.medicines.map(
+        ({ medicine_id }) => `${selectedDate}-${timeKey}-${medicine_id}`
       );
-  
-      // 현재 전부 체크돼 있는지 확인
-      const allChecked = keys.every(key => prev[key]);
-  
-      keys.forEach(key => {
+      const allChecked = keys.every((key) => prev[key]);
+      keys.forEach((key) => {
         newChecked[key] = allChecked ? false : true;
       });
-  
       return newChecked;
     });
   };
 
-  // 글자 크기 변경 함수
   const handleFontSizeChange = (value) => {
     setFontSizeValue(value);
-    // 여기에 실제로 앱 전체 폰트 크기를 변경하는 로직을 추가할 수 있습니다
-    // 예: 글로벌 상태 관리나 context API를 통해 전체 앱에 적용
-  };
-  
-  // 현재 슬라이더 값에 따른 텍스트 레이블 반환
-  const getFontSizeLabel = () => {
-    if (fontSizeValue < 0.5) return '기본';
-    if (fontSizeValue < 1.5) return '보통';
-    return '크게';
   };
 
   return (
@@ -80,8 +72,8 @@ const Profile = () => {
       <Header>글자 크기 설정</Header>
       <Wrapper>
         <ContentWrapper>
-          <SearchResultItem item={exampleItem} onPress={() => {}}/>
-          
+          <SearchResultItem item={exampleItem} fontSizeMode={fontSizeMode} />
+
           <RoutineCard
             routine={exampleRoutine}
             index={0}
@@ -93,10 +85,10 @@ const Profile = () => {
             isInModal={true}
             selectedDateString="0000-00-00"
             backgroundColor={themes.light.boxColor.buttonSecondary}
+            fontSizeMode={fontSizeMode}
           />
         </ContentWrapper>
 
-        {/* 글자 크기 선택 슬라이더 */}
         <FontSizeSelector>
           <Slider
             value={fontSizeValue}
@@ -108,11 +100,11 @@ const Profile = () => {
             maximumTrackTintColor={themes.light.textColor.Primary10}
             thumbTintColor={themes.light.pointColor.Primary}
           />
-          
+
           <SliderLabelsContainer>
-            <SliderLabelText>기본</SliderLabelText>
-            <SliderLabelText>보통</SliderLabelText>
-            <SliderLabelText>크게</SliderLabelText>
+            <SliderLabelText fontSizeMode={fontSizeMode}>기본</SliderLabelText>
+            <SliderLabelText fontSizeMode={fontSizeMode}>보통</SliderLabelText>
+            <SliderLabelText fontSizeMode={fontSizeMode}>크게</SliderLabelText>
           </SliderLabelsContainer>
         </FontSizeSelector>
       </Wrapper>
@@ -146,10 +138,10 @@ const SliderLabelsContainer = styled.View`
 `;
 
 const SliderLabelText = styled.Text`
-  font-family: "Pretendard-Medium";
-  font-size: ${FontSizes.body.default};
+  font-family: 'Pretendard-Medium';
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.textPrimary};
   text-align: center;
 `;
 
-export default Profile;
+export default FontSize;

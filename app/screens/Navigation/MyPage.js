@@ -7,7 +7,6 @@ import MedicationInfo from '../../components/MedicationInfo';
 import SettingList from '../../components/SettingList';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
-import {useSignUp} from '../../api/context/SignUpContext';
 import { getUser } from '../../api/user';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -49,27 +48,25 @@ const MyPage = () => {
         {/* 약 챙겨먹은 일수 */}
         <MedicationInfo days={32} medicationCount={5} />
         {/* 설정 리스트 */}
-        <VSpacer height={24} />
         <SettingList />
-        <VSpacer height={48} />
         {/* Footer */}
-        <Footer />
+        <FooterContainer>
+          <Footer />
+        </FooterContainer>
       </ScrollContent>
     </Container>
   );
 };
 
-const Container = styled.View`
+const Container = styled.SafeAreaView`
   flex: 1;
-  background-color: ${themes.light.bgColor.bgPrimary};
+  background-color: ${themes.light.boxColor.buttonPrimary};
 `;
 
 const HeaderContainer = styled.View`
   justify-content: flex-end;
   background-color: ${themes.light.boxColor.buttonPrimary};
-  ${Platform.OS === 'ios' && `padding-top: 50px;`}
-  ${Platform.OS === 'android' && `padding-top: 20px;`}
-  padding-left: 20px;
+  padding: 10px 20px;
 `;
 
 const Title = styled.Text`
@@ -77,8 +74,6 @@ const Title = styled.Text`
   font-family: 'KimjungchulGothic-Bold';
   font-weight: bold;
   color: ${themes.light.textColor.buttonText};
-  margin-bottom: 20px;
-  margin-top: 20px;
 `;
 
 const ScrollContent = styled.ScrollView`
@@ -110,7 +105,7 @@ const SmallText = styled.Text`
   color: ${themes.light.textColor.buttonText60};
 `;
 
-const VSpacer = styled.View`
-  height: ${({height}) => height || 16}px;
+const FooterContainer = styled.View`
+  background-color: ${themes.light.bgColor.bgPrimary};
 `;
 export default MyPage;
