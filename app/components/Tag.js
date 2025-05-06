@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, Text, LayoutAnimation } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { themes } from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 
 const size = {
   small: {
-    fontSize: '12px',
     fontFamily: 'Pretendard-SemiBold',
     padding: '4px 7px',
   },
   large: {
-    fontSize: '15px',
     fontFamily: 'Pretendard-Bold',
     padding: '6px 10px',
   },
@@ -24,7 +23,7 @@ const color = {
   },
   resultSecondary: {
     bgColor: themes.light.boxColor.tagResultSecondary,
-    color: themes.light.textColor.primary,
+    color: themes.light.textColor.textPrimary,
   },
   detailPrimary: {
     bgColor: themes.light.boxColor.tagDetailPrimary,
@@ -36,23 +35,35 @@ const color = {
   },
 };
 
-const TagContainer = styled.View`
+// 일립시스 모드를 위한 고정 너비 컨테이너
+const FixedWidthContainer = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  font-size: ${props =>
-    props.sizeType === 'small' ? size.small.fontSize : size.large.fontSize};
-  font-family: ${props =>
-    props.sizeType === 'small' ? size.small.fontFamily : size.large.fontFamily};
+  align-self: flex-start;
+  border-radius: 5px;
   background-color: ${props =>
     props.colorType
       ? color[props.colorType].bgColor
       : props.bgColor || themes.light.boxColor.tagDetailPrimary};
-  border-radius: 5px;
   padding: ${props =>
     props.sizeType === 'small' ? size.small.padding : size.large.padding};
-  align-self: flex-start;
-  max-width: ${props => props.maxWidth || '150'};
+  max-width: ${props => props.maxWidth || 'auto'};
+`;
+
+// 스크롤 모드를 위한 유연한 너비 컨테이너
+const FlexibleWidthContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  background-color: ${props =>
+    props.colorType
+      ? color[props.colorType].bgColor
+      : props.bgColor || themes.light.boxColor.tagDetailPrimary};
+  padding: ${props =>
+    props.sizeType === 'small' ? size.small.padding : size.large.padding};
+  max-width: ${props => props.maxWidth || 'auto'};
 `;
 
 const TagText = styled.Text`
@@ -60,7 +71,10 @@ const TagText = styled.Text`
     props.colorType
       ? color[props.colorType].color
       : props.color || themes.light.textColor.buttonText};
-  font-size: ${props => FontSizes.caption[props.fontSizeMode]};
+  font-size: ${props => 
+  props.sizeType === 'small' 
+    ? FontSizes.caption[props.fontSizeMode]
+    : FontSizes.body[props.fontSizeMode]};
   font-family: ${props =>
     props.sizeType === 'small' ? size.small.fontFamily : size.large.fontFamily};
 `;
@@ -72,27 +86,16 @@ const Tag = ({
   bgColor,
   color,
   style,
-  overflowMode = 'scroll', // 'ellipsis' or 'scroll'
-  maxWidth = '130',
-  maxLength = 12, // 최대 글자 수
-  fontSizeMode = 'default',
+  overflowMode = 'scroll', // 'ellipsis' 또는 'scroll'
+  maxWidth, // 선택적 최대 너비 (예: '100%', '150px' 등)
   ...rest
 }) => {
-  const [isOverflow, setIsOverflow] = useState(false);
-  const textRef = useRef(null);
-
-  useEffect(() => {
-    // 텍스트가 문자열이고 길이가 maxLength를 초과하면 오버플로우 처리
-    if (typeof children === 'string' && children.length > maxLength) {
-      setIsOverflow(true);
-    } else {
-      setIsOverflow(false);
-    }
-  }, [children, maxLength]);
+  const { fontSizeMode } = useFontSize();
+  const containerRef = useRef(null);
 
   if (typeof children !== 'string') {
     return (
-      <TagContainer
+      <FixedWidthContainer
         sizeType={sizeType}
         colorType={colorType}
         bgColor={bgColor}
@@ -101,60 +104,63 @@ const Tag = ({
         {...rest}
       >
         {children}
-      </TagContainer>
+      </FixedWidthContainer>
     );
   }
 
-  return (
-    <TagContainer
-      sizeType={sizeType}
-      colorType={colorType}
-      bgColor={bgColor}
-      style={style}
-      maxWidth={maxWidth}
-      {...rest}
-    >
-      {isOverflow ? (
-        overflowMode === 'ellipsis' ? (
-          <TagText
-            ref={textRef}
-            sizeType={sizeType}
-            colorType={colorType}
-            color={color}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            fontSizeMode={fontSizeMode}
-          >
-            {children}
-          </TagText>
-        ) : (
-          <ScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-          >
-            <TagText
-              ref={textRef}
-              sizeType={sizeType}
-              colorType={colorType}
-              color={color}
-              fontSizeMode={fontSizeMode}
-            >
-              {children}
-            </TagText>
-          </ScrollView>
-        )
-      ) : (
+  // ellipsis 모드일 때는 기존처럼 고정 너비 사용
+  if (overflowMode === 'ellipsis') {
+    return (
+      <FixedWidthContainer
+        ref={containerRef}
+        sizeType={sizeType}
+        colorType={colorType}
+        bgColor={bgColor}
+        style={style}
+        maxWidth={maxWidth}
+        {...rest}
+      >
         <TagText
-          ref={textRef}
           sizeType={sizeType}
           colorType={colorType}
           color={color}
+          numberOfLines={1}
+          ellipsizeMode="tail"
           fontSizeMode={fontSizeMode}
         >
           {children}
         </TagText>
-      )}
-    </TagContainer>
+      </FixedWidthContainer>
+    );
+  }
+
+  // scroll 모드일 때는 유연한 너비를 사용하되, ScrollView의 최대 너비 제한
+  return (
+    <View style={{ maxWidth }}>
+      <FlexibleWidthContainer
+        ref={containerRef}
+        sizeType={sizeType}
+        colorType={colorType}
+        bgColor={bgColor}
+        style={[{ alignSelf: 'flex-start' }, style]}
+        {...rest}
+      >
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 0 }}
+        >
+          <TagText
+            sizeType={sizeType}
+            colorType={colorType}
+            color={color}
+            fontSizeMode={fontSizeMode}
+          >
+            {children}
+          </TagText>
+        </ScrollView>
+      </FlexibleWidthContainer>
+    </View>
   );
 };
 
