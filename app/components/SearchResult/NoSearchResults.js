@@ -2,10 +2,12 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {Images} from '../../../assets/icons';
 
 const NoSearchResults = () => {
   return (
     <Container>
+      <Images.emptySearchResult style={{marginBottom: 48}} />
       <NoResultsText>검색 결과가 없습니다.</NoResultsText>
       <NoResultsSubText>
         검색어를 다시 한 번{'\n'}확인해 주세요.
