@@ -3,6 +3,7 @@ import {View, TouchableOpacity, Platform} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from './../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {SearchBar} from './../../components';
@@ -13,6 +14,7 @@ import {getSearchPopular} from '../../api/search';
 const RECENT_SEARCHES_STORAGE_KEY = '@mediapp:recent_searches';
 
 const SearchMedicineScreen = ({navigation, route}) => {
+  const {fontSizeMode} = useFontSize();
   const [searchQuery, setSearchQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState([]);
   const [currentDate, setCurrentDate] = useState('');
@@ -182,9 +184,9 @@ const SearchMedicineScreen = ({navigation, route}) => {
       <SearchesContainer>
         <View>
           <SearchSectionHeader>
-            <SearchTitle>최근 검색어</SearchTitle>
+            <SearchTitle fontSizeMode={fontSizeMode}>최근 검색어</SearchTitle>
             <TouchableOpacity style={{padding: 12}} onPress={handleClearAll}>
-              <ClearAllText>전체 삭제</ClearAllText>
+              <ClearAllText fontSizeMode={fontSizeMode}>전체 삭제</ClearAllText>
             </TouchableOpacity>
           </SearchSectionHeader>
           {recentSearches.length > 0 ? (
@@ -195,7 +197,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
                 <RecentSearchItemButton
                   key={index}
                   onPress={() => handleRecentSearchClick(item)}>
-                  <RecentSearchItemText>{item}</RecentSearchItemText>
+                  <RecentSearchItemText fontSizeMode={fontSizeMode}>{item}</RecentSearchItemText>
                   <DeleteIconButton
                     style={{padding: 8}}
                     onPress={e => {
@@ -212,21 +214,21 @@ const SearchMedicineScreen = ({navigation, route}) => {
               ))}
             </RecentSearchListContainer>
           ) : (
-            <NoRecentSearchesText>검색 기록이 없습니다.</NoRecentSearchesText>
+            <NoRecentSearchesText fontSizeMode={fontSizeMode}>검색 기록이 없습니다.</NoRecentSearchesText>
           )}
         </View>
 
         <View>
           <SearchSectionHeader>
-            <SearchTitle>인기 검색어</SearchTitle>
+            <SearchTitle fontSizeMode={fontSizeMode}>인기 검색어</SearchTitle>
           </SearchSectionHeader>
           <PopularSearchListContainer>
             {popularSearches.map(item => (
               <PopularSearchItemButton
                 key={item.rank}
                 onPress={() => handlePopularSearchClick(item.term)}>
-                <RankingText>{item.rank}</RankingText>
-                <PopularSearchText>{item.term}</PopularSearchText>
+                <RankingText fontSizeMode={fontSizeMode}>{item.rank}</RankingText>
+                <PopularSearchText fontSizeMode={fontSizeMode}>{item.term}</PopularSearchText>
                 <IconContainer>
                   {getRankChangeIcon(item.rankChange)}
                 </IconContainer>
@@ -240,7 +242,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
             alignSelf: 'flex-end',
             marginTop: 10,
           }}>
-          <UpdateDateText>업데이트 {currentDate}</UpdateDateText>
+          <UpdateDateText fontSizeMode={fontSizeMode}>업데이트 {currentDate}</UpdateDateText>
         </View>
       </SearchesContainer>
     </Container>
@@ -280,19 +282,19 @@ const SearchSectionHeader = styled.View`
 `;
 
 const SearchTitle = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Semibold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const ClearAllText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
 `;
 
 const NoRecentSearchesText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Semibold';
   color: ${themes.light.textColor.Primary30};
   text-align: center;
@@ -321,7 +323,7 @@ const RecentSearchItemButton = styled(TouchableOpacity)`
 `;
 
 const RecentSearchItemText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -335,7 +337,7 @@ const PopularSearchItemButton = styled(TouchableOpacity)`
 `;
 
 const RankingText = styled.Text`
-  font-size: ${FontSizes.caption.large};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Bold';
   font-weight: bold;
   color: ${themes.light.pointColor.Primary};
@@ -343,7 +345,7 @@ const RankingText = styled.Text`
 `;
 
 const PopularSearchText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
   flex: 1;
@@ -357,13 +359,13 @@ const IconContainer = styled.View`
 `;
 
 const RankingStayText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   text-align: center;
   color: ${themes.light.textColor.Primary30};
 `;
 
 const UpdateDateText = styled.Text`
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   margin-right: 20px;
   color: ${themes.light.textColor.Primary30};

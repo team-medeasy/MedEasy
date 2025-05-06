@@ -552,9 +552,11 @@ const SetMedicineRoutine = ({ route, navigation }) => {
           paddingBottom: 150,
         }}>
         <MedicineOverview
-          medicine={medicine}
-          isFavorite={isFavorite}
-          setIsFavorite={setIsFavorite}
+            medicine={{
+              ...medicine,
+              // item_id가 없다면 medicineId를 사용
+              item_id: medicine.item_id || medicineId
+            }}
           onPressEnlarge={handlePressEnlarge}
         />
 
