@@ -1,11 +1,13 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import { View, Text } from 'react-native';
-import { Tag } from './Tag';
+import { SearchResultItem } from './../components';
 import FontSizes from '../../assets/fonts/fontSizes';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 import { themes } from '../styles';
 
 export const MedicineListItem = ({ item, onPress }) => {
+  const { fontSizeMode } = useFontSize();
 
   // 종료일이 오늘을 지났는지 확인
   const isPastMedicine = () => {
@@ -28,54 +30,23 @@ export const MedicineListItem = ({ item, onPress }) => {
 
   const isPast = isPastMedicine();
 
+  // SearchResultItem에 전달할 데이터 객체 생성
+  const searchResultItemData = {
+    item_image: item.medicine_image,
+    entp_name: item.entp_name,
+    item_name: item.medicine_name || item.nickname,
+    etc_otc_name: item.etc_otc_name,
+    class_name: item.class_name
+  };
+
   return (
-    <ItemContainer onPress={onPress}>
-      <View style={{ flexDirection: 'row', gap: 15 }}>
-        <MedicineImage
-          source={{ uri: item.medicine_image }}
-          resizeMode="cover"
-        />
+    <ItemContainer>
+      <SearchResultItem 
+        item={searchResultItemData} 
+        onPress={() => onPress(item)} 
+      />
 
-        <InfoContainer>
-          <View style={{ gap: 7 }}>
-            <Description numberOfLines={2} ellipsizeMode="tail">
-              {item.entp_name || '정보 없음'}
-            </Description>
-            <MedicineName numberOfLines={1} ellipsizeMode="tail">
-              {item.medicine_name || item.nickname || '정보 없음'}
-            </MedicineName>
-
-            <View style={{ flexDirection: 'row', gap: 11 }}>
-              <Tag
-                sizeType="small"
-                colorType="resultPrimary"
-                overflowMode="ellipsis"
-                maxWidth="66"
-              >
-                {item.etc_otc_name || '정보 없음'}
-              </Tag>
-              <Tag
-                sizeType="small"
-                colorType="resultSecondary"
-                overflowMode="ellipsis"
-                maxWidth="110"
-                maxLength={10}
-              >
-                {item.class_name || '정보 없음'}
-              </Tag>
-            </View>
-          </View>
-        </InfoContainer>
-      </View>
-
-      <View
-        style={{
-          backgroundColor: themes.light.boxColor.inputPrimary,
-          padding: 10,
-          gap: 8,
-          borderRadius: 10,
-        }}
-      >
+      <RoutineInfoContainer>
         <Routine
           label={isPast ? '복용 기간    ' : '복용 시작일'}
           value={
@@ -85,6 +56,7 @@ export const MedicineListItem = ({ item, onPress }) => {
                 ? formatDate(item.routine_start_date)
                 : '정보 없음'
           }
+          fontSizeMode={fontSizeMode}
         />
         <Routine
           label={'복용량        '}
@@ -93,6 +65,7 @@ export const MedicineListItem = ({ item, onPress }) => {
               ? `하루 ${item.schedule_size}번, ${item.dose}정씩`
               : '정보 없음'
           }
+          fontSizeMode={fontSizeMode}
         />
         <Routine
           label={'복용 주기    '}
@@ -101,21 +74,21 @@ export const MedicineListItem = ({ item, onPress }) => {
               ? '매일'
               : `${item.interval_days}일에 한 번`)
             : '정보 없음'}
+          fontSizeMode={fontSizeMode}
         />
-      </View>
+      </RoutineInfoContainer>
     </ItemContainer>
   );
 };
 
-
-const Routine = ({ label, value }) => {
+const Routine = ({ label, value, fontSizeMode }) => {
   return (
     <View style={{ flexDirection: 'row', gap: 18, alignItems: 'center' }}>
       <Text
         style={{
           color: themes.light.textColor.Primary50,
           fontFamily: 'Pretendard-Medium',
-          fontSize: FontSizes.caption.default,
+          fontSize: FontSizes.caption[fontSizeMode || 'default'],
         }}
       >
         {label}
@@ -124,7 +97,7 @@ const Routine = ({ label, value }) => {
         style={{
           color: themes.light.pointColor.Primary,
           fontFamily: 'Pretendard-Bold',
-          fontSize: FontSizes.caption.default,
+          fontSize: FontSizes.caption[fontSizeMode || 'default'],
           flex: 1,
         }}
       >
@@ -134,29 +107,14 @@ const Routine = ({ label, value }) => {
   );
 };
 
-const ItemContainer = styled.TouchableOpacity`
+const ItemContainer = styled.View`
   margin-bottom: 28px;
-  gap: 15px;
 `;
 
-const MedicineImage = styled.Image`
-  width: 140px;
-  height: 74px;
+const RoutineInfoContainer = styled.View`
+  background-color: ${themes.light.boxColor.inputPrimary};
+  padding: 10px;
+  gap: 8px;
   border-radius: 10px;
-`;
-
-const InfoContainer = styled.View`
-  flex: 1;
-`;
-
-const MedicineName = styled.Text`
-  font-size: ${FontSizes.heading.default};
-  font-family: 'Pretendard-bold';
-  color: ${themes.light.textColor.textPrimary};
-`;
-
-const Description = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-medium';
-  color: ${themes.light.textColor.Primary50};
+  margin-top: 15px;
 `;
