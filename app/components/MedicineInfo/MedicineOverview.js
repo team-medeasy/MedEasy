@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
 import { Alert, ImageBackground, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { themes } from '../../styles';
 import { ChatIcons, RoutineIcons } from '../../../assets/icons';
 import { Tag } from '..';
@@ -27,20 +28,27 @@ const MedicineOverview = ({
   const [currentSound, setCurrentSound] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // 컴포넌트 마운트 시 관심 약품 상태 확인
-  useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      try {
-        const response = await getInterestedMedicineStatus(medicine.item_id);
-        console.log('🤍 관심 약품 상태 응답:', response.data.body);
-        setIsFavorite(response.data.body.is_interested_medicine);
-      } catch (error) {
-        console.error('관심 의약품 상태 확인 실패:', error);
-      }
-    };
+  // 화면에 포커스될 때마다 관심 약품 상태 확인
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkFavoriteStatus = async () => {
+        try {
+          const response = await getInterestedMedicineStatus(medicine.item_id);
+          console.log('🤍 관심 약품 상태 응답:', response.data.body);
+          setIsFavorite(response.data.body.is_interested_medicine);
+        } catch (error) {
+          console.error('관심 의약품 상태 확인 실패:', error);
+        }
+      };
 
-    checkFavoriteStatus();
-  }, [medicine.item_id]);
+      checkFavoriteStatus();
+      
+      // 클린업 함수는 화면이 언포커스될 때 실행됨
+      return () => {
+        // 필요한 클린업 작업이 있다면 여기에 작성
+      };
+    }, [medicine.item_id])
+  );
 
   const handleAudioPress = async (medicineId) => {
     // 이미 재생 중이면 중지
