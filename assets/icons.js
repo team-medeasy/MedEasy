@@ -87,6 +87,13 @@ import SearchGeneralIcon from './icons/search.svg';
 import ChevronDownIcon from './icons/chevron_down.svg';
 import KakaoIcon from './icons/kakao.svg';
 
+// 이미지 에셋
+import EmptyLikeImage from './images/emptyLike.svg';
+import EmptyNotificationImage from './images/emptyNotification.svg';
+import EmptyRoutineImage from './images/emptyRoutine.svg';
+import EmptySearchResultImage from './images/emptySearchResult.svg';
+import SignInImage from './images/signIn.svg';
+
 // 전체 아이콘 객체로 정리
 export const TabIcons = {
   home: HomeIcon,
@@ -187,4 +194,12 @@ export const OtherIcons = {
   search: SearchGeneralIcon,
   chevronDown: ChevronDownIcon,
   kakao: KakaoIcon,
+};
+
+export const Images = {
+  emptyLike: EmptyLikeImage,
+  emptyNotification: EmptyNotificationImage,
+  emptyRoutine: EmptyRoutineImage,
+  emptySearchResult: EmptySearchResultImage,
+  signIn: SignInImage,
 };
