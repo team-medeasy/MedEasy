@@ -1,22 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components/native';
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { Header, SearchResultItem } from '../../components';
 import RoutineCard from '../../components/RoutineCard';
 import Slider from '@react-native-community/slider';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
 const FontSize = () => {
-  const [checkedItems, setCheckedItems] = useState({});
-  const [fontSizeValue, setFontSizeValue] = useState(0); // 0: default, 1: medium, 2: large
-
-  const getFontSizeMode = (value) => {
-    if (value < 0.5) return 'default';
-    if (value < 1.5) return 'medium';
-    return 'large';
+  const [checkedItems, setCheckedItems] = React.useState({});
+  const { fontSizeMode, setFontSizeMode } = useFontSize(); // 폰트 사이즈 컨텍스트 사용
+  
+  // 슬라이더 값을 fontSizeMode에 맞게 설정
+  const getFontSizeValue = (mode) => {
+    switch (mode) {
+      case 'default': return 0;
+      case 'medium': return 1;
+      case 'large': return 2;
+      default: return 0;
+    }
   };
 
-  const fontSizeMode = getFontSizeMode(fontSizeValue);
+  const [fontSizeValue, setFontSizeValue] = React.useState(() => getFontSizeValue(fontSizeMode));
 
   const exampleItem = {
     item_image: '',
@@ -65,6 +70,15 @@ const FontSize = () => {
 
   const handleFontSizeChange = (value) => {
     setFontSizeValue(value);
+    
+    // 폰트 사이즈 모드 변경
+    let newMode;
+    if (value < 0.5) newMode = 'default';
+    else if (value < 1.5) newMode = 'medium';
+    else newMode = 'large';
+    
+    // 컨텍스트를 통해 전역 폰트 사이즈 모드 업데이트
+    setFontSizeMode(newMode);
   };
 
   return (
