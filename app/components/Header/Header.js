@@ -5,24 +5,24 @@ import {useNavigation} from '@react-navigation/native';
 import {HeaderIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { useFontSize } from '../../../assets/fonts/FontSizeContext';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const Header = ({children, onBackPress}) => {
   const navigation = useNavigation();
   const handleBackPress = onBackPress || (() => navigation.goBack());
-  const { fontSizeMode } = useFontSize();
+  const {fontSizeMode} = useFontSize();
 
   return (
     <HeaderContainer>
       <BackAndTitleContainer>
-        <TouchableOpacity style={{paddingRight: 12}} onPress={handleBackPress}>
+        <TouchableOpacity style={{padding: 12}} onPress={handleBackPress}>
           <HeaderIcons.chevron
             width={17}
             height={17}
             style={{color: themes.light.textColor.textPrimary}}
           />
         </TouchableOpacity>
-        <Title 
+        <Title
           fontSizeMode={fontSizeMode}
           numberOfLines={1}
           ellipsizeMode="tail">
