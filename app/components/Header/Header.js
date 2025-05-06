@@ -13,7 +13,7 @@ const Header = ({children, onBackPress}) => {
   return (
     <HeaderContainer>
       <BackAndTitleContainer>
-        <TouchableOpacity style={{padding: 12}} onPress={handleBackPress}>
+        <TouchableOpacity style={{paddingRight: 12}} onPress={handleBackPress}>
           <HeaderIcons.chevron
             width={17}
             height={17}
