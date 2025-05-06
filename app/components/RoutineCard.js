@@ -11,7 +11,7 @@ const RoutineCard = ({
   allLength,
   checkedItems,
   toggleTimeCheck,
-  toggleHospitalCheck,
+  //toggleHospitalCheck,
   toggleCheck,
   isInModal = false,
   selectedDateString,
