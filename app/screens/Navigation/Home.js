@@ -20,6 +20,7 @@ dayjs.locale('ko');
 import {useSignUp} from '../../api/context/SignUpContext';
 import {getRoutineByDate} from '../../api/routine';
 import { getUser } from '../../api/user';
+import { getUnreadNotification } from '../../api/notification';
 
 const Home = () => {
   const navigation = useNavigation();
@@ -31,6 +32,7 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   const [userName, setUserName] = useState('');
+  const [isUnreadNotification, setIsUnreadNotification] = useState(false);
   
   useFocusEffect(
     useCallback(() => {
@@ -195,6 +197,24 @@ const Home = () => {
   //   navigation.navigate('AddHospitalVisit'); // 병원 진료 추가 화면으로 이동
   // };
 
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUnreadNotification = async () => {
+        try {
+          const response = await getUnreadNotification();
+          console.log('안읽은 알림 여부 응답:', response.data.body);
+          setIsUnreadNotification(response.data.body);
+        } catch (error) {
+          console.error('안읽은 알림 확인 실패:', error);
+          setIsUnreadNotification(false);
+        }
+      };
+
+      fetchUnreadNotification();
+    }, [])
+  );
+
+
   return (
     <View
       style={{
@@ -225,6 +245,9 @@ const Home = () => {
               width={22}
               style={{color: themes.light.textColor.textPrimary}}
             />
+            {isUnreadNotification && (
+              <UnreadDot />
+            )}
           </TouchableOpacity>
         </Header>
 
@@ -516,5 +539,16 @@ const RoutineTime = styled.Text`
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
 `;
+
+const UnreadDot = styled.View`
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 4px;
+  background-color: red;
+`;
+
 
 export default Home;
