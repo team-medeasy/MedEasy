@@ -21,12 +21,14 @@ import {
   SimilarMedicineItem,
 } from './../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {OtherIcons} from '../../../assets/icons';
 import {getSimilarMedicines, getMedicineById} from '../../api/medicine';
 import {getUserMedicineCount} from '../../api/user';
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {medicineId, isModal, basicInfo, item, title} = route.params;
+  const {fontSizeMode} = useFontSize();
   
   const [medicine, setMedicine] = useState(basicInfo || item || null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
@@ -286,7 +288,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
           약 정보
         </HeaderComponent>
         <LoadingContainer>
-          <EmptyText>약 정보를 불러올 수 없습니다.</EmptyText>
+          <EmptyText fontSizeMode={fontSizeMode}>약 정보를 불러올 수 없습니다.</EmptyText>
         </LoadingContainer>
       </Container>
     );
@@ -316,31 +318,36 @@ const MedicineDetailScreen = ({route, navigation}) => {
               <Usage
                 label={'💊 이런 증상에 효과가 있어요'}
                 value={medicine.efcy_qesitm}
+                fontSizeMode={fontSizeMode}
               />
               <Usage
                 label={'📋 이렇게 복용하세요'}
                 value={medicine.use_method_qesitm}
+                fontSizeMode={fontSizeMode}
               />
               <Usage
                 label={'🗄️ 이렇게 보관하세요'}
                 value={medicine.deposit_method_qesitm}
                 borderBottomWidth={10}
+                fontSizeMode={fontSizeMode}
               />
             </View>
             <View>
               <Usage
                 label={'⚠️ 이런 주의사항이 있어요'}
                 value={medicine.atpn_qesitm}
+                fontSizeMode={fontSizeMode}
               />
               <Usage
                 label={'🤒 이런 부작용이 예상돼요'}
                 value={medicine.se_qesitm}
                 borderBottomWidth={10}
+                fontSizeMode={fontSizeMode}
               />
             </View>
           </MedicineUsageContainer>
           <SimilarMedicinesContainer>
-            <HeadingText style={{paddingHorizontal: 20}}>
+            <HeadingText style={{paddingHorizontal: 20}} fontSizeMode={fontSizeMode}>
               비슷한 약 보기
             </HeadingText>
             {similarMedicines.length > 0 ? (
@@ -363,7 +370,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
                 style={{
                   color: themes.light.textColor.Primary30,
                   fontFamily: 'Pretendard-semiBold',
-                  fontSize: FontSizes.caption.large,
+                  fontSize: FontSizes.caption[fontSizeMode],
                   paddingHorizontal: 20,
                 }}>
                 비슷한 약이 존재하지 않아요.
@@ -427,11 +434,11 @@ const LoadingContainer = styled.View`
 
 const EmptyText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.Primary50};
 `;
 
-const Usage = ({label, value, borderBottomWidth = 1}) => {
+const Usage = ({label, value, borderBottomWidth = 1, fontSizeMode}) => {
   const [expanded, setExpanded] = useState(false);
   const textLengthThreshold = 150; // 토글 기능 활성화 길이
   const isLongText = value && value.length > textLengthThreshold;
@@ -455,7 +462,7 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        <HeadingText>{label}</HeadingText>
+        <HeadingText fontSizeMode={fontSizeMode}>{label}</HeadingText>
 
         {isLongText && (
           <TouchableOpacity
@@ -485,7 +492,7 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
         style={{
           color: themes.light.textColor.Primary70,
           fontFamily: 'Pretendard-Medium',
-          fontSize: FontSizes.body.default,
+          fontSize: FontSizes.body[fontSizeMode],
           lineHeight: 30,
         }}>
         {shortenedText}
@@ -497,7 +504,7 @@ const Usage = ({label, value, borderBottomWidth = 1}) => {
 const HeadingText = styled.Text`
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
 `;
 
 export default MedicineDetailScreen;
