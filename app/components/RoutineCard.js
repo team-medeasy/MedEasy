@@ -11,11 +11,12 @@ const RoutineCard = ({
   allLength,
   checkedItems,
   toggleTimeCheck,
-  toggleHospitalCheck,
+  //toggleHospitalCheck,
   toggleCheck,
   isInModal = false,
   selectedDateString,
   backgroundColor,
+  fontSizeMode = 'default',
 }) => {
   const navigation = useNavigation();
 
@@ -47,8 +48,8 @@ const RoutineCard = ({
               />
             </IconContainer>
             <TextContainer>
-              <TypeText>{routine.label}</TypeText>
-              <TimeText>{routine.time}</TimeText>
+              <TypeText fontSizeMode={fontSizeMode}>{routine.label}</TypeText>
+              <TimeText fontSizeMode={fontSizeMode}>{routine.time}</TimeText>
             </TextContainer>
             <CheckBox onPress={() => toggleTimeCheck(routine.timeKey)}>
               {routine.medicines.every(
@@ -109,6 +110,7 @@ const RoutineCard = ({
               {routine.medicines.map(medicine => (
                 <MedicineItem key={medicine.medicine_id}>
                   <MedicineText
+                    fontSizeMode={fontSizeMode}
                     isChecked={
                       checkedItems[
                         `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
@@ -122,6 +124,7 @@ const RoutineCard = ({
                     {medicine.nickname}
                   </MedicineText>
                   <MedicineCount
+                    fontSizeMode={fontSizeMode}
                     isChecked={
                       checkedItems[
                         `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
@@ -233,12 +236,12 @@ const TextContainer = styled.View`
 `;
 
 const TypeText = styled.Text`
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-ExtraBold';
 `;
 
 const TimeText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -254,7 +257,7 @@ const MedicineItem = styled.View`
 `;
 
 const MedicineText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   padding: 20px;
   width: 80%;
@@ -269,7 +272,7 @@ const MedicineText = styled.Text`
 
 const MedicineCount = styled.Text`
   position: absolute;
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   right: 45px;
   text-decoration-line: ${({isChecked}) =>

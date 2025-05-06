@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components/native';
 import { ScrollView, Text, LayoutAnimation } from 'react-native';
 import { themes } from '../styles';
+import FontSizes from '../../assets/fonts/fontSizes';
 
 const size = {
   small: {
@@ -59,8 +60,7 @@ const TagText = styled.Text`
     props.colorType
       ? color[props.colorType].color
       : props.color || themes.light.textColor.buttonText};
-  font-size: ${props =>
-    props.sizeType === 'small' ? size.small.fontSize : size.large.fontSize};
+  font-size: ${props => FontSizes.caption[props.fontSizeMode]};
   font-family: ${props =>
     props.sizeType === 'small' ? size.small.fontFamily : size.large.fontFamily};
 `;
@@ -75,6 +75,7 @@ const Tag = ({
   overflowMode = 'scroll', // 'ellipsis' or 'scroll'
   maxWidth = '130',
   maxLength = 12, // 최대 글자 수
+  fontSizeMode = 'default',
   ...rest
 }) => {
   const [isOverflow, setIsOverflow] = useState(false);
@@ -122,6 +123,7 @@ const Tag = ({
             color={color}
             numberOfLines={1}
             ellipsizeMode="tail"
+            fontSizeMode={fontSizeMode}
           >
             {children}
           </TagText>
@@ -135,6 +137,7 @@ const Tag = ({
               sizeType={sizeType}
               colorType={colorType}
               color={color}
+              fontSizeMode={fontSizeMode}
             >
               {children}
             </TagText>
@@ -146,6 +149,7 @@ const Tag = ({
           sizeType={sizeType}
           colorType={colorType}
           color={color}
+          fontSizeMode={fontSizeMode}
         >
           {children}
         </TagText>

@@ -191,9 +191,9 @@ const Home = () => {
     navigation.navigate('AddMedicineRoutine'); // 복용 루틴 추가 화면으로 이동
   };
 
-  const handleAddHospitalVisit = () => {
-    navigation.navigate('AddHospitalVisit'); // 병원 진료 추가 화면으로 이동
-  };
+  // const handleAddHospitalVisit = () => {
+  //   navigation.navigate('AddHospitalVisit'); // 병원 진료 추가 화면으로 이동
+  // };
 
   return (
     <View
@@ -290,7 +290,7 @@ const Home = () => {
                 />
               </ButtonContent>
             </AddButton>
-            <AddButton onPress={handleAddHospitalVisit}>
+            {/* <AddButton onPress={handleAddHospitalVisit}>
               <ButtonContent>
                 <ButtonInfo>
                   <RoutineIcons.hospital
@@ -311,7 +311,7 @@ const Home = () => {
                   }}
                 />
               </ButtonContent>
-            </AddButton>
+            </AddButton> */}
           </ButtonContainer>
         </PillReminderContainer>
 
@@ -330,12 +330,12 @@ const Home = () => {
             style={{color: themes.light.textColor.Primary20}}
           />
           <EventText>미복용</EventText>
-          <RoutineIcons.hospital
+          {/* <RoutineIcons.hospital
             width={16}
             height={16}
             style={{color: themes.light.pointColor.Secondary}}
           />
-          <EventText>병원 진료</EventText>
+          <EventText>병원 진료</EventText> */}
         </EventIcons>
 
         <RoutineListContainer>
