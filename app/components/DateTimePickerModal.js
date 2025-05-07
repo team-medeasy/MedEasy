@@ -5,6 +5,7 @@ import { themes } from '../styles';
 import { Button } from '../components';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import FontSizes from '../../assets/fonts/fontSizes';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 
 const DateTimePickerModal = ({
   visible,
@@ -15,6 +16,8 @@ const DateTimePickerModal = ({
   onChange,
   title,
 }) => {
+
+  const { fontSizeMode } = useFontSize();
 
   // 선택 확인 버튼 핸들러
   const handleConfirm = () => {
@@ -30,7 +33,7 @@ const DateTimePickerModal = ({
       <ModalContainer onStartShouldSetResponder={() => true} onResponderRelease={onClose}>
         <ModalContent onStartShouldSetResponder={() => true}>
           <TopBar />
-          <ModalTitle>{title}</ModalTitle>
+          <ModalTitle fontSizeMode={fontSizeMode}>{title}</ModalTitle>
           <View style={{ margin: 30 }}>
             <DateTimePicker
               value={date}
@@ -74,7 +77,7 @@ const TopBar = styled.View`
 
 const ModalTitle = styled.Text`
   font-family: 'KimjungchulGothic-Bold';
-  font-size: ${FontSizes.title.default};
+  font-size: ${({ fontSizeMode }) => FontSizes.title[fontSizeMode]}px;
   color: ${themes.light.textColor.textPrimary};
 `;
 
