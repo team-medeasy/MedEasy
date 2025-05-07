@@ -51,9 +51,11 @@ const MedicationInfo = () => {
     <Container>
       <BGStyle />
       <DaysSinceMedication>
-        <WithMedeasy fontSizeMode={fontSizeMode}>메디지와 함께</WithMedeasy>
-        <InfoText fontSizeMode={fontSizeMode}>약 챙겨먹은지 </InfoText>
-        <InfoNum fontSizeMode={fontSizeMode}>{daysSinceJoin}일째</InfoNum>
+        <TextContainer>
+          <WithMedeasy fontSizeMode={fontSizeMode}>메디지와 함께</WithMedeasy>
+          <InfoText fontSizeMode={fontSizeMode}>약 챙겨먹은지 </InfoText>
+          <InfoNum fontSizeMode={fontSizeMode}>{daysSinceJoin}일째</InfoNum>
+        </TextContainer>
         <IconWrapper>
           <KarteIcon
             width={90}
@@ -63,9 +65,11 @@ const MedicationInfo = () => {
         </IconWrapper>
       </DaysSinceMedication>
       <MedicationCount onPress={handleMedicineList}>
-        <WithMedeasy fontSizeMode={fontSizeMode}>메디지와 함께</WithMedeasy>
-        <InfoText fontSizeMode={fontSizeMode}>복용중인 약 </InfoText>
-        <InfoNum fontSizeMode={fontSizeMode}>{medicineCount}개</InfoNum>
+        <TextContainer>
+          <WithMedeasy fontSizeMode={fontSizeMode}>메디지와 함께</WithMedeasy>
+          <InfoText fontSizeMode={fontSizeMode}>복용중인 약 </InfoText>
+          <InfoNum fontSizeMode={fontSizeMode}>{medicineCount}개</InfoNum>
+        </TextContainer>
         <IconWrapper>
           <LogoIcon style={{ color: themes.light.boxColor.tagDetailPrimary }} />
         </IconWrapper>
@@ -109,6 +113,11 @@ const MedicationCount = styled.TouchableOpacity`
   aspect-ratio: 1;
   border-radius: 10px;
   overflow: hidden;
+`;
+
+const TextContainer = styled.View`
+  position: relative;
+  z-index: 1;
 `;
 
 const IconWrapper = styled.View`
