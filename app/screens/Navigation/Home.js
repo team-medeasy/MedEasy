@@ -493,7 +493,7 @@ const EventIcons = styled.View`
 `;
 
 const EventText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary50};
   padding-right: 10px;
