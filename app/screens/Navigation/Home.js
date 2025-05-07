@@ -1,7 +1,8 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {View, TouchableOpacity} from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
 import {themes} from './../../styles';
 import {
@@ -27,6 +28,7 @@ const Home = () => {
   const navigation = useNavigation();
   const {signUpData} = useSignUp();
   const {fontSizeMode} = useFontSize();
+  const isFocused = useIsFocused(); // 화면 포커스 상태 확인
 
   const [medicineRoutines, setMedicineRoutines] = useState([]);
   const [todayRoutine, setTodayRoutine] = useState(null);
@@ -35,6 +37,7 @@ const Home = () => {
 
   const [userName, setUserName] = useState('');
   const [isUnreadNotification, setIsUnreadNotification] = useState(false);
+  const [lastCheckTime, setLastCheckTime] = useState(0); // 마지막 알림 확인 시간 추적
   
   useFocusEffect(
     useCallback(() => {
@@ -64,6 +67,33 @@ const Home = () => {
     year: today.year(),
     fullDate: today,
   });
+
+  // 안읽은 알림 상태 확인 함수
+  const fetchUnreadNotification = async () => {
+    try {
+      const response = await getUnreadNotification();
+      console.log('안읽은 알림 여부 응답:', response.data.body);
+      setIsUnreadNotification(response.data.body.is_unread);
+      setLastCheckTime(Date.now()); // 마지막 확인 시간 업데이트
+    } catch (error) {
+      console.error('안읽은 알림 확인 실패:', error);
+      setIsUnreadNotification(false);
+    }
+  };
+
+  // 화면이 포커스될 때마다 알림 상태 확인
+  useEffect(() => {
+    if (isFocused) {
+      console.log('홈 화면 포커스 감지: 안읽은 알림 상태 확인');
+      fetchUnreadNotification();
+    }
+  }, [isFocused]);
+
+  // 포커스 효과 외에도 컴포넌트가 마운트될 때 추가 호출
+  useEffect(() => {
+    console.log('홈 컴포넌트 마운트: 초기 알림 상태 확인');
+    fetchUnreadNotification();
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -188,7 +218,13 @@ const Home = () => {
   };
 
   const handleNotificationPress = () => {
-    navigation.navigate('Notification');
+    navigation.navigate('Notification', {
+      onGoBack: () => {
+        // 알림 화면에서 돌아올 때 실행될 콜백
+        console.log('알림 화면에서 돌아옴 - 즉시 알림 상태 확인');
+        fetchUnreadNotification();
+      }
+    });
   };
 
   const handleAddMedicineRoutine = () => {
@@ -198,24 +234,6 @@ const Home = () => {
   // const handleAddHospitalVisit = () => {
   //   navigation.navigate('AddHospitalVisit'); // 병원 진료 추가 화면으로 이동
   // };
-
-  useFocusEffect(
-    useCallback(() => {
-      const fetchUnreadNotification = async () => {
-        try {
-          const response = await getUnreadNotification();
-          console.log('안읽은 알림 여부 응답:', response.data.body);
-          setIsUnreadNotification(response.data.body.is_unread);
-        } catch (error) {
-          console.error('안읽은 알림 확인 실패:', error);
-          setIsUnreadNotification(false);
-        }
-      };
-
-      fetchUnreadNotification();
-    }, [])
-  );
-
 
   return (
     <View
