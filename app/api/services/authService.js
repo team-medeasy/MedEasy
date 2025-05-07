@@ -1,4 +1,5 @@
 import {login, signUp} from '../auth';
+import {kakaoLogin} from './kakaoAuth';
 import {getUser} from '../user';
 
 import {
@@ -67,6 +68,32 @@ export const handleLogin = async credentials => {
       );
     }
 
+    throw error;
+  }
+};
+
+// 카카오 로그인 처리
+export const handleKakaoLogin = async (navigation) => {
+  try {
+    const result = await kakaoLogin();
+
+    if (result?.accessToken) {
+      console.log('카카오 로그인 성공:', result);
+
+      navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
+      return result;
+    }
+  } catch (error) {
+    console.error('카카오 로그인 실패:', error);
+    
+    // 오류 응답에 따른 처리
+    if (error.response?.status === 404) {
+      // 사용자가 등록되지 않은 경우, 회원가입 화면으로 이동
+      alert('카카오 계정으로 먼저 회원가입이 필요합니다.');
+      navigation.navigate('SignUpName');
+    } else {
+      alert('카카오 로그인에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
+    }
     throw error;
   }
 };
