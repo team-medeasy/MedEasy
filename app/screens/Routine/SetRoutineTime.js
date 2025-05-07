@@ -8,7 +8,7 @@ import {RoutineIcons} from '../../../assets/icons';
 import {useNavigation} from '@react-navigation/native';
 
 import { useSignUp } from '../../api/context/SignUpContext';
-import { getUserSchedule } from '../../api/user';
+import { getUser, getUserSchedule } from '../../api/user';
 import { updateUserSchedule } from '../../api/user';
 
 const {
@@ -35,6 +35,8 @@ const TimeSettingItem = ({icon, title, time, onPress}) => {
 const SetRoutineTime = () => {
   const {signUpData} = useSignUp();
   const navigation = useNavigation();
+
+  const [userName, setUserName] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [currentSettingType, setCurrentSettingType] = useState('');
@@ -77,6 +79,20 @@ const SetRoutineTime = () => {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${hours}:${minutes}:00`;
   };
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const response = await getUser();
+        const userData = response.data.body;
+        setUserName(userData.name || '');
+      } catch (error) {
+        console.error('유저 이름 가져오기 실패:', error);
+      }
+    };
+  
+    fetchUserName();
+  }, []);
 
   // 컴포넌트 마운트 시 사용자 일정 가져오기
   useEffect(() => {
@@ -352,7 +368,7 @@ const SetRoutineTime = () => {
           paddingBottom: 53,
           gap: 7,
         }}>
-        <Title>{signUpData.firstName}님의 하루 일과를 알려주세요.</Title>
+        <Title>{userName}님의 하루 일과를 알려주세요.</Title>
         <Subtitle>메디지가 일정에 맞춰 복약 알림을 보내드릴게요!</Subtitle>
       </View>
 
