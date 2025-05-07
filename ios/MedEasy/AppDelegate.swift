@@ -3,6 +3,9 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import FirebaseCore
+// 카카오 SDK 추가
+import KakaoSDKCommon
+import KakaoSDKAuth
 
 @main
 class AppDelegate: RCTAppDelegate {
@@ -10,6 +13,9 @@ class AppDelegate: RCTAppDelegate {
     self.moduleName = "MedEasy"
     self.dependencyProvider = RCTAppDependencyProvider()
 
+    // 카카오 SDK 초기화 - 앱 시작시 반드시 필요
+    KakaoSDK.initSDK(appKey: "9779801f476eafda8410589c1fb3fc92")
+    
     // Firebase 초기화
     FirebaseApp.configure()
 
@@ -17,9 +23,15 @@ class AppDelegate: RCTAppDelegate {
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
   
-  // URL 스킴 처리를 위한 메서드 추가
+  // URL 스킴 처리 메서드 수정
   override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     print("앱 딥링크 호출됨: \(url.absoluteString)")
+    
+    // 카카오 로그인 URL 처리 추가
+    if AuthApi.isKakaoTalkLoginUrl(url) {
+      return AuthController.handleOpenUrl(url: url)
+    }
+    
     return RCTLinkingManager.application(app, open: url, options: options)
   }
 
