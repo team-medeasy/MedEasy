@@ -257,7 +257,9 @@ const Home = () => {
         <PillReminderContainer>
           <TextContainer>
             <ReminderText fontSizeMode={fontSizeMode}>
-              {userName}님, {'\n'}까먹은 약이 있어요.
+            {todayRoutine
+              ? `${userName}님,\n까먹은 약이 있어요.`
+              : `${userName}님,\n건강한 하루 보내세요!`}
             </ReminderText>
             <LogoIcons.logo
               width={70}
