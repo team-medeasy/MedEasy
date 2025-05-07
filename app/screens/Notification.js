@@ -207,6 +207,11 @@ const Notification = () => {
   return (
     <Container>
       <Header>알림</Header>
+      <RightButtonWrapper>
+        <TouchableOpacity onPress={handleMarkAllAsRead}>
+          <RightButtonText fontSizeMode={fontSizeMode}>전체 읽음</RightButtonText>
+        </TouchableOpacity>
+      </RightButtonWrapper>
       <FlatList
         data={notifications}
         renderItem={renderItem}
@@ -278,6 +283,13 @@ const NotiTime = styled.Text`
   font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   color: ${themes.light.textColor.Primary30};
   font-family: 'Pretendard-SemiBold';
+`;
+
+const RightButtonWrapper = styled.View`
+  position: absolute;
+  right: 20px;
+  top: ${Platform.OS === 'ios' ? '75px' : '20px'};
+  //z-index: 10;
 `;
 
 export default Notification;

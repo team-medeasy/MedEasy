@@ -17,6 +17,7 @@ import {TabIcons, CameraIcons, OtherIcons} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
 import useRoutineUrl from '../hooks/useRoutineUrl'
 import RoutineCheckModal from './RoutineCheckModal';
+import { useFontSize } from '../../assets/fonts/FontSizeContext.js';
 
 // 카메라 버튼
 const CameraButton = ({onPress}) => {
@@ -35,6 +36,7 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const navigation = useNavigation();
+  const { fontSizeMode } = useFontSize();
 
   const handleCameraPress = useCallback(async () => {
     console.log('Camera button pressed');
@@ -61,6 +63,10 @@ const TabNavigator = () => {
           },
           tabBarActiveTintColor: themes.light.pointColor.Primary,
           tabBarInactiveTintColor: themes.light.textColor.Primary20,
+          tabBarLabelStyle: {
+            fontSize: FontSizes.caption[fontSizeMode],
+            fontFamily: 'Pretendard-SemiBold',
+          },
         }}>
         <Tab.Screen
           name="홈"

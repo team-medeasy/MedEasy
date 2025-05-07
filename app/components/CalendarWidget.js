@@ -7,6 +7,7 @@ import FontSizes from '../../assets/fonts/fontSizes';
 import { HeaderIcons, RoutineIcons } from '../../assets/icons';
 import dayjs from 'dayjs';
 import { getRoutineByDate } from '../api/routine';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 
 // 요일을 한글로 설정
 LocaleConfig.locales['ko'] = {
@@ -33,6 +34,7 @@ const CalendarWidget = ({
   medicineRoutines,
   setMedicineRoutines
 }) => {
+  const {fontSizeMode} = useFontSize();
   const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [routineMarkedDates, setRoutineMarkedDates] = useState({});
@@ -170,7 +172,7 @@ const CalendarWidget = ({
   };
 
   // 커스텀 날짜 컴포넌트 
-  const CustomDay = React.memo(({ date, state, marking, onPress }) => {
+  const CustomDay = React.memo(({ date, state, marking, onPress, fontSizeMode }) => {
     const isSelected = selectedDate === date.dateString;
     const hasRoutine = marking?.marked || false;
     const allTaken = marking?.allTaken || false;
@@ -193,7 +195,7 @@ const CalendarWidget = ({
         
         <DayContainer>
           {/* 날짜(day) */}
-          <DayText style={dayTextStyle}>{date.day}</DayText>
+          <DayText style={dayTextStyle} fontSizeMode={fontSizeMode}>{date.day}</DayText>
           
           {/* 루틴이 있는 경우 */}
           {hasRoutine && (
@@ -217,7 +219,9 @@ const CalendarWidget = ({
   return (
     <CalendarContainer>
       <StyledCalendar
+        key={`calendar-${fontSizeMode}`}
         locale="ko"
+        fontSizeMode={fontSizeMode}
         onDayPress={handleDayPress}
         onMonthChange={handleMonthChange}
         current={currentMonth.format('YYYY-MM-DD')}
@@ -228,6 +232,7 @@ const CalendarWidget = ({
             marking={marking} 
             onPress={(date) => handleDayPress(date)}
             selectedDate={selectedDate} // 명시적으로 선택된 날짜 전달
+            fontSizeMode={fontSizeMode}
           />
         )}
         markedDates={{
@@ -276,7 +281,7 @@ const DayContainer = styled.View`
 `;
 
 const DayText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Bold';
 `;
 
@@ -286,41 +291,44 @@ const IconContainer = styled.View`
   align-items: center;
 `;
 
-const StyledCalendar = styled(Calendar).attrs({
-  theme: {
-    backgroundColor: themes.light.bgColor.bgPrimary,
-    calendarBackground: themes.light.bgColor.bgPrimary,
-    textSectionTitleColor: themes.light.textColor.textPrimary,
-    monthTextColor: themes.light.textColor.textPrimary,
-    todayTextColor: themes.light.pointColor.Primary,
-    dayTextColor: themes.light.textColor.textPrimary,
-    textDisabledColor: themes.light.textColor.Primary20,
-    arrowColor: themes.light.textColor.textPrimary,
-    fontFamily: 'Pretendard-ExtraBold',
-    textDayFontSize: 15,
-    textMonthFontSize: 20,
-    textDayHeaderFontSize: 13,
-    textDayFontWeight: '600',
-    textMonthFontWeight: '800',
-    textDayHeaderFontWeight: '800',
-    'stylesheet.calendar.header': {
-      dayTextAtIndex0: {
-        color: themes.light.pointColor.Secondary,
+const StyledCalendar = ({ fontSizeMode, ...props }) => (
+  <Calendar
+    {...props}
+    theme={{
+      backgroundColor: themes.light.bgColor.bgPrimary,
+      calendarBackground: themes.light.bgColor.bgPrimary,
+      textSectionTitleColor: themes.light.textColor.textPrimary,
+      monthTextColor: themes.light.textColor.textPrimary,
+      todayTextColor: themes.light.pointColor.Primary,
+      dayTextColor: themes.light.textColor.textPrimary,
+      textDisabledColor: themes.light.textColor.Primary20,
+      arrowColor: themes.light.textColor.textPrimary,
+      fontFamily: 'Pretendard-ExtraBold',
+      textDayFontSize: FontSizes.body[fontSizeMode],
+      textMonthFontSize: FontSizes.title[fontSizeMode],
+      textDayHeaderFontSize: FontSizes.caption[fontSizeMode],
+      textDayFontWeight: '600',
+      textMonthFontWeight: '800',
+      textDayHeaderFontWeight: '800',
+      'stylesheet.calendar.header': {
+        dayTextAtIndex0: {
+          color: themes.light.pointColor.Secondary,
+        },
       },
-    },
-  },
-  monthFormat: 'yyyy.MM',
-  renderArrow: direction => (
-    <HeaderIcons.chevron
-      style={{
-        transform: [{ rotate: direction === 'left' ? '0deg' : '180deg' }],
-        marginHorizontal: 30,
-        color: themes.light.textColor.textPrimary,
-      }}
-      height={16}
-      width={16}
-    />
-  ),
-})``;
+    }}
+    renderArrow={direction => (
+      <HeaderIcons.chevron
+        style={{
+          transform: [{ rotate: direction === 'left' ? '0deg' : '180deg' }],
+          marginHorizontal: 30,
+          color: themes.light.textColor.textPrimary,
+        }}
+        height={16}
+        width={16}
+      />
+    )}
+  />
+);
+
 
 export default CalendarWidget;
