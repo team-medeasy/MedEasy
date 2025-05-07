@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import styled from 'styled-components/native';
 import {View, TouchableOpacity} from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
@@ -14,17 +14,19 @@ import CalendarWidget from '../../components/CalendarWidget';
 import TodayHeader from '../../components/TodayHeader';
 import HomeRoutine from '../../components/HomeRoutine';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import dayjs from 'dayjs';
 dayjs.locale('ko');
 
 import {useSignUp} from '../../api/context/SignUpContext';
 import {getRoutineByDate} from '../../api/routine';
-import { getUser } from '../../api/user';
-import { getUnreadNotification } from '../../api/notification';
+import {getUser} from '../../api/user';
+import {getUnreadNotification} from '../../api/notification';
 
 const Home = () => {
   const navigation = useNavigation();
   const {signUpData} = useSignUp();
+  const {fontSizeMode} = useFontSize();
 
   const [medicineRoutines, setMedicineRoutines] = useState([]);
   const [todayRoutine, setTodayRoutine] = useState(null);
@@ -254,7 +256,7 @@ const Home = () => {
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
-            <ReminderText>
+            <ReminderText fontSizeMode={fontSizeMode}>
               {userName}님, {'\n'}까먹은 약이 있어요.
             </ReminderText>
             <LogoIcons.logo
@@ -286,7 +288,7 @@ const Home = () => {
                   height={115}
                   style={{color: themes.light.pointColor.primary30}}
                 />
-                <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
+                <RoutineButtonText fontSizeMode={fontSizeMode}>루틴을 추가해주세요.</RoutineButtonText>
               </RoutineButton>
             </View>
           )}
@@ -302,7 +304,7 @@ const Home = () => {
                       marginRight: 10,
                     }}
                   />
-                  <ButtonText>복용 루틴 추가하기</ButtonText>
+                  <ButtonText fontSizeMode={fontSizeMode}>복용 루틴 추가하기</ButtonText>
                 </ButtonInfo>
                 <HeaderIcons.chevron
                   height={16}
@@ -346,13 +348,13 @@ const Home = () => {
             height={16}
             style={{color: themes.light.pointColor.Primary}}
           />
-          <EventText>복용 완료</EventText>
+          <EventText fontSizeMode={fontSizeMode}>복용 완료</EventText>
           <RoutineIcons.medicine
             width={16}
             height={16}
             style={{color: themes.light.textColor.Primary20}}
           />
-          <EventText>미복용</EventText>
+          <EventText fontSizeMode={fontSizeMode}>미복용</EventText>
           {/* <RoutineIcons.hospital
             width={16}
             height={16}
@@ -380,8 +382,8 @@ const Home = () => {
                   style={{color: themes.light.pointColor.Primary}}
                 />
                 <ListText>
-                  <RoutineTitle>{routine.medicineTitle}</RoutineTitle>
-                  <RoutineTime>
+                  <RoutineTitle fontSizeMode={fontSizeMode}>{routine.medicineTitle}</RoutineTitle>
+                  <RoutineTime fontSizeMode={fontSizeMode}>
                     {routine.timeName} • {routine.takeTime}
                   </RoutineTime>
                 </ListText>
@@ -431,7 +433,7 @@ const TextContainer = styled.View`
 `;
 
 const ReminderText = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   margin-left: 10px;
 `;
@@ -446,7 +448,7 @@ const RoutineButton = styled(TouchableOpacity)`
 `;
 
 const RoutineButtonText = styled.Text`
-  font-size: ${FontSizes.body.medium};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.pointColor.Primary};
   margin-top: 10px;
@@ -477,8 +479,8 @@ const ButtonInfo = styled.View`
 `;
 
 const ButtonText = styled.Text`
-  font-size: ${FontSizes.body.medium};
-  font-family: 'Pretendard-SemiBold';
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
@@ -491,7 +493,8 @@ const EventIcons = styled.View`
 `;
 
 const EventText = styled.Text`
-  font-size: ${FontSizes.caption.medium};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary50};
   padding-right: 10px;
 `;
@@ -529,14 +532,14 @@ const ListText = styled.View`
 `;
 
 const RoutineTitle = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Medium';
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const RoutineTime = styled.Text`
-  font-size: ${FontSizes.caption.default};
-  font-family: 'Pretendard-Medium';
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary50};
 `;
 

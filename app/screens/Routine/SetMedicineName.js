@@ -5,9 +5,11 @@ import {ProgressBar, InputWithDelete} from '../../components';
 import {themes} from './../../styles';
 import {ModalHeader, Button} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const SetMedicineName = ({route, navigation}) => {
   const {item} = route.params;
+  const {fontSizeMode} = useFontSize();
   const [medicine, setMedicine] = useState(null);
   const [medicineName, setMedicineName] = useState('');
 
@@ -66,8 +68,12 @@ const SetMedicineName = ({route, navigation}) => {
       <ScrollView>
         <View>
           <TextContainer>
-            <LargeText>약 이름을 바꿀 수 있어요</LargeText>
-            <SmallText>메디지가 기억하기 쉬운 이름으로 불러드릴게요!</SmallText>
+            <LargeText fontSizeMode={fontSizeMode}>
+              약 이름을 바꿀 수 있어요
+            </LargeText>
+            <SmallText fontSizeMode={fontSizeMode}>
+              메디지가 기억하기 쉬운 이름으로 불러드릴게요!
+            </SmallText>
           </TextContainer>
           {/* 별명 */}
           <Section>
@@ -108,12 +114,12 @@ const TextContainer = styled.View`
 `;
 
 const LargeText = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: ${'KimjungchulGothic-Bold'};
   color: ${themes.light.textColor.textPrimary};
 `;
 const SmallText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: ${'Pretendard-Midium'};
   color: ${themes.light.textColor.Primary50};
 `;

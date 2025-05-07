@@ -4,10 +4,12 @@ import {ScrollView} from 'react-native-gesture-handler';
 import styled from 'styled-components/native';
 import {themes} from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
 import {RoutineIcons} from '../../assets/icons';
 import dayjs from 'dayjs';
 
 const HomeRoutine = ({schedules}) => {
+  const {fontSizeMode} = useFontSize();
   const [routineSchedules, setRoutineSchedules] = useState([]);
 
   useEffect(() => {
@@ -27,15 +29,16 @@ const HomeRoutine = ({schedules}) => {
             height={15}
             style={{color: themes.light.pointColor.Primary}}
           />
-          <TimeTitle>{item.name}</TimeTitle>
+          <TimeTitle fontSizeMode={fontSizeMode}>{item.name}</TimeTitle>
         </TitleContainer>
-        <TimeText>
+        <TimeText fontSizeMode={fontSizeMode}>
           {dayjs(`2024-01-01T${item.take_time}`)
             .format('A h:mm')
             .replace('AM', '오전')
             .replace('PM', '오후')}
         </TimeText>
       </MedicineHeader>
+
       <ScrollView
         style={{marginTop: 10}}
         contentContainerStyle={{gap: 10}}
@@ -44,7 +47,7 @@ const HomeRoutine = ({schedules}) => {
         {item.routine_dtos.map(medicine => (
           <MedicineItem key={medicine.routine_id}>
             {medicine.is_taken ? <FilledCircle /> : <EmptyCircle />}
-            <MedicineText>
+            <MedicineText fontSizeMode={fontSizeMode}>
               {medicine.nickname} {medicine.dose}정
             </MedicineText>
           </MedicineItem>
@@ -106,18 +109,13 @@ const TitleContainer = styled.View`
 const TimeTitle = styled.Text`
   color: ${themes.light.textColor.buttonText};
   font-family: 'KimjungchulGothic-Bold';
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
 `;
 
 const TimeText = styled.Text`
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-Regular';
-  font-size: ${FontSizes.body.default};
-`;
-
-const MedicineList = styled.View`
-  margin-top: 10px;
-  gap: 10px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
 `;
 
 const MedicineItem = styled.View`
@@ -129,7 +127,7 @@ const MedicineItem = styled.View`
 const MedicineText = styled.Text`
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   width: 90%;
 `;
 
