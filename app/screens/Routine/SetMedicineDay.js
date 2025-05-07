@@ -4,10 +4,12 @@ import { View, ScrollView, Platform } from 'react-native';
 import { themes } from './../../styles';
 import { ModalHeader, Button, ProgressBar, InputWithDelete, DualTextButton } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const SetMedicineDay = ({ route, navigation }) => {
   const { medicine_id, nickname } = route.params;
   const progress = '33.33%';
+  const {fontSizeMode} = useFontSize();
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [intervalDays, setIntervalDays] = useState('');
@@ -42,8 +44,12 @@ const SetMedicineDay = ({ route, navigation }) => {
       <ScrollView>
         <View>
           <TextContainer>
-            <LargeText>며칠 주기로 복용하는 약인가요?</LargeText>
-            <SmallText>일정에 맞춰 복약 알림을 보내드릴게요!</SmallText>
+            <LargeText fontSizeMode={fontSizeMode}>
+              며칠 주기로 복용하는 약인가요?
+            </LargeText>
+            <SmallText fontSizeMode={fontSizeMode}>
+              일정에 맞춰 복약 알림을 보내드릴게요!
+            </SmallText>
           </TextContainer>
           <SelectDay>
             <DualTextButton
@@ -118,13 +124,13 @@ const TextContainer = styled.View`
 `;
 
 const LargeText = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const SmallText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Midium';
   color: ${themes.light.textColor.Primary50};
 `;

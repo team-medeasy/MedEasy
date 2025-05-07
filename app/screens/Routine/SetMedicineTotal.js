@@ -9,14 +9,17 @@ import {
     InputWithDelete
 } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+
 import { createRoutine } from '../../api/routine';
 
 const SetMedicineTotal = ({route, navigation}) => {
     const { medicine_id, nickname, routine_start_date, interval_days, user_schedule_ids, dose } = route.params;
     console.log("dose:", dose);
+    const progress = '100%';
+    const {fontSizeMode} = useFontSize();
     
     const [total, setTotal] = useState('');
-    const progress = '100%';
 
     const handleSaveRoutine = () => {
         // 전송할 데이터 구성
@@ -54,8 +57,12 @@ const SetMedicineTotal = ({route, navigation}) => {
             <ScrollView>
                 <View>
                     <TextContainer>
-                        <LargeText>약의 총 개수를 알려주세요</LargeText>
-                        <SmallText>메디지가 복용해야 할 약의 개수도 기억해 드릴게요</SmallText>
+                        <LargeText fontSizeMode={fontSizeMode}>
+                            약의 총 개수를 알려주세요
+                        </LargeText>
+                        <SmallText fontSizeMode={fontSizeMode}>
+                            메디지가 복용해야 할 약의 개수도 기억해 드릴게요
+                        </SmallText>
                     </TextContainer>
                     {/* 총 복용량 입력 */}
                     <Section>
@@ -108,12 +115,12 @@ const TextContainer = styled.View`
 `;
 
 const LargeText = styled.Text`
-    font-size: ${FontSizes.title.default};
+    font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
     font-family: ${'KimjungchulGothic-Bold'};
     color: ${themes.light.textColor.textPrimary};
 `;
 const SmallText = styled.Text`
-    font-size: ${FontSizes.body.default};
+    font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
     font-family: ${'Pretendard-Midium'};
     color: ${themes.light.textColor.Primary50};
 `;
