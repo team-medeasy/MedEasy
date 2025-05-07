@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import FontSizes from '../../assets/fonts/fontSizes';
-import {themes} from '../styles';
-import {RoutineIcons} from '../../assets/icons';
+import { themes } from '../styles';
+import { RoutineIcons } from '../../assets/icons';
 import { useFontSize } from '../../assets/fonts/FontSizeContext';
 
 const RoutineCard = ({
@@ -12,7 +12,6 @@ const RoutineCard = ({
   allLength,
   checkedItems,
   toggleTimeCheck,
-  //toggleHospitalCheck,
   toggleCheck,
   isInModal = false,
   selectedDateString,
@@ -35,9 +34,10 @@ const RoutineCard = ({
             isFirst={index === 0}
             isLast={index === allLength - 1}
           />
-          <TimelineLine />
+          {allLength > 1 && index !== allLength - 1 && <TimelineLine />}
         </>
       )}
+
 
       <RoutineContainer isInModal={isInModal} backgroundColor={backgroundColor}>
         {routine.type === 'medicine' ? (
@@ -46,7 +46,7 @@ const RoutineCard = ({
               <RoutineIcons.medicine
                 width={22}
                 height={22}
-                style={{color: themes.light.pointColor.Primary}}
+                style={{ color: themes.light.pointColor.Primary }}
               />
             </IconContainer>
             <TextContainer>
@@ -58,53 +58,23 @@ const RoutineCard = ({
                 medicine =>
                   checkedItems[
                     `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
-                  ],
+                  ]
               ) ? (
                 <RoutineIcons.checkOn
                   width={26}
                   height={26}
-                  style={{color: themes.light.pointColor.Primary}}
+                  style={{ color: themes.light.pointColor.Primary }}
                 />
               ) : (
                 <RoutineIcons.checkOff
                   width={26}
                   height={26}
-                  style={{color: themes.light.boxColor.inputSecondary}}
+                  style={{ color: themes.light.boxColor.inputSecondary }}
                 />
               )}
             </CheckBox>
           </TimeContainer>
-        ) : (
-          <HospitalTimeContainer>
-            <IconContainer>
-              <RoutineIcons.hospital
-                width={22}
-                height={22}
-                style={{color: themes.light.pointColor.Secondary}}
-              />
-            </IconContainer>
-            <TextContainer>
-              <TypeText>{routine.label}</TypeText>
-              <TimeText>{routine.time}</TimeText>
-            </TextContainer>
-            <CheckBox
-              onPress={() => toggleHospitalCheck(routine.hospital.hospital_id)}>
-              {checkedItems[`hospital-${routine.hospital.hospital_id}`] ? (
-                <RoutineIcons.checkOn
-                  width={26}
-                  height={26}
-                  style={{color: themes.light.pointColor.Primary}}
-                />
-              ) : (
-                <RoutineIcons.checkOff
-                  width={26}
-                  height={26}
-                  style={{color: themes.light.boxColor.inputSecondary}}
-                />
-              )}
-            </CheckBox>
-          </HospitalTimeContainer>
-        )}
+        ) : null}
 
         {routine.type === 'medicine' && (
           <Routines>
@@ -122,7 +92,8 @@ const RoutineCard = ({
                       navigation.navigate('SetMedicineRoutine', {
                         medicineId: medicine.medicine_id,
                       })
-                    }>
+                    }
+                  >
                     {medicine.nickname}
                   </MedicineText>
                   <MedicineCount
@@ -131,26 +102,30 @@ const RoutineCard = ({
                       checkedItems[
                         `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                       ]
-                    }>
+                    }
+                  >
                     {`${medicine.dose}개`}
                   </MedicineCount>
                   <CheckBox
                     onPress={() =>
                       toggleCheck(medicine.medicine_id, routine.timeKey)
-                    }>
+                    }
+                  >
                     {checkedItems[
                       `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                     ] ? (
                       <RoutineIcons.checkOn
                         width={26}
                         height={26}
-                        style={{color: themes.light.pointColor.Primary}}
+                        style={{ color: themes.light.pointColor.Primary }}
                       />
                     ) : (
                       <RoutineIcons.checkOff
                         width={26}
                         height={26}
-                        style={{color: themes.light.boxColor.inputSecondary}}
+                        style={{
+                          color: themes.light.boxColor.inputSecondary,
+                        }}
                       />
                     )}
                   </CheckBox>
@@ -193,8 +168,17 @@ const TimelinePoint = styled.View`
   z-index: 2;
 `;
 
+const TimelineLine = styled.View`
+  position: absolute;
+  left: -9px;
+  top: 20px;
+  bottom: -50px;
+  width: 6px;
+  background-color: ${themes.light.pointColor.Primary};
+`;
+
 const RoutineContainer = styled.View`
-  background-color: ${({isInModal, backgroundColor}) =>
+  background-color: ${({ isInModal, backgroundColor }) =>
     backgroundColor
       ? backgroundColor
       : isInModal
@@ -202,7 +186,7 @@ const RoutineContainer = styled.View`
       : themes.light.bgColor.bgPrimary};
   padding: 0 20px;
   border-radius: 10px;
-  ${({isInModal}) =>
+  ${({ isInModal }) =>
     isInModal
       ? `
     margin-left: 0;
@@ -223,12 +207,6 @@ const TimeContainer = styled.View`
   align-items: center;
 `;
 
-const HospitalTimeContainer = styled.View`
-  flex-direction: row;
-  padding: 20px 0px;
-  align-items: center;
-`;
-
 const IconContainer = styled.View`
   padding-right: 15px;
 `;
@@ -238,12 +216,12 @@ const TextContainer = styled.View`
 `;
 
 const TypeText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-ExtraBold';
 `;
 
 const TimeText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -259,14 +237,14 @@ const MedicineItem = styled.View`
 `;
 
 const MedicineText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   padding: 20px;
   width: 80%;
   overflow: hidden;
-  text-decoration-line: ${({isChecked}) =>
+  text-decoration-line: ${({ isChecked }) =>
     isChecked ? 'line-through' : 'none'};
-  color: ${({isChecked}) =>
+  color: ${({ isChecked }) =>
     isChecked
       ? themes.light.textColor.Primary50
       : themes.light.textColor.textPrimary};
@@ -274,12 +252,12 @@ const MedicineText = styled.Text`
 
 const MedicineCount = styled.Text`
   position: absolute;
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   right: 45px;
-  text-decoration-line: ${({isChecked}) =>
+  text-decoration-line: ${({ isChecked }) =>
     isChecked ? 'line-through' : 'none'};
-  color: ${({isChecked}) =>
+  color: ${({ isChecked }) =>
     isChecked
       ? themes.light.textColor.Primary50
       : themes.light.textColor.textPrimary};
@@ -288,13 +266,4 @@ const MedicineCount = styled.Text`
 const CheckBox = styled.TouchableOpacity`
   position: absolute;
   right: 0;
-`;
-
-const TimelineLine = styled.View`
-  position: absolute;
-  left: -9px;
-  top: 30px;
-  bottom: 30px;
-  width: 6px;
-  background-color: ${themes.light.pointColor.Primary};
 `;

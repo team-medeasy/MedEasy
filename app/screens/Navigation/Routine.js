@@ -41,19 +41,9 @@ const Routine = ({route}) => {
     if (lowerName.includes('아침')) return 'MORNING';
     if (lowerName.includes('점심')) return 'LUNCH';
     if (lowerName.includes('저녁')) return 'DINNER';
-    if (lowerName.includes('취침') || lowerName.includes('자기 전'))
-      return 'BEDTIME';
+    if (lowerName.includes('자기 전')) return 'BEDTIME';
 
     return null;
-  };
-
-  const getTimeTypeFromTime = timeString => {
-    const hour = parseInt(timeString.split(':')[0], 10);
-
-    if (hour >= 5 && hour < 10) return 'MORNING';
-    if (hour >= 10 && hour < 14) return 'LUNCH';
-    if (hour >= 14 && hour < 20) return 'DINNER';
-    return 'BEDTIME';
   };
 
   useFocusEffect(
@@ -327,8 +317,7 @@ const Routine = ({route}) => {
 
       day.user_schedule_dtos.forEach(schedule => {
         const timeType =
-          getTimeTypeFromScheduleName(schedule.name) ||
-          getTimeTypeFromTime(schedule.take_time);
+          getTimeTypeFromScheduleName(schedule.name);
 
         if (!routineMap[dateKey][timeType]) {
           routineMap[dateKey][timeType] = {};
@@ -366,8 +355,7 @@ const Routine = ({route}) => {
       dayData.user_schedule_dtos.forEach(schedule => {
         // 스케줄 이름으로 시간대 결정, 없으면 시간으로 판단
         const timeType =
-          getTimeTypeFromScheduleName(schedule.name) ||
-          getTimeTypeFromTime(schedule.take_time);
+          getTimeTypeFromScheduleName(schedule.name);
 
         // 해당 스케줄의 약물 정보 처리
         if (schedule.routine_dtos && schedule.routine_dtos.length > 0) {
