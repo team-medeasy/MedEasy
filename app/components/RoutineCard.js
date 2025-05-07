@@ -4,6 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 import FontSizes from '../../assets/fonts/fontSizes';
 import {themes} from '../styles';
 import {RoutineIcons} from '../../assets/icons';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 
 const RoutineCard = ({
   routine,
@@ -16,9 +17,9 @@ const RoutineCard = ({
   isInModal = false,
   selectedDateString,
   backgroundColor,
-  fontSizeMode = 'default',
 }) => {
   const navigation = useNavigation();
+  const { fontSizeMode } = useFontSize();
 
   return (
     <RoutineBoxContainer isInModal={isInModal}>
