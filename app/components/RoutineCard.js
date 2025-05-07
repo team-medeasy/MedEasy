@@ -35,6 +35,7 @@ const RoutineCard = ({
             isFirst={index === 0}
             isLast={index === allLength - 1}
           />
+          <TimelineLine />
         </>
       )}
 
@@ -287,4 +288,13 @@ const MedicineCount = styled.Text`
 const CheckBox = styled.TouchableOpacity`
   position: absolute;
   right: 0;
+`;
+
+const TimelineLine = styled.View`
+  position: absolute;
+  left: -9px;
+  top: 30px;
+  bottom: 30px;
+  width: 6px;
+  background-color: ${themes.light.pointColor.Primary};
 `;

@@ -14,7 +14,7 @@ import {RoutineIcons, Images} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
 import {useFontSize} from '../../assets/fonts/FontSizeContext';
 import {getNotificationList, markNotificationAsRead, markAllNotificationsAsRead} from '../api/notification';
-import EmptyState from '../components/\bEmptyState';
+import EmptyState from '../components/EmptyState';
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 // 날짜 형식 변환 함수
