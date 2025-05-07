@@ -16,7 +16,7 @@ import RoutineCheckModal from './components/RoutineCheckModal';
 import useFCMTokenRefresh from './hooks/useFCMTokenRefresh';
 
 // FCM 토큰 저장 함수
-import {setFCMToken} from './api/storage';
+import {getAccessToken, setFCMToken} from './api/storage';
 
 import Splash from './screens/Splash';
 import SignUpStartScreen from './screens/SignUp/SignUpStart';
@@ -50,6 +50,8 @@ import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
 
 import {navigationRef} from './screens/Navigation/NavigationRef';
 import RoutineUrlService from './services/RoutineUrlService';
+import { setAuthToken } from './api';
+
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -242,12 +244,35 @@ const initializeUrlSchemeHandlers = () => {
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [permissionInitialized, setPermissionInitialized] = useState(false);
+  const [initialScreen, setInitialScreen] = useState('Auth');
 
   // FCM 토큰 갱신 훅 - 개선된 버전 사용
   const { refreshToken } = useFCMTokenRefresh();
   
   // URL 스킴 처리를 위한 커스텀 훅 사용 
   const { routineData, isModalVisible, closeModal } = useRoutineUrl();
+
+  useEffect(() => {
+    const checkAutoLogin = async () => {
+      try {
+        const token = await getAccessToken();
+        if (token) {
+          console.log('[AutoLogin] 토큰 있음, NavigationBar로 이동');
+          setAuthToken(token); // axios 헤더 설정
+          setInitialScreen('NavigationBar');
+        } else {
+          console.log('[AutoLogin] 토큰 없음, Auth로 이동');
+          setInitialScreen('Auth');
+        }
+      } catch (err) {
+        console.error('자동 로그인 체크 실패:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAutoLogin();
+  }, []);
 
   // URL 스킴 초기화 처리 - 앱 시작 시 한 번만 실행
   useEffect(() => {
@@ -376,7 +401,9 @@ const App = () => {
             <Splash />
           ) : (
             <>
-              <RootStack.Navigator screenOptions={{headerShown: false}}>
+              <RootStack.Navigator 
+              initialRouteName={initialScreen}
+              screenOptions={{headerShown: false}}>
                 {/* 👥 회원가입 네비게이터 */}
                 <RootStack.Screen name="Auth" component={AuthNavigator} />
                 
