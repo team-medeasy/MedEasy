@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {Images} from '../../../assets/icons';
-import EmptyState from '../\bEmptyState';
+import EmptyState from '../EmptyState';
 import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
 const NoSearchResults = () => {

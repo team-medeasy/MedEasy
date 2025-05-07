@@ -16,7 +16,7 @@ import {
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
 import RoutineCard from '../../components/RoutineCard';
-import EmptyState from '../../components/\bEmptyState';
+import EmptyState from '../../components/EmptyState';
 import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
 const {width} = Dimensions.get('window');
@@ -596,7 +596,7 @@ const Routine = ({route}) => {
             {/* 타임라인 컨테이너 추가 */}
             <TimelineContainer>
               {/* 타임라인 세로줄 */}
-              <TimelineLine />
+              {/* <TimelineLine /> */}
 
               {/* 모든 루틴을 시간순으로 렌더링 */}
 
