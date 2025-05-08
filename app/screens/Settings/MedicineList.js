@@ -55,63 +55,71 @@ const MedicineList = () => {
         }
     };
 
-    const renderTabContent = () => {
-        const data = activeTab === 'current' ? currentMedicines : previousMedicines;
+    const groupMedicines = (medicines) => {
+        const grouped = {};
+      
+        medicines.forEach((item) => {
+          const key = item.medicine_id;
+          if (!grouped[key]) {
+            grouped[key] = {
+              ...item, // 대표 약 정보
+              routines: [],
+            };
+          }
+      
+          grouped[key].routines.push({
+            routine_start_date: item.routine_start_date,
+            routine_end_date: item.routine_end_date,
+            schedule_size: item.schedule_size,
+            dose: item.dose,
+            interval_days: item.interval_days,
+          });
+        });
+      
+        return Object.values(grouped);
+      };
+      
+      const renderTabContent = () => {
+        const rawData = activeTab === 'current' ? currentMedicines : previousMedicines;
+        const data = groupMedicines(rawData);
+      
         const emptyMessage = activeTab === 'current' 
-            ? '현재 복용 중인 약이 없습니다.' 
-            : '이전에 복용한 약이 없습니다.';
-
+          ? '현재 복용 중인 약이 없습니다.' 
+          : '이전에 복용한 약이 없습니다.';
+      
         if (loading) {
-            return (
-                <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20}}>
-                <ActivityIndicator
-                  size="medium"
-                  color={themes.light.pointColor.Primary}
-                />
-                <Text style={{
-                  marginTop: 10,
-                  fontSize: FontSizes.caption[fontSizeMode],
-                  color: themes.light.textColor.Primary50,
-                  fontFamily: 'Pretendard-Medium'
-                }}>검색 중...</Text>
-              </View>
-            );
+          return <ActivityIndicator fontSizeMode={fontSizeMode} />;
         }
-            
+      
         return (
-            <FlatList
-                data={data}
-                keyExtractor={(item, index) => 
-                    item.medicine_id?.toString() || `medicine-${index}`
-                }                  
-                renderItem={({ item }) => (
-                    <MedicineListItem 
-                        item={item} 
-                        routineInfo={item} 
-                        onPress={() => navigation.navigate('MedicineDetail', { 
-                            medicineId: item.medicine_id,
-                            title: item.medicine_name,
-                            basicInfo: {
-                                item_name: item.medicine_name,
-                                entp_name: item.entp_name,
-                                class_name: item.class_name,
-                                etc_otc_name: item.etc_otc_name,
-                                item_image: item.medicine_image
-                            }
-                        })}
-                    />
-                )}
-                showsVerticalScrollIndicator={false}
-                ListEmptyComponent={
-                    <NoResultContainer>
-                        <NoResultText fontSizeMode={fontSizeMode}>{emptyMessage}</NoResultText>
-                    </NoResultContainer>
-                }
-            />
+          <FlatList
+            data={data}
+            keyExtractor={(item, index) => `${item.medicine_id}-${index}`}
+            renderItem={({ item }) => (
+              <MedicineListItem 
+                item={item}
+                onPress={() => navigation.navigate('MedicineDetail', {
+                  medicineId: item.medicine_id,
+                  title: item.medicine_name,
+                  basicInfo: {
+                    item_name: item.medicine_name,
+                    entp_name: item.entp_name,
+                    class_name: item.class_name,
+                    etc_otc_name: item.etc_otc_name,
+                    item_image: item.medicine_image
+                  }
+                })}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <NoResultContainer>
+                <NoResultText fontSizeMode={fontSizeMode}>{emptyMessage}</NoResultText>
+              </NoResultContainer>
+            }
+          />
         );
-    };
-
-
+      };
 
     return (
         <Container>
