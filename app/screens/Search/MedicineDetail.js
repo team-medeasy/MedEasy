@@ -1,3 +1,4 @@
+// MedicineDetailScreen.js
 import React, {useState, useEffect, useRef} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -20,6 +21,7 @@ import {
   Button,
   SimilarMedicineItem,
 } from './../../components';
+import MedicineWarning from '../../components/MedicineInfo/MedicineWarning';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {OtherIcons} from '../../../assets/icons';
@@ -52,6 +54,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
           class_name: item.class_name,
           etc_otc_name: item.etc_otc_name,
           item_image: item.item_image,
+          item_seq: item.item_seq, // 금기정보 조회에 필요
         };
 
         // 기본 정보로 먼저 상태 업데이트
@@ -109,6 +112,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
             class_name: medicineData.class_name,
             etc_otc_name: medicineData.etc_otc_name,
             item_image: medicineData.item_image,
+            item_seq: medicineData.item_seq, // 금기정보 조회에 필요
             // 추가 정보
             chart: medicineData.chart,
             drug_shape: medicineData.drug_shape,
@@ -304,6 +308,9 @@ const MedicineDetailScreen = ({route, navigation}) => {
           <MedicineAppearanceContainer>
             <MedicineAppearance item={medicine} size="large" />
           </MedicineAppearanceContainer>
+
+          {/* 약품 금기 정보 컴포넌트 추가 */}
+          <MedicineWarning item={medicine} />
 
           <MedicineUsageContainer>
             <View
