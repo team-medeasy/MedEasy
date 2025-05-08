@@ -542,7 +542,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
       <ModalHeader
         showDelete="true"
         DeleteColor={themes.light.pointColor.Secondary}
-        onDeletePress={() => handleModifyRoutine()}
+        onDeletePress={() => handleDeleteRoutineGroup()}
       >
         {isEditing && !isPrescriptionMode ? '루틴 수정' : '루틴 등록'}
       </ModalHeader>

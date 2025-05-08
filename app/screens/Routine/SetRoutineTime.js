@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import {View, TouchableOpacity, Alert} from 'react-native';
+import {View, TouchableOpacity, Alert, ScrollView} from 'react-native';
 import {themes} from './../../styles';
 import {ModalHeader, Button, DateTimePickerModal} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -363,61 +363,66 @@ const SetRoutineTime = () => {
         루틴 설정
       </ModalHeader>
 
-      <View
-        style={{
-          paddingTop: 39,
-          paddingLeft: 30,
-          paddingBottom: 30,
-          gap: 7,
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: 120, // 버튼 안 가리게 여유 공간 확보
         }}>
-        <Title fontSizeMode={fontSizeMode}>
-          {userName}님의 하루 일과를 알려주세요.
-        </Title>
-        <Subtitle fontSizeMode={fontSizeMode}>
-          메디지가 일정에 맞춰 복약 알림을 보내드릴게요!
-        </Subtitle>
-      </View>
+        <View
+          style={{
+            paddingTop: 39,
+            paddingLeft: 30,
+            paddingRight: 30,
+            paddingBottom: 30,
+            gap: 7,
+          }}>
+          <Title fontSizeMode={fontSizeMode}>
+            {userName}님의 하루 일과를 알려주세요.
+          </Title>
+          <Subtitle fontSizeMode={fontSizeMode}>
+            메디지가 일정에 맞춰 복약 알림을 보내드릴게요!
+          </Subtitle>
+        </View>
 
-      <View style={{paddingHorizontal: 20, gap: 20}}>
-        <TimeSettingItem
-          icon={<CupIcon width={20} height={20} style={{color: '#A0CC88'}} />}
-          title={scheduleData.morning.name}
-          time={breakfastTime}
-          onPress={() => openTimePicker('아침식사')}
-          fontSizeMode={fontSizeMode}
-        />
+        <View style={{paddingHorizontal: 20, gap: 20}}>
+          <TimeSettingItem
+            icon={<CupIcon width={20} height={20} style={{color: '#A0CC88'}} />}
+            title={scheduleData.morning.name}
+            time={breakfastTime}
+            onPress={() => openTimePicker('아침식사')}
+            fontSizeMode={fontSizeMode}
+          />
 
-        <TimeSettingItem
-          icon={<SunIcon width={20} height={20} style={{color: '#FF8B25'}} />}
-          title={scheduleData.lunch.name}
-          time={lunchTime}
-          onPress={() => openTimePicker('점심식사')}
-          fontSizeMode={fontSizeMode}
-        />
+          <TimeSettingItem
+            icon={<SunIcon width={20} height={20} style={{color: '#FF8B25'}} />}
+            title={scheduleData.lunch.name}
+            time={lunchTime}
+            onPress={() => openTimePicker('점심식사')}
+            fontSizeMode={fontSizeMode}
+          />
 
-        <TimeSettingItem
-          icon={
-            <HomeRoutineIcon
-              width={20}
-              height={20}
-              style={{color: '#A5BEF0'}}
-            />
-          }
-          title={scheduleData.dinner.name}
-          time={dinnerTime}
-          onPress={() => openTimePicker('저녁식사')}
-          fontSizeMode={fontSizeMode}
-        />
+          <TimeSettingItem
+            icon={
+              <HomeRoutineIcon
+                width={20}
+                height={20}
+                style={{color: '#A5BEF0'}}
+              />
+            }
+            title={scheduleData.dinner.name}
+            time={dinnerTime}
+            onPress={() => openTimePicker('저녁식사')}
+            fontSizeMode={fontSizeMode}
+          />
 
-        <TimeSettingItem
-          icon={<MoonIcon width={20} height={20} style={{color: '#FED359'}} />}
-          title={scheduleData.bedtime.name}
-          time={bedTime}
-          onPress={() => openTimePicker('취침시간')}
-          fontSizeMode={fontSizeMode}
-        />
-      </View>
-
+          <TimeSettingItem
+            icon={<MoonIcon width={20} height={20} style={{color: '#FED359'}} />}
+            title={scheduleData.bedtime.name}
+            time={bedTime}
+            onPress={() => openTimePicker('취침시간')}
+            fontSizeMode={fontSizeMode}
+          />
+        </View>
+      </ScrollView>
       <DateTimePickerModal
         visible={showTimePicker}
         onClose={() => setShowTimePicker(false)}
