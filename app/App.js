@@ -257,7 +257,7 @@ const App = () => {
     const checkAutoLogin = async () => {
       try {
         const token = await getAccessToken();
-        if (token) {
+        if (token && token !== 'undefined' && token.trim() !== '') {
           console.log('[AutoLogin] 토큰 있음, NavigationBar로 이동');
           setAuthToken(token); // axios 헤더 설정
           setInitialScreen('NavigationBar');
