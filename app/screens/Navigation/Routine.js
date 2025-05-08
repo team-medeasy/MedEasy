@@ -590,17 +590,18 @@ const Routine = ({route}) => {
               {/* <TimelineLine /> */}
 
               {/* 모든 루틴을 시간순으로 렌더링 */}
-
               {allRoutines.length === 0 ? (
-                <EmptyState
-                  image={
-                    <Images.emptyRoutine
-                      style={{marginBottom: 32, marginTop: 80}}
-                    />
-                  }
-                  title="루틴이 없습니다."
-                  description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
-                />
+                <EmptyContainer>
+                  <EmptyState
+                    image={
+                      <Images.emptyRoutine
+                        style={{marginBottom: 32, marginTop: 80}}
+                      />
+                    }
+                    title="루틴이 없습니다."
+                    description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
+                  />
+                </EmptyContainer>
               ) : (
                 allRoutines.map((routine, index) => (
                   <RoutineCard
@@ -617,7 +618,7 @@ const Routine = ({route}) => {
                     )}
                   />
                 ))
-              )}
+              )}  
             </TimelineContainer>
           </ScheduleContainer>
         </ScrollView>
@@ -729,6 +730,7 @@ const TodayContainer = styled.View`
   justify-content: space-between;
   padding: 20px 30px;
 `;
+
 // 타임라인 관련 스타일 추가
 const TimelineContainer = styled.View`
   //padding-top: 10px;
@@ -743,6 +745,14 @@ const TimelineLine = styled.View`
   bottom: 30px;
   width: 6px;
   background-color: ${themes.light.pointColor.Primary};
+`;
+
+// TimelineContainer에 좌측 여백이 있으므로, 우측에 30px 여백이 있어야 중앙에 정렬됨
+const EmptyContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-right: 30px;
 `;
 
 export default Routine;
