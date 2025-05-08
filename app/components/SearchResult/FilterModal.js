@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import {Button, ColorShapeView} from './../../components';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {PillsIcon} from '../../../assets/icons';
 import CustomModal from '../../components/CustomModal';
 
@@ -24,6 +25,7 @@ export const FilterModal = ({
   currentFilters,
 }) => {
   if (!filterType) return null;
+  const {fontSizeMode} = useFontSize();
 
   const handleApplyFilters = () => {
     const hasChanges =
@@ -39,7 +41,7 @@ export const FilterModal = ({
 
   return (
     <CustomModal visible={visible} onClose={onClose} height="75%">
-      <Title>
+      <Title fontSizeMode={fontSizeMode}>
         {filterType === 'color'
           ? '색상 선택'
           : filterType === 'shape'
@@ -63,7 +65,7 @@ export const FilterModal = ({
                     width: 77,
                     height: 50,
                   })}
-                <FilterOptionText
+                <FilterOptionText fontSizeMode={fontSizeMode}
                   selected={tempFilters[filterType].includes(option)}>
                   {option}
                 </FilterOptionText>
@@ -71,7 +73,7 @@ export const FilterModal = ({
             ) : (
               <RowView>
                 <ColorShapeView type={filterType} value={option} />
-                <FilterOptionText
+                <FilterOptionText fontSizeMode={fontSizeMode}
                   selected={tempFilters[filterType].includes(option)}>
                   {option}
                 </FilterOptionText>
@@ -87,7 +89,7 @@ export const FilterModal = ({
 };
 
 const Title = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
   padding: 30px 0;
@@ -125,6 +127,7 @@ const FilterOptionText = styled.Text`
       ? themes.light.textColor.buttonText
       : themes.light.textColor.Primary50};
   font-family: 'Pretendard-SemiBold';
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
 `;
 
 const RowView = styled.View`

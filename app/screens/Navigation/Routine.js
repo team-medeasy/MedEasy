@@ -1,7 +1,8 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useState, useRef, useCallback} from 'react';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
+import {ScrollView, Dimensions, FlatList} from 'react-native';
 import styled from 'styled-components/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {HeaderIcons, OtherIcons, Images} from '../../../assets/icons';
 import {themes} from '../../styles';
 import dayjs from 'dayjs';
@@ -17,7 +18,7 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
 import RoutineCard from '../../components/RoutineCard';
 import EmptyState from '../../components/EmptyState';
-import { useFontSize } from '../../../assets/fonts/FontSizeContext';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const {width} = Dimensions.get('window');
 
@@ -27,6 +28,8 @@ const Routine = ({route}) => {
   const navigation = useNavigation();
   const paramDate = route.params?.selectedDate; // 스크롤할 날짜 파라미터
   const { fontSizeMode } = useFontSize();
+
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   const [timeMapping, setTimeMapping] = useState({
     MORNING: {label: '아침', time: '', sortValue: ''},
@@ -498,7 +501,7 @@ const Routine = ({route}) => {
   );
 
   return (
-    <Container>
+    <Container style={{ paddingTop: insets.top }}>
       <Header>
         <HeaderText fontSizeMode={fontSizeMode}>루틴</HeaderText>
         <ReturnButton
@@ -587,17 +590,18 @@ const Routine = ({route}) => {
               {/* <TimelineLine /> */}
 
               {/* 모든 루틴을 시간순으로 렌더링 */}
-
               {allRoutines.length === 0 ? (
-                <EmptyState
-                  image={
-                    <Images.emptyRoutine
-                      style={{marginBottom: 32, marginTop: 80}}
-                    />
-                  }
-                  title="루틴이 없습니다."
-                  description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
-                />
+                <EmptyContainer>
+                  <EmptyState
+                    image={
+                      <Images.emptyRoutine
+                        style={{marginBottom: 32, marginTop: 80}}
+                      />
+                    }
+                    title="루틴이 없습니다."
+                    description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
+                  />
+                </EmptyContainer>
               ) : (
                 allRoutines.map((routine, index) => (
                   <RoutineCard
@@ -614,7 +618,7 @@ const Routine = ({route}) => {
                     )}
                   />
                 ))
-              )}
+              )}  
             </TimelineContainer>
           </ScheduleContainer>
         </ScrollView>
@@ -623,7 +627,7 @@ const Routine = ({route}) => {
   );
 };
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.pointColor.Primary};
 `;
@@ -726,6 +730,7 @@ const TodayContainer = styled.View`
   justify-content: space-between;
   padding: 20px 30px;
 `;
+
 // 타임라인 관련 스타일 추가
 const TimelineContainer = styled.View`
   //padding-top: 10px;
@@ -740,6 +745,14 @@ const TimelineLine = styled.View`
   bottom: 30px;
   width: 6px;
   background-color: ${themes.light.pointColor.Primary};
+`;
+
+// TimelineContainer에 좌측 여백이 있으므로, 우측에 30px 여백이 있어야 중앙에 정렬됨
+const EmptyContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-right: 30px;
 `;
 
 export default Routine;

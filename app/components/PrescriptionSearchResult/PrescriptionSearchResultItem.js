@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Tag } from './../index';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { themes } from '../../styles';
 
 export const PrescriptionSearchResultItem = ({ item, onPress, onModifyRoutine }) => {
@@ -10,6 +11,8 @@ export const PrescriptionSearchResultItem = ({ item, onPress, onModifyRoutine })
   const handleImageError = (error) => {
     console.error('이미지 로드 오류:', error);
   };
+
+  const {fontSizeMode} = useFontSize();
 
   return (
     <ItemContainer>
@@ -29,10 +32,18 @@ export const PrescriptionSearchResultItem = ({ item, onPress, onModifyRoutine })
 
           <InfoContainer>
             <View style={{ gap: 7 }}>
-              <Description numberOfLines={2} ellipsizeMode="tail">
+              <Description 
+                fontSizeMode={fontSizeMode}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
                 {item.entp_name || '정보 없음'}
               </Description>
-              <MedicineName numberOfLines={1} ellipsizeMode="tail">
+              <MedicineName 
+                fontSizeMode={fontSizeMode} 
+                numberOfLines={1} 
+                ellipsizeMode="tail"
+              >
                 {item.item_name || '정보 없음'}
               </MedicineName>
 
@@ -71,22 +82,27 @@ export const PrescriptionSearchResultItem = ({ item, onPress, onModifyRoutine })
         }}
       >
         <Routine 
-          label={'한 번에 얼마나 투여하나요?'} 
-          value={item.dose ? `${item.dose}정` : '3정'} 
+          label={'한 번에 얼마나 투여하나요?'}
+          value={item.dose ? `${item.dose}정` : '3정'}
+          fontSizeMode={fontSizeMode}
         />
         <Routine 
-          label={'언제 투여하나요?'} 
-          value={getScheduleTime(item) || '아침, 저녁'} 
+          label={'언제 투여하나요?'}
+          value={getScheduleTime(item) || '아침, 저녁'}
+          fontSizeMode={fontSizeMode}
         />
         <Routine 
-          label={'며칠간 투여하나요?'} 
-          value={item.total_days ? `${item.total_days}일간` : '2일간'} 
+          label={'며칠간 투여하나요?'}
+          value={item.total_days ? `${item.total_days}일간` : '2일간'}
+          fontSizeMode={fontSizeMode}
         />
       </View>
       
       {/* 루틴 수정 버튼 추가 */}
       <ModifyRoutineButton onPress={() => onModifyRoutine(item)}>
-        <ModifyRoutineText>이 약의 루틴을 수정하고 싶어요</ModifyRoutineText>
+        <ModifyRoutineText fontSizeMode={fontSizeMode}>
+          이 약의 루틴을 수정하고 싶어요
+        </ModifyRoutineText>
       </ModifyRoutineButton>
     </ItemContainer>
   );
@@ -106,14 +122,14 @@ const getScheduleTime = (item) => {
   return recommendedSchedules.join(', ');
 };
 
-const Routine = ({ label, value }) => {
+const Routine = ({ label, value, fontSizeMode }) => {
   return (
     <View style={{ flexDirection: 'row', gap: 18, alignItems: 'center' }}>
       <Text
         style={{
           color: themes.light.textColor.Primary50,
           fontFamily: 'Pretendard-SemiBold',
-          fontSize: FontSizes.body.default,
+          fontSize: FontSizes.body[fontSizeMode],
         }}
       >
         {label}
@@ -122,7 +138,7 @@ const Routine = ({ label, value }) => {
         style={{
           color: themes.light.textColor.textPrimary,
           fontFamily: 'Pretendard-Bold',
-          fontSize: FontSizes.body.default,
+          fontSize: FontSizes.body[fontSizeMode],
           flex: 1,
           textAlign: 'right'
         }}
@@ -158,13 +174,13 @@ const InfoContainer = styled.View`
 `;
 
 const MedicineName = styled.Text`
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   font-family: 'Pretendard-bold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const Description = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-medium';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -178,7 +194,7 @@ const ModifyRoutineButton = styled.TouchableOpacity`
 
 const ModifyRoutineText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.pointColor.Primary};
   text-decoration: underline;
   text-decoration-color: ${themes.light.pointColor.Primary};
