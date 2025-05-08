@@ -24,7 +24,7 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {OtherIcons} from '../../../assets/icons';
 import {getSimilarMedicines, getMedicineById} from '../../api/medicine';
-import {getUserMedicineCount} from '../../api/user';
+import {getUserMedicinesCurrent} from '../../api/user';
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {medicineId, isModal, basicInfo, item, title} = route.params;
@@ -216,24 +216,19 @@ const MedicineDetailScreen = ({route, navigation}) => {
     try {
       if (!medicine) return;
 
-      const response = await getUserMedicineCount();
-      const countData = response.data?.body || response.data;
+      const response = await getUserMedicinesCurrent();
+      const currentList = response.data?.body || response.data;
 
-      if (countData) {
-        const {medicine_ids} = countData;
+      if (Array.isArray(currentList)) {
+        const registered = currentList.some(
+          med => String(med.medicine_id) === String(medicine.item_id)
+        );
 
-        console.log('💊등록된 약 id 리스트: ', medicine_ids);
-        console.log('현재 약 id: ', medicine.item_id);
-
-        if (medicine_ids && medicine_ids.includes(String(medicine.item_id))) {
-          setIsRegistered(true);
-          console.log('📝 등록된 약입니다.');
-        } else {
-          setIsRegistered(false);
-          console.log('❔ 등록되지 않은 약입니다.');
-        }
+        setIsRegistered(registered);
+        console.log(registered ? '📝 등록된 약입니다.' : '❔ 등록되지 않은 약입니다.');
       } else {
-        console.error('API 응답에 유효한 데이터가 없습니다:', response);
+        console.warn('예상과 다른 데이터 형식:', currentList);
+        setIsRegistered(false);
       }
     } catch (error) {
       console.error('API 호출 중 오류 발생:', error);
