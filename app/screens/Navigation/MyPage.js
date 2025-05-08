@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components/native';
-import {Platform} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {themes} from './../../styles';
 import {Footer} from '../../components';
 import MedicationInfo from '../../components/MedicationInfo';
@@ -14,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 const MyPage = () => {
   const {fontSizeMode} = useFontSize();
   const [userName, setUserName] = useState('');
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   useFocusEffect(
       useCallback(() => {
@@ -32,7 +33,7 @@ const MyPage = () => {
     );
 
   return (
-    <Container>
+    <Container style={{ paddingTop: insets.top }}>
       <ScrollContent>
         {/* 헤더 */}
         <HeaderContainer>
@@ -62,7 +63,7 @@ const MyPage = () => {
   );
 };
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.boxColor.buttonPrimary};
 `;

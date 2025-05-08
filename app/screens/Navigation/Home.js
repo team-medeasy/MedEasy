@@ -23,12 +23,14 @@ import {useSignUp} from '../../api/context/SignUpContext';
 import {getRoutineByDate} from '../../api/routine';
 import {getUser} from '../../api/user';
 import {getUnreadNotification} from '../../api/notification';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const Home = () => {
   const navigation = useNavigation();
   const {signUpData} = useSignUp();
   const {fontSizeMode} = useFontSize();
   const isFocused = useIsFocused(); // 화면 포커스 상태 확인
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   const [medicineRoutines, setMedicineRoutines] = useState([]);
   const [todayRoutine, setTodayRoutine] = useState(null);
@@ -236,12 +238,7 @@ const Home = () => {
   // };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: themes.light.bgColor.bgPrimary,
-        paddingTop: 68,
-      }}>
+    <Container style={{ paddingTop: insets.top }}>
       <ScrollContainer>
         <Header>
           <LogoContainer>
@@ -418,13 +415,19 @@ const Home = () => {
           ))}
         </RoutineListContainer>
       </ScrollContainer>
-    </View>
+    </Container>
   );
 };
+
+const Container = styled.View`
+  flex: 1;
+  background-color: ${themes.light.bgColor.bgPrimary}
+`;
 
 const ScrollContainer = styled.ScrollView`
   flex: 1;
 `;
+
 const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
