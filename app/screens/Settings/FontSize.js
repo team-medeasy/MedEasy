@@ -1,34 +1,40 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { themes } from '../../styles';
+import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { Header, SearchResultItem } from '../../components';
+import {Header, SearchResultItem} from '../../components';
 import RoutineCard from '../../components/RoutineCard';
 import Slider from '@react-native-community/slider';
-import { useFontSize } from '../../../assets/fonts/FontSizeContext';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const FontSize = () => {
   const [checkedItems, setCheckedItems] = React.useState({});
-  const { fontSizeMode, setFontSizeMode } = useFontSize(); // 폰트 사이즈 컨텍스트 사용
-  
+  const {fontSizeMode, setFontSizeMode} = useFontSize(); // 폰트 사이즈 컨텍스트 사용
+
   // 슬라이더 값을 fontSizeMode에 맞게 설정
-  const getFontSizeValue = (mode) => {
+  const getFontSizeValue = mode => {
     switch (mode) {
-      case 'default': return 0;
-      case 'medium': return 1;
-      case 'large': return 2;
-      default: return 0;
+      case 'default':
+        return 0;
+      case 'medium':
+        return 1;
+      case 'large':
+        return 2;
+      default:
+        return 0;
     }
   };
 
-  const [fontSizeValue, setFontSizeValue] = React.useState(() => getFontSizeValue(fontSizeMode));
+  const [fontSizeValue, setFontSizeValue] = React.useState(() =>
+    getFontSizeValue(fontSizeMode),
+  );
 
   const exampleItem = {
     item_image: '',
     entp_name: '팀메디지',
     item_name: '메디지정',
     etc_otc_name: '일반의약품',
-    class_name: '테스트',
+    class_name: '샘플 클래스',
   };
 
   const exampleRoutine = {
@@ -37,14 +43,14 @@ const FontSize = () => {
     time: '오전 8:00',
     timeKey: 'morning',
     medicines: [
-      { medicine_id: 1, nickname: '샘플 텍스트', dose: 1 },
-      { medicine_id: 2, nickname: '샘플 텍스트', dose: 2 },
-      { medicine_id: 3, nickname: '샘플 텍스트', dose: 3 },
+      {medicine_id: 1, nickname: '샘플 텍스트', dose: 1},
+      {medicine_id: 2, nickname: '샘플 텍스트', dose: 2},
+      {medicine_id: 3, nickname: '샘플 텍스트', dose: 3},
     ],
   };
 
   const toggleCheck = (medicineId, timeKey) => {
-    setCheckedItems((prev) => {
+    setCheckedItems(prev => {
       const key = `0000-00-00-${timeKey}-${medicineId}`;
       return {
         ...prev,
@@ -54,29 +60,29 @@ const FontSize = () => {
   };
 
   const toggleTimeCheck = (timeKey, routine) => {
-    setCheckedItems((prev) => {
-      const newChecked = { ...prev };
+    setCheckedItems(prev => {
+      const newChecked = {...prev};
       const selectedDate = '0000-00-00';
       const keys = routine.medicines.map(
-        ({ medicine_id }) => `${selectedDate}-${timeKey}-${medicine_id}`
+        ({medicine_id}) => `${selectedDate}-${timeKey}-${medicine_id}`,
       );
-      const allChecked = keys.every((key) => prev[key]);
-      keys.forEach((key) => {
+      const allChecked = keys.every(key => prev[key]);
+      keys.forEach(key => {
         newChecked[key] = allChecked ? false : true;
       });
       return newChecked;
     });
   };
 
-  const handleFontSizeChange = (value) => {
+  const handleFontSizeChange = value => {
     setFontSizeValue(value);
-    
+
     // 폰트 사이즈 모드 변경
     let newMode;
     if (value < 0.5) newMode = 'default';
     else if (value < 1.5) newMode = 'medium';
     else newMode = 'large';
-    
+
     // 컨텍스트를 통해 전역 폰트 사이즈 모드 업데이트
     setFontSizeMode(newMode);
   };
@@ -93,7 +99,9 @@ const FontSize = () => {
             index={0}
             allLength={1}
             checkedItems={checkedItems}
-            toggleTimeCheck={(timeKey) => toggleTimeCheck(timeKey, exampleRoutine)}
+            toggleTimeCheck={timeKey =>
+              toggleTimeCheck(timeKey, exampleRoutine)
+            }
             toggleHospitalCheck={() => {}}
             toggleCheck={toggleCheck}
             isInModal={true}
@@ -153,7 +161,7 @@ const SliderLabelsContainer = styled.View`
 
 const SliderLabelText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.textPrimary};
   text-align: center;
 `;

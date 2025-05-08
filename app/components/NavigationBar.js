@@ -12,12 +12,13 @@ import CameraSearchScreen from '../screens/Search/CameraSearch.js';
 import CameraSearchResultsScreen from '../screens/Search/CameraSearchResults.js';
 import PhotoPreviewScreen from '../screens/Search/PhotoPreview.js';
 import Chat from '../screens/Chat/Chat.js';
+import VoiceChat from '../screens/Chat/VoiceChat.js';
 import {pointColor, themes} from './../styles';
 import {TabIcons, CameraIcons, OtherIcons} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
-import useRoutineUrl from '../hooks/useRoutineUrl'
+import useRoutineUrl from '../hooks/useRoutineUrl';
 import RoutineCheckModal from './RoutineCheckModal';
-import { useFontSize } from '../../assets/fonts/FontSizeContext.js';
+import {useFontSize} from '../../assets/fonts/FontSizeContext.js';
 
 // 카메라 버튼
 const CameraButton = ({onPress}) => {
@@ -36,7 +37,7 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const navigation = useNavigation();
-  const { fontSizeMode } = useFontSize();
+  const {fontSizeMode} = useFontSize();
 
   const handleCameraPress = useCallback(async () => {
     console.log('Camera button pressed');
@@ -48,11 +49,11 @@ const TabNavigator = () => {
   }, [navigation]);
 
   const handleChatPress = useCallback(() => {
-    navigation.navigate('Chat');
+    navigation.navigate('VoiceChat');
   }, [navigation]);
 
   // useNfcListener 대신 useRoutineUrlHandler 사용
-  const { routineData, isModalVisible, closeModal } = useRoutineUrl();
+  const {routineData, isModalVisible, closeModal} = useRoutineUrl();
 
   return (
     <MainContainer>
@@ -138,11 +139,11 @@ const TabNavigator = () => {
         />
       </Tab.Navigator>
       <CameraButton onPress={handleCameraPress} />
-      {/* <ChatContainer>
-        <ChatBuble>
+      <ChatContainer>
+        {/* <ChatBuble>
           <BubbleTail />
           <BubbleText>챗봇 약사에게{'\n'}상담해보세요!</BubbleText>
-        </ChatBuble>
+        </ChatBuble> */}
         <ChatButton onPress={handleChatPress}>
           <OtherIcons.chat
             width={25}
@@ -150,12 +151,12 @@ const TabNavigator = () => {
             style={{color: themes.light.pointColor.Primary}}
           />
         </ChatButton>
-      </ChatContainer> */}
-      
+      </ChatContainer>
+
       {/* ModalComponent 대신 RoutineCheckModal 사용 */}
-      <RoutineCheckModal 
-        visible={isModalVisible} 
-        onClose={closeModal} 
+      <RoutineCheckModal
+        visible={isModalVisible}
+        onClose={closeModal}
         routineData={routineData}
       />
     </MainContainer>
@@ -191,6 +192,11 @@ const RootNavigator = () => {
       <Stack.Screen
         name="Chat"
         component={Chat}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="VoiceChat"
+        component={VoiceChat}
         options={{headerShown: false}}
       />
     </Stack.Navigator>
