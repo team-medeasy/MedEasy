@@ -25,6 +25,7 @@ import Svg, {Rect, Mask, Defs} from 'react-native-svg';
 import {CameraIcons, HeaderIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {launchImageLibrary} from 'react-native-image-picker';
 
 // --- Constants ---
@@ -47,6 +48,7 @@ const CameraSearchScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const {hasPermission, requestPermission} = useCameraPermission();
+  const {fontSizeMode} = useFontSize();
 
   // --- State ---
   const [activeIndex, setActiveIndex] = useState(0);
@@ -462,7 +464,7 @@ const CameraSearchScreen = () => {
               />
             </HeaderButton>
           </HeaderButtonWrapper>
-          <Title>사진으로 검색하기</Title>
+          <Title fontSizeMode={fontSizeMode}>사진으로 검색하기</Title>
           <HeaderButtonWrapper
             onPress={toggleFlash}
             hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
@@ -497,14 +499,22 @@ const CameraSearchScreen = () => {
               onPress={() => handleToggle(0)}
               disabled={isProcessing}>
               <ToggleButton>
-                <ToggleText isActive={activeIndex === 0}>알약 촬영</ToggleText>
+                <ToggleText 
+                  isActive={activeIndex === 0}
+                  fontSizeMode={fontSizeMode}
+                >
+                  알약 촬영
+                </ToggleText>
               </ToggleButton>
             </ToggleOption>
             <ToggleOption
               onPress={() => handleToggle(1)}
               disabled={isProcessing}>
               <ToggleButton>
-                <ToggleText isActive={activeIndex === 1}>
+                <ToggleText 
+                  isActive={activeIndex === 1}
+                  fontSizeMode={fontSizeMode}
+                >
                   처방전 촬영
                 </ToggleText>
               </ToggleButton>
@@ -616,8 +626,8 @@ const CameraSearchScreen = () => {
                 />
               </HintIconWrapper>
               <HintTextWrapper>
-                <HintTitle>인식률을 높이려면?</HintTitle>
-                <HintText>
+                <HintTitle fontSizeMode={fontSizeMode}>인식률을 높이려면?</HintTitle>
+                <HintText fontSizeMode={fontSizeMode}>
                   문자가 적힌 면이 위로 가도록 밝은 곳에서 촬영해주세요.
                 </HintText>
               </HintTextWrapper>
@@ -751,7 +761,7 @@ const HeaderButton = styled.View`
 
 const Title = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
 `;
 
@@ -782,7 +792,7 @@ const ToggleButton = styled.View``;
 
 const ToggleText = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${({isActive}) => (isActive ? 'black' : 'rgba(255, 255, 255, 0.8)')};
   font-weight: ${({isActive}) => (isActive ? 'bold' : 'normal')};
 `;
@@ -833,15 +843,15 @@ const HintTextWrapper = styled.View`
 
 const HintTitle = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${FontSizes.body.small};
-  color: white;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  color: ${themes.light.textColor.buttonText};
   margin-bottom: 4px;
 `;
 
 const HintText = styled.Text`
   font-family: 'Pretendard-Regular';
-  font-size: ${FontSizes.caption.small};
-  color: rgba(255, 255, 255, 0.9);
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  color: ${themes.light.textColor.buttonText70};
   line-height: 16px;
 `;
 

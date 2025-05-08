@@ -3,9 +3,12 @@ import styled from 'styled-components/native';
 import {View, Dimensions} from 'react-native';
 import {Tag, Button, MedicineAppearance} from './../index';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {themes} from '../../styles';
 
 export const CameraSearchResultItem = ({item, onPress}) => {
+  const {fontSizeMode} = useFontSize();
+
   return (
     <ItemContainer>
       <FullWidthImageContainer>
@@ -21,24 +24,34 @@ export const CameraSearchResultItem = ({item, onPress}) => {
             sizeType="small"
             colorType="resultPrimary"
             overflowMode="ellipsis"
-            maxWidth="66">
+            maxWidth="80"
+          >
             {item.etc_otc_name || '정보 없음'}
           </Tag>
           <Tag
             sizeType="small"
             colorType="resultSecondary"
             overflowMode="ellipsis"
-            maxWidth="150">
+            maxWidth="200"
+          >
             {item.class_name || '정보 없음'}
           </Tag>
         </View>
 
         <View style={{gap: 10}}>
           <View style={{gap: 10}}>
-            <MedicineName numberOfLines={1} ellipsizeMode="tail">
+            <MedicineName 
+              fontSizeMode={fontSizeMode}
+              numberOfLines={1} 
+              ellipsizeMode="tail"
+            >
               {item.item_name || '정보 없음'}
             </MedicineName>
-            <Description numberOfLines={2} ellipsizeMode="tail">
+            <Description 
+              fontSizeMode={fontSizeMode}
+              numberOfLines={2} 
+              ellipsizeMode="tail"
+            >
               {item.chart || '정보 없음'}
             </Description>
           </View>
@@ -85,13 +98,13 @@ const InfoContainer = styled.View`
 `;
 
 const MedicineName = styled.Text`
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   font-family: 'Pretendard-bold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const Description = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-medium';
   color: ${themes.light.textColor.Primary50};
 `;

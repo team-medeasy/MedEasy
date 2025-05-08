@@ -370,7 +370,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
                 style={{
                   color: themes.light.textColor.Primary30,
                   fontFamily: 'Pretendard-semiBold',
-                  fontSize: FontSizes.caption[fontSizeMode],
+                  fontSize: FontSizes.body[fontSizeMode],
                   paddingHorizontal: 20,
                 }}>
                 비슷한 약이 존재하지 않아요.
