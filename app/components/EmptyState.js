@@ -1,9 +1,12 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import FontSizes from '../../assets/fonts/fontSizes';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
 import {themes} from '../styles';
 
-const EmptyState = ({image, title, description, fontSizeMode = 'default'}) => {
+const EmptyState = ({image, title, description}) => {
+  const {fontSizeMode} = useFontSize();
+  
   return (
     <EmptyImageWrapper>
       {image}
