@@ -46,37 +46,47 @@ export const MedicineListItem = ({ item, onPress }) => {
         onPress={() => onPress(item)} 
       />
 
-      <RoutineInfoContainer>
-        <Routine
-          label={isPast ? '복용 기간    ' : '복용 시작일'}
-          value={
-            isPast && item.routine_start_date && item.routine_end_date
-              ? `${formatDate(item.routine_start_date)} ~ ${formatDate(item.routine_end_date)}`
-              : item.routine_start_date
-                ? formatDate(item.routine_start_date)
-                : '정보 없음'
-          }
-          fontSizeMode={fontSizeMode}
-        />
-        <Routine
-          label={'복용량        '}
-          value={
-            item.schedule_size && item.dose
-              ? `하루 ${item.schedule_size}번, ${item.dose}정씩`
+{item.routines?.map((routine, index) => {
+  const isPast = routine.routine_end_date
+    ? new Date(routine.routine_end_date).setHours(0, 0, 0, 0) <
+      new Date().setHours(0, 0, 0, 0)
+    : false;
+
+  return (
+    <RoutineInfoContainer key={index}>
+      <Routine
+        label={isPast ? '복용 기간    ' : '복용 시작일'}
+        value={
+          isPast && routine.routine_start_date && routine.routine_end_date
+            ? `${formatDate(routine.routine_start_date)} ~ ${formatDate(routine.routine_end_date)}`
+            : routine.routine_start_date
+              ? formatDate(routine.routine_start_date)
               : '정보 없음'
-          }
-          fontSizeMode={fontSizeMode}
-        />
-        <Routine
-          label={'복용 주기    '}
-          value={item.interval_days != null
-            ? (item.interval_days === 1
-              ? '매일'
-              : `${item.interval_days}일에 한 번`)
-            : '정보 없음'}
-          fontSizeMode={fontSizeMode}
-        />
-      </RoutineInfoContainer>
+        }
+        fontSizeMode={fontSizeMode}
+      />
+      <Routine
+        label={'복용량        '}
+        value={
+          routine.schedule_size && routine.dose
+            ? `하루 ${routine.schedule_size}번, ${routine.dose}정씩`
+            : '정보 없음'
+        }
+        fontSizeMode={fontSizeMode}
+      />
+      <Routine
+        label={'복용 주기    '}
+        value={
+          routine.interval_days != null
+            ? (routine.interval_days === 1 ? '매일' : `${routine.interval_days}일에 한 번`)
+            : '정보 없음'
+        }
+        fontSizeMode={fontSizeMode}
+      />
+    </RoutineInfoContainer>
+  );
+})}
+
     </ItemContainer>
   );
 };
