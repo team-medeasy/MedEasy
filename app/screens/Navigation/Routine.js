@@ -1,7 +1,8 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useState, useRef, useCallback} from 'react';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
+import {ScrollView, Dimensions, FlatList} from 'react-native';
 import styled from 'styled-components/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {HeaderIcons, OtherIcons, Images} from '../../../assets/icons';
 import {themes} from '../../styles';
 import dayjs from 'dayjs';
@@ -17,7 +18,7 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
 import RoutineCard from '../../components/RoutineCard';
 import EmptyState from '../../components/EmptyState';
-import { useFontSize } from '../../../assets/fonts/FontSizeContext';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const {width} = Dimensions.get('window');
 
@@ -27,6 +28,8 @@ const Routine = ({route}) => {
   const navigation = useNavigation();
   const paramDate = route.params?.selectedDate; // 스크롤할 날짜 파라미터
   const { fontSizeMode } = useFontSize();
+
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   const [timeMapping, setTimeMapping] = useState({
     MORNING: {label: '아침', time: '', sortValue: ''},
@@ -498,7 +501,7 @@ const Routine = ({route}) => {
   );
 
   return (
-    <Container>
+    <Container style={{ paddingTop: insets.top }}>
       <Header>
         <HeaderText fontSizeMode={fontSizeMode}>루틴</HeaderText>
         <ReturnButton
@@ -623,7 +626,7 @@ const Routine = ({route}) => {
   );
 };
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.pointColor.Primary};
 `;
