@@ -8,6 +8,8 @@ import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {useNavigation} from '@react-navigation/native';
 
 import {getUserMedicinesCurrent, getUserMedicinesPast} from '../../api/user';
+import EmptyState from '../../components/EmptyState';
+import {Images} from '../../../assets/icons';
 
 const MedicineList = () => {
   const navigation = useNavigation();
@@ -116,11 +118,17 @@ const MedicineList = () => {
         )}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <NoResultContainer>
-            <NoResultText fontSizeMode={fontSizeMode}>
-              {emptyMessage}
-            </NoResultText>
-          </NoResultContainer>
+          <EmptyContainer>
+            <EmptyState
+              image={<Images.emptyRoutine style={{marginBottom: 32}} />}
+              title={emptyMessage}
+              description={
+                activeTab === 'current'
+                  ? `약을 검색해\n복용 루틴을 추가해 보세요.`
+                  : `약을 검색해\n복용 루틴을 추가해 보세요.`
+              }
+            />
+          </EmptyContainer>
         }
       />
     );
@@ -159,6 +167,10 @@ const MedicineList = () => {
 const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
+`;
+
+const EmptyContainer = styled.View`
+  margin-top: 100px;
 `;
 
 const TabContainer = styled.View`
