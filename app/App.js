@@ -23,7 +23,6 @@ import SignUpStartScreen from './screens/SignUp/SignUpStart';
 import SignUpNameScreen from './screens/SignUp/SignUpName';
 import SignUpEmailScreen from './screens/SignUp/SignUpEmail';
 import SignUpPasswordScreen from './screens/SignUp/SignUpPassword';
-import SignUpDOBGenderScreen from './screens/SignUp/SignUpDOBGender';
 import SignInScreen from './screens/SignUp/SignIn';
 import NavigationBar from './components/NavigationBar';
 import SearchMedicineScreen from './screens/Search/SearchMedicine';
@@ -68,10 +67,6 @@ const AuthNavigator = () => {
       <AuthStack.Screen
         name="SignUpPassword"
         component={SignUpPasswordScreen}
-      />
-      <AuthStack.Screen
-        name="SignUpDOBGender"
-        component={SignUpDOBGenderScreen}
       />
     </AuthStack.Navigator>
   );
