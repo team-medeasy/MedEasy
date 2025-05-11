@@ -259,18 +259,20 @@ const App = () => {
           setAuthToken(token); // axios 헤더 설정
           setInitialScreen('NavigationBar');
         } else {
-          console.log('[AutoLogin] 토큰 없음, Auth로 이동');
+          console.log('[AutoLogin] 유효하지 않은 토큰, SignUpStart로 이동');
           setInitialScreen('Auth');
         }
       } catch (err) {
         console.error('자동 로그인 체크 실패:', err);
+        setInitialScreen('Auth'); // 에러 시에도 로그인 화면으로
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     checkAutoLogin();
   }, []);
+  
 
   // URL 스킴 초기화 처리 - 앱 시작 시 한 번만 실행
   useEffect(() => {
