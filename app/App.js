@@ -43,6 +43,8 @@ import SetMedicineDoseScreen from './screens/Routine/SetMedicineDose';
 import SetMedicineTotalScreen from './screens/Routine/SetMedicineTotal';
 import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
 import MedicineListScreen from './screens/Settings/MedicineList';
+import AddCareTargetScreen from './screens/Care/AddCareTarget';
+import VerifyCodeScreen from './screens/Care/VerifyCode';
 
 import {SignUpProvider} from './api/context/SignUpContext';
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
@@ -466,6 +468,14 @@ const App = () => {
                   <RootStack.Screen
                     name="MedicineList"
                     component={MedicineListScreen}
+                  />
+                  <RootStack.Screen
+                    name="AddCareTarget"
+                    component={AddCareTargetScreen}
+                  />
+                  <RootStack.Screen
+                    name="VerifyCode"
+                    component={VerifyCodeScreen}
                   />
                 </RootStack.Navigator>
                 
