@@ -86,6 +86,7 @@ import ReturnIcon from './icons/return.svg';
 import SearchGeneralIcon from './icons/search.svg';
 import ChevronDownIcon from './icons/chevron_down.svg';
 import KakaoIcon from './icons/kakao.svg';
+import CheckCircleIcon from './icons/check_circle.svg';
 
 // 이미지 에셋
 import EmptyLikeImage from './images/emptyLike.svg';
@@ -194,6 +195,7 @@ export const OtherIcons = {
   search: SearchGeneralIcon,
   chevronDown: ChevronDownIcon,
   kakao: KakaoIcon,
+  CheckCircle: CheckCircleIcon,
 };
 
 export const Images = {

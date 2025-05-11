@@ -16,6 +16,7 @@ import TodayHeader from '../../components/TodayHeader';
 import HomeRoutine from '../../components/HomeRoutine';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+import {useCareListModal} from '../../components/CareListModal';
 import dayjs from 'dayjs';
 dayjs.locale('ko');
 
@@ -29,6 +30,7 @@ const Home = () => {
   const navigation = useNavigation();
   const {signUpData} = useSignUp();
   const {fontSizeMode} = useFontSize();
+  const {modalVisible, openModal, closeModal, CareListModalComponent} = useCareListModal();
   const isFocused = useIsFocused(); // 화면 포커스 상태 확인
   const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
@@ -271,11 +273,17 @@ const Home = () => {
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
-            <ReminderText fontSizeMode={fontSizeMode}>
-            {todayRoutine
-              ? `${userName}님,\n까먹은 약이 있어요.`
-              : `${userName}님,\n건강한 하루 보내세요!`}
-            </ReminderText>
+            <TouchableOpacity onPress={openModal}>
+              <ReminderText fontSizeMode={fontSizeMode}>
+              {todayRoutine
+                ? `${userName}님,\n까먹은 약이 있어요.`
+                : `${userName}님,\n건강한 하루 보내세요!`}
+              </ReminderText>
+            </TouchableOpacity>
+
+            {/* 모달 컴포넌트 */}
+            {CareListModalComponent}
+
             <LogoIcons.logo
               width={70}
               height={112}
