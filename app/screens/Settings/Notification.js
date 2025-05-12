@@ -6,10 +6,12 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import {Header} from '../../components';
 import {LogoIcons} from '../../../assets/icons';
 import {BlurView} from '@react-native-community/blur';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const Notification = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const {fontSizeMode} = useFontSize();
 
   const MockNotification = ({title, sub}) => {
     return (
@@ -42,8 +44,8 @@ const Notification = () => {
     <Container>
       <Header>알림 설정</Header>
       <TitleContainer>
-        <LargeText>복약 알림 설정</LargeText>
-        <SmallText>약을 잊지 않도록 정해진 시간에 알려드릴게요.</SmallText>
+        <LargeText fontSizeMode={fontSizeMode}>복약 알림 설정</LargeText>
+        <SmallText fontSizeMode={fontSizeMode}>약을 잊지 않도록 정해진 시간에 알려드릴게요.</SmallText>
       </TitleContainer>
       <MockImageArea>
         <PhoneMockup />
@@ -60,7 +62,7 @@ const Notification = () => {
         </NotificationContainer>
       </MockImageArea>
       <SwitchWrapper>
-        <Label>복약 알림</Label>
+        <Label fontSizeMode={fontSizeMode}>복약 알림</Label>
         <StyledSwitch
           onValueChange={toggleSwitch}
           value={isEnabled}
@@ -86,13 +88,13 @@ const TitleContainer = styled.View`
 `;
 
 const LargeText = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
   font-family: KimjungchulGothic-Bold;
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const SmallText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: Pretendard-Medium;
   color: ${themes.light.textColor.Primary50};
 `;
@@ -176,7 +178,7 @@ const SwitchWrapper = styled.View`
 `;
 
 const Label = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: Pretendard-Medium;
   color: ${themes.light.textColor.textPrimary};
 `;
