@@ -17,9 +17,24 @@ const RoutineCard = ({
   isInModal = false,
   selectedDateString,
   backgroundColor,
+  routineMode = 'default', // 루틴 모드 prop
 }) => {
   const navigation = useNavigation();
   const { fontSizeMode } = useFontSize();
+
+  const handleMedicinePress = (medicineId) => {
+    if (routineMode === 'care') {
+      // care 모드일 때 다른 페이지로 네비게이션
+      navigation.navigate('MedicineDetail', {
+        medicineId: medicineId,
+      });
+    } else {
+      // 기본 모드에서는 기존대로 SetMedicineRoutine 페이지로 이동
+      navigation.navigate('SetMedicineRoutine', {
+        medicineId: medicineId,
+      });
+    }
+  };
 
   return (
     <RoutineBoxContainer isInModal={isInModal}>
@@ -93,11 +108,7 @@ const RoutineCard = ({
                         `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                       ]
                     }
-                    onPress={() =>
-                      navigation.navigate('SetMedicineRoutine', {
-                        medicineId: medicine.medicine_id,
-                      })
-                    }
+                    onPress={() => handleMedicinePress(medicine.medicine_id)}
                   >
                     {medicine.nickname}
                   </MedicineText>
