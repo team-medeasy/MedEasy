@@ -251,27 +251,28 @@ const App = () => {
   const { routineData, isModalVisible, closeModal } = useRoutineUrl();
 
   useEffect(() => {
-    const checkAutoLogin = async () => {
-      try {
-        const token = await getAccessToken();
-        if (token && token !== 'undefined' && token.trim() !== '') {
-          console.log('[AutoLogin] 토큰 있음, NavigationBar로 이동');
-          setAuthToken(token); // axios 헤더 설정
-          setInitialScreen('NavigationBar');
-        } else {
-          console.log('[AutoLogin] 유효하지 않은 토큰, SignUpStart로 이동');
-          setInitialScreen('Auth');
-        }
-      } catch (err) {
-        console.error('자동 로그인 체크 실패:', err);
-        setInitialScreen('Auth'); // 에러 시에도 로그인 화면으로
-      } finally {
-        setIsLoading(false);
+  const checkAutoLogin = async () => {
+    try {
+      const token = await getAccessToken();
+      if (token && token !== 'undefined' && token.trim() !== '') {
+        console.log('[AutoLogin] 토큰 있음, NavigationBar로 이동');
+        setAuthToken(token);
+        setInitialScreen('NavigationBar');
+      } else {
+        console.log('[AutoLogin] 유효하지 않은 토큰, SignUpStart로 이동');
+        setInitialScreen('Auth');
       }
-    };
-  
-    checkAutoLogin();
-  }, []);
+    } catch (err) {
+      console.error('자동 로그인 체크 실패:', err);
+      setInitialScreen('Auth');
+    } finally {
+      // 스플래시 종료 시점: 자동 로그인 판단 완료 후
+      setTimeout(() => setIsLoading(false), 2000);
+    }
+  };
+
+  checkAutoLogin();
+}, []);
   
 
   // URL 스킴 초기화 처리 - 앱 시작 시 한 번만 실행
@@ -339,13 +340,13 @@ const App = () => {
   };
   
   // 스플래시 화면 표시용 useEffect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
   
   // 스플래시 화면이 사라진 후 FCM 초기화를 위한 useEffect
   useEffect(() => {
