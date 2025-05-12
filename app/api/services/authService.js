@@ -1,3 +1,4 @@
+// api/services/authService.js
 import {login, signUp} from '../auth';
 import {kakaoLogin} from './kakaoAuth';
 import {getUser} from '../user';
@@ -72,7 +73,6 @@ export const handleLogin = async credentials => {
   }
 };
 
-// 카카오 로그인 처리
 export const handleKakaoLogin = async (navigation) => {
   try {
     const result = await kakaoLogin();

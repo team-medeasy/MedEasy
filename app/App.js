@@ -55,6 +55,8 @@ import {navigationRef} from './screens/Navigation/NavigationRef';
 import RoutineUrlService from './services/RoutineUrlService';
 import { setAuthToken } from './api';
 
+import { validateAndRefreshToken } from './api/services/tokenService';
+
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -252,16 +254,23 @@ const App = () => {
   const { routineData, isModalVisible, closeModal } = useRoutineUrl();
 
   useEffect(() => {
-  const checkAutoLogin = async () => {
-    try {
-      const token = await getAccessToken();
-      if (token && token !== 'undefined' && token.trim() !== '') {
-        console.log('[AutoLogin] 토큰 있음, NavigationBar로 이동');
-        setAuthToken(token);
-        setInitialScreen('NavigationBar');
-      } else {
-        console.log('[AutoLogin] 유효하지 않은 토큰, SignUpStart로 이동');
-        setInitialScreen('Auth');
+    const checkAutoLogin = async () => {
+      try {
+        // 토큰 유효성 검증 및 필요시 갱신
+        const isTokenValid = await validateAndRefreshToken();
+        
+        if (isTokenValid) {
+          console.log('[AutoLogin] 토큰 유효함, NavigationBar로 이동');
+          setInitialScreen('NavigationBar');
+        } else {
+          console.log('[AutoLogin] 유효하지 않은 토큰, SignUpStart로 이동');
+          setInitialScreen('Auth');
+        }
+      } catch (err) {
+        console.error('자동 로그인 체크 실패:', err);
+        setInitialScreen('Auth'); // 에러 시에도 로그인 화면으로
+      } finally {
+        setIsLoading(false);
       }
     } catch (err) {
       console.error('자동 로그인 체크 실패:', err);

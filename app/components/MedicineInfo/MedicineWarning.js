@@ -15,8 +15,6 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { OtherIcons } from '../../../assets/icons';
 
-// 유틸 함수 제거
-
 const MedicineWarning = ({ item }) => {
   const { fontSizeMode } = useFontSize();
   const [warningData, setWarningData] = useState(null);
@@ -73,7 +71,9 @@ const MedicineWarning = ({ item }) => {
     return (
       <WarningContainer>
         <ActivityIndicator size="small" color={themes.light.textColor.Primary50} />
-        <LoadingText fontSizeMode={fontSizeMode}>금기 정보를 불러오는 중...</LoadingText>
+        <LoadingText fontSizeMode={fontSizeMode}>
+          안전 정보를 불러오는 중...
+        </LoadingText>
       </WarningContainer>
     );
   }
@@ -90,9 +90,20 @@ const MedicineWarning = ({ item }) => {
   if (!warningData || !warningData.hasWarning) {
     return (
       <WarningContainer>
-        <NoWarningText fontSizeMode={fontSizeMode}>
-          이 약품에는 특별한 금기 사항이 없습니다.
-        </NoWarningText>
+        <HeadingText fontSizeMode={fontSizeMode}>
+          💊 이 약의 안전 사용 정보예요
+        </HeadingText>
+        <NoWarningContent>
+          <NoWarningText fontSizeMode={fontSizeMode}>
+            이 약품은 특별한 안전 주의사항이 없어요.
+          </NoWarningText>
+          <SimpleTag 
+            bgColor={themes.light.pointColor.Primary10} 
+            textColor={themes.light.pointColor.Primary}
+            size="large">
+            안전 사용 가능
+          </SimpleTag>
+        </NoWarningContent>
       </WarningContainer>
     );
   }
@@ -109,7 +120,7 @@ const MedicineWarning = ({ item }) => {
       <WarningSection>
         <WarningHeaderRow onPress={() => toggleSection('pregnancy')}>
           <WarningTitleText fontSizeMode={fontSizeMode}>
-            🤰 임부금기
+            🤰 임산부 주의사항
           </WarningTitleText>
           <TouchableOpacity
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -132,9 +143,16 @@ const MedicineWarning = ({ item }) => {
             </WarningContentText>
           </WarningContentContainer>
         ) : (
-          <WarningPreviewText fontSizeMode={fontSizeMode}>
-            {content?.substring(0, 50)}...
-          </WarningPreviewText>
+          <WarningPreviewRow>
+            <WarningPreviewText fontSizeMode={fontSizeMode}>
+              {content?.substring(0, 50)}...
+            </WarningPreviewText>
+            <SimpleTag 
+              bgColor={themes.light.pointColor.Primary10} 
+              textColor={themes.light.pointColor.Primary}>
+              주의 필요
+            </SimpleTag>
+          </WarningPreviewRow>
         )}
       </WarningSection>
     );
@@ -152,7 +170,7 @@ const MedicineWarning = ({ item }) => {
       <WarningSection>
         <WarningHeaderRow onPress={() => toggleSection('elderly')}>
           <WarningTitleText fontSizeMode={fontSizeMode}>
-            👵 노인주의
+            👵 고령자 주의사항
           </WarningTitleText>
           <TouchableOpacity
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -175,9 +193,16 @@ const MedicineWarning = ({ item }) => {
             </WarningContentText>
           </WarningContentContainer>
         ) : (
-          <WarningPreviewText fontSizeMode={fontSizeMode}>
-            {content?.substring(0, 50)}...
-          </WarningPreviewText>
+          <WarningPreviewRow>
+            <WarningPreviewText fontSizeMode={fontSizeMode}>
+              {content?.substring(0, 50)}...
+            </WarningPreviewText>
+            <SimpleTag 
+              bgColor={themes.light.pointColor.Primary10} 
+              textColor={themes.light.pointColor.Primary}>
+              주의 필요
+            </SimpleTag>
+          </WarningPreviewRow>
         )}
       </WarningSection>
     );
@@ -194,7 +219,7 @@ const MedicineWarning = ({ item }) => {
         <WarningSection style={{ borderBottomWidth: 0 }}>
           <WarningHeaderRow onPress={() => toggleSection('interaction')}>
             <WarningTitleText fontSizeMode={fontSizeMode} warning={true}>
-              ⚠️ 현재 복용 중인 약과 함께 복용 금지 ({conflictCount}개)
+              ⚠️ 현재 복용 중인 약과의 충돌 ({conflictCount}개)
             </WarningTitleText>
             <TouchableOpacity
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -214,11 +239,18 @@ const MedicineWarning = ({ item }) => {
             <WarningContentContainer>
               {conflictItems.map((conflict, index) => (
                 <ConflictItem key={index}>
-                  <ConflictMedicineName fontSizeMode={fontSizeMode}>
-                    {conflict.currentMedicine.medicine_name}
-                  </ConflictMedicineName>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <ConflictMedicineName fontSizeMode={fontSizeMode}>
+                      {conflict.currentMedicine.medicine_name}
+                    </ConflictMedicineName>
+                    <SimpleTag 
+                      bgColor={themes.light.pointColor.Secondary} 
+                      textColor={themes.light.textColor.buttonText}>
+                      함께 복용 금지
+                    </SimpleTag>
+                  </View>
                   <ConflictContent fontSizeMode={fontSizeMode}>
-                    금기 사유: {conflict.warningInfo.PROHBT_CONTENT || '정보 없음'}
+                    {conflict.warningInfo.PROHBT_CONTENT || '정보 없음'}
                   </ConflictContent>
                   {conflict.warningInfo.REMARK && (
                     <ConflictRemark fontSizeMode={fontSizeMode}>
@@ -229,11 +261,18 @@ const MedicineWarning = ({ item }) => {
               ))}
             </WarningContentContainer>
           ) : (
-            <WarningPreviewText fontSizeMode={fontSizeMode} warning={true}>
-              {currentMedicines.length > 0 
-                ? `현재 복용 중인 약물 중 ${conflictCount}개와 함께 복용하면 안됩니다.`
-                : '복용 중인 약물과의 병용금기 정보가 있습니다.'}
-            </WarningPreviewText>
+            <WarningPreviewRow>
+              <WarningPreviewText fontSizeMode={fontSizeMode} warning={true}>
+                {currentMedicines.length > 0 
+                  ? `현재 복용 중인 약물 중 ${conflictCount}개와 함께 복용하면 안됩니다.`
+                  : '복용 중인 약물과의 병용금기 정보가 있습니다.'}
+              </WarningPreviewText>
+              <SimpleTag 
+                bgColor={themes.light.pointColor.Secondary} 
+                textColor={themes.light.textColor.buttonText}>
+                위험
+              </SimpleTag>
+            </WarningPreviewRow>
           )}
         </WarningSection>
       );
@@ -243,10 +282,17 @@ const MedicineWarning = ({ item }) => {
     else if (warningData.combination?.hasWarning) {
       return (
         <WarningSection style={{ borderBottomWidth: 0 }}>
-          <WarningInfoText fontSizeMode={fontSizeMode}>
-            이 약은 다른 특정 약물과 함께 복용하면 안 되는 병용금기 정보가 있으나, 
-            현재 복용 중인 약물과는 충돌이 없습니다.
-          </WarningInfoText>
+          <WarningInfoRow>
+            <WarningInfoText fontSizeMode={fontSizeMode}>
+              이 약은 특정 약물과 함께 복용하면 안 되는 병용금기 정보가 있으나, 
+              현재 복용 중인 약물과는 충돌이 없습니다.
+            </WarningInfoText>
+            <SimpleTag 
+              bgColor={themes.light.boxColor.inputSecondary} 
+              textColor={themes.light.textColor.Primary70}>
+              정보 제공
+            </SimpleTag>
+          </WarningInfoRow>
         </WarningSection>
       );
     }
@@ -258,7 +304,7 @@ const MedicineWarning = ({ item }) => {
   return (
     <WarningContainer>
       <HeadingText fontSizeMode={fontSizeMode}>
-        💊 약품 금기 정보
+        💊 이 약의 안전 사용 정보예요
       </HeadingText>
       
       {/* 병용금기 정보 (가장 중요하므로 먼저 표시) */}
@@ -273,16 +319,49 @@ const MedicineWarning = ({ item }) => {
   );
 };
 
+// 태그를 인라인으로 직접 구현
+const SimpleTag = ({ children, bgColor, textColor, size = 'small' }) => {
+  const { fontSizeMode } = useFontSize();
+  return (
+    <SimpleTagContainer bgColor={bgColor} size={size}>
+      <SimpleTagText fontSizeMode={fontSizeMode} textColor={textColor} size={size}>
+        {children}
+      </SimpleTagText>
+    </SimpleTagContainer>
+  );
+};
+
+const SimpleTagContainer = styled.View`
+  background-color: ${props => props.bgColor};
+  padding: ${props => props.size === 'small' ? '4px 8px' : '6px 10px'};
+  border-radius: 5px;
+  align-self: flex-start;
+`;
+
+const SimpleTagText = styled.Text`
+  color: ${props => props.textColor};
+  font-family: ${props => props.size === 'small' ? 'Pretendard-SemiBold' : 'Pretendard-Bold'};
+  font-size: ${props => props.size === 'small' 
+    ? FontSizes.caption[props.fontSizeMode] + 1
+    : FontSizes.body[props.fontSizeMode]
+  }px;
+`;
+
 // 스타일 컴포넌트
 const WarningContainer = styled.View`
   background-color: ${themes.light.bgColor.bgPrimary};
   padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  elevation: 2;
+  border-width: 1px;
+  border-color: ${themes.light.borderColor.borderSecondary};
 `;
 
 const HeadingText = styled.Text`
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode] + 2}px;
   margin-bottom: 20px;
 `;
 
@@ -300,82 +379,120 @@ const WarningHeaderRow = styled.TouchableOpacity`
   margin-bottom: 10px;
 `;
 
+const WarningPreviewRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const WarningInfoRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: ${themes.light.boxColor.inputPrimary};
+  padding: 15px;
+  border-radius: 10px;
+`;
+
 const WarningTitleText = styled.Text`
-  color: ${({warning}) => warning ? themes.light.pointColor.Error : themes.light.textColor.textPrimary};
+  color: ${({warning}) => warning ? themes.light.pointColor.Secondary : themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 1}px;
 `;
 
 const WarningPreviewText = styled.Text`
-  color: ${({warning}) => warning ? themes.light.pointColor.Error : themes.light.textColor.Primary70};
+  color: ${({warning}) => warning ? themes.light.pointColor.Secondary : themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode] + 1}px;
+  flex: 1;
+  margin-right: 10px;
 `;
 
 const WarningContentContainer = styled.View`
   background-color: ${themes.light.boxColor.inputPrimary};
   padding: 15px;
   border-radius: 10px;
+  margin-top: 5px;
 `;
 
 const WarningContentText = styled.Text`
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
-  line-height: 24px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 1}px;
+  line-height: 26px;
 `;
-
-// 고시일 텍스트 스타일 제거
 
 const WarningInfoText = styled.Text`
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 1}px;
   line-height: 24px;
+  flex: 1;
+  margin-right: 10px;
 `;
 
 const ConflictItem = styled.View`
   margin-bottom: 15px;
+  padding: 12px;
+  background-color: ${themes.light.pointColor.Primary10};
+  border-radius: 8px;
+  border-left-width: 3px;
+  border-left-color: ${themes.light.pointColor.Secondary};
 `;
 
 const ConflictMedicineName = styled.Text`
-  color: ${themes.light.pointColor.Error};
+  color: ${themes.light.pointColor.Secondary};
   font-family: 'Pretendard-Bold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 1}px;
   margin-bottom: 5px;
 `;
 
 const ConflictContent = styled.Text`
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
-  margin-bottom: 5px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 1}px;
+  margin-vertical: 5px;
 `;
 
 const ConflictRemark = styled.Text`
   color: ${themes.light.textColor.Primary50};
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode] + 1}px;
 `;
 
 const LoadingText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 1}px;
   color: ${themes.light.textColor.Primary50};
   margin-top: 10px;
+  text-align: center;
 `;
 
 const ErrorText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
-  color: ${themes.light.pointColor.Error};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 1}px;
+  color: ${themes.light.pointColor.Secondary};
   margin-top: 10px;
+  text-align: center;
+`;
+
+const NoWarningContent = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: ${themes.light.boxColor.inputPrimary};
+  padding: 15px;
+  border-radius: 10px;
+  border-left-width: 3px;
+  border-left-color: ${themes.light.pointColor.Primary};
 `;
 
 const NoWarningText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 1}px;
   color: ${themes.light.textColor.Primary70};
+  flex: 1;
+  margin-right: 10px;
 `;
 
 export default MedicineWarning;
