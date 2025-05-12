@@ -45,6 +45,7 @@ import SetRoutineTimeScreen from './screens/Routine/SetRoutineTime';
 import MedicineListScreen from './screens/Settings/MedicineList';
 import AddCareTargetScreen from './screens/Care/AddCareTarget';
 import VerifyCodeScreen from './screens/Care/VerifyCode';
+import CareRoutineScreen from './screens/Care/CareRoutine';
 
 import {SignUpProvider} from './api/context/SignUpContext';
 import {FontSizeProvider} from './../assets/fonts/FontSizeContext';
@@ -271,10 +272,17 @@ const App = () => {
       } finally {
         setIsLoading(false);
       }
-    };
-  
-    checkAutoLogin();
-  }, []);
+    } catch (err) {
+      console.error('자동 로그인 체크 실패:', err);
+      setInitialScreen('Auth');
+    } finally {
+      // 스플래시 종료 시점: 자동 로그인 판단 완료 후
+      setTimeout(() => setIsLoading(false), 2000);
+    }
+  };
+
+  checkAutoLogin();
+}, []);
   
 
   // URL 스킴 초기화 처리 - 앱 시작 시 한 번만 실행
@@ -342,13 +350,13 @@ const App = () => {
   };
   
   // 스플래시 화면 표시용 useEffect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
   
   // 스플래시 화면이 사라진 후 FCM 초기화를 위한 useEffect
   useEffect(() => {
@@ -481,6 +489,10 @@ const App = () => {
                   <RootStack.Screen
                     name="VerifyCode"
                     component={VerifyCodeScreen}
+                  />
+                  <RootStack.Screen
+                    name="CareRoutine"
+                    component={CareRoutineScreen}
                   />
                 </RootStack.Navigator>
                 

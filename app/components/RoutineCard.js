@@ -2,9 +2,10 @@ import React from 'react';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import FontSizes from '../../assets/fonts/fontSizes';
-import { themes } from '../styles';
+import { pointColor, themes } from '../styles';
 import { RoutineIcons } from '../../assets/icons';
 import { useFontSize } from '../../assets/fonts/FontSizeContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 const RoutineCard = ({
   routine,
@@ -34,7 +35,11 @@ const RoutineCard = ({
             isFirst={index === 0}
             isLast={index === allLength - 1}
           />
-          {allLength > 1 && index !== allLength - 1 && <TimelineLine />}
+          {/* {allLength > 1 && index !== allLength - 1 && 
+          <TimelineLine 
+            colors={[pointColor.primary20, pointColor.pointPrimaryDark]} // 밝은색 → 진한색
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}/>} */}
         </>
       )}
 
@@ -168,7 +173,7 @@ const TimelinePoint = styled.View`
   z-index: 2;
 `;
 
-const TimelineLine = styled.View`
+const TimelineLine = styled(LinearGradient)`
   position: absolute;
   left: -9px;
   top: 20px;
