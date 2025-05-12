@@ -360,7 +360,8 @@ const CareRoutine = ({ route }) => {
                   checkedItems={routine.checkedItems || {}}
                   selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
                   toggleTimeCheck={() => {}} 
-                  toggleCheck={() => {}} 
+                  toggleCheck={() => {}}
+                  routineMode="care"
                 />
               ))
             )}

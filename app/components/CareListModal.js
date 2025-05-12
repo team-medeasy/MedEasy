@@ -69,7 +69,12 @@ export const CareListModal = ({
     }, 200);
   };
 
-  const handleCareRoutine = (userId, userName) => {
+  const handleCareRoutine = (userId, userName, tag) => {
+    if (tag === '내 계정') {
+      onClose(); // 내 계정인 경우 모달만 닫음
+      return;
+    }
+    
     setSelectedUserId(userId);
     
     onClose();
@@ -86,7 +91,7 @@ export const CareListModal = ({
         {careList.map((item, index) => (
           <TouchableCareItem
             key={index}
-            onPress={() => handleCareRoutine(item.user_id, item.name)}
+            onPress={() => handleCareRoutine(item.user_id, item.name, item.tag)}
           >
             <CareListItem>
               <LeftContainer>
