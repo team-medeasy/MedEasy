@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 import {themes} from '../styles';
@@ -7,6 +7,7 @@ import {useFontSize} from '../../assets/fonts/FontSizeContext';
 import CustomModal from './CustomModal';
 import {Button, Tag} from '../components';
 import {OtherIcons} from '../../assets/icons';
+import { getCareList } from '../api/userCare';
 
 // 모달을 사용할 컴포넌트에서 이 함수를 가져다 사용할 수 있습니다.
 export const useCareListModal = () => {
@@ -34,15 +35,21 @@ export const CareListModal = ({
 }) => {
   const {fontSizeMode} = useFontSize();
   const navigation = useNavigation();  
+  const [careList, setCareList] = useState([]);
 
-  // 하드 코딩 목록 데이터
-  const careList = [
-    { name: '현주', email: 'aaa@medeasy.dev', type: '내 계정' },
-    { name: '홍영준', email: 'bbb@medeasy.dev', type: '피보호자' },
-    { name: '박지원', email: 'ccc@medeasy.dev', type: '피보호자' },
-    { name: '양예영', email: 'ddd@medeasy.dev', type: '피보호자' },
-    { name: '김가영', email: 'eee@medeasy.dev', type: '피보호자' },
-  ];
+  useEffect(() => {
+    const fetchCareList = async () => {
+      try {
+        const response = await getCareList();
+        console.log("관리 대상 목록: ", response.data.body);
+        setCareList(response.data.body);
+      } catch (error) {
+        console.error('careList 불러오기 실패:', error);
+      }
+    };
+
+    if (visible) fetchCareList(); // 모달이 열릴 때만 호출
+  }, [visible]);
 
   const handleAddCareTarget = () => {
     onClose();
@@ -67,7 +74,7 @@ export const CareListModal = ({
           <CareListItem key={index}>
             <LeftContainer>
               <IconContainer>
-                {item.type === '내 계정' ? (
+                {item.tag === '내 계정' ? (
                   <OtherIcons.CheckCircle />
                 ) : (
                   <PlaceholderView />
@@ -78,7 +85,7 @@ export const CareListModal = ({
                 <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
               </UserInfoContainer>
             </LeftContainer>
-            <Tag sizeType='small' colorType='resultPrimary'>{item.type}</Tag>
+            <Tag sizeType="small" colorType="resultPrimary">{item.tag}</Tag>
           </CareListItem>
         ))}
       </CareListContainer>
