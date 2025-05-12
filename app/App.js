@@ -54,6 +54,8 @@ import {navigationRef} from './screens/Navigation/NavigationRef';
 import RoutineUrlService from './services/RoutineUrlService';
 import { setAuthToken } from './api';
 
+import { validateAndRefreshToken } from './api/services/tokenService';
+
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -253,10 +255,11 @@ const App = () => {
   useEffect(() => {
     const checkAutoLogin = async () => {
       try {
-        const token = await getAccessToken();
-        if (token && token !== 'undefined' && token.trim() !== '') {
-          console.log('[AutoLogin] 토큰 있음, NavigationBar로 이동');
-          setAuthToken(token); // axios 헤더 설정
+        // 토큰 유효성 검증 및 필요시 갱신
+        const isTokenValid = await validateAndRefreshToken();
+        
+        if (isTokenValid) {
+          console.log('[AutoLogin] 토큰 유효함, NavigationBar로 이동');
           setInitialScreen('NavigationBar');
         } else {
           console.log('[AutoLogin] 유효하지 않은 토큰, SignUpStart로 이동');
