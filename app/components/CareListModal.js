@@ -36,19 +36,23 @@ export const CareListModal = ({
   const {fontSizeMode} = useFontSize();
   const navigation = useNavigation();  
   const [careList, setCareList] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   useEffect(() => {
-    const fetchCareList = async () => {
-      try {
-        const response = await getCareList();
-        console.log("관리 대상 목록: ", response.data.body);
-        setCareList(response.data.body);
-      } catch (error) {
-        console.error('careList 불러오기 실패:', error);
-      }
-    };
+  const fetchCareList = async () => {
+    try {
+      const response = await getCareList();
+      const careList = response.data.body;
+      console.log("관리 대상 목록: ", careList);
+      setCareList(careList);
+      const myAccount = careList.find(item => item.tag === '내 계정');
+      if (myAccount) setSelectedUserId(myAccount.user_id);
+    } catch (error) {
+      console.error('careList 불러오기 실패:', error);
+    }
+  };
 
-    if (visible) fetchCareList(); // 모달이 열릴 때만 호출
+    if (visible) fetchCareList();
   }, [visible]);
 
   const handleAddCareTarget = () => {
@@ -71,22 +75,24 @@ export const CareListModal = ({
 
       <CareListContainer>
         {careList.map((item, index) => (
-          <CareListItem key={index}>
-            <LeftContainer>
-              <IconContainer>
-                {item.tag === '내 계정' ? (
-                  <OtherIcons.CheckCircle />
-                ) : (
-                  <PlaceholderView />
-                )}
-              </IconContainer>
-              <UserInfoContainer>
-                <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
-                <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
-              </UserInfoContainer>
-            </LeftContainer>
-            <Tag sizeType="small" colorType="resultPrimary">{item.tag}</Tag>
-          </CareListItem>
+          <TouchableCareItem key={index} onPress={() => setSelectedUserId(item.user_id)}>
+            <CareListItem>
+              <LeftContainer>
+                <IconContainer>
+                  {selectedUserId === item.user_id ? (
+                    <OtherIcons.CheckCircle />
+                  ) : (
+                    <PlaceholderView />
+                  )}
+                </IconContainer>
+                <UserInfoContainer>
+                  <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
+                  <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
+                </UserInfoContainer>
+              </LeftContainer>
+              <Tag sizeType="small" colorType="resultPrimary">{item.tag}</Tag>
+            </CareListItem>
+          </TouchableCareItem>
         ))}
       </CareListContainer>
 
@@ -168,5 +174,8 @@ const UnderlinedButtonText = styled.Text`
   text-decoration: underline;
   text-decoration-color: ${themes.light.textColor.Primary50};
 `;
+
+const TouchableCareItem = styled.TouchableOpacity``;
+
 
 export default CareListModal;
