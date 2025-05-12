@@ -5,6 +5,7 @@ import {themes, fonts} from './../../styles';
 import {ProgressBar, BackAndNextButtons} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { handleSignUp } from '../../api/services/authService';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -74,15 +75,24 @@ const SignUpPasswordScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
   const progress = '75%';
 
-  const handleNext = () => {
-    if (password) {
-      updateSignUpData({password});
-      // 다음 페이지로 이동
-      navigation.navigate('SignUpDOBGender');
-    } else {
+  const handleNext = async () => {
+    if (!password) {
       alert('비밀번호를 입력하세요.');
+      return;
+    }
+  
+    try {
+      const updatedData = { ...signUpData, password };
+      updateSignUpData(updatedData); // 선택: context 업데이트 유지하려면
+  
+      await handleSignUp(updatedData, navigation); // 여기서 회원가입 요청
+      console.log('회원가입 성공!');
+    } catch (error) {
+      console.error('회원가입 실패:', error);
+      alert('회원가입에 실패했습니다. 다시 시도해주세요.');
     }
   };
+  
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -142,6 +152,7 @@ const SignUpPasswordScreen = ({navigation}) => {
         </Container2>
         <BtnContainer>
           <BackAndNextButtons
+            nextTitle="메디지 시작하기"
             onPressPrev={() => navigation.goBack()}
             onPressNext={handleNext}
           />

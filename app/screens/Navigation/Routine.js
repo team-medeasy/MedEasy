@@ -1,9 +1,10 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useState, useRef, useCallback} from 'react';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {ScrollView, Dimensions, FlatList, Platform} from 'react-native';
+import {ScrollView, Dimensions, FlatList} from 'react-native';
 import styled from 'styled-components/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {HeaderIcons, OtherIcons, Images} from '../../../assets/icons';
-import {themes} from '../../styles';
+import {pointColor, themes} from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
 import LinearGradient from 'react-native-linear-gradient';
@@ -16,7 +17,8 @@ import {
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
 import RoutineCard from '../../components/RoutineCard';
-import EmptyState from '../../components/\bEmptyState';
+import EmptyState from '../../components/EmptyState';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const {width} = Dimensions.get('window');
 
@@ -25,6 +27,9 @@ const Routine = ({route}) => {
   const flatListRef = useRef(null);
   const navigation = useNavigation();
   const paramDate = route.params?.selectedDate; // 스크롤할 날짜 파라미터
+  const { fontSizeMode } = useFontSize();
+
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   const [timeMapping, setTimeMapping] = useState({
     MORNING: {label: '아침', time: '', sortValue: ''},
@@ -39,19 +44,9 @@ const Routine = ({route}) => {
     if (lowerName.includes('아침')) return 'MORNING';
     if (lowerName.includes('점심')) return 'LUNCH';
     if (lowerName.includes('저녁')) return 'DINNER';
-    if (lowerName.includes('취침') || lowerName.includes('자기 전'))
-      return 'BEDTIME';
+    if (lowerName.includes('자기 전')) return 'BEDTIME';
 
     return null;
-  };
-
-  const getTimeTypeFromTime = timeString => {
-    const hour = parseInt(timeString.split(':')[0], 10);
-
-    if (hour >= 5 && hour < 10) return 'MORNING';
-    if (hour >= 10 && hour < 14) return 'LUNCH';
-    if (hour >= 14 && hour < 20) return 'DINNER';
-    return 'BEDTIME';
   };
 
   useFocusEffect(
@@ -325,8 +320,7 @@ const Routine = ({route}) => {
 
       day.user_schedule_dtos.forEach(schedule => {
         const timeType =
-          getTimeTypeFromScheduleName(schedule.name) ||
-          getTimeTypeFromTime(schedule.take_time);
+          getTimeTypeFromScheduleName(schedule.name);
 
         if (!routineMap[dateKey][timeType]) {
           routineMap[dateKey][timeType] = {};
@@ -364,8 +358,7 @@ const Routine = ({route}) => {
       dayData.user_schedule_dtos.forEach(schedule => {
         // 스케줄 이름으로 시간대 결정, 없으면 시간으로 판단
         const timeType =
-          getTimeTypeFromScheduleName(schedule.name) ||
-          getTimeTypeFromTime(schedule.take_time);
+          getTimeTypeFromScheduleName(schedule.name);
 
         // 해당 스케줄의 약물 정보 처리
         if (schedule.routine_dtos && schedule.routine_dtos.length > 0) {
@@ -500,17 +493,17 @@ const Routine = ({route}) => {
             selectedDate.year === dayInfo.year
           }
           onPress={() => setSelectedDate(dayInfo)}>
-          <DayText>{dayInfo.day}</DayText>
-          <DateText isToday={dayInfo.isToday}>{dayInfo.date}</DateText>
+          <DayText fontSizeMode={fontSizeMode}>{dayInfo.day}</DayText>
+          <DateText isToday={dayInfo.isToday} fontSizeMode={fontSizeMode}>{dayInfo.date}</DateText>
         </DayBox>
       ))}
     </WeekContainer>
   );
 
   return (
-    <Container>
+    <Container style={{ paddingTop: insets.top }}>
       <Header>
-        <HeaderText>루틴</HeaderText>
+        <HeaderText fontSizeMode={fontSizeMode}>루틴</HeaderText>
         <ReturnButton
           onPress={() => {
             // 오늘 날짜로 선택 날짜 변경
@@ -535,7 +528,7 @@ const Routine = ({route}) => {
             height={11}
             style={{color: themes.light.pointColor.Primary10}}
           />
-          <ButtonText>돌아가기</ButtonText>
+          <ButtonText fontSizeMode={fontSizeMode}>돌아가기</ButtonText>
         </ReturnButton>
       </Header>
 
@@ -576,7 +569,7 @@ const Routine = ({route}) => {
             <TodayHeader today={today} selectedDate={selectedDate} />
             <MedicineListButton
               onPress={() => navigation.navigate('MedicineList')}>
-              <MedicineListText>전체 목록</MedicineListText>
+              <MedicineListText fontSizeMode={fontSizeMode}>전체 목록</MedicineListText>
               <HeaderIcons.chevron
                 width={11}
                 height={11}
@@ -592,40 +585,43 @@ const Routine = ({route}) => {
         <ScrollView contentContainerStyle={{paddingVertical: 70}}>
           <ScheduleContainer>
             {/* 타임라인 컨테이너 추가 */}
-            <TimelineContainer>
-              {/* 타임라인 세로줄 */}
-              <TimelineLine />
+           <TimelineContainer>
+            {allRoutines.length > 0 && (
+              <TimelineLine
+                colors={[pointColor.pointPrimaryDark, pointColor.primary20]}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+              />
+            )}
 
-              {/* 모든 루틴을 시간순으로 렌더링 */}
-
-              {allRoutines.length === 0 ? (
+            {/* 루틴 또는 빈 상태 렌더링 */}
+            {allRoutines.length === 0 ? (
+              <EmptyContainer>
                 <EmptyState
                   image={
                     <Images.emptyRoutine
-                      style={{marginBottom: 32, marginTop: 80}}
+                      style={{ marginBottom: 32, marginTop: 80 }}
                     />
                   }
                   title="루틴이 없습니다."
                   description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
                 />
-              ) : (
-                allRoutines.map((routine, index) => (
-                  <RoutineCard
-                    key={routine.id}
-                    routine={routine}
-                    index={index}
-                    allLength={allRoutines.length}
-                    checkedItems={checkedItems}
-                    toggleTimeCheck={toggleTimeCheck}
-                    //toggleHospitalCheck={toggleHospitalCheck}
-                    toggleCheck={toggleCheck}
-                    selectedDateString={selectedDate.fullDate.format(
-                      'YYYY-MM-DD',
-                    )}
-                  />
-                ))
-              )}
-            </TimelineContainer>
+              </EmptyContainer>
+            ) : (
+              allRoutines.map((routine, index) => (
+                <RoutineCard
+                  key={routine.id}
+                  routine={routine}
+                  index={index}
+                  allLength={allRoutines.length}
+                  checkedItems={checkedItems}
+                  toggleTimeCheck={toggleTimeCheck}
+                  toggleCheck={toggleCheck}
+                  selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
+                />
+              ))
+            )}
+          </TimelineContainer>
           </ScheduleContainer>
         </ScrollView>
       </RoundedBox>
@@ -633,7 +629,7 @@ const Routine = ({route}) => {
   );
 };
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.pointColor.Primary};
 `;
@@ -647,7 +643,7 @@ const Header = styled.View`
 `;
 
 const HeaderText = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({ fontSizeMode }) => FontSizes.title[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
   padding-left: 10px;
@@ -664,7 +660,7 @@ const ReturnButton = styled.TouchableOpacity`
 `;
 
 const ButtonText = styled.Text`
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]}px;
   font-family: 'Pretendart-Medium';
   color: ${themes.light.pointColor.Primary10};
 `;
@@ -679,7 +675,7 @@ const MedicineListButton = styled(ReturnButton)`
 const MedicineListText = styled(ButtonText)`
   color: ${themes.light.textColor.Primary50};
   font-family: 'Pretendart-Medium';
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]}px;
 `;
 
 // 페이징을 위한 컨테이너
@@ -706,13 +702,13 @@ const DayBox = styled.TouchableOpacity`
 `;
 
 const DayText = styled.Text`
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.buttonText};
 `;
 
 const DateText = styled.Text`
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]}px;
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.buttonText};
 `;
@@ -736,20 +732,29 @@ const TodayContainer = styled.View`
   justify-content: space-between;
   padding: 20px 30px;
 `;
+
 // 타임라인 관련 스타일 추가
 const TimelineContainer = styled.View`
-  //padding-top: 10px;
   padding-left: 30px;
   position: relative;
 `;
 
-const TimelineLine = styled.View`
+const TimelineLine = styled(LinearGradient)`
   position: absolute;
-  left: 21px;
-  top: 30px;
-  bottom: 30px;
+  left: 22px;    
+  top: 20px;
   width: 6px;
-  background-color: ${themes.light.pointColor.Primary};
+  height: 100%;   
+  z-index: 0;
+  border-radius: 3px;
+`;
+
+// TimelineContainer에 좌측 여백이 있으므로, 우측에 30px 여백이 있어야 중앙에 정렬됨
+const EmptyContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-right: 30px;
 `;
 
 export default Routine;

@@ -1,7 +1,8 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import {View, TouchableOpacity} from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
 import {themes} from './../../styles';
 import {
@@ -14,17 +15,24 @@ import CalendarWidget from '../../components/CalendarWidget';
 import TodayHeader from '../../components/TodayHeader';
 import HomeRoutine from '../../components/HomeRoutine';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+import {useCareListModal} from '../../components/CareListModal';
 import dayjs from 'dayjs';
 dayjs.locale('ko');
 
 import {useSignUp} from '../../api/context/SignUpContext';
 import {getRoutineByDate} from '../../api/routine';
-import { getUser } from '../../api/user';
-import { getUnreadNotification } from '../../api/notification';
+import {getUser} from '../../api/user';
+import {getUnreadNotification} from '../../api/notification';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const Home = () => {
   const navigation = useNavigation();
   const {signUpData} = useSignUp();
+  const {fontSizeMode} = useFontSize();
+  const {modalVisible, openModal, closeModal, CareListModalComponent} = useCareListModal();
+  const isFocused = useIsFocused(); // 화면 포커스 상태 확인
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   const [medicineRoutines, setMedicineRoutines] = useState([]);
   const [todayRoutine, setTodayRoutine] = useState(null);
@@ -33,6 +41,7 @@ const Home = () => {
 
   const [userName, setUserName] = useState('');
   const [isUnreadNotification, setIsUnreadNotification] = useState(false);
+  const [lastCheckTime, setLastCheckTime] = useState(0); // 마지막 알림 확인 시간 추적
   
   useFocusEffect(
     useCallback(() => {
@@ -62,6 +71,33 @@ const Home = () => {
     year: today.year(),
     fullDate: today,
   });
+
+  // 안읽은 알림 상태 확인 함수
+  const fetchUnreadNotification = async () => {
+    try {
+      const response = await getUnreadNotification();
+      console.log('안읽은 알림 여부 응답:', response.data.body);
+      setIsUnreadNotification(response.data.body.is_unread);
+      setLastCheckTime(Date.now()); // 마지막 확인 시간 업데이트
+    } catch (error) {
+      console.error('안읽은 알림 확인 실패:', error);
+      setIsUnreadNotification(false);
+    }
+  };
+
+  // 화면이 포커스될 때마다 알림 상태 확인
+  useEffect(() => {
+    if (isFocused) {
+      console.log('홈 화면 포커스 감지: 안읽은 알림 상태 확인');
+      fetchUnreadNotification();
+    }
+  }, [isFocused]);
+
+  // 포커스 효과 외에도 컴포넌트가 마운트될 때 추가 호출
+  useEffect(() => {
+    console.log('홈 컴포넌트 마운트: 초기 알림 상태 확인');
+    fetchUnreadNotification();
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -186,7 +222,13 @@ const Home = () => {
   };
 
   const handleNotificationPress = () => {
-    navigation.navigate('Notification');
+    navigation.navigate('Notification', {
+      onGoBack: () => {
+        // 알림 화면에서 돌아올 때 실행될 콜백
+        console.log('알림 화면에서 돌아옴 - 즉시 알림 상태 확인');
+        fetchUnreadNotification();
+      }
+    });
   };
 
   const handleAddMedicineRoutine = () => {
@@ -197,31 +239,8 @@ const Home = () => {
   //   navigation.navigate('AddHospitalVisit'); // 병원 진료 추가 화면으로 이동
   // };
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchUnreadNotification = async () => {
-        try {
-          const response = await getUnreadNotification();
-          console.log('안읽은 알림 여부 응답:', response.data.body);
-          setIsUnreadNotification(response.data.body);
-        } catch (error) {
-          console.error('안읽은 알림 확인 실패:', error);
-          setIsUnreadNotification(false);
-        }
-      };
-
-      fetchUnreadNotification();
-    }, [])
-  );
-
-
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: themes.light.bgColor.bgPrimary,
-        paddingTop: 68,
-      }}>
+    <Container style={{ paddingTop: insets.top }}>
       <ScrollContainer>
         <Header>
           <LogoContainer>
@@ -254,9 +273,17 @@ const Home = () => {
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
-            <ReminderText>
-              {userName}님, {'\n'}까먹은 약이 있어요.
-            </ReminderText>
+            <TouchableOpacity onPress={openModal}>
+              <ReminderText fontSizeMode={fontSizeMode}>
+              {todayRoutine
+                ? `${userName}님,\n까먹은 약이 있어요.`
+                : `${userName}님,\n건강한 하루 보내세요!`}
+              </ReminderText>
+            </TouchableOpacity>
+
+            {/* 모달 컴포넌트 */}
+            {CareListModalComponent}
+
             <LogoIcons.logo
               width={70}
               height={112}
@@ -286,7 +313,7 @@ const Home = () => {
                   height={115}
                   style={{color: themes.light.pointColor.primary30}}
                 />
-                <RoutineButtonText>루틴을 추가해주세요.</RoutineButtonText>
+                <RoutineButtonText fontSizeMode={fontSizeMode}>루틴을 추가해주세요.</RoutineButtonText>
               </RoutineButton>
             </View>
           )}
@@ -302,7 +329,7 @@ const Home = () => {
                       marginRight: 10,
                     }}
                   />
-                  <ButtonText>복용 루틴 추가하기</ButtonText>
+                  <ButtonText fontSizeMode={fontSizeMode}>복용 루틴 추가하기</ButtonText>
                 </ButtonInfo>
                 <HeaderIcons.chevron
                   height={16}
@@ -346,13 +373,13 @@ const Home = () => {
             height={16}
             style={{color: themes.light.pointColor.Primary}}
           />
-          <EventText>복용 완료</EventText>
+          <EventText fontSizeMode={fontSizeMode}>복용 완료</EventText>
           <RoutineIcons.medicine
             width={16}
             height={16}
             style={{color: themes.light.textColor.Primary20}}
           />
-          <EventText>미복용</EventText>
+          <EventText fontSizeMode={fontSizeMode}>미복용</EventText>
           {/* <RoutineIcons.hospital
             width={16}
             height={16}
@@ -380,8 +407,8 @@ const Home = () => {
                   style={{color: themes.light.pointColor.Primary}}
                 />
                 <ListText>
-                  <RoutineTitle>{routine.medicineTitle}</RoutineTitle>
-                  <RoutineTime>
+                  <RoutineTitle fontSizeMode={fontSizeMode}>{routine.medicineTitle}</RoutineTitle>
+                  <RoutineTime fontSizeMode={fontSizeMode}>
                     {routine.timeName} • {routine.takeTime}
                   </RoutineTime>
                 </ListText>
@@ -396,13 +423,19 @@ const Home = () => {
           ))}
         </RoutineListContainer>
       </ScrollContainer>
-    </View>
+    </Container>
   );
 };
+
+const Container = styled.View`
+  flex: 1;
+  background-color: ${themes.light.bgColor.bgPrimary}
+`;
 
 const ScrollContainer = styled.ScrollView`
   flex: 1;
 `;
+
 const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
@@ -431,7 +464,7 @@ const TextContainer = styled.View`
 `;
 
 const ReminderText = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   margin-left: 10px;
 `;
@@ -446,7 +479,7 @@ const RoutineButton = styled(TouchableOpacity)`
 `;
 
 const RoutineButtonText = styled.Text`
-  font-size: ${FontSizes.body.medium};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.pointColor.Primary};
   margin-top: 10px;
@@ -477,8 +510,8 @@ const ButtonInfo = styled.View`
 `;
 
 const ButtonText = styled.Text`
-  font-size: ${FontSizes.body.medium};
-  font-family: 'Pretendard-SemiBold';
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
@@ -491,7 +524,8 @@ const EventIcons = styled.View`
 `;
 
 const EventText = styled.Text`
-  font-size: ${FontSizes.caption.medium};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary50};
   padding-right: 10px;
 `;
@@ -529,14 +563,14 @@ const ListText = styled.View`
 `;
 
 const RoutineTitle = styled.Text`
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Medium';
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const RoutineTime = styled.Text`
-  font-size: ${FontSizes.caption.default};
-  font-family: 'Pretendard-Medium';
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary50};
 `;
 

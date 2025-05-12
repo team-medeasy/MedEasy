@@ -12,6 +12,7 @@ import {
 } from '../../components';
 import { ScheduleSelector } from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { 
   createRoutine, 
   deleteRoutineGroup, 
@@ -23,6 +24,8 @@ import { getMedicineById } from '../../api/medicine';
 const SetMedicineRoutine = ({ route, navigation }) => {
   // 네비게이션 파라미터 확인 및 로깅
   console.log('🔍 route.params:', JSON.stringify(route.params));
+
+  const {fontSizeMode} = useFontSize();
   
   const { 
     medicineId, 
@@ -539,7 +542,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
       <ModalHeader
         showDelete="true"
         DeleteColor={themes.light.pointColor.Secondary}
-        onDeletePress={() => handleModifyRoutine()}
+        onDeletePress={() => handleDeleteRoutineGroup()}
       >
         {isEditing && !isPrescriptionMode ? '루틴 수정' : '루틴 등록'}
       </ModalHeader>
@@ -549,9 +552,11 @@ const SetMedicineRoutine = ({ route, navigation }) => {
           paddingBottom: 150,
         }}>
         <MedicineOverview
-          medicine={medicine}
-          isFavorite={isFavorite}
-          setIsFavorite={setIsFavorite}
+            medicine={{
+              ...medicine,
+              // item_id가 없다면 medicineId를 사용
+              item_id: medicine.item_id || medicineId
+            }}
           onPressEnlarge={handlePressEnlarge}
         />
 
@@ -564,7 +569,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
           }}>
           {/* 별명 */}
           <Section>
-            <SectionHeader title="별명" />
+            <SectionHeader title="별명" fontSizeMode={fontSizeMode} />
             <InputWithDelete
               placeholder="약 별명을 입력하세요"
               value={medicineName}
@@ -574,7 +579,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
 
           {/* 주기 선택 */}
           <Section>
-            <SectionHeader title="복용 주기" />
+            <SectionHeader title="복용 주기" fontSizeMode={fontSizeMode} />
             <SelectDay>
               <DualTextButton
                 title={'매일'}
@@ -610,6 +615,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
               title="복용 시간대"
               buttonText="시간대 설정하기"
               onButtonPress={handleSetTimings}
+              fontSizeMode={fontSizeMode}
             />
             <SelectTime>
               <ScheduleSelector
@@ -623,7 +629,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
 
           {/* 1회 복용량 */}
           <Section>
-            <SectionHeader title="1회 복용량" />
+            <SectionHeader title="1회 복용량" fontSizeMode={fontSizeMode} />
             <InputWithDelete
               placeholder="복용량을 입력하세요"
               value={dosage}
@@ -636,7 +642,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
           <Section style={{
             marginBottom: 34
           }}>
-            <SectionHeader title="총 개수" />
+            <SectionHeader title="총 개수" fontSizeMode={fontSizeMode} />
             <InputWithDelete
               placeholder="총 개수를 입력하세요"
               value={totalCount}
@@ -677,7 +683,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
 };
 
 // 섹션 헤더 컴포넌트
-const SectionHeader = ({ title, buttonText, onButtonPress }) => {
+const SectionHeader = ({ title, buttonText, onButtonPress, fontSizeMode }) => {
   return (
     <View
       style={{
@@ -685,7 +691,7 @@ const SectionHeader = ({ title, buttonText, onButtonPress }) => {
         justifyContent: 'space-between',
         alignItems: 'center',
       }}>
-      <SectionTitle>{title}</SectionTitle>
+      <SectionTitle fontSizeMode={fontSizeMode}>{title}</SectionTitle>
       {buttonText && (
         <HeaderButton
           onPress={onButtonPress}
@@ -694,7 +700,7 @@ const SectionHeader = ({ title, buttonText, onButtonPress }) => {
             alignItems: 'center',
             gap: 5,
           }}>
-          <HeaderButtonText>{buttonText}</HeaderButtonText>
+          <HeaderButtonText fontSizeMode={fontSizeMode}>{buttonText}</HeaderButtonText>
           <HeaderIcons.chevron width={15} height={15} style={{ color: themes.light.textColor.Primary20, transform: [{ rotate: '180deg' }] }} />
         </HeaderButton>
       )}
@@ -713,7 +719,7 @@ const Section = styled.View`
 
 const SectionTitle = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   color: ${themes.light.textColor.textPrimary};
 `;
 
@@ -721,30 +727,12 @@ const HeaderButton = styled.TouchableOpacity``;
 
 const HeaderButtonText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.Primary30};
 `;
 
 const SelectDay = styled.View`
   gap: 10px;
-`;
-
-const DaySelection = styled.View`
-  flex-direction: row;
-  gap: 10px;
-  justify-content: center;
-`;
-
-const DayButton = styled.TouchableOpacity`
-  background-color: ${(props) => (props.selected ? themes.light.pointColor.Primary : themes.light.boxColor.inputSecondary)};
-  padding: 8px 10px;
-  border-radius: 5px;
-`;
-
-const DayText = styled.Text`
-  color: ${(props) => (props.selected ? themes.light.textColor.buttonText : themes.light.textColor.Primary30)};
-  font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-SemiBold';
 `;
 
 const SelectTime = styled.View`

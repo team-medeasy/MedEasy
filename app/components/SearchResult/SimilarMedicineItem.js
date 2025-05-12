@@ -3,10 +3,13 @@ import { TouchableOpacity, Image, View, Text } from 'react-native';
 import { Tag } from '../../components';
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { PlaceholderImage } from './PlaceholderImage';
 import { getMedicineById } from '../../api/medicine';
 
 export const SimilarMedicineItem = ({ item, navigation, isModal }) => {
+  const {fontSizeMode} = useFontSize();
+  
   const hasImage = !!item.item_image;
 
   const handlePressMedicine = async () => {
@@ -54,16 +57,18 @@ export const SimilarMedicineItem = ({ item, navigation, isModal }) => {
         <Text
           style={{
             fontFamily: 'Pretendard-SemiBold',
-            fontSize: FontSizes.caption.default,
+            fontSize: FontSizes.caption[fontSizeMode],
             color: themes.light.textColor.Primary50,
           }}
+          numberOfLines={1}
+          ellipsizeMode="tail"
         >
           {item.entp_name}
         </Text>
         <Text
           style={{
             fontFamily: 'Pretendard-Bold',
-            fontSize: FontSizes.body.default,
+            fontSize: FontSizes.body[fontSizeMode],
             color: themes.light.textColor.textPrimary,
           }}
           numberOfLines={1}

@@ -8,22 +8,19 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-# ✅ 정적 프레임워크 사용 (iOS 17/18 SDK 및 Swift 라이브러리와의 호환성 개선)
+# ✅ 정적 프레임워크 사용
 use_frameworks! :linkage => :static
 
 target 'MedEasy' do
-  # ❌ use_modular_headers! 제거 - Xcode 16.2에서 빌드 오류 발생
-  # use_modular_headers! 
-
   config = use_native_modules!
 
-  # Firebase 관련 Pods을 위한 명시적 설정
-  # pod 'FirebaseCoreInternal', :modular_headers => true
-  # pod 'GoogleUtilities', :modular_headers => true
+  # 카카오 SDK 의존성 추가
+  pod 'KakaoSDKCommon'
+  pod 'KakaoSDKAuth'
+  pod 'KakaoSDKUser'
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # 명시적으로 New Architecture 비활성화
     :fabric_enabled => false,
     :hermes_enabled => true,
     :app_path => "#{Pod::Config.instance.installation_root}/.."

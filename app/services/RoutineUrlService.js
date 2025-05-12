@@ -26,6 +26,19 @@ const parseTimeString = (timeString) => {
   return { hour: hours, minute: minutes };
 };
 
+// 한국 시간 기준 오늘 날짜를 YYYY-MM-DD 형식으로 가져오는 함수
+const getKoreanToday = () => {
+  // 로컬 시간대(한국)에서 년, 월, 일 가져오기
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // getMonth()는 0부터 시작
+  const day = String(now.getDate()).padStart(2, '0');
+  
+  const formattedDate = `${year}-${month}-${day}`;
+  console.log('[RoutineUrlService] 한국 기준 오늘 날짜:', formattedDate);
+  return formattedDate;
+};
+
 // 현재 시간에 가장 가까운 루틴 찾기 함수
 const findClosestRoutineByTime = (routineGroups) => {
   console.log('[RoutineUrlService] 가장 가까운 루틴 찾기 시작');
@@ -41,15 +54,28 @@ const findClosestRoutineByTime = (routineGroups) => {
   const currentTotalMinutes = currentHour * 60 + currentMinute;
   
   console.log(`[RoutineUrlService] 현재 시간: ${currentHour}:${currentMinute} (${currentTotalMinutes}분)`);
+  console.log(`[RoutineUrlService] 현재 로컬 시간 전체: ${now.toString()}`);
   
   let closestSchedule = null;
   let minTimeDifference = Number.MAX_SAFE_INTEGER;
   
-  // 오늘 날짜의 루틴 그룹 찾기
+  // 오늘 날짜의 루틴 그룹 찾기 (날짜 비교 로직 개선)
   const todayGroup = routineGroups.find(group => {
-    const groupDate = new Date(group.take_date);
+    // API에서 받은 날짜(YYYY-MM-DD)를 파싱
+    const [groupYear, groupMonth, groupDay] = group.take_date.split('-').map(Number);
+    
+    // 현재 로컬 날짜 (한국 시간)
     const today = new Date();
-    return groupDate.toDateString() === today.toDateString();
+    const todayYear = today.getFullYear();
+    const todayMonth = today.getMonth() + 1; // getMonth()는 0부터 시작
+    const todayDay = today.getDate();
+    
+    // 로그 추가
+    console.log(`[RoutineUrlService] 루틴 그룹 날짜: ${groupYear}-${groupMonth}-${groupDay}`);
+    console.log(`[RoutineUrlService] 현재 로컬 날짜: ${todayYear}-${todayMonth}-${todayDay}`);
+    
+    // 년, 월, 일이 모두 일치하는지 확인
+    return groupYear === todayYear && groupMonth === todayMonth && groupDay === todayDay;
   });
   
   if (!todayGroup) {
@@ -202,9 +228,15 @@ const handleUrlScheme = async (url) => {
     console.log('[RoutineUrlService] URL 스킴 처리 시작:', url);
     isProcessing = true;  // 처리 중 플래그 설정
     
-    // 현재 날짜 생성
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD 형식
-    console.log('[RoutineUrlService] 오늘 날짜:', today);
+    // 현재 날짜 생성 (한국 시간 기준)
+    const today = getKoreanToday(); // 수정된 부분: toISOString() 대신 한국 시간대 기준 함수 사용
+    console.log('[RoutineUrlService] 한국 시간대 기준 오늘 날짜:', today);
+    
+    // 시간대 관련 추가 로그
+    const nowDate = new Date();
+    console.log('[RoutineUrlService] 현재 로컬 시간:', nowDate.toString());
+    console.log('[RoutineUrlService] 현재 UTC 시간:', nowDate.toUTCString());
+    console.log('[RoutineUrlService] 로컬 시간과 UTC의 시차(분):', nowDate.getTimezoneOffset());
     
     // 오늘의 루틴 목록 가져오기
     console.log('[RoutineUrlService] API 호출: getRoutineByDate 시작');
@@ -339,6 +371,13 @@ const initializeService = () => {
   console.log('- 모달 표시 상태:', isModalVisible);
   console.log('- 현재 루틴 데이터:', currentRoutineData);
   console.log('- 마지막 처리 URL:', lastProcessedUrl);
+  
+  // 현재 시간대 정보 출력
+  const now = new Date();
+  console.log('[RoutineUrlService] 현재 시간대 정보:');
+  console.log('- 로컬 시간:', now.toString());
+  console.log('- UTC 시간:', now.toUTCString());
+  console.log('- 시차(분):', now.getTimezoneOffset());
   
   console.log('[RoutineUrlService] 초기화 완료');
 };

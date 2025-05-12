@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
 import {resetNavigate} from './Navigation/NavigationRef';
 import styled from 'styled-components/native';
 import {
@@ -9,12 +8,14 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import {themes} from '../styles';
 import {Header} from '../components/Header/Header';
 import {RoutineIcons, Images} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
-import {getNotificationList, markNotificationAsRead} from '../api/notification';
-import EmptyState from '../components/\bEmptyState';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
+import {getNotificationList, markNotificationAsRead, markAllNotificationsAsRead} from '../api/notification';
+import EmptyState from '../components/EmptyState';
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
 // 날짜 형식 변환 함수
@@ -41,14 +42,25 @@ const formatDate = dateString => {
   return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
 
-const Notification = () => {
-  const navigation = useNavigation();
+const Notification = ({route, navigation}) => {
+  const {fontSizeMode} = useFontSize();
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMoreData, setHasMoreData] = useState(true);
   const PAGE_SIZE = 10;
+
+  // 화면에서 벗어날 때 콜백 호출을 위한 로직
+  useEffect(() => {
+    // 화면이 언마운트될 때 onGoBack 콜백 실행
+    return () => {
+      if (route.params?.onGoBack) {
+        console.log('알림 화면 종료: onGoBack 콜백 실행');
+        route.params.onGoBack();
+      }
+    };
+  }, [route.params]);
 
   const fetchNotifications = async (page = 0, refresh = false) => {
     if (loading) return;
@@ -92,9 +104,37 @@ const Notification = () => {
     }
   };
 
+  // 컴포넌트 마운트 시 첫 페이지 실행
   useEffect(() => {
-    fetchNotifications(0, true); // 컴포넌트 mount 시 첫 페이지 실행
+    fetchNotifications(0, true);
   }, []);
+
+  // 화면에서 포커스가 사라질 때 모든 알림 읽음 처리
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        // 화면을 떠날 때 모든 알림 읽음 처리
+        handleMarkAllAsRead();
+      };
+    }, []),
+  );
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllNotificationsAsRead();
+      console.log('모든 알림이 읽음 처리되었습니다.');
+      
+      // 현재 알림 목록을 읽음 상태로 UI 업데이트
+      setNotifications(prev => 
+        prev.map(notification => ({
+          ...notification,
+          is_read: true
+        }))
+      );
+    } catch (error) {
+      console.error('전체 알림 읽음 처리 실패:', error);
+    }
+  };
 
   const onRefresh = useCallback(() => {
     if (loading) return;
@@ -103,9 +143,12 @@ const Notification = () => {
     setCurrentPage(0);
     setHasMoreData(true);
 
-    // 새로고침 로직 - 첫 페이지부터 다시 로드
-    fetchNotifications(0, true).finally(() => {
-      setRefreshing(false);
+    // 새로고침 시 전체 알림 읽음 처리 추가
+    handleMarkAllAsRead().then(() => {
+      // 새로고침 로직 - 첫 페이지부터 다시 로드
+      fetchNotifications(0, true).finally(() => {
+        setRefreshing(false);
+      });
     });
   }, [loading]);
 
@@ -155,11 +198,11 @@ const Notification = () => {
             />
           ) : null}
           <NotiTextContainer>
-            <NotificationTitle>{item.title}</NotificationTitle>
-            <NotificationMessage>{item.content}</NotificationMessage>
+            <NotificationTitle fontSizeMode={fontSizeMode}>{item.title}</NotificationTitle>
+            <NotificationMessage fontSizeMode={fontSizeMode}>{item.content}</NotificationMessage>
           </NotiTextContainer>
         </NotiContainer>
-        <NotiTime>{item.formatted_time}</NotiTime>
+        <NotiTime fontSizeMode={fontSizeMode}>{item.formatted_time}</NotiTime>
       </NotificationItem>
     </TouchableOpacity>
   );
@@ -243,7 +286,7 @@ const NotiTextContainer = styled.View`
 `;
 
 const NotificationTitle = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
   margin-bottom: 10px;
@@ -251,13 +294,13 @@ const NotificationTitle = styled.Text`
 
 const NotificationMessage = styled.Text`
   width: 80%;
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
 `;
 
 const NotiTime = styled.Text`
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   color: ${themes.light.textColor.Primary30};
   font-family: 'Pretendard-SemiBold';
 `;

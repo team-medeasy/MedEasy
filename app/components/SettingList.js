@@ -7,6 +7,7 @@ import { SettingsIcons } from './../../assets/icons';
 import { themes } from './../styles';
 import { deleteUser } from '../api/user';
 import FontSizes from '../../assets/fonts/fontSizes';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 import { 
   removeAccessToken,
   removeRefreshToken, 
@@ -17,6 +18,7 @@ import { useSignUp } from '../api/context/SignUpContext';
 
 const SettingList = () => {
   const navigation = useNavigation();
+  const {fontSizeMode} = useFontSize();
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [password, setPassword] = useState('');
   const appVersion = "1.0.0"; // 앱 버전 정보
@@ -158,9 +160,9 @@ const SettingList = () => {
   const renderSettingItem = (item) => (
     <SettingItem key={item.name} onPress={() => handlePress(item.name)}>
       {item.icon}
-      <SettingText>{item.label}</SettingText>
+      <SettingText fontSizeMode={fontSizeMode}>{item.label}</SettingText>
       {item.name === 'AppVersion' && (
-        <VersionText>v{appVersion}</VersionText>
+        <VersionText fontSizeMode={fontSizeMode}>v{appVersion}</VersionText>
       )}
     </SettingItem>
   );
@@ -226,7 +228,7 @@ const SettingItem = styled.TouchableOpacity`
 `;
 
 const SettingText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
   margin-left: 20px;
@@ -234,7 +236,7 @@ const SettingText = styled.Text`
 `;
 
 const VersionText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
   margin-left: auto;

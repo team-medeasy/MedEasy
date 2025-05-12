@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect} from 'react';
 import styled from 'styled-components/native';
-import {Platform} from 'react-native';
+import {Platform, AppState} from 'react-native'; // AppState 추가
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
@@ -12,11 +12,18 @@ import CameraSearchScreen from '../screens/Search/CameraSearch.js';
 import CameraSearchResultsScreen from '../screens/Search/CameraSearchResults.js';
 import PhotoPreviewScreen from '../screens/Search/PhotoPreview.js';
 import Chat from '../screens/Chat/Chat.js';
+import VoiceChat from '../screens/Chat/VoiceChat.js';
 import {pointColor, themes} from './../styles';
 import {TabIcons, CameraIcons, OtherIcons} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
-import useRoutineUrl from '../hooks/useRoutineUrl'
+import useRoutineUrl from '../hooks/useRoutineUrl';
 import RoutineCheckModal from './RoutineCheckModal';
+import {useFontSize} from '../../assets/fonts/FontSizeContext.js';
+
+// 토큰 관리 및 사용자 정보 갱신을 위한 import 추가
+import { validateAndRefreshToken } from '../api/services/tokenService';
+import { getUser } from '../api/user';
+import { setUserInfo } from '../api/storage';
 
 // 카메라 버튼
 const CameraButton = ({onPress}) => {
@@ -35,6 +42,7 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   const navigation = useNavigation();
+  const {fontSizeMode} = useFontSize();
 
   const handleCameraPress = useCallback(async () => {
     console.log('Camera button pressed');
@@ -46,11 +54,63 @@ const TabNavigator = () => {
   }, [navigation]);
 
   const handleChatPress = useCallback(() => {
-    navigation.navigate('Chat');
+    navigation.navigate('VoiceChat');
   }, [navigation]);
 
   // useNfcListener 대신 useRoutineUrlHandler 사용
-  const { routineData, isModalVisible, closeModal } = useRoutineUrl();
+  const {routineData, isModalVisible, closeModal} = useRoutineUrl();
+
+  // 토큰 검증 및 사용자 정보 갱신 함수
+  const refreshUserInfo = useCallback(async () => {
+    try {
+      console.log('[NavigationBar] 토큰 검증 및 사용자 정보 갱신 시작');
+      
+      // 토큰 유효성 확인 및 필요시 갱신
+      const isTokenValid = await validateAndRefreshToken();
+      
+      if (isTokenValid) {
+        // 사용자 정보 새로 가져오기
+        const userResponse = await getUser();
+        console.log('[NavigationBar] 사용자 정보 갱신:', userResponse.data);
+        
+        const userData = userResponse.data?.body || {};
+        
+        // 사용자 정보 저장
+        await setUserInfo({
+          name: userData.name || '',
+          gender: userData.gender || '',
+          birthday: userData.birthday || '',
+        });
+        
+        console.log('[NavigationBar] 사용자 정보 갱신 완료');
+      } else {
+        console.warn('[NavigationBar] 토큰이 유효하지 않아 사용자 정보를 갱신하지 못했습니다');
+        // 필요시 로그인 화면으로 이동하는 로직 (선택적)
+        // navigation.reset({index: 0, routes: [{name: 'Auth'}]});
+      }
+    } catch (error) {
+      console.error('[NavigationBar] 사용자 정보 갱신 실패:', error);
+    }
+  }, [navigation]);
+
+  // 앱 마운트 시 및 포그라운드로 전환 시 사용자 정보 갱신
+  useEffect(() => {
+    // 컴포넌트 마운트 시 즉시 사용자 정보 갱신
+    refreshUserInfo();
+    
+    // 앱 상태 변경 리스너 설정 (백그라운드 → 포그라운드)
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        console.log('[NavigationBar] 앱이 활성화됨 - 사용자 정보 갱신 시도');
+        refreshUserInfo();
+      }
+    });
+    
+    // 컴포넌트 언마운트 시 리스너 정리
+    return () => {
+      subscription.remove();
+    };
+  }, [refreshUserInfo]);
 
   return (
     <MainContainer>
@@ -61,6 +121,10 @@ const TabNavigator = () => {
           },
           tabBarActiveTintColor: themes.light.pointColor.Primary,
           tabBarInactiveTintColor: themes.light.textColor.Primary20,
+          tabBarLabelStyle: {
+            fontSize: FontSizes.caption[fontSizeMode],
+            fontFamily: 'Pretendard-SemiBold',
+          },
         }}>
         <Tab.Screen
           name="홈"
@@ -132,11 +196,7 @@ const TabNavigator = () => {
         />
       </Tab.Navigator>
       <CameraButton onPress={handleCameraPress} />
-      {/* <ChatContainer>
-        <ChatBuble>
-          <BubbleTail />
-          <BubbleText>챗봇 약사에게{'\n'}상담해보세요!</BubbleText>
-        </ChatBuble>
+      <ChatContainer>
         <ChatButton onPress={handleChatPress}>
           <OtherIcons.chat
             width={25}
@@ -144,12 +204,12 @@ const TabNavigator = () => {
             style={{color: themes.light.pointColor.Primary}}
           />
         </ChatButton>
-      </ChatContainer> */}
-      
+      </ChatContainer>
+
       {/* ModalComponent 대신 RoutineCheckModal 사용 */}
-      <RoutineCheckModal 
-        visible={isModalVisible} 
-        onClose={closeModal} 
+      <RoutineCheckModal
+        visible={isModalVisible}
+        onClose={closeModal}
         routineData={routineData}
       />
     </MainContainer>
@@ -168,9 +228,6 @@ const RootNavigator = () => {
         name="Camera"
         component={CameraSearchScreen}
         options={{headerShown: false}}
-        // name="Camera"
-        // component={CameraSearchResultsScreen}
-        // options={{headerShown: false}}
       />
       <Stack.Screen
         name="PhotoPreview"
@@ -185,6 +242,11 @@ const RootNavigator = () => {
       <Stack.Screen
         name="Chat"
         component={Chat}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="VoiceChat"
+        component={VoiceChat}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

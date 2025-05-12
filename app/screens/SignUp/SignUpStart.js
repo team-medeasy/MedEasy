@@ -7,6 +7,9 @@ import {themes, fonts} from './../../styles';
 import {OtherIcons, Images} from './../../../assets/icons';
 const {kakao: KakaoIcon} = OtherIcons;
 
+// kakaologin
+import { handleKakaoLogin } from '../../api/services/authService';
+
 import FontSizes from '../../../assets/fonts/fontSizes';
 
 const Container = styled(SafeAreaView)`
@@ -51,6 +54,15 @@ const SignUpContainer = styled.View`
 `;
 
 const SignUpStartScreen = ({navigation}) => {
+  // 카카오 로그인 처리 함수
+  const onKakaoLogin = async () => {
+    try {
+      await handleKakaoLogin(navigation);
+    } catch (error) {
+      console.error('카카오 로그인 화면 처리 오류:', error);
+    }
+  };
+
   return (
     <Container>
       <TitleContainer>
@@ -68,7 +80,7 @@ const SignUpStartScreen = ({navigation}) => {
 
       <ButtonContainer>
         <IconTextButton
-          onPress={() => navigation.navigate('NavigationBar')}
+          onPress={onKakaoLogin}
           icon={
             <KakaoIcon
               height={18}

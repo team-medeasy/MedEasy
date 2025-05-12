@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import DateTimePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
 import { themes } from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 
 export const CustomCalendar = ({
   mode = 'single', // 'single' or 'range'
@@ -14,6 +15,7 @@ export const CustomCalendar = ({
   onRangeChange,
 }) => {
   const defaultStyles = useDefaultStyles();
+  const { fontSizeMode } = useFontSize();
   
   // 모드에 따라 초기 상태 설정
   const [selected, setSelected] = useState(
@@ -55,27 +57,27 @@ export const CustomCalendar = ({
     },
     selected_label: {
         fontFamily: `Pretendard-SemiBold`,
-        fontSize: FontSizes.body.default,
+        fontSize: FontSizes.body[fontSizeMode],
         color: themes.light.textColor.buttonText,
     },
     day_label: {
         fontFamily: `Pretendard-SemiBold`,
-        fontSize: FontSizes.body.default,
+        fontSize: FontSizes.body[fontSizeMode],
         color: themes.light.textColor.textPrimary,
     },
     weekday_label: {
         fontFamily: `Pretendard-Medium`,
-        fontSize: FontSizes.caption.default,
+        fontSize: FontSizes.caption[fontSizeMode],
         color: themes.light.textColor.textPrimary,
     },
     year_selector_label: {
         fontFamily: `Pretendard-Bold`,
-        fontSize: FontSizes.title.default,
+        fontSize: FontSizes.title[fontSizeMode],
         color: themes.light.textColor.textPrimary,
     },
     month_selector_label: {
         fontFamily: `Pretendard-Bold`,
-        fontSize: FontSizes.title.default,
+        fontSize: FontSizes.title[fontSizeMode],
         color: themes.light.textColor.textPrimary,
     },
     // range 모드 전용 스타일

@@ -12,10 +12,13 @@ import { searchPrescriptionByImage } from '../../api/prescriptionSearch';
 import { getMedicineDetailByMedicineId } from '../../api/search';
 import { createRoutineList } from '../../api/routine';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
 const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
   // route.params에서 photoUri 가져오기
   const { photoUri } = route.params || {};
+
+  const {fontSizeMode} = useFontSize();
   
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -324,12 +327,12 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
       }}>
         <Text style={{
            fontFamily: 'KimjungchulGothic-Bold', 
-           fontSize: FontSizes.title.default,
+           fontSize: FontSizes.title[fontSizeMode],
            color: themes.light.textColor.textPrimary
         }}>이대로 루틴을 등록할까요?</Text>
         <Text style={{
             fontFamily: 'Pretendard-Medium',
-            fontSize: FontSizes.body.default,
+            fontSize: FontSizes.body[fontSizeMode],
             color: themes.light.textColor.Primary50
         }}>메디지가 일정에 맞춰 복약 알림을 보내드릴게요!</Text>
       </View>

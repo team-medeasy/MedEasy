@@ -4,5 +4,5 @@ export const pointColor = {
   primary20: '#D9E3FB',
   pointSecondary: '#FF6565',
   pointPrimaryDark: '#2E50A8',
-  gradient: '',
+  gradient: '#18337B',
 };

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
 import { Alert, ImageBackground, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { themes } from '../../styles';
 import { ChatIcons, RoutineIcons } from '../../../assets/icons';
 import { Tag } from '..';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { PlaceholderImage } from '../SearchResult/PlaceholderImage';
 import { updateInterestedMedicine, getInterestedMedicineStatus } from '../../api/interestedMedicine';
 import { getMedicineAudioUrl } from '../../api/medicine';
@@ -20,25 +22,33 @@ const MedicineOverview = ({
   medicine,
   onPressEnlarge,
 }) => {
+  const {fontSizeMode} = useFontSize();
   const hasImage = !!medicine.item_image;
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSound, setCurrentSound] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // 컴포넌트 마운트 시 관심 약품 상태 확인
-  useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      try {
-        const response = await getInterestedMedicineStatus(medicine.item_id);
-        console.log('🤍 관심 약품 상태 응답:', response.data.body);
-        setIsFavorite(response.data.body.is_interested_medicine);
-      } catch (error) {
-        console.error('관심 의약품 상태 확인 실패:', error);
-      }
-    };
+  // 화면에 포커스될 때마다 관심 약품 상태 확인
+  useFocusEffect(
+    React.useCallback(() => {
+      const checkFavoriteStatus = async () => {
+        try {
+          const response = await getInterestedMedicineStatus(medicine.item_id);
+          console.log('🤍 관심 약품 상태 응답:', response.data.body);
+          setIsFavorite(response.data.body.is_interested_medicine);
+        } catch (error) {
+          console.error('관심 의약품 상태 확인 실패:', error);
+        }
+      };
 
-    checkFavoriteStatus();
-  }, [medicine.item_id]);
+      checkFavoriteStatus();
+      
+      // 클린업 함수는 화면이 언포커스될 때 실행됨
+      return () => {
+        // 필요한 클린업 작업이 있다면 여기에 작성
+      };
+    }, [medicine.item_id])
+  );
 
   const handleAudioPress = async (medicineId) => {
     // 이미 재생 중이면 중지
@@ -160,9 +170,15 @@ const MedicineOverview = ({
           marginHorizontal: 7,
           gap: 10,
         }}>
-        <MedicineInfoSub>{medicine.entp_name || '정보 없음'}</MedicineInfoSub>
-        <MedicineInfoName>{medicine.item_name || '정보 없음'}</MedicineInfoName>
-        <MedicineInfoSub>{medicine.chart || '정보 없음'}</MedicineInfoSub>
+        <MedicineInfoSub fontSizeMode={fontSizeMode}>
+          {medicine.entp_name || '정보 없음'}
+        </MedicineInfoSub>
+        <MedicineInfoName fontSizeMode={fontSizeMode}>
+          {medicine.item_name || '정보 없음'}
+        </MedicineInfoName>
+        <MedicineInfoSub fontSizeMode={fontSizeMode}>
+          {medicine.chart || '정보 없음'}
+        </MedicineInfoSub>
 
         <View
           style={{
@@ -252,14 +268,14 @@ const MedicineImage = styled.Image.attrs({
 const MedicineInfoSub = styled.Text`
   flex: 1;
   font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText70};
 `;
 
 const MedicineInfoName = styled.Text`
   flex: 1;
   font-family: 'Pretendard-Bold';
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
 `;
 

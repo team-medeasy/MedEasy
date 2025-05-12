@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import { OtherIcons } from '../../assets/icons';
 import { themes } from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
+import { useFontSize } from '../../assets/fonts/FontSizeContext';
 
 // 삭제 버튼이 있는 입력창
 export const InputWithDelete = ({
@@ -14,6 +15,8 @@ export const InputWithDelete = ({
     autoCapitalize = 'none',
     secureTextEntry = false,
 }) => {
+    const { fontSizeMode } = useFontSize();
+    
     return (
         <InputContainer style={style}>
         <StyledInput
@@ -24,6 +27,7 @@ export const InputWithDelete = ({
             returnKeyType="done"
             autoCapitalize={autoCapitalize}
             secureTextEntry={secureTextEntry}
+            fontSizeMode={fontSizeMode}
         />
         {value && value.length > 0 && (
             <DeleteButton onPress={() => onChangeText('')}>
@@ -40,12 +44,14 @@ export const InputWithDelete = ({
   
 // 읽기 전용 입력창
 export const ReadOnlyInput = ({ text }) => {
+    const { fontSizeMode } = useFontSize();
+    
     return (
       <InputContainer>
-        <LabelText numberOfLines={1}>{text}</LabelText>
+        <LabelText numberOfLines={1} fontSizeMode={fontSizeMode}>{text}</LabelText>
       </InputContainer>
     );
-  };
+};
 
 const InputContainer = styled.View`
     flex-direction: row;
@@ -59,7 +65,8 @@ const StyledInput = styled.TextInput`
     flex: 1;
     padding: 18px 0;
     font-family: 'Pretendard-SemiBold';
-    font-size: ${FontSizes.body.default};
+    font-size: ${props => 
+        props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}px` : FontSizes.body.default};
     color: ${themes.light.textColor.textPrimary};
 `;
 
@@ -68,9 +75,10 @@ const DeleteButton = styled.TouchableOpacity`
 `;
 
 const LabelText = styled.Text`
-  flex: 1;
-  padding: 18px 0;
-  font-family: 'Pretendard-SemiBold';
-  font-size: ${FontSizes.body.default};
-  color: ${themes.light.textColor.textPrimary};
+    flex: 1;
+    padding: 18px 0;
+    font-family: 'Pretendard-SemiBold';
+    font-size: ${props => 
+        props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}px` : FontSizes.body.default};
+    color: ${themes.light.textColor.textPrimary};
 `;

@@ -97,7 +97,7 @@ const SearchBarTouchable = styled(TouchableOpacity)`
   border-radius: 10px;
   background-color: ${({theme}) => themes.light.boxColor.inputSecondary};
   flex: 1;
-  padding: 13px 20px 13px 15px;
+  padding: 11px 20px 11px 15px;
 `;
 
 const SearchQueryText = styled.Text`

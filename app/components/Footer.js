@@ -3,13 +3,17 @@ import styled from 'styled-components/native';
 import {themes} from '../styles';
 import {LogoIcons} from '../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
 
 const {logo: LogoIcon, logoKr: LogoKrIcon} = LogoIcons;
 
 const Footer = ({marginTop = 0}) => {
+  const {fontSizeMode} = useFontSize();
+  
   return (
     <FooterContainer marginTop={marginTop}>
       <FooterText
+        fontSizeMode={fontSizeMode}
         style={{
           borderBottomWidth: 1,
           borderBottomColor: themes.light.borderColor.borderPrimary,
@@ -20,8 +24,8 @@ const Footer = ({marginTop = 0}) => {
       </FooterText>
 
       <FooterTextContainer>
-        <StyledText>관련 문의: https://github.com/team-medeasy</StyledText>
-        <StyledText>© 2025 Team MedEasy.</StyledText>
+        <StyledText fontSizeMode={fontSizeMode}>관련 문의: https://github.com/team-medeasy</StyledText>
+        <StyledText fontSizeMode={fontSizeMode}>© 2025 Team MedEasy.</StyledText>
       </FooterTextContainer>
 
       <FooterLogoContainer>
@@ -47,7 +51,7 @@ const FooterContainer = styled.View`
 `;
 
 const FooterText = styled.Text`
-  font-size: ${FontSizes.captionSm.default};
+  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
   padding: 20px 0;
@@ -59,7 +63,7 @@ const FooterTextContainer = styled.View`
 `;
 
 const StyledText = styled.Text`
-  font-size: ${FontSizes.captionSm.default};
+  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
   line-height: 21px;

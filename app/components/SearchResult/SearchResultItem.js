@@ -37,7 +37,7 @@ export const SearchResultItem = ({item, onPress}) => {
             colorType="resultPrimary"
             overflowMode="ellipsis"
             maxWidth="80"
-            fontSizeMode={fontSizeMode}>
+          >
             {item.etc_otc_name || '정보 없음'}
           </Tag>
           <Tag
@@ -45,7 +45,7 @@ export const SearchResultItem = ({item, onPress}) => {
             colorType="resultSecondary"
             overflowMode="ellipsis"
             maxWidth="128"
-            fontSizeMode={fontSizeMode}>
+          >
             {item.class_name || '정보 없음'}
           </Tag>
         </TypeContainer>

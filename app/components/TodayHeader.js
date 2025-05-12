@@ -2,9 +2,12 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {themes} from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
 import dayjs from 'dayjs';
 
 const TodayHeader = ({today, selectedDate}) => {
+  const {fontSizeMode} = useFontSize();
+
   const getRelativeDayText = (selectedDate, today) => {
     const selectedDateObj = dayjs(
       `${selectedDate.year}-${selectedDate.month}-${selectedDate.date}`,
@@ -23,8 +26,12 @@ const TodayHeader = ({today, selectedDate}) => {
 
   return (
     <TodayContainer>
-      <TodayText>{getRelativeDayText(selectedDate, today)}</TodayText>
-      <TodayDate>{`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}</TodayDate>
+      <TodayText fontSizeMode={fontSizeMode}>
+        {getRelativeDayText(selectedDate, today)}
+      </TodayText>
+      <TodayDate fontSizeMode={fontSizeMode}>
+        {`${selectedDate.month}월 ${selectedDate.date}일 ${selectedDate.day}요일`}
+      </TodayDate>
     </TodayContainer>
   );
 };
@@ -37,13 +44,13 @@ const TodayContainer = styled.View`
 `;
 
 const TodayText = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'Pretendard-ExtraBold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const TodayDate = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'Pretendard-ExtraBold';
   color: ${themes.light.textColor.Primary30};
 `;

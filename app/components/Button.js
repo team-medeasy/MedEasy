@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import {Text, TouchableOpacity, View} from 'react-native';
 import {themes} from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
 
 // 기본 버튼
 const Button = ({
@@ -18,6 +19,8 @@ const Button = ({
   disabled,
   icon
 }) => {
+  const {fontSizeMode} = useFontSize();
+  
   return (
     <ButtonContainer
       onPress={disabled ? null : onPress}
@@ -26,7 +29,11 @@ const Button = ({
       height={height}
       flex={flex}
       disabled={disabled}>
-        <ButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
+        <ButtonText 
+          color={textColor} 
+          fontSize={fontSize} 
+          fontFamily={fontFamily}
+          fontSizeMode={fontSizeMode}>
           {title}
         </ButtonText>
     </ButtonContainer>
@@ -46,6 +53,8 @@ const DualTextButton = ({
   height,
   flex,
 }) => {
+  const {fontSizeMode} = useFontSize();
+  
   return (
     <DualTextButtonContainer
       onPress={onPress}
@@ -53,10 +62,18 @@ const DualTextButton = ({
       width={width}
       height={height}
       flex={flex}>
-      <DualTextButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
+      <DualTextButtonText 
+        color={textColor} 
+        fontSize={fontSize} 
+        fontFamily={fontFamily}
+        fontSizeMode={fontSizeMode}>
         {title}
       </DualTextButtonText>
-      <DualTextButtonText color={textColor} fontSize={fontSize} fontFamily={fontFamily}>
+      <DualTextButtonText 
+        color={textColor} 
+        fontSize={fontSize} 
+        fontFamily={fontFamily}
+        fontSizeMode={fontSizeMode}>
         {messageText}
       </DualTextButtonText>
     </DualTextButtonContainer>
@@ -99,6 +116,8 @@ const IconTextButton = ({
   gap,
   disabled
 }) => {
+  const {fontSizeMode} = useFontSize();
+  
   return (
     <IconTextButtonContainer
       onPress={disabled ? null : onPress}
@@ -113,6 +132,7 @@ const IconTextButton = ({
         color={textColor}
         fontSize={fontSize}
         fontFamily={fontFamily}
+        fontSizeMode={fontSizeMode}
       >
         {title}
       </IconTextButtonText>
@@ -133,7 +153,8 @@ const ButtonContainer = styled(TouchableOpacity)`
 
 const ButtonText = styled(Text)`
   color: ${props => props.color || themes.light.textColor.buttonText};
-  font-size: ${props => props.fontSize || FontSizes.heading.default};
+  font-size: ${props => props.fontSize || 
+    props.fontSizeMode ? `${FontSizes.heading[props.fontSizeMode]}px` : FontSizes.heading.default};
   font-family: ${props => props.fontFamily || 'KimjungchulGothic-Bold'};
 `;
 
@@ -151,7 +172,8 @@ const DualTextButtonContainer = styled(TouchableOpacity)`
 `;
 
 const DualTextButtonText = styled(Text)`
-  font-size: ${props => props.fontSize || FontSizes.body.default};
+  font-size: ${props => props.fontSize || 
+    props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}px` : FontSizes.body.default};
   font-family: ${props => props.fontFamily || 'Pretendard-SemiBold'};
   color: ${props => props.color || themes.light.textColor.buttonText};
 `;
@@ -171,7 +193,8 @@ const IconTextButtonContainer = styled(TouchableOpacity)`
 
 const IconTextButtonText = styled(Text)`
   color: ${({ color }) => color || themes.light.textColor.buttonText};
-  font-size: ${({ fontSize }) => fontSize || FontSizes.body.default};
+  font-size: ${props => props.fontSize || 
+    props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}px` : FontSizes.body.default};
   font-family: ${({ fontFamily }) => fontFamily || 'Pretendard-SemiBold'};
 `;
 

@@ -17,7 +17,11 @@ export const setRefreshToken = async token => {
 
 // AccessToken 가져오기
 export const getAccessToken = async () => {
-  return await AsyncStorage.getItem(ACCESS_TOKEN_KEY);
+  const token = await AsyncStorage.getItem(ACCESS_TOKEN_KEY);
+  if (!token || token === 'undefined' || token.trim() === '') {
+    return null;
+  }
+  return token;
 };
 
 // RefreshToken 가져오기

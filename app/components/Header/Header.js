@@ -7,13 +7,13 @@ import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
-const Header = ({children, onBackPress}) => {
+const Header = ({children, onBackPress, hideBorder = false}) => {
   const navigation = useNavigation();
   const handleBackPress = onBackPress || (() => navigation.goBack());
   const {fontSizeMode} = useFontSize();
 
   return (
-    <HeaderContainer>
+    <HeaderContainer hideBorder={hideBorder}>
       <BackAndTitleContainer>
         <TouchableOpacity style={{padding: 12}} onPress={handleBackPress}>
           <HeaderIcons.chevron
@@ -45,7 +45,7 @@ const HeaderContainer = styled.View`
   `}
   justify-content: flex-end;
   background-color: ${themes.light.bgColor.bgPrimary};
-  border-bottom-width: 1;
+  border-bottom-width: ${props => (props.hideBorder ? 0 : 1)}px;
   border-bottom-color: ${themes.light.borderColor.borderPrimary};
 `;
 

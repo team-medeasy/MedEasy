@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import {View, TouchableOpacity, Alert} from 'react-native';
+import {View, TouchableOpacity, Alert, ScrollView} from 'react-native';
 import {themes} from './../../styles';
 import {ModalHeader, Button, DateTimePickerModal} from '../../components';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {RoutineIcons} from '../../../assets/icons';
 import {useNavigation} from '@react-navigation/native';
 
 import { useSignUp } from '../../api/context/SignUpContext';
-import { getUserSchedule } from '../../api/user';
+import { getUser, getUserSchedule } from '../../api/user';
 import { updateUserSchedule } from '../../api/user';
 
 const {
@@ -18,15 +19,15 @@ const {
   homeRoutine: HomeRoutineIcon,
 } = RoutineIcons;
 
-const TimeSettingItem = ({icon, title, time, onPress}) => {
+const TimeSettingItem = ({icon, title, time, onPress, fontSizeMode}) => {
   return (
     <View style={{gap: 15}}>
       <IconTextContainer>
         {icon}
-        <TimeSettingText>{title}</TimeSettingText>
+        <TimeSettingText fontSizeMode={fontSizeMode}>{title}</TimeSettingText>
       </IconTextContainer>
       <TimeButton onPress={onPress}>
-        <TimeButtonText>{time}</TimeButtonText>
+        <TimeButtonText fontSizeMode={fontSizeMode}>{time}</TimeButtonText>
       </TimeButton>
     </View>
   );
@@ -35,6 +36,9 @@ const TimeSettingItem = ({icon, title, time, onPress}) => {
 const SetRoutineTime = () => {
   const {signUpData} = useSignUp();
   const navigation = useNavigation();
+  const {fontSizeMode} = useFontSize();
+
+  const [userName, setUserName] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [currentSettingType, setCurrentSettingType] = useState('');
@@ -77,6 +81,20 @@ const SetRoutineTime = () => {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${hours}:${minutes}:00`;
   };
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const response = await getUser();
+        const userData = response.data.body;
+        setUserName(userData.name || '');
+      } catch (error) {
+        console.error('유저 이름 가져오기 실패:', error);
+      }
+    };
+  
+    fetchUserName();
+  }, []);
 
   // 컴포넌트 마운트 시 사용자 일정 가져오기
   useEffect(() => {
@@ -345,53 +363,66 @@ const SetRoutineTime = () => {
         루틴 설정
       </ModalHeader>
 
-      <View
-        style={{
-          paddingTop: 39,
-          paddingLeft: 30,
-          paddingBottom: 53,
-          gap: 7,
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: 120, // 버튼 안 가리게 여유 공간 확보
         }}>
-        <Title>{signUpData.firstName}님의 하루 일과를 알려주세요.</Title>
-        <Subtitle>메디지가 일정에 맞춰 복약 알림을 보내드릴게요!</Subtitle>
-      </View>
+        <View
+          style={{
+            paddingTop: 39,
+            paddingLeft: 30,
+            paddingRight: 30,
+            paddingBottom: 30,
+            gap: 7,
+          }}>
+          <Title fontSizeMode={fontSizeMode}>
+            {userName}님의 하루 일과를 알려주세요.
+          </Title>
+          <Subtitle fontSizeMode={fontSizeMode}>
+            메디지가 일정에 맞춰 복약 알림을 보내드릴게요!
+          </Subtitle>
+        </View>
 
-      <View style={{paddingHorizontal: 20, gap: 20}}>
-        <TimeSettingItem
-          icon={<CupIcon width={20} height={20} style={{color: '#A0CC88'}} />}
-          title={scheduleData.morning.name}
-          time={breakfastTime}
-          onPress={() => openTimePicker('아침식사')}
-        />
+        <View style={{paddingHorizontal: 20, gap: 20}}>
+          <TimeSettingItem
+            icon={<CupIcon width={20} height={20} style={{color: '#A0CC88'}} />}
+            title={scheduleData.morning.name}
+            time={breakfastTime}
+            onPress={() => openTimePicker('아침식사')}
+            fontSizeMode={fontSizeMode}
+          />
 
-        <TimeSettingItem
-          icon={<SunIcon width={20} height={20} style={{color: '#FF8B25'}} />}
-          title={scheduleData.lunch.name}
-          time={lunchTime}
-          onPress={() => openTimePicker('점심식사')}
-        />
+          <TimeSettingItem
+            icon={<SunIcon width={20} height={20} style={{color: '#FF8B25'}} />}
+            title={scheduleData.lunch.name}
+            time={lunchTime}
+            onPress={() => openTimePicker('점심식사')}
+            fontSizeMode={fontSizeMode}
+          />
 
-        <TimeSettingItem
-          icon={
-            <HomeRoutineIcon
-              width={20}
-              height={20}
-              style={{color: '#A5BEF0'}}
-            />
-          }
-          title={scheduleData.dinner.name}
-          time={dinnerTime}
-          onPress={() => openTimePicker('저녁식사')}
-        />
+          <TimeSettingItem
+            icon={
+              <HomeRoutineIcon
+                width={20}
+                height={20}
+                style={{color: '#A5BEF0'}}
+              />
+            }
+            title={scheduleData.dinner.name}
+            time={dinnerTime}
+            onPress={() => openTimePicker('저녁식사')}
+            fontSizeMode={fontSizeMode}
+          />
 
-        <TimeSettingItem
-          icon={<MoonIcon width={20} height={20} style={{color: '#FED359'}} />}
-          title={scheduleData.bedtime.name}
-          time={bedTime}
-          onPress={() => openTimePicker('취침시간')}
-        />
-      </View>
-
+          <TimeSettingItem
+            icon={<MoonIcon width={20} height={20} style={{color: '#FED359'}} />}
+            title={scheduleData.bedtime.name}
+            time={bedTime}
+            onPress={() => openTimePicker('취침시간')}
+            fontSizeMode={fontSizeMode}
+          />
+        </View>
+      </ScrollView>
       <DateTimePickerModal
         visible={showTimePicker}
         onClose={() => setShowTimePicker(false)}
@@ -425,13 +456,13 @@ const Container = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const Subtitle = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -443,7 +474,7 @@ const IconTextContainer = styled.View`
 `;
 
 const TimeSettingText = styled.Text`
-  font-size: ${FontSizes.heading.default};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -456,7 +487,7 @@ const TimeButton = styled(TouchableOpacity)`
 `;
 
 const TimeButtonText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;

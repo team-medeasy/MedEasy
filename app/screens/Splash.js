@@ -4,10 +4,15 @@ import Logo from './../../assets/icons/logo/logo.svg';
 import Logo_kr from './../../assets/icons/logo/logo_kr.svg';
 import { pointColor, themes } from './../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Splash = () => {
   return (
-    <Container>
+    <Container
+    colors={[pointColor.pointPrimaryDark, pointColor.gradient]} // 밝은색 → 진한색
+    start={{ x: 0.5, y: 0 }}
+    end={{ x: 0.5, y: 1 }}
+    >
       <TextContainer>
         <SmallLine>복잡한 약 정보를 간단하게</SmallLine>
         <BigLine>내 손 안의</BigLine>
@@ -33,7 +38,7 @@ const Splash = () => {
   );
 };
 
-const Container = styled.View`
+const Container = styled(LinearGradient)`
   flex: 1;
   background-color: ${pointColor.pointPrimaryDark};
 `;

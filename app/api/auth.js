@@ -76,3 +76,20 @@ export const refreshToken = async data => {
     throw error;
   }
 };
+
+export const kakaoAuth = async (accessToken) => {
+  try {
+    // FCM 토큰 가져오기
+    const fcmToken = await getFCMToken();
+    
+    const response = await api.post('/open-api/auth/kakao', {
+      access_token: accessToken,
+      fcm_token: fcmToken || ''
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('카카오 인증 실패:', error.response?.data || error.message);
+    throw error;
+  }
+};

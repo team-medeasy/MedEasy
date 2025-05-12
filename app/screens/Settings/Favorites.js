@@ -7,7 +7,7 @@ import {Header, SearchResultsList} from '../../components';
 import {getInteresedMedicine} from '../../api/interestedMedicine';
 import {useNavigation} from '@react-navigation/native';
 import {Images} from '../../../assets/icons';
-import EmptyState from '../../components/\bEmptyState';
+import EmptyState from '../../components/EmptyState';
 
 const Favorites = () => {
   const navigation = useNavigation();
