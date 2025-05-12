@@ -4,7 +4,15 @@ export const registerCareReceiver = (data) => api.post('/care/receiver', data);
 
 export const createCareAuthCode = (data) => api.post('/care/auth-code', data);
 
-export const getCareRoutine = () => api.get('/care/routine');
+export const getCareRoutine = ({ userId, startDate, endDate }) => {
+  return api.get('/care/routine', {
+    params: {
+      care_receiver_user_id: userId,
+      start_date: startDate,
+      end_date: endDate,
+    },
+  });
+};
 
 export const getCareList = () => api.get('/care/list');
 
