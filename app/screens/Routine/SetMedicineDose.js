@@ -107,7 +107,7 @@ const LargeText = styled.Text`
 `;
 const SmallText = styled.Text`
     font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
-    font-family: ${'Pretendard-Midium'};
+    font-family: ${'Pretendard-Medium'};
     color: ${themes.light.textColor.Primary50};
 `;
 
