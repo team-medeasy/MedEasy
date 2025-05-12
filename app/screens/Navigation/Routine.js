@@ -4,7 +4,7 @@ import {ScrollView, Dimensions, FlatList} from 'react-native';
 import styled from 'styled-components/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {HeaderIcons, OtherIcons, Images} from '../../../assets/icons';
-import {themes} from '../../styles';
+import {pointColor, themes} from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
 import LinearGradient from 'react-native-linear-gradient';
@@ -585,41 +585,43 @@ const Routine = ({route}) => {
         <ScrollView contentContainerStyle={{paddingVertical: 70}}>
           <ScheduleContainer>
             {/* 타임라인 컨테이너 추가 */}
-            <TimelineContainer>
-              {/* 타임라인 세로줄 */}
-              {/* <TimelineLine /> */}
+           <TimelineContainer>
+            {allRoutines.length > 0 && (
+              <TimelineLine
+                colors={[pointColor.pointPrimaryDark, pointColor.primary20]}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+              />
+            )}
 
-              {/* 모든 루틴을 시간순으로 렌더링 */}
-              {allRoutines.length === 0 ? (
-                <EmptyContainer>
-                  <EmptyState
-                    image={
-                      <Images.emptyRoutine
-                        style={{marginBottom: 32, marginTop: 80}}
-                      />
-                    }
-                    title="루틴이 없습니다."
-                    description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
-                  />
-                </EmptyContainer>
-              ) : (
-                allRoutines.map((routine, index) => (
-                  <RoutineCard
-                    key={routine.id}
-                    routine={routine}
-                    index={index}
-                    allLength={allRoutines.length}
-                    checkedItems={checkedItems}
-                    toggleTimeCheck={toggleTimeCheck}
-                    //toggleHospitalCheck={toggleHospitalCheck}
-                    toggleCheck={toggleCheck}
-                    selectedDateString={selectedDate.fullDate.format(
-                      'YYYY-MM-DD',
-                    )}
-                  />
-                ))
-              )}  
-            </TimelineContainer>
+            {/* 루틴 또는 빈 상태 렌더링 */}
+            {allRoutines.length === 0 ? (
+              <EmptyContainer>
+                <EmptyState
+                  image={
+                    <Images.emptyRoutine
+                      style={{ marginBottom: 32, marginTop: 80 }}
+                    />
+                  }
+                  title="루틴이 없습니다."
+                  description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
+                />
+              </EmptyContainer>
+            ) : (
+              allRoutines.map((routine, index) => (
+                <RoutineCard
+                  key={routine.id}
+                  routine={routine}
+                  index={index}
+                  allLength={allRoutines.length}
+                  checkedItems={checkedItems}
+                  toggleTimeCheck={toggleTimeCheck}
+                  toggleCheck={toggleCheck}
+                  selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
+                />
+              ))
+            )}
+          </TimelineContainer>
           </ScheduleContainer>
         </ScrollView>
       </RoundedBox>
@@ -733,18 +735,18 @@ const TodayContainer = styled.View`
 
 // 타임라인 관련 스타일 추가
 const TimelineContainer = styled.View`
-  //padding-top: 10px;
   padding-left: 30px;
   position: relative;
 `;
 
-const TimelineLine = styled.View`
+const TimelineLine = styled(LinearGradient)`
   position: absolute;
-  left: 21px;
-  top: 30px;
-  bottom: 30px;
+  left: 22px;    
+  top: 20px;
   width: 6px;
-  background-color: ${themes.light.pointColor.Primary};
+  height: 100%;   
+  z-index: 0;
+  border-radius: 3px;
 `;
 
 // TimelineContainer에 좌측 여백이 있으므로, 우측에 30px 여백이 있어야 중앙에 정렬됨
