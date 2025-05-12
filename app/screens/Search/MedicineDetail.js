@@ -31,7 +31,7 @@ import {getUserMedicinesCurrent} from '../../api/user';
 const MedicineDetailScreen = ({route, navigation}) => {
   const {medicineId, isModal, basicInfo, item, title} = route.params;
   const {fontSizeMode} = useFontSize();
-  
+
   const [medicine, setMedicine] = useState(basicInfo || item || null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -43,7 +43,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const fetchMedicineData = async () => {
     try {
       setIsLoading(true);
-      
+
       // 기존 item 객체가 전달된 경우
       if (item && !medicineId) {
         // 기본 정보만 먼저 매핑하여 빠르게 렌더링
@@ -86,24 +86,24 @@ const MedicineDetailScreen = ({route, navigation}) => {
             setIsLoading(false);
           }
         });
-      } 
+      }
       // medicineId로 API 호출하여 데이터 가져오기
       else if (medicineId) {
         console.log('약품 ID로 상세 정보 가져오기:', medicineId);
-        
+
         // 기본 정보가 전달된 경우 우선 표시
         if (basicInfo) {
           setMedicine({
             item_id: medicineId,
-            ...basicInfo
+            ...basicInfo,
           });
         }
-        
+
         const response = await getMedicineById(medicineId);
-        
+
         if (response.data?.result?.result_code === 200) {
           const medicineData = response.data.body;
-          
+
           // 기본 정보 매핑
           const mappedMedicine = {
             item_id: medicineData.id,
@@ -128,7 +128,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
             atpn_qesitm: medicineData.precautions,
             se_qesitm: medicineData.side_effects,
           };
-          
+
           setMedicine(mappedMedicine);
         } else {
           console.error('약품 정보 API 오류:', response);
@@ -146,7 +146,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
   // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
     fetchMedicineData();
-    
+
     return () => {
       isMounted.current = false;
     };
@@ -225,11 +225,13 @@ const MedicineDetailScreen = ({route, navigation}) => {
 
       if (Array.isArray(currentList)) {
         const registered = currentList.some(
-          med => String(med.medicine_id) === String(medicine.item_id)
+          med => String(med.medicine_id) === String(medicine.item_id),
         );
 
         setIsRegistered(registered);
-        console.log(registered ? '📝 등록된 약입니다.' : '❔ 등록되지 않은 약입니다.');
+        console.log(
+          registered ? '📝 등록된 약입니다.' : '❔ 등록되지 않은 약입니다.',
+        );
       } else {
         console.warn('예상과 다른 데이터 형식:', currentList);
         setIsRegistered(false);
@@ -273,7 +275,10 @@ const MedicineDetailScreen = ({route, navigation}) => {
           약 정보를 불러오는 중...
         </HeaderComponent>
         <LoadingContainer>
-          <ActivityIndicator size="large" color={themes.light.textColor.Primary50} />
+          <ActivityIndicator
+            size="large"
+            color={themes.light.textColor.Primary50}
+          />
         </LoadingContainer>
       </Container>
     );
@@ -283,11 +288,11 @@ const MedicineDetailScreen = ({route, navigation}) => {
   if (!medicine) {
     return (
       <Container>
-        <HeaderComponent isModal={isModal}>
-          약 정보
-        </HeaderComponent>
+        <HeaderComponent isModal={isModal}>약 정보</HeaderComponent>
         <LoadingContainer>
-          <EmptyText fontSizeMode={fontSizeMode}>약 정보를 불러올 수 없습니다.</EmptyText>
+          <EmptyText fontSizeMode={fontSizeMode}>
+            약 정보를 불러올 수 없습니다.
+          </EmptyText>
         </LoadingContainer>
       </Container>
     );
@@ -349,7 +354,9 @@ const MedicineDetailScreen = ({route, navigation}) => {
             </View>
           </MedicineUsageContainer>
           <SimilarMedicinesContainer>
-            <HeadingText style={{paddingHorizontal: 20}} fontSizeMode={fontSizeMode}>
+            <HeadingText
+              style={{paddingHorizontal: 20}}
+              fontSizeMode={fontSizeMode}>
               비슷한 약 보기
             </HeadingText>
             {similarMedicines.length > 0 ? (
@@ -495,7 +502,7 @@ const Usage = ({label, value, borderBottomWidth = 1, fontSizeMode}) => {
           color: themes.light.textColor.Primary70,
           fontFamily: 'Pretendard-Medium',
           fontSize: FontSizes.body[fontSizeMode],
-          lineHeight: 30,
+          lineHeight: 26,
         }}>
         {shortenedText}
       </Text>
