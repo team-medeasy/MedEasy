@@ -69,13 +69,25 @@ export const CareListModal = ({
     }, 200);
   };
 
+  const handleCareRoutine = (userId, userName) => {
+    setSelectedUserId(userId);
+    
+    onClose();
+    setTimeout(() => {
+      navigation.navigate('CareRoutine', { userId, userName }); // userId를 파라미터로 넘김
+    }, 200);
+  };
+
   return (
     <CustomModal visible={visible} onClose={onClose} height="75%">
       <Title fontSizeMode={fontSizeMode}>복약 관리 목록</Title>
 
       <CareListContainer>
         {careList.map((item, index) => (
-          <TouchableCareItem key={index} onPress={() => setSelectedUserId(item.user_id)}>
+          <TouchableCareItem
+            key={index}
+            onPress={() => handleCareRoutine(item.user_id, item.name)}
+          >
             <CareListItem>
               <LeftContainer>
                 <IconContainer>
