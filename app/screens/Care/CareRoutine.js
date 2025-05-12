@@ -5,7 +5,7 @@ import styled from 'styled-components/native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderIcons, OtherIcons, Images } from '../../../assets/icons';
-import { themes } from '../../styles';
+import { pointColor, themes } from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
 import LinearGradient from 'react-native-linear-gradient';
@@ -328,33 +328,43 @@ const CareRoutine = ({ route }) => {
         <ScrollView contentContainerStyle={{paddingVertical: 70}}>
           <ScheduleContainer>
             <TimelineContainer>
-              {allRoutines.length === 0 ? (
-                <EmptyContainer>
-                  <EmptyState
-                    image={
-                      <Images.emptyRoutine
-                        style={{marginBottom: 32, marginTop: 80}}
-                      />
-                    }
-                    title="루틴이 없습니다."
-                    description="현재 등록된 루틴이 없습니다."
-                  />
-                </EmptyContainer>
-              ) : (
-                allRoutines.map((routine, index) => (
-                    <RoutineCard
-                        key={routine.id}
-                        routine={routine}
-                        index={index}
-                        allLength={allRoutines.length}
-                        checkedItems={routine.checkedItems || {}} // 이 부분을 수정하세요
-                        selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
-                        toggleTimeCheck={() => {}} 
-                        toggleCheck={() => {}} 
+            {/* 루틴이 있을 때만 타임라인 세로줄 렌더링 */}
+            {allRoutines.length > 0 && (
+              <TimelineLine
+                colors={[pointColor.pointPrimaryDark, pointColor.primary20]}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+              />
+            )}
+
+            {/* 루틴이 없을 때 */}
+            {allRoutines.length === 0 ? (
+              <EmptyContainer>
+                <EmptyState
+                  image={
+                    <Images.emptyRoutine
+                      style={{ marginBottom: 32, marginTop: 80 }}
                     />
-                ))
-              )}  
-            </TimelineContainer>
+                  }
+                  title="루틴이 없습니다."
+                  description="현재 등록된 루틴이 없습니다."
+                />
+              </EmptyContainer>
+            ) : (
+              allRoutines.map((routine, index) => (
+                <RoutineCard
+                  key={routine.id}
+                  routine={routine}
+                  index={index}
+                  allLength={allRoutines.length}
+                  checkedItems={routine.checkedItems || {}}
+                  selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
+                  toggleTimeCheck={() => {}} 
+                  toggleCheck={() => {}} 
+                />
+              ))
+            )}
+          </TimelineContainer>
           </ScheduleContainer>
         </ScrollView>
       </RoundedBox>
@@ -464,6 +474,16 @@ const TimelineContainer = styled.View`
   //padding-top: 10px;
   padding-left: 30px;
   position: relative;
+`;
+
+const TimelineLine = styled(LinearGradient)`
+  position: absolute;
+  left: 22px;
+  top: 20px;
+  width: 6px;
+  height: 100%;
+  z-index: 0;
+  border-radius: 3px;
 `;
 
 // TimelineContainer에 좌측 여백이 있으므로, 우측에 30px 여백이 있어야 중앙에 정렬됨
