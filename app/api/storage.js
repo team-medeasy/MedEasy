@@ -39,6 +39,35 @@ export const removeRefreshToken = async () => {
   await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
 };
 
+// 액세스 토큰 만료 시간 저장
+export const setTokenExpiryTime = async (expiryTime) => {
+  try {
+    await AsyncStorage.setItem('ACCESS_TOKEN_EXPIRES_AT', String(expiryTime));
+  } catch (error) {
+    console.error('토큰 만료 시간 저장 오류:', error);
+  }
+};
+
+// 액세스 토큰 만료 시간 조회
+export const getTokenExpiryTime = async () => {
+  try {
+    const expiryTime = await AsyncStorage.getItem('ACCESS_TOKEN_EXPIRES_AT');
+    return expiryTime ? Number(expiryTime) : null;
+  } catch (error) {
+    console.error('토큰 만료 시간 조회 오류:', error);
+    return null;
+  }
+};
+
+// 토큰 만료 시간 제거
+export const removeTokenExpiryTime = async () => {
+  try {
+    await AsyncStorage.removeItem('ACCESS_TOKEN_EXPIRES_AT');
+  } catch (error) {
+    console.error('토큰 만료 시간 제거 오류:', error);
+  }
+};
+
 // FCM 토큰 저장
 export const setFCMToken = async token => {
   try {
