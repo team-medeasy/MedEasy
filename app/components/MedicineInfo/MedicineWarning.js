@@ -1,13 +1,13 @@
 // MedicineWarning.js - 단순화된 버전
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import { fetchAllWarnings } from '../../api/dur';
 import { getUserMedicinesCurrent } from '../../api/user';
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { useFontSize } from '../../../assets/fonts/FontSizeContext';
-import { RoutineIcons } from '../../../assets/icons';
+import { RoutineIcons, OtherIcons } from '../../../assets/icons';
 
 const MedicineWarning = ({ item }) => {
   const { fontSizeMode } = useFontSize();
@@ -15,6 +15,7 @@ const MedicineWarning = ({ item }) => {
   const [currentMedicines, setCurrentMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const loadWarningData = async () => {
@@ -40,23 +41,6 @@ const MedicineWarning = ({ item }) => {
 
     loadWarningData();
   }, [item?.item_seq]);
-
-  if (loading) {
-    return (
-      <WarningContainer>
-        <ActivityIndicator size="small" color={themes.light.textColor.Primary50} />
-        <LoadingText fontSizeMode={fontSizeMode}>안전 정보를 불러오는 중...</LoadingText>
-      </WarningContainer>
-    );
-  }
-
-  if (error) {
-    return (
-      <WarningContainer>
-        <ErrorText fontSizeMode={fontSizeMode}>{error}</ErrorText>
-      </WarningContainer>
-    );
-  }
 
   // 기본 색상 정의 - 테마에서 가져오거나 기본값 사용
   const blueColor = themes.light.pointColor?.Primary || '#007AFF'; // 파란색 (금기사항 없음)
@@ -102,26 +86,69 @@ const MedicineWarning = ({ item }) => {
 
   return (
     <WarningContainer>
-      <SectionTitle fontSizeMode={fontSizeMode}>금기사항</SectionTitle>
-      {sections.map(({ key, title, hasWarning, isBlue, description }) => (
-        <CautionItem key={key}>
-          <SquareIconWrapper>
-            <RoutineIcons.medicine
-              width={18}
-              height={18}
-              color={
-                hasWarning
-                  ? isBlue ? blueColor : redColor  // 금기사항 있음: 파란색 또는 빨간색
-                  : blueColor  // 금기사항 없음: 항상 파란색
-              }
-            />
-          </SquareIconWrapper>
-          <TextContainer>
-            <CautionTitle fontSizeMode={fontSizeMode}>{title}</CautionTitle>
-            <CautionDescription fontSizeMode={fontSizeMode}>{description}</CautionDescription>
-          </TextContainer>
-        </CautionItem>
-      ))}
+      <ToggleContainer>
+        <TouchableOpacity 
+          activeOpacity={0.7}
+          onPress={() => setExpanded(!expanded)}
+          style={{ width: '100%' }}
+        >
+          <ToggleButton>
+            <ToggleTextContainer>
+              <WarningIcon>🚫</WarningIcon>
+              <ToggleText fontSizeMode={fontSizeMode}>약품 금기 정보 확인하기</ToggleText>
+            </ToggleTextContainer>
+            {expanded ? (
+              <OtherIcons.chevronDown
+                width={17}
+                height={17}
+                style={{
+                  color: themes.light.pointColor.Primary,
+                  transform: [{rotate: '180deg'}],
+                }}
+              />
+            ) : (
+              <OtherIcons.chevronDown
+                width={17}
+                height={17}
+                style={{color: themes.light.pointColor.Primary}}
+              />
+            )}
+          </ToggleButton>
+        </TouchableOpacity>
+      </ToggleContainer>
+
+      {expanded && (
+        <>
+          {loading ? (
+            <LoadingContainer>
+              <ActivityIndicator size="small" color={themes.light.textColor.Primary50} />
+              <LoadingText fontSizeMode={fontSizeMode}>안전 정보를 불러오는 중...</LoadingText>
+            </LoadingContainer>
+          ) : error ? (
+            <ErrorContainer>
+              <ErrorText fontSizeMode={fontSizeMode}>{error}</ErrorText>
+            </ErrorContainer>
+          ) : (
+            sections.map(({ key, title, hasWarning, isBlue, description }, index) => (
+              <CautionItem key={key} isLastItem={index === sections.length - 1}>
+                <RoutineIcons.medicine
+                  width={18}
+                  height={18}
+                  color={
+                    hasWarning
+                      ? isBlue ? blueColor : redColor  // 금기사항 있음: 파란색 또는 빨간색
+                      : blueColor  // 금기사항 없음: 항상 파란색
+                  }
+                />
+                <TextContainer>
+                  <CautionTitle fontSizeMode={fontSizeMode}>{title}</CautionTitle>
+                  <CautionDescription fontSizeMode={fontSizeMode}>{description}</CautionDescription>
+                </TextContainer>
+              </CautionItem>
+            ))
+          )}
+        </>
+      )}
     </WarningContainer>
   );
 };
@@ -136,7 +163,7 @@ const WarningContainer = styled.View`
 const SectionTitle = styled.Text`
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 2}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
 `;
 
 const CautionItem = styled.View`
@@ -144,7 +171,7 @@ const CautionItem = styled.View`
   gap: 12px;
   padding-top: 10px;
   padding-bottom: 15px;
-  border-bottom-width: 1px;
+  border-bottom-width: ${props => props.isLastItem ? '0' : '1px'};
   border-bottom-color: ${themes.light.borderColor.borderSecondary};
 `;
 
@@ -189,4 +216,43 @@ const ErrorText = styled.Text`
   color: ${themes.light.pointColor.Secondary};
   margin-top: 10px;
   text-align: center;
+`;
+
+const ToggleContainer = styled.View`
+  margin-bottom: 16px;
+`;
+
+const ToggleButton = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: ${themes.light.pointColor.Primary10};
+  border-radius: 12px;
+`;
+
+const ToggleTextContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const WarningIcon = styled.Text`
+  margin-right: 8px;
+  font-size: 16px;
+`;
+
+const ToggleText = styled.Text`
+  font-family: 'Pretendard-Bold';
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  color: ${themes.light.pointColor.Primary};
+`;
+
+const LoadingContainer = styled.View`
+  padding: 20px;
+  align-items: center;
+`;
+
+const ErrorContainer = styled.View`
+  padding: 20px;
+  align-items: center;
 `;
