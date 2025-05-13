@@ -4,16 +4,15 @@ import { ScrollView, Dimensions, FlatList, TouchableOpacity } from 'react-native
 import styled from 'styled-components/native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { HeaderIcons, OtherIcons, Images } from '../../../assets/icons';
-import { pointColor, themes } from '../../styles';
+import { HeaderIcons, OtherIcons } from '../../../assets/icons';
+import { themes } from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { getCareRoutine } from '../../api/userCare';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { useFontSize } from '../../../assets/fonts/FontSizeContext';
-import RoutineCard from '../../components/RoutineCard';
-import EmptyState from '../../components/EmptyState';
+import RoutineTimeline from '../../components/RoutineTimeline';
 import { weekDays } from '../../../assets/data/data';
 
 const { width } = Dimensions.get('window');
@@ -250,7 +249,7 @@ const CareRoutine = ({ route }) => {
 
   return (
     <Container style={{ paddingTop: insets.top }}>
-            <Header>
+      <Header>
         <BackHeaderContainer>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <HeaderIcons.chevron
@@ -327,45 +326,17 @@ const CareRoutine = ({ route }) => {
 
         <ScrollView contentContainerStyle={{paddingVertical: 70}}>
           <ScheduleContainer>
-            <TimelineContainer>
-            {/* 루틴이 있을 때만 타임라인 세로줄 렌더링 */}
-            {allRoutines.length > 0 && (
-              <TimelineLine
-                colors={[pointColor.pointPrimaryDark, pointColor.primary20]}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-              />
-            )}
-
-            {/* 루틴이 없을 때 */}
-            {allRoutines.length === 0 ? (
-              <EmptyContainer>
-                <EmptyState
-                  image={
-                    <Images.emptyRoutine
-                      style={{ marginBottom: 32, marginTop: 80 }}
-                    />
-                  }
-                  title="루틴이 없습니다."
-                  description="현재 등록된 루틴이 없습니다."
-                />
-              </EmptyContainer>
-            ) : (
-              allRoutines.map((routine, index) => (
-                <RoutineCard
-                  key={routine.id}
-                  routine={routine}
-                  index={index}
-                  allLength={allRoutines.length}
-                  checkedItems={routine.checkedItems || {}}
-                  selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
-                  toggleTimeCheck={() => {}} 
-                  toggleCheck={() => {}}
-                  routineMode="care"
-                />
-              ))
-            )}
-          </TimelineContainer>
+            {/* RoutineTimeline 컴포넌트 사용 */}
+            <RoutineTimeline
+              allRoutines={allRoutines}
+              selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
+              // toggleTimeCheck, toggleCheck는 CareRoutine에서는 사용하지 않으므로 빈 함수 전달 또는 조건부 전달
+              toggleTimeCheck={() => {}}
+              toggleCheck={() => {}}
+              routineMode="care" // CareRoutine이므로 care 모드 명시
+              emptyTitle="루틴이 없습니다."
+              emptyDescription="현재 등록된 루틴이 없습니다."
+            />
           </ScheduleContainer>
         </ScrollView>
       </RoundedBox>
@@ -390,7 +361,6 @@ const Header = styled.View`
   padding: 0px 20px;
   padding-top: 10px;
   justify-content: space-between;
-  align-items: center;
 `;
 
 const HeaderText = styled.Text`
@@ -468,31 +438,6 @@ const TodayContainer = styled.View`
   align-items: center;
   justify-content: space-between;
   padding: 20px 30px;
-`;
-
-// 타임라인 관련 스타일 추가
-const TimelineContainer = styled.View`
-  //padding-top: 10px;
-  padding-left: 30px;
-  position: relative;
-`;
-
-const TimelineLine = styled(LinearGradient)`
-  position: absolute;
-  left: 22px;
-  top: 20px;
-  width: 6px;
-  height: 100%;
-  z-index: 0;
-  border-radius: 3px;
-`;
-
-// TimelineContainer에 좌측 여백이 있으므로, 우측에 30px 여백이 있어야 중앙에 정렬됨
-const EmptyContainer = styled.View`
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding-right: 30px;
 `;
 
 export default CareRoutine;
