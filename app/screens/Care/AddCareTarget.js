@@ -1,13 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import {View} from 'react-native';
+import {Alert, View} from 'react-native';
 import {Header, InputWithDelete, Button} from '../../components';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+import { registerCareReceiver } from '../../api/userCare';
+import { navigate } from '../Navigation/NavigationRef';
+import { useNavigation } from '@react-navigation/native';
 
 const AddCareTarget = () => {
   const {fontSizeMode} = useFontSize();
+  const [authCode, setAuthCode] = useState('');
+  const navigation = useNavigation();
+
+  const handleRegister = async () => {
+    if (!authCode.trim()) {
+      Alert.alert('인증번호를 입력해주세요.');
+      return;
+    }
+     console.log('전송할 auth_code:', authCode);
+
+    try {
+      const response = await registerCareReceiver({ auth_code: authCode.trim()});
+      console.log('등록 성공:', response.data);
+      Alert.alert(
+      '등록 완료',
+      '관리 대상이 성공적으로 등록되었습니다.',
+      [{ text: '확인', onPress: () => navigation.goBack() }]
+    );
+    } catch (error) {
+      console.error('등록 실패:', error);
+      Alert.alert('등록에 실패했습니다. 인증번호를 확인해주세요.');
+    }
+  };
 
   return (
     <Container>
@@ -23,7 +49,11 @@ const AddCareTarget = () => {
       </TextContainer>
 
       <InputContainer>
-        <InputWithDelete/>
+        <InputWithDelete
+          placeholder="인증번호 입력"
+          value={authCode}
+          onChangeText={setAuthCode}
+        />
       </InputContainer>
 
       <View
@@ -37,7 +67,7 @@ const AddCareTarget = () => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-        <Button title='확인' />
+        <Button title='확인' onPress={handleRegister}/>
     </View>
     </Container>
   );

@@ -2,9 +2,10 @@ import React from 'react';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import FontSizes from '../../assets/fonts/fontSizes';
-import { themes } from '../styles';
+import { pointColor, themes } from '../styles';
 import { RoutineIcons } from '../../assets/icons';
 import { useFontSize } from '../../assets/fonts/FontSizeContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 const RoutineCard = ({
   routine,
@@ -16,9 +17,24 @@ const RoutineCard = ({
   isInModal = false,
   selectedDateString,
   backgroundColor,
+  routineMode = 'default', // 루틴 모드 prop
 }) => {
   const navigation = useNavigation();
   const { fontSizeMode } = useFontSize();
+
+  const handleMedicinePress = (medicineId) => {
+    if (routineMode === 'care') {
+      // care 모드일 때 다른 페이지로 네비게이션
+      navigation.navigate('MedicineDetail', {
+        medicineId: medicineId,
+      });
+    } else {
+      // 기본 모드에서는 기존대로 SetMedicineRoutine 페이지로 이동
+      navigation.navigate('SetMedicineRoutine', {
+        medicineId: medicineId,
+      });
+    }
+  };
 
   return (
     <RoutineBoxContainer isInModal={isInModal}>
@@ -34,7 +50,11 @@ const RoutineCard = ({
             isFirst={index === 0}
             isLast={index === allLength - 1}
           />
-          {allLength > 1 && index !== allLength - 1 && <TimelineLine />}
+          {/* {allLength > 1 && index !== allLength - 1 && 
+          <TimelineLine 
+            colors={[pointColor.primary20, pointColor.pointPrimaryDark]} // 밝은색 → 진한색
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}/>} */}
         </>
       )}
 
@@ -88,11 +108,7 @@ const RoutineCard = ({
                         `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                       ]
                     }
-                    onPress={() =>
-                      navigation.navigate('SetMedicineRoutine', {
-                        medicineId: medicine.medicine_id,
-                      })
-                    }
+                    onPress={() => handleMedicinePress(medicine.medicine_id)}
                   >
                     {medicine.nickname}
                   </MedicineText>
@@ -168,7 +184,7 @@ const TimelinePoint = styled.View`
   z-index: 2;
 `;
 
-const TimelineLine = styled.View`
+const TimelineLine = styled(LinearGradient)`
   position: absolute;
   left: -9px;
   top: 20px;

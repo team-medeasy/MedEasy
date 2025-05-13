@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 import {themes} from '../styles';
@@ -7,6 +7,7 @@ import {useFontSize} from '../../assets/fonts/FontSizeContext';
 import CustomModal from './CustomModal';
 import {Button, Tag} from '../components';
 import {OtherIcons} from '../../assets/icons';
+import { getCareList } from '../api/userCare';
 
 // 모달을 사용할 컴포넌트에서 이 함수를 가져다 사용할 수 있습니다.
 export const useCareListModal = () => {
@@ -34,15 +35,25 @@ export const CareListModal = ({
 }) => {
   const {fontSizeMode} = useFontSize();
   const navigation = useNavigation();  
+  const [careList, setCareList] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
-  // 하드 코딩 목록 데이터
-  const careList = [
-    { name: '현주', email: 'aaa@medeasy.dev', type: '내 계정' },
-    { name: '홍영준', email: 'bbb@medeasy.dev', type: '피보호자' },
-    { name: '박지원', email: 'ccc@medeasy.dev', type: '피보호자' },
-    { name: '양예영', email: 'ddd@medeasy.dev', type: '피보호자' },
-    { name: '김가영', email: 'eee@medeasy.dev', type: '피보호자' },
-  ];
+  useEffect(() => {
+  const fetchCareList = async () => {
+    try {
+      const response = await getCareList();
+      const careList = response.data.body;
+      console.log("관리 대상 목록: ", careList);
+      setCareList(careList);
+      const myAccount = careList.find(item => item.tag === '내 계정');
+      if (myAccount) setSelectedUserId(myAccount.user_id);
+    } catch (error) {
+      console.error('careList 불러오기 실패:', error);
+    }
+  };
+
+    if (visible) fetchCareList();
+  }, [visible]);
 
   const handleAddCareTarget = () => {
     onClose();
@@ -58,28 +69,47 @@ export const CareListModal = ({
     }, 200);
   };
 
+  const handleCareRoutine = (userId, userName, tag) => {
+    if (tag === '내 계정') {
+      onClose(); // 내 계정인 경우 모달만 닫음
+      return;
+    }
+    
+    setSelectedUserId(userId);
+    
+    onClose();
+    setTimeout(() => {
+      navigation.navigate('CareRoutine', { userId, userName }); // userId를 파라미터로 넘김
+    }, 200);
+  };
+
   return (
     <CustomModal visible={visible} onClose={onClose} height="75%">
       <Title fontSizeMode={fontSizeMode}>복약 관리 목록</Title>
 
       <CareListContainer>
         {careList.map((item, index) => (
-          <CareListItem key={index}>
-            <LeftContainer>
-              <IconContainer>
-                {item.type === '내 계정' ? (
-                  <OtherIcons.CheckCircle />
-                ) : (
-                  <PlaceholderView />
-                )}
-              </IconContainer>
-              <UserInfoContainer>
-                <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
-                <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
-              </UserInfoContainer>
-            </LeftContainer>
-            <Tag sizeType='small' colorType='resultPrimary'>{item.type}</Tag>
-          </CareListItem>
+          <TouchableCareItem
+            key={index}
+            onPress={() => handleCareRoutine(item.user_id, item.name, item.tag)}
+          >
+            <CareListItem>
+              <LeftContainer>
+                <IconContainer>
+                  {selectedUserId === item.user_id ? (
+                    <OtherIcons.CheckCircle />
+                  ) : (
+                    <PlaceholderView />
+                  )}
+                </IconContainer>
+                <UserInfoContainer>
+                  <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
+                  <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
+                </UserInfoContainer>
+              </LeftContainer>
+              <Tag sizeType="small" colorType="resultPrimary">{item.tag}</Tag>
+            </CareListItem>
+          </TouchableCareItem>
         ))}
       </CareListContainer>
 
@@ -161,5 +191,8 @@ const UnderlinedButtonText = styled.Text`
   text-decoration: underline;
   text-decoration-color: ${themes.light.textColor.Primary50};
 `;
+
+const TouchableCareItem = styled.TouchableOpacity``;
+
 
 export default CareListModal;

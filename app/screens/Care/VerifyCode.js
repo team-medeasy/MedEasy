@@ -5,31 +5,49 @@ import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { Images } from '../../../assets/icons';
+import { createCareAuthCode } from '../../api/userCare';
 
 const VerifyCode = ({ route }) => {
   const {fontSizeMode} = useFontSize();
   const [minutes, setMinutes] = useState(3);
   const [seconds, setSeconds] = useState(0);
+  const [verificationCode, setVerificationCode] = useState('');
+
+  const fetchAuthCode = async () => {
+    try {
+      const response = await createCareAuthCode();
+      console.log("auth-code: ", response.data);
+      setVerificationCode(response.data.auth_code);
+    } catch (err) {
+      console.error('인증 코드 발급 실패:', err);
+    }
+  };
+
+  // 최초 코드 발급
+  useEffect(() => {
+    fetchAuthCode();
+  }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (seconds > 0) {
-        setSeconds(seconds - 1);
+  let timer = setInterval(() => {
+    setSeconds((prevSec) => {
+      if (prevSec > 0) return prevSec - 1;
+      if (minutes > 0) {
+        setMinutes((prevMin) => prevMin - 1);
+        return 59;
       } else {
-        if (minutes > 0) {
-          setMinutes(minutes - 1);
-          setSeconds(59);
-        } else {
-          clearInterval(timer);
-        }
+        clearInterval(timer);
+        fetchAuthCode();      // 새 인증 코드 요청
+        setMinutes(3);        // 타이머 초기화
+        setSeconds(0);
+        return 0;
       }
-    }, 1000);
+    });
+  }, 1000);
 
-    return () => clearInterval(timer);
-  }, [minutes, seconds]);
+  return () => clearInterval(timer);
+}, [minutes, seconds]);
 
-  // 하드코딩된 인증 코드
-  const verificationCode = "1234-1234-1234";
 
   return (
     <Container>
