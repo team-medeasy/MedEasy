@@ -1,4 +1,3 @@
-// api/services/tokenService.js
 import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, removeAccessToken, removeRefreshToken } from '../storage';
 import api from '../index';
 import { setAuthToken } from '..';
@@ -26,14 +25,14 @@ export const validateAndRefreshToken = async () => {
       console.log('토큰 유효성 확인 성공: 토큰이 유효합니다');
       return true; // API 호출 성공 시 토큰이 유효한 것으로 판단
     } catch (error) {
-      // 401 에러 발생 시 토큰 갱신 시도
-      if (error.response?.status === 401) {
-        console.log('액세스 토큰이 만료되었습니다. 토큰 갱신 시도...');
+      // 401 또는 400 오류 발생 시 토큰 갱신 시도
+      if (error.response?.status === 401 || error.response?.status === 400) {
+        console.log(`액세스 토큰이 만료되었거나 유효하지 않습니다(${error.response?.status}). 토큰 갱신 시도...`);
         return await refreshAuthToken();
       }
       
       console.error('토큰 검증 중 API 오류:', error.response?.status, error.message);
-      return false; // 401 이외의 에러는 토큰 유효하지 않은 것으로 처리
+      return false; // 다른 오류는 토큰 유효하지 않은 것으로 처리
     }
   } catch (error) {
     console.error('토큰 검증 중 오류 발생:', error);
@@ -51,8 +50,15 @@ export const refreshAuthToken = async () => {
     
     if (!refreshToken) {
       console.log('리프레시 토큰이 없습니다');
+      // 토큰 초기화
+      await removeAccessToken();
+      await removeRefreshToken();
+      setAuthToken(null);
       return false;
     }
+    
+    // 토큰 갱신 API 호출 전에 로그 추가
+    console.log('리프레시 토큰으로 갱신 시도:', refreshToken.substring(0, 10) + '...');
     
     // 토큰 갱신 API 호출
     const response = await api.post('/open-api/auth/refresh', {
@@ -75,6 +81,10 @@ export const refreshAuthToken = async () => {
       return true;
     } else {
       console.log('토큰 갱신 실패: 새 토큰이 응답에 없습니다');
+      // 토큰 초기화
+      await removeAccessToken();
+      await removeRefreshToken();
+      setAuthToken(null);
       return false;
     }
   } catch (error) {
