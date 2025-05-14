@@ -33,6 +33,7 @@
     "react-native-calendars": "^1.1309.1",
     "react-native-date-picker": "^5.0.10",
     "react-native-dialog": "^9.3.0",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-image-picker": "^8.2.0",
     "react-native-image-size": "^1.1.6",
