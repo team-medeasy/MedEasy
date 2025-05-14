@@ -1,6 +1,7 @@
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {themes} from './../../styles';
 import {HeaderIcons, OtherIcons} from '../../../assets/icons';
 import {FilterButton} from './FilterButton';
@@ -23,9 +24,10 @@ export const SearchScreenHeader = ({
   renderFilterButtonIcon,
 }) => {
   const { fontSizeMode } = useFontSize();
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
   
   return (
-    <HeaderContainer>
+    <HeaderContainer style={{ paddingTop: insets.top }}>
       <ChevronAndSearchContainer>
         <ChevronIconButton style={{padding: 12}} onPress={onBackPress}>
           <ChevronIcon
@@ -79,7 +81,6 @@ export const SearchScreenHeader = ({
 };
 
 const HeaderContainer = styled.View`
-  padding-top: 70px;
   background-color: ${themes.light.bgColor.headerBG};
 `;
 
