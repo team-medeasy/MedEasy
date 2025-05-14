@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {TouchableOpacity, View, Platform} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {HeaderIcons} from '../../../assets/icons';
 import {themes} from '../../styles';
@@ -11,9 +12,13 @@ const Header = ({children, onBackPress, hideBorder = false}) => {
   const navigation = useNavigation();
   const handleBackPress = onBackPress || (() => navigation.goBack());
   const {fontSizeMode} = useFontSize();
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   return (
-    <HeaderContainer hideBorder={hideBorder}>
+    <HeaderContainer 
+      hideBorder={hideBorder}
+      style={{ paddingTop: insets.top }}
+    >
       <BackAndTitleContainer>
         <TouchableOpacity style={{padding: 12}} onPress={handleBackPress}>
           <HeaderIcons.chevron
@@ -35,14 +40,6 @@ const Header = ({children, onBackPress, hideBorder = false}) => {
 };
 
 const HeaderContainer = styled.View`
-  ${Platform.OS === 'ios' &&
-  `
-    height: 108px;
-  `}
-  ${Platform.OS === 'android' &&
-  `
-    height: 50px;
-  `}
   justify-content: flex-end;
   background-color: ${themes.light.bgColor.bgPrimary};
   border-bottom-width: ${props => (props.hideBorder ? 0 : 1)}px;

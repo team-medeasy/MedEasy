@@ -284,25 +284,22 @@ const Home = () => {
             {/* 모달 컴포넌트 */}
             {CareListModalComponent}
 
-            <LogoIcons.logo
-              width={70}
-              height={112}
-              style={{
-                color: themes.light.pointColor.Primary10,
-                transform: [{rotate: '10deg'}],
-                position: 'absolute',
-                bottom: -20,
-                right: 40,
-              }}
-            />
+            <LogoBackgroundContainer>
+              <LogoIcons.logo
+                width={70}
+                height={112}
+                style={{
+                  color: themes.light.pointColor.Primary10,
+                  transform: [{rotate: '10deg'}],
+                }}
+              />
+            </LogoBackgroundContainer>
           </TextContainer>
+          
           {todayRoutine ? (
-            <View
-              style={{
-                alignItems: 'center',
-              }}>
+            <HomeRoutineContainer>
               <HomeRoutine schedules={todayRoutine} />
-            </View>
+            </HomeRoutineContainer>
           ) : (
             <View
               style={{
@@ -317,6 +314,7 @@ const Home = () => {
               </RoutineButton>
             </View>
           )}
+          
           <ButtonContainer>
             <AddButton onPress={handleAddMedicineRoutine}>
               <ButtonContent>
@@ -458,9 +456,23 @@ const TextContainer = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  overflow: hidden;
+  overflow: visible;
   margin-top: 20px;
   padding: 12px 20px 20px 20px;
+  position: relative;
+`;
+
+// 로고를 위한 별도 컨테이너 생성 - z-index 조정을 위해
+const LogoBackgroundContainer = styled.View`
+  position: absolute;
+  bottom: -20px;
+  right: 40px;
+  z-index: -1;
+`;
+
+const HomeRoutineContainer = styled.View`
+  position: relative;
+  z-index: 2;
 `;
 
 const ReminderText = styled.Text`
@@ -583,6 +595,5 @@ const UnreadDot = styled.View`
   border-radius: 4px;
   background-color: red;
 `;
-
 
 export default Home;

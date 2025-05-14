@@ -114,7 +114,7 @@ export const CareListModal = ({
         <OtherIcons.deleteCircle width={16} height={16} style={{color: themes.light.textColor.buttonText70}}/>
       </DeleteButton>
     </DeleteButtonWrapper>
-);
+  );
 
   return (
     <CustomModal visible={visible} onClose={onClose} height="75%">
@@ -145,7 +145,10 @@ export const CareListModal = ({
                     <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
                   </UserInfoContainer>
                 </LeftContainer>
-                <Tag sizeType="small" colorType="resultPrimary">
+                <Tag
+                  sizeType="small"
+                  colorType={item.tag === "내 계정" ? "resultSecondary" : "resultPrimary"}
+                >
                   {item.tag}
                 </Tag>
               </CareListItem>
@@ -182,6 +185,7 @@ const CareListItem = styled.View`
   align-items: center;
   justify-content: space-between;
   padding-bottom: 25px;
+  background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
 const LeftContainer = styled.View`
@@ -239,6 +243,7 @@ const DeleteButtonWrapper = styled.View`
   justify-content: center;
   align-items: center;
   padding-left: 10px;
+  padding-bottom: 25px;
 `;
 
 const DeleteButton = styled.TouchableOpacity`
@@ -254,6 +259,5 @@ const DeleteText = styled.Text`
   font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;;
   font-family: 'Pretendard-Bold';
 `;
-
 
 export default CareListModal;

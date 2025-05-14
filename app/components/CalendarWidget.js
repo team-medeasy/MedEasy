@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
@@ -9,199 +9,123 @@ import dayjs from 'dayjs';
 import { getRoutineByDate } from '../api/routine';
 import { useFontSize } from '../../assets/fonts/FontSizeContext';
 
-// 요일을 한글로 설정
+// 캘린더를 한글로 표시하기 위한 설정
 LocaleConfig.locales['ko'] = {
-  monthNames: [
-    '1월', '2월', '3월', '4월', '5월', '6월',
-    '7월', '8월', '9월', '10월', '11월', '12월'
-  ],
-  monthNamesShort: [
-    '1월', '2월', '3월', '4월', '5월', '6월',
-    '7월', '8월', '9월', '10월', '11월', '12월'
-  ],
-  dayNames: [
-    '일요일', '월요일', '화요일', '수요일',
-    '목요일', '금요일', '토요일'
-  ],
+  monthNames: [...Array(12)].map((_, i) => `${i + 1}월`),
+  monthNamesShort: [...Array(12)].map((_, i) => `${i + 1}월`),
+  dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
   dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
   today: '오늘',
 };
 LocaleConfig.defaultLocale = 'ko';
 
-const CalendarWidget = ({
-  onDateChange,
-  markedDates = {},
-  medicineRoutines,
-  setMedicineRoutines
-}) => {
-  const {fontSizeMode} = useFontSize();
+const CalendarWidget = ({ onDateChange, markedDates = {} }) => {
+  const { fontSizeMode } = useFontSize(); // 전역 폰트 크기 설정값 가져오기
   const koreanDays = ['일', '월', '화', '수', '목', '금', '토'];
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
-  const [routineMarkedDates, setRoutineMarkedDates] = useState({});
-  const [today, setToday] = useState(dayjs().format('YYYY-MM-DD'));
-  const [selectedDate, setSelectedDate] = useState(today);
 
-  // 현재 보여지는 월의 루틴 데이터 가져오기
+  const todayRef = useRef(dayjs().format('YYYY-MM-DD')); // 오늘 날짜를 ref로 저장 (렌더링 사이에 값 유지)
+  const [selectedDate, setSelectedDate] = useState(todayRef.current); // 선택된 날짜 상태
+  const [routineMarkedDates, setRoutineMarkedDates] = useState({}); // 루틴이 존재하는 날짜 표시
+  const [currentMonth, setCurrentMonth] = useState(dayjs()); // 현재 보고 있는 월 상태
+
+  // 해당 월의 루틴 데이터를 가져오는 함수
   const fetchMonthlyRoutine = async (month) => {
     try {
-      // 현재 보여지는 월의 시작일과 종료일 계산
       const startDate = month.startOf('month').format('YYYY-MM-DD');
       const endDate = month.endOf('month').format('YYYY-MM-DD');
-      
-      console.log('루틴 데이터 조회 기간:', startDate, '~', endDate);
-      
       const response = await getRoutineByDate(startDate, endDate);
       const routineData = response.data.body;
-      console.log('월 데이터 조회 결과:', routineData);
 
+      // 날짜별로 루틴 표시 여부를 구성
       const markedRoutineDates = routineData.reduce((acc, item) => {
         const dateString = item.take_date;
-        
-        // 모든 스케줄을 순회하며 routine_medicine_dtos 확인
-        const hasRoutineMedicines = item.user_schedule_dtos.some(schedule => 
-          schedule.routine_dtos.length > 0
-        );
-    
-        if (hasRoutineMedicines) {
-          // 모든 약이 복용 완료되었는지 확인
-          const allTaken = item.user_schedule_dtos.every(schedule => 
-            schedule.routine_dtos.length === 0 || 
-            schedule.routine_dtos.every(medicine => medicine.is_taken)
+        const hasRoutine = item.user_schedule_dtos.some(s => s.routine_dtos.length > 0);
+        if (hasRoutine) {
+          // 모든 루틴이 완료되었는지 여부 확인
+          const allTaken = item.user_schedule_dtos.every(schedule =>
+            schedule.routine_dtos.length === 0 ||
+            schedule.routine_dtos.every(med => med.is_taken)
           );
-          
           acc[dateString] = {
             marked: true,
-            allTaken: allTaken // 모든 약 복용 완료 여부 저장
+            allTaken,
           };
         }
         return acc;
       }, {});
 
-      // 기존 markedDates와 병합
-      setRoutineMarkedDates({
-        ...markedDates,
-        ...markedRoutineDates
-      });
-      
-      console.log('마킹된 날짜 정보 업데이트:', markedRoutineDates);
-    } catch (error) {
-      console.error('루틴 데이터 가져오기 실패:', error);
+      setRoutineMarkedDates(prev => ({ ...prev, ...markedRoutineDates }));
+    } catch (e) {
+      console.error('루틴 데이터 가져오기 실패:', e);
     }
   };
 
+  // 초기 렌더링 시 오늘 날짜 선택 및 루틴 데이터 가져오기
   useEffect(() => {
-    // 오늘 날짜 초기화
-    const currentToday = dayjs().format('YYYY-MM-DD');
-    setToday(currentToday);
-    
-    // 컴포넌트 마운트 시 오늘 날짜를 기본 선택 상태로 설정
-    setSelectedDate(currentToday);
-    
-    // 오늘 날짜에 대한 onDateChange 호출
-    const todayDayjs = dayjs(currentToday);
-    const todayData = {
-      day: koreanDays[todayDayjs.day()],
-      date: todayDayjs.date(),
-      month: todayDayjs.month() + 1,
-      year: todayDayjs.year(),
-      fullDate: todayDayjs
-    };
-    onDateChange(todayData);
-    
-    // 자정에 오늘 날짜 업데이트하는 타이머 설정
-    const updateTodayDate = () => {
-      const now = dayjs();
-      const tomorrow = now.add(1, 'day').startOf('day');
-      const timeUntilMidnight = tomorrow.diff(now);
-      
-      const timer = setTimeout(() => {
-        setToday(dayjs().format('YYYY-MM-DD'));
-        // 다음 자정을 위한 타이머 재설정
-        updateTodayDate();
-      }, timeUntilMidnight);
-      
-      return timer;
-    };
-    
-    const timer = updateTodayDate();
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
+    setSelectedDate(todayRef.current);
+    const today = dayjs(todayRef.current);
+    onDateChange({
+      day: koreanDays[today.day()],
+      date: today.date(),
+      month: today.month() + 1,
+      year: today.year(),
+      fullDate: today,
+    });
     fetchMonthlyRoutine(currentMonth);
   }, []);
 
+  // 화면이 다시 포커스될 때 루틴 데이터 다시 가져오기
   useFocusEffect(
     React.useCallback(() => {
-      console.log('루틴 데이터 다시 로드 중...');
-      // 현재 표시 중인 월의 데이터 다시 로드
       fetchMonthlyRoutine(currentMonth);
-      
-      return () => {
-        // 클린업 함수 (필요시)
-      };
     }, [currentMonth])
   );
 
-  // 날짜 선택 핸들러
+  // 날짜 선택 시 실행되는 함수
   const handleDayPress = (day) => {
-    const selectedDayjs = dayjs(day.dateString);
-    const newSelectedDate = {
-      day: koreanDays[selectedDayjs.day()],
-      date: selectedDayjs.date(),
-      month: selectedDayjs.month() + 1,
-      year: selectedDayjs.year(),
-      fullDate: selectedDayjs
-    };
-    // 선택된 날짜 변경
+    const date = dayjs(day.dateString);
     setSelectedDate(day.dateString);
-
-    onDateChange(newSelectedDate);
-    console.log("선택된 날짜: ", newSelectedDate);
+    onDateChange({
+      day: koreanDays[date.day()],
+      date: date.date(),
+      month: date.month() + 1,
+      year: date.year(),
+      fullDate: date,
+    });
   };
 
-  // 월 변경 핸들러
+  // 월이 바뀔 때 실행되는 함수
   const handleMonthChange = (month) => {
     const newMonth = dayjs(`${month.year}-${month.month}-01`);
     setCurrentMonth(newMonth);
-    console.log('달력 월 변경:', newMonth.format('YYYY-MM'));
-    
-    // 월 변경 시 해당 월의 루틴 데이터 가져오기
-    fetchMonthlyRoutine(newMonth);
   };
 
-  // 커스텀 날짜 컴포넌트 
-  const CustomDay = React.memo(({ date, state, marking, onPress, fontSizeMode }) => {
+  // 날짜 셀 커스텀 컴포넌트
+  const CustomDay = React.memo(({ date, state, marking, onPress }) => {
     const isSelected = selectedDate === date.dateString;
-    const hasRoutine = marking?.marked || false;
-    const allTaken = marking?.allTaken || false;
-    const isToday = date.dateString === today;
-  
-    // 날짜 텍스트 스타일
+    const isToday = date.dateString === todayRef.current;
+    const hasRoutine = marking?.marked;
+    const allTaken = marking?.allTaken;
+
     const dayTextStyle = {
-      color: state === 'disabled' 
-        ? themes.light.textColor.Primary20 
+      color: state === 'disabled'
+        ? themes.light.textColor.Primary20
         : isToday
-          ? themes.light.pointColor.Primary // 오늘 날짜 색상
-          : isSelected 
-            ? themes.light.textColor.textPrimary
-            : themes.light.textColor.textPrimary,
+          ? themes.light.pointColor.Primary
+          : themes.light.textColor.textPrimary,
     };
-  
+
     return (
       <TouchableWrapper onPress={() => onPress(date)}>
         {isSelected && <SelectedBackground />}
-        
         <DayContainer>
-          {/* 날짜(day) */}
-          <DayText style={dayTextStyle} fontSizeMode={fontSizeMode}>{date.day}</DayText>
-          
-          {/* 루틴이 있는 경우 */}
+          <DayText fontSizeMode={fontSizeMode} style={dayTextStyle}>
+            {date.day}
+          </DayText>
           {hasRoutine && (
             <IconContainer>
-              <RoutineIcons.medicine 
-                width={15} 
+              <RoutineIcons.medicine
+                width={15}
                 height={15}
                 style={{
                   color: allTaken 
@@ -214,35 +138,35 @@ const CalendarWidget = ({
         </DayContainer>
       </TouchableWrapper>
     );
-  });
+  }, (prev, next) => 
+    // React.memo 최적화를 위한 비교: 날짜와 표시 정보가 같으면 리렌더링 방지
+    prev.date.dateString === next.date.dateString && prev.marking === next.marking
+  );
 
   return (
     <CalendarContainer>
       <StyledCalendar
-        key={`calendar-${fontSizeMode}`}
         locale="ko"
         fontSizeMode={fontSizeMode}
         onDayPress={handleDayPress}
         onMonthChange={handleMonthChange}
         current={currentMonth.format('YYYY-MM-DD')}
         dayComponent={({ date, state, marking }) => (
-          <CustomDay 
-            date={date} 
-            state={state} 
-            marking={marking} 
-            onPress={(date) => handleDayPress(date)}
-            selectedDate={selectedDate} // 명시적으로 선택된 날짜 전달
-            fontSizeMode={fontSizeMode}
+          <CustomDay
+            date={date}
+            state={state}
+            marking={marking}
+            onPress={handleDayPress}
           />
         )}
         markedDates={{
           ...markedDates,
           ...routineMarkedDates,
-          // 선택된 날짜도 표시
           [selectedDate]: {
             ...(markedDates[selectedDate] || {}),
             ...(routineMarkedDates[selectedDate] || {}),
-            selected: true
+            selected: true,
+            selectedColor: themes.light.pointColor.Primary20,
           }
         }}
       />
@@ -281,7 +205,7 @@ const DayContainer = styled.View`
 `;
 
 const DayText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Bold';
 `;
 
@@ -291,6 +215,7 @@ const IconContainer = styled.View`
   align-items: center;
 `;
 
+// Calendar 테마를 적용한 Styled 컴포넌트 형태의 Calendar
 const StyledCalendar = ({ fontSizeMode, ...props }) => (
   <Calendar
     {...props}
@@ -329,6 +254,5 @@ const StyledCalendar = ({ fontSizeMode, ...props }) => (
     )}
   />
 );
-
 
 export default CalendarWidget;
