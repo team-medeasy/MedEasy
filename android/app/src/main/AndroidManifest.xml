@@ -7,7 +7,12 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.nfc" android:required="false" />   
-
+    
+    <!-- 음성 인식 관련 권한 추가 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
     <!-- AOS 13 이상에 대응하기 위한 권한 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATION" />
 

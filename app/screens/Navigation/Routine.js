@@ -3,8 +3,8 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {ScrollView, Dimensions, FlatList} from 'react-native';
 import styled from 'styled-components/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {HeaderIcons, OtherIcons, Images} from '../../../assets/icons';
-import {pointColor, themes} from '../../styles';
+import {HeaderIcons, OtherIcons} from '../../../assets/icons';
+import {themes} from '../../styles';
 import dayjs from 'dayjs';
 import TodayHeader from '../../components/TodayHeader';
 import LinearGradient from 'react-native-linear-gradient';
@@ -16,8 +16,7 @@ import {
 } from '../../../assets/data/data';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
-import RoutineCard from '../../components/RoutineCard';
-import EmptyState from '../../components/EmptyState';
+import RoutineTimeline from '../../components/RoutineTimeline';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const {width} = Dimensions.get('window');
@@ -584,44 +583,17 @@ const Routine = ({route}) => {
 
         <ScrollView contentContainerStyle={{paddingVertical: 70}}>
           <ScheduleContainer>
-            {/* 타임라인 컨테이너 추가 */}
-           <TimelineContainer>
-            {allRoutines.length > 0 && (
-              <TimelineLine
-                colors={[pointColor.pointPrimaryDark, pointColor.primary20]}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-              />
-            )}
-
-            {/* 루틴 또는 빈 상태 렌더링 */}
-            {allRoutines.length === 0 ? (
-              <EmptyContainer>
-                <EmptyState
-                  image={
-                    <Images.emptyRoutine
-                      style={{ marginBottom: 32, marginTop: 80 }}
-                    />
-                  }
-                  title="루틴이 없습니다."
-                  description={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
-                />
-              </EmptyContainer>
-            ) : (
-              allRoutines.map((routine, index) => (
-                <RoutineCard
-                  key={routine.id}
-                  routine={routine}
-                  index={index}
-                  allLength={allRoutines.length}
-                  checkedItems={checkedItems}
-                  toggleTimeCheck={toggleTimeCheck}
-                  toggleCheck={toggleCheck}
-                  selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
-                />
-              ))
-            )}
-          </TimelineContainer>
+            {/* RoutineTimeline 컴포넌트 사용 */}
+            <RoutineTimeline
+              allRoutines={allRoutines}
+              checkedItems={checkedItems}
+              selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
+              toggleTimeCheck={toggleTimeCheck}
+              toggleCheck={toggleCheck}
+              // Routine.js는 기본 모드이므로 routineMode prop을 전달하지 않거나 'default'로 명시 가능
+              emptyTitle="루틴이 없습니다."
+              emptyDescription={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
+            />
           </ScheduleContainer>
         </ScrollView>
       </RoundedBox>
@@ -731,30 +703,6 @@ const TodayContainer = styled.View`
   align-items: center;
   justify-content: space-between;
   padding: 20px 30px;
-`;
-
-// 타임라인 관련 스타일 추가
-const TimelineContainer = styled.View`
-  padding-left: 30px;
-  position: relative;
-`;
-
-const TimelineLine = styled(LinearGradient)`
-  position: absolute;
-  left: 22px;    
-  top: 20px;
-  width: 6px;
-  height: 100%;   
-  z-index: 0;
-  border-radius: 3px;
-`;
-
-// TimelineContainer에 좌측 여백이 있으므로, 우측에 30px 여백이 있어야 중앙에 정렬됨
-const EmptyContainer = styled.View`
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding-right: 30px;
 `;
 
 export default Routine;

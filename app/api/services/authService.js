@@ -9,18 +9,33 @@ import {
   removeAccessToken,
   removeRefreshToken,
   setUserInfo,
+  setTokenExpiryTime,  // 추가
+  removeTokenExpiryTime  // 추가
 } from '../storage';
 import {setAuthToken} from '..';
 
 export const handleLogin = async credentials => {
   try {
-    const {accessToken, refreshToken} = await login(credentials);
+    // 로그인 결과에서 만료 시간도 받아옴
+    const {accessToken, refreshToken, accessTokenExpiredAt} = await login(credentials);
 
-    console.log('로그인 응답:', {accessToken, refreshToken});
+    console.log('로그인 응답:', {accessToken, refreshToken, accessTokenExpiredAt});
 
     if (accessToken) {
       await setAccessToken(accessToken);
       setAuthToken(accessToken);
+      
+      // 토큰 만료 시간 저장
+      if (accessTokenExpiredAt) {
+        const expiryTime = new Date(accessTokenExpiredAt).getTime();
+        await setTokenExpiryTime(expiryTime);
+        console.log('토큰 만료 시간 저장:', new Date(expiryTime).toLocaleString());
+      } else {
+        // 만료 시간이 없으면 기본값으로 1시간 설정
+        const oneHourLater = Date.now() + 60 * 60 * 1000;
+        await setTokenExpiryTime(oneHourLater);
+        console.log('기본 토큰 만료 시간 설정:', new Date(oneHourLater).toLocaleString());
+      }
       
       // 토큰 설정 후 사용자 정보 가져오기
       try {
@@ -46,6 +61,7 @@ export const handleLogin = async credentials => {
     } else {
       console.warn('ACCESS_TOKEN is undefined. Removing key from storage.');
       await removeAccessToken();
+      await removeTokenExpiryTime();  // 추가: 만료 시간도 함께 제거
     }
 
     if (refreshToken) {
@@ -65,7 +81,7 @@ export const handleLogin = async credentials => {
       alert('사용자를 찾을 수 없습니다.');
     } else {
       alert(
-        '로그인 실패: ' + (error.response?.data.message || '알 수 없는 오류'),
+        '로그인 실패: ' + (error.response?.data?.message || error.response?.data?.result_message || '알 수 없는 오류'),
       );
     }
 
@@ -75,10 +91,23 @@ export const handleLogin = async credentials => {
 
 export const handleKakaoLogin = async (navigation) => {
   try {
+    // 카카오 로그인 결과에서 만료 시간도 받아옴
     const result = await kakaoLogin();
 
     if (result?.accessToken) {
       console.log('카카오 로그인 성공:', result);
+      
+      // 토큰 만료 시간 저장
+      if (result.accessTokenExpiredAt) {
+        const expiryTime = new Date(result.accessTokenExpiredAt).getTime();
+        await setTokenExpiryTime(expiryTime);
+        console.log('카카오 토큰 만료 시간 저장:', new Date(expiryTime).toLocaleString());
+      } else {
+        // 만료 시간이 없으면 기본값으로 1시간 설정
+        const oneHourLater = Date.now() + 60 * 60 * 1000;
+        await setTokenExpiryTime(oneHourLater);
+        console.log('카카오 기본 토큰 만료 시간 설정:', new Date(oneHourLater).toLocaleString());
+      }
 
       navigation.reset({index: 0, routes: [{name: 'NavigationBar'}]});
       return result;
@@ -111,15 +140,27 @@ export const handleSignUp = async (data, navigation) => {
     };
     
     console.log('회원가입 요청 데이터:', requestData);
+    // 회원가입 응답에서 accessToken, refreshToken, accessTokenExpiredAt 추출
     const response = await signUp(requestData);
+    const { accessToken, refreshToken, accessTokenExpiredAt } = response;
 
     console.log('회원가입 응답:', response.data);
 
-    const {access_token, refresh_token} = response.data.body || {};
-
-    if (access_token) {
-      await setAccessToken(access_token);
-      setAuthToken(access_token);
+    if (accessToken) {
+      await setAccessToken(accessToken);
+      setAuthToken(accessToken);
+      
+      // 토큰 만료 시간 저장
+      if (accessTokenExpiredAt) {
+        const expiryTime = new Date(accessTokenExpiredAt).getTime();
+        await setTokenExpiryTime(expiryTime);
+        console.log('토큰 만료 시간 저장:', new Date(expiryTime).toLocaleString());
+      } else {
+        // 만료 시간이 없으면 기본값으로 1시간 설정
+        const oneHourLater = Date.now() + 60 * 60 * 1000;
+        await setTokenExpiryTime(oneHourLater);
+        console.log('기본 토큰 만료 시간 설정:', new Date(oneHourLater).toLocaleString());
+      }
       
       // 회원가입 후 사용자 정보 저장 - 이미 요청 데이터에 있으므로 바로 저장 가능
       await setUserInfo({
@@ -130,10 +171,11 @@ export const handleSignUp = async (data, navigation) => {
     } else {
       console.warn('ACCESS_TOKEN is undefined. Removing key from storage.');
       await removeAccessToken();
+      await removeTokenExpiryTime();
     }
 
-    if (refresh_token) {
-      await setRefreshToken(refresh_token);
+    if (refreshToken) {
+      await setRefreshToken(refreshToken);
     } else {
       console.warn('REFRESH_TOKEN is undefined. Removing key from storage.');
       await removeRefreshToken();
@@ -166,5 +208,30 @@ export const handleSignUp = async (data, navigation) => {
     }
 
     throw error;
+  }
+};
+
+// 로그아웃 시 토큰 관련 데이터 모두 제거하는 함수 추가
+export const handleLogout = async (navigation) => {
+  try {
+    // 모든 토큰 관련 데이터 제거
+    await removeAccessToken();
+    await removeRefreshToken();
+    await removeTokenExpiryTime();
+    
+    // 인증 헤더 제거
+    setAuthToken(null);
+    
+    console.log('로그아웃 성공');
+    
+    // 로그인 화면으로 이동
+    if (navigation) {
+      navigation.reset({index: 0, routes: [{name: 'Auth'}]});
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('로그아웃 실패:', error);
+    return false;
   }
 };
