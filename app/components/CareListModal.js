@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
+import { Swipeable } from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import {themes} from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
@@ -7,7 +8,8 @@ import {useFontSize} from '../../assets/fonts/FontSizeContext';
 import CustomModal from './CustomModal';
 import {Button, Tag} from '../components';
 import {OtherIcons} from '../../assets/icons';
-import { getCareList } from '../api/userCare';
+import { deleteReceiver, getCareList } from '../api/userCare';
+import { Alert } from 'react-native';
 
 // 모달을 사용할 컴포넌트에서 이 함수를 가져다 사용할 수 있습니다.
 export const useCareListModal = () => {
@@ -83,33 +85,72 @@ export const CareListModal = ({
     }, 200);
   };
 
+  const handleDeleteCareTarget = (userId, userName) => {
+    Alert.alert(
+      '삭제 확인',
+      `${userName}님을 복약 관리 목록에서 삭제하시겠습니까?`,
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteReceiver(userId);
+              setCareList(prev => prev.filter(user => user.user_id !== userId));
+            } catch (error) {
+              console.error('삭제 실패:', error);
+              Alert.alert('오류', '삭제에 실패했습니다.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const renderRightActions = (userId, userName) => (
+    <DeleteButtonWrapper>
+      <DeleteButton onPress={() => handleDeleteCareTarget(userId, userName)}>
+        <OtherIcons.deleteCircle width={16} height={16} style={{color: themes.light.textColor.buttonText70}}/>
+      </DeleteButton>
+    </DeleteButtonWrapper>
+);
+
   return (
     <CustomModal visible={visible} onClose={onClose} height="75%">
       <Title fontSizeMode={fontSizeMode}>복약 관리 목록</Title>
 
       <CareListContainer>
-        {careList.map((item, index) => (
-          <TouchableCareItem
-            key={index}
-            onPress={() => handleCareRoutine(item.user_id, item.name, item.tag)}
+        {careList.map((item) => (
+          <Swipeable
+            key={item.user_id}
+            renderRightActions={() =>
+              item.tag === '내 계정' ? null : renderRightActions(item.user_id, item.name)
+            }
           >
-            <CareListItem>
-              <LeftContainer>
-                <IconContainer>
-                  {selectedUserId === item.user_id ? (
-                    <OtherIcons.CheckCircle />
-                  ) : (
-                    <PlaceholderView />
-                  )}
-                </IconContainer>
-                <UserInfoContainer>
-                  <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
-                  <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
-                </UserInfoContainer>
-              </LeftContainer>
-              <Tag sizeType="small" colorType="resultPrimary">{item.tag}</Tag>
-            </CareListItem>
-          </TouchableCareItem>
+            <TouchableCareItem
+              onPress={() => handleCareRoutine(item.user_id, item.name, item.tag)}
+            >
+              <CareListItem>
+                <LeftContainer>
+                  <IconContainer>
+                    {selectedUserId === item.user_id ? (
+                      <OtherIcons.CheckCircle />
+                    ) : (
+                      <PlaceholderView />
+                    )}
+                  </IconContainer>
+                  <UserInfoContainer>
+                    <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
+                    <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
+                  </UserInfoContainer>
+                </LeftContainer>
+                <Tag sizeType="small" colorType="resultPrimary">
+                  {item.tag}
+                </Tag>
+              </CareListItem>
+            </TouchableCareItem>
+          </Swipeable>
         ))}
       </CareListContainer>
 
@@ -193,6 +234,26 @@ const UnderlinedButtonText = styled.Text`
 `;
 
 const TouchableCareItem = styled.TouchableOpacity``;
+
+const DeleteButtonWrapper = styled.View`
+  justify-content: center;
+  align-items: center;
+  padding-left: 10px;
+`;
+
+const DeleteButton = styled.TouchableOpacity`
+  background-color:${themes.light.pointColor.Secondary};
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  padding: 15px;
+`;
+
+const DeleteText = styled.Text`
+  color: ${themes.light.textColor.buttonText};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;;
+  font-family: 'Pretendard-Bold';
+`;
 
 
 export default CareListModal;
