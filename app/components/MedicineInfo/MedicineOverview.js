@@ -14,7 +14,7 @@ import { getMedicineAudioUrl } from '../../api/medicine';
 import Sound from 'react-native-sound';
 
 // Sound 초기화
-Sound.setCategory('Playback');
+Sound.setCategory('Playback', true);
 
 const { heartOff: HeartOffIcon, heartOn: HeartOnIcon } = RoutineIcons;
 
