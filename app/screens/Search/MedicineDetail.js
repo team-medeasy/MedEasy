@@ -1,3 +1,4 @@
+// MedicineDetailScreen.js
 import React, {useState, useEffect, useRef} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
 import styled from 'styled-components/native';
@@ -6,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   InteractionManager,
+  ActivityIndicator,
   Alert,
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
@@ -20,7 +22,6 @@ import {
   SimilarMedicineItem,
 } from './../../components';
 import MedicineWarning from '../../components/MedicineInfo/MedicineWarning';
-import MedicineDetailShimmer from '../../components/MedicineInfo/MedicineDetailShimmer';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {OtherIcons} from '../../../assets/icons';
@@ -264,16 +265,16 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   };
 
-  // 로딩 중 표시 - Shimmer Effect 적용
+  // 로딩 중 표시
   if (isLoading) {
     return (
       <Container>
         <HeaderComponent isModal={isModal}>
-          {title || '약 정보를 불러오는 중...'}
+          약 정보를 불러오는 중...
         </HeaderComponent>
-        <ScrollView>
-          <MedicineDetailShimmer />
-        </ScrollView>
+        <LoadingContainer>
+          <ActivityIndicator size="large" color={themes.light.textColor.Primary50} />
+        </LoadingContainer>
       </Container>
     );
   }
@@ -310,12 +311,6 @@ const MedicineDetailScreen = ({route, navigation}) => {
 
           {/* 약품 금기 정보 컴포넌트 추가 */}
           <MedicineWarning item={medicine} />
-          
-          {/* 섹션 분리선 - bgSecondary로 배경색 구분 */}
-          <View style={{
-            height: 10,
-            backgroundColor: themes.light.bgColor.bgSecondary,
-          }} />
 
           <MedicineUsageContainer>
             <View
