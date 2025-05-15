@@ -26,6 +26,7 @@ export default function VoiceChat() {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const audioPlayer = useRef(null);
   const debounceTimer = useRef(null);
+  const flatListRef = useRef(null);
 
   const [status, setStatus] = useState('idle');
   const [hasPermission, setHasPermission] = useState(false);
@@ -36,24 +37,26 @@ export default function VoiceChat() {
   const [chatMode, setChatMode] = useState('text'); // 'text' 또는 'voice'
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingMessageId, setTypingMessageId] = useState(null);
 
   useEffect(() => {
-  const fetchUserName = async () => {
-    const { data } = await getUser();
-    const userName = data.body.name;
+    const fetchUserName = async () => {
+      const { data } = await getUser();
+      const userName = data.body.name;
 
-    setMessages([
-      {
-        id: 1,
-        type: 'bot',
-        text: `${userName}님, 안녕하세요☺️\n어떤 도움이 필요하신가요?`,
-        options: ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'],
-      },
-    ]);
-  };
+      setMessages([
+        {
+          id: 1,
+          type: 'bot',
+          text: `${userName}님, 안녕하세요☺️\n어떤 도움이 필요하신가요?`,
+          options: ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'],
+        },
+      ]);
+    };
 
-  fetchUserName();
-}, []);
+    fetchUserName();
+  }, []);
 
   useEffect(() => {
     requestMicPermission();
@@ -88,6 +91,15 @@ export default function VoiceChat() {
     }
     return () => clearTimeout(debounceTimer.current);
   }, [recognizedText, status]);
+
+  // 새 메시지가 추가될 때마다 스크롤 맨 아래로 이동
+  useEffect(() => {
+    if (messages.length > 0 && flatListRef.current) {
+      setTimeout(() => {
+        flatListRef.current.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages]);
 
   async function requestMicPermission() {
     if (Platform.OS === 'android') {
@@ -147,21 +159,44 @@ export default function VoiceChat() {
     
     // 음성 인식된 텍스트를 메시지로 추가
     addMessage(text, 'user');
-    processRecognizedText(text);
+    
+    // 로봇이 입력 중인 메시지 표시
+    const currentTime = new Date();
+    const hours = currentTime.getHours();
+    const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+    const period = hours >= 12 ? '오후' : '오전';
+    const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+    const formattedTime = `${period} ${formattedHours}:${minutes}`;
+    
+    const typingMsgId = Date.now() + 100; // 고유한 ID 보장
+    setTypingMessageId(typingMsgId);
+    setIsTyping(true);
+    
+    setMessages(prevMessages => [
+      ...prevMessages,
+      {id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true},
+    ]);
+    
+    processRecognizedText(text, typingMsgId);
   }
 
-  async function processRecognizedText(text) {
+  async function processRecognizedText(text, typingMsgId) {
     try {
       await cleanupTempAudioFiles();
       const filePath = await sendVoiceMessage(text);
-      playBotResponse(filePath);
+      playBotResponse(filePath, typingMsgId);
     } catch (error) {
       console.error('[VoiceChat] API error:', error);
+      // 타이핑 메시지 제거
+      setMessages(prevMessages => 
+        prevMessages.filter(msg => msg.id !== typingMsgId)
+      );
+      setIsTyping(false);
       reset('처리 실패 - 재시작');
     }
   }
 
-  function playBotResponse(path) {
+  function playBotResponse(path, typingMsgId) {
     console.log('[VOICE] playBotResponse:', path);
     Voice.cancel();
 
@@ -172,12 +207,27 @@ export default function VoiceChat() {
     audioPlayer.current = new Sound(path, '', error => {
       if (error) {
         console.error('[VoiceChat] Sound load error:', error);
+        // 타이핑 메시지 제거
+        setMessages(prevMessages => 
+          prevMessages.filter(msg => msg.id !== typingMsgId)
+        );
+        setIsTyping(false);
         reset();
         return;
       }
       audioPlayer.current.play(success => {
         console.log('[VOICE] Audio play finished:', success);
-        addMessage('봇 응답 메시지입니다', 'bot');
+        
+        // 타이핑 메시지를 실제 메시지로 교체
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === typingMsgId 
+              ? {...msg, text: '봇 응답 메시지입니다', isTyping: false} 
+              : msg
+          )
+        );
+        
+        setIsTyping(false);
         reset(); // 이 시점에서 idle로 돌아감
       });
     });
@@ -218,13 +268,41 @@ export default function VoiceChat() {
   const sendTextMessage = () => {
     if (inputText.trim() === '') return;
     
-    addMessage(inputText, 'user');
+    const userMessage = inputText;
+    setInputText(''); // 먼저 입력 필드를 비우기
+    
+    // 사용자 메시지 추가
+    addMessage(userMessage, 'user');
+
+    // 로봇이 입력 중인 메시지 표시
+    const currentTime = new Date();
+    const hours = currentTime.getHours();
+    const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+    const period = hours >= 12 ? '오후' : '오전';
+    const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+    const formattedTime = `${period} ${formattedHours}:${minutes}`;
+    
+    const typingMsgId = Date.now() + 1; // 사용자 메시지와 구분되는 ID 사용
+    setTypingMessageId(typingMsgId);
+    setIsTyping(true);
+    
+    // 타이핑 메시지 추가
+    setMessages(prevMessages => [
+      ...prevMessages,
+      {id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true},
+    ]);
 
     setTimeout(() => {
-      addMessage('네, 해당 내용에 대해 알려드릴게요!', 'bot');
+      // 타이핑 메시지를 실제 메시지로 교체
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === typingMsgId 
+            ? {...msg, text: '네, 해당 내용에 대해 알려드릴게요!', isTyping: false} 
+            : msg
+        )
+      );
+      setIsTyping(false);
     }, 1000);
-
-    setInputText('');
   };
 
   // 채팅 모드 전환 (텍스트 <-> 음성)
@@ -252,9 +330,11 @@ export default function VoiceChat() {
     const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
     const formattedTime = `${period} ${formattedHours}:${minutes}`;
 
+    const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+    
     setMessages(prevMessages => [
       ...prevMessages,
-      {id: Date.now(), type, text, time: formattedTime},
+      {id: uniqueId, type, text, time: formattedTime},
     ]);
   };
 
@@ -287,6 +367,7 @@ export default function VoiceChat() {
 
         {/* 채팅 메시지 목록 */}
         <FlatList
+          ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
           keyExtractor={item => item.id.toString()}
@@ -295,6 +376,16 @@ export default function VoiceChat() {
             paddingBottom: chatMode === 'voice' ? 200 : 16 // 음성 모드일 때 하단 여백 추가
           }}
           showsVerticalScrollIndicator={false} // 스크롤바 숨기기
+          onContentSizeChange={() => {
+            if (messages.length > 0) {
+              flatListRef.current.scrollToEnd({ animated: true });
+            }
+          }}
+          onLayout={() => {
+            if (messages.length > 0) {
+              flatListRef.current.scrollToEnd({ animated: true });
+            }
+          }}
         />
 
         {/* 음성 모드 UI */}
