@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {Button} from './../../components';
+import {Button} from '..';
 import {themes} from '../../styles';
 import {LogoIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import CustomModal from '../../components/CustomModal';
+import CustomModal from '../CustomModal';
 
 const ChatInfoModal = ({visible, onClose}) => {
   return (

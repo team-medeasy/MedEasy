@@ -92,6 +92,26 @@ const HomeRoutine = ({schedules}) => {
     </RoutineContainer>
   );
 
+  // 루틴이 하나일 때 중앙 정렬, 그렇지 않으면 기본 정렬
+  const getContentContainerStyle = () => {
+    const baseStyle = {
+      paddingHorizontal: 20,
+      gap: 15,
+    };
+
+    // 루틴이 하나일 때 중앙 정렬 스타일 추가
+    if (routineSchedules.length === 1) {
+      return {
+        ...baseStyle,
+        paddingHorizontal: 20,
+        justifyContent: 'center', // 중앙 정렬
+        flex: 1, // 전체 너비를 차지하도록 설정
+      };
+    }
+
+    return baseStyle;
+  };
+
   return (
     <FlatList
       data={routineSchedules}
@@ -99,10 +119,7 @@ const HomeRoutine = ({schedules}) => {
       keyExtractor={item => item.user_schedule_id.toString()}
       horizontal={true}
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingHorizontal: 20,
-        gap: 15,
-      }}
+      contentContainerStyle={getContentContainerStyle()}
       style={{backgroundColor: 'transparent'}}
     />
   );

@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {View, TouchableOpacity, Platform} from 'react-native';
 import styled from 'styled-components/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {themes} from './../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
@@ -18,6 +19,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState([]);
   const [currentDate, setCurrentDate] = useState('');
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   // 현재 날짜 설정
   useEffect(() => {
@@ -161,7 +163,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
 
   return (
     <Container>
-      <HeaderContainer>
+      <HeaderContainer style={{ paddingTop: insets.top }}>
         <ChevronAndSearchContainer>
           <ChevronIconButton
             style={{padding: 12}}
@@ -255,8 +257,6 @@ const Container = styled.View`
 `;
 
 const HeaderContainer = styled.View`
-  ${Platform.OS === 'ios' && `padding-top: 70px;`}
-  ${Platform.OS === 'android' && `padding-top: 30px;`}
   padding-bottom: 7px;
   background-color: ${themes.light.bgColor.headerBG};
 `;
