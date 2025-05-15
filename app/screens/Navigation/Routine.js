@@ -11,9 +11,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import {getRoutineByDate, checkRoutine} from '../../api/routine';
 // data.js에서 데이터 import
 import {
-  //initialHospitalRoutines,
   weekDays,
-} from '../../../assets/data/data';
+  generateWeeks,
+  getTimeTypeFromScheduleName,
+  convertToPrettyTime,
+  convertToSortValue,
+  getDayOfWeek,
+} from '../../../assets/data/utils';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {getUserSchedule} from '../../api/user';
 import RoutineTimeline from '../../components/RoutineTimeline';
@@ -36,17 +40,9 @@ const Routine = ({route}) => {
     DINNER: {label: '저녁', time: '', sortValue: ''},
     BEDTIME: {label: '자기 전', time: '', sortValue: ''},
   });
-
-  const getTimeTypeFromScheduleName = scheduleName => {
-    const lowerName = scheduleName.toLowerCase();
-
-    if (lowerName.includes('아침')) return 'MORNING';
-    if (lowerName.includes('점심')) return 'LUNCH';
-    if (lowerName.includes('저녁')) return 'DINNER';
-    if (lowerName.includes('자기 전')) return 'BEDTIME';
-
-    return null;
-  };
+  const [medicineRoutines, setMedicineRoutines] = useState([]);
+  // 날짜별 routine_medicine_id를 저장
+  const [routineMedicineMap, setRoutineMedicineMap] = useState({});
 
   useFocusEffect(
     useCallback(() => {
@@ -84,53 +80,6 @@ const Routine = ({route}) => {
       return () => {};
     }, []),
   );
-
-  const convertToPrettyTime = time24 => {
-    const [hourStr, minuteStr] = time24.split(':');
-    let hour = parseInt(hourStr, 10);
-    const minute = minuteStr;
-    const isPM = hour >= 12;
-    const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-    return `오${isPM ? '후' : '전'} ${displayHour}:${minute}`;
-  };
-
-  const convertToSortValue = time24 => {
-    const [hourStr, minuteStr] = time24.split(':');
-    const hour = parseInt(hourStr, 10);
-    const minute = parseInt(minuteStr, 10);
-    return hour * 100 + minute; // 예: 09:30 → 930, 14:00 → 1400
-  };
-
-  // 날짜별 routine_medicine_id를 저장
-  const [routineMedicineMap, setRoutineMedicineMap] = useState({});
-
-  // 현재 주차를 중심으로 이전 4주, 이후 4주까지 총 9주 데이터 생성
-  const generateWeeks = centerDate => {
-    const weeks = [];
-
-    // 이전 4주
-    for (let i = -4; i <= 4; i++) {
-      const startOfWeek = centerDate.startOf('week').add(i * 7, 'day');
-      const weekData = [];
-
-      for (let j = 0; j < 7; j++) {
-        const currentDate = startOfWeek.add(j, 'day');
-        weekData.push({
-          day: weekDays[currentDate.day()],
-          date: currentDate.date(),
-          month: currentDate.month() + 1,
-          year: currentDate.year(),
-          fullDate: currentDate,
-          isToday:
-            currentDate.format('YYYY-MM-DD') === today.format('YYYY-MM-DD'),
-        });
-      }
-
-      weeks.push(weekData);
-    }
-
-    return weeks;
-  };
 
   const weeks = generateWeeks(today);
 
@@ -268,12 +217,6 @@ const Routine = ({route}) => {
     setCheckedItems(updatedChecks);
   };
 
-  const [medicineRoutines, setMedicineRoutines] = useState([]);
-  //임시 데이터 사용
-  // const [hospitalRoutines, setHospitalRoutines] = useState(
-  //   initialHospitalRoutines,
-  // );
-
   useFocusEffect(
     useCallback(() => {
       const fetchRoutineData = async () => {
@@ -341,13 +284,6 @@ const Routine = ({route}) => {
   const processRoutineData = routineData => {
     // 약물 ID 기준으로 데이터를 그룹화할 객체
     const medicineMap = {};
-
-    // 요일 매핑 (API 날짜 -> 요일 숫자로 변환)
-    // getDayOfWeek 함수 수정 - 시간대 이슈 방지
-    const getDayOfWeek = dateString => {
-      const date = dayjs(dateString);
-      return date.day() === 0 ? 7 : date.day();
-    };
 
     // 각 날짜별로 데이터 처리
     routineData.forEach(dayData => {
@@ -437,20 +373,6 @@ const Routine = ({route}) => {
         });
       }
     });
-
-    // 오늘 날짜에 해당하는 병원 방문 아이템 생성
-    // const todayHospitalItems = hospitalRoutines
-    //   .filter(hospital =>
-    //     hospital.day_of_weeks.includes(selectedDate.fullDate.day() + 1),
-    //   )
-    //   .map(hospital => ({
-    //     id: `hospital-${hospital.hospital_id}`,
-    //     label: hospital.name,
-    //     time: hospital.specific_time,
-    //     sortValue: hospital.sortValue,
-    //     type: 'hospital',
-    //     hospital,
-    //   }));
 
     // 모든 아이템 합치고 시간순 정렬
     return [...todayMedicineItems].sort((a, b) => a.sortValue - b.sortValue);
@@ -590,7 +512,7 @@ const Routine = ({route}) => {
               selectedDateString={selectedDate.fullDate.format('YYYY-MM-DD')}
               toggleTimeCheck={toggleTimeCheck}
               toggleCheck={toggleCheck}
-              // Routine.js는 기본 모드이므로 routineMode prop을 전달하지 않거나 'default'로 명시 가능
+              routineMode="default"
               emptyTitle="루틴이 없습니다."
               emptyDescription={`복용 중인 약을 검색하고\n루틴을 추가해 보세요.`}
             />
