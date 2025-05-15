@@ -123,25 +123,35 @@ const MedicineWarning = ({ item }) => {
               <ErrorText fontSizeMode={fontSizeMode}>{error}</ErrorText>
             </ErrorContainer>
           ) : (
-            sections.map(({ key, title, hasWarning, isBlue, description }, index) => (
-              <CautionItem key={key} isLastItem={index === sections.length - 1}>
-                <RoutineIcons.medicine
-                  width={18}
-                  height={18}
-                  color={
-                    hasWarning
-                      ? isBlue
-                        ? blueColor
-                        : redColor
-                      : blueColor
-                  }
-                />
-                <TextContainer>
-                  <CautionTitle fontSizeMode={fontSizeMode}>{title}</CautionTitle>
-                  <CautionDescription fontSizeMode={fontSizeMode}>{description}</CautionDescription>
-                </TextContainer>
-              </CautionItem>
-            ))
+            sections.map(({ key, title, hasWarning, isBlue, description }, index) => {
+              const iconColor = hasWarning
+                ? isBlue
+                  ? blueColor
+                  : redColor
+                : blueColor;
+
+              const backgroundColor = hasWarning
+                ? isBlue
+                  ? themes.light.pointColor.Primary10
+                  : themes.light.pointColor.Secondary20
+                : themes.light.pointColor.Primary10;
+
+              return (
+                <CautionItem key={key} isLastItem={index === sections.length - 1}>
+                  <SquareIconWrapper backgroundColor={backgroundColor}>
+                    <RoutineIcons.medicine
+                      width={18}
+                      height={18}
+                      color={iconColor}
+                    />
+                  </SquareIconWrapper>
+                  <TextContainer>
+                    <CautionTitle fontSizeMode={fontSizeMode}>{title}</CautionTitle>
+                    <CautionDescription fontSizeMode={fontSizeMode}>{description}</CautionDescription>
+                  </TextContainer>
+                </CautionItem>
+              );
+            })
           )}
         </>
       )}
@@ -176,7 +186,7 @@ const SquareIconWrapper = styled.View`
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  background-color: ${themes.light.pointColor?.Primary10 || '#E6F2FF'};
+  background-color: ${({ backgroundColor }) => backgroundColor || '#E6F2FF'};
   align-items: center;
   justify-content: center;
 `;

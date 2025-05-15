@@ -12,6 +12,7 @@ import MessageBubble from '../../components/Chat/MessageBubble';
 import MessageInput from '../../components/Chat/MessageInput';
 import { cleanupTempAudioFiles, sendVoiceMessage } from '../../api/voiceChat';
 import { OtherIcons } from '../../../assets/icons';
+import { getUser } from '../../api/user';
 
 const recognizerOptions = Platform.OS === 'android' ? {
   REQUEST_PERMISSIONS_AUTO: true,
@@ -33,16 +34,26 @@ export default function VoiceChat() {
   const [statusMessage, setStatusMessage] = useState('준비 중...');
   
   const [chatMode, setChatMode] = useState('text'); // 'text' 또는 'voice'
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      type: 'bot',
-      text: '복용하는 약에 대해 궁금하신 점이 있으신가요?',
-      options: ['복용 방법', '주의사항', '주변 병원 정보', '그 외 궁금한 점'],
-      time: '오전 9:00',
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
+
+  useEffect(() => {
+  const fetchUserName = async () => {
+    const { data } = await getUser();
+    const userName = data.body.name;
+
+    setMessages([
+      {
+        id: 1,
+        type: 'bot',
+        text: `${userName}님, 안녕하세요☺️\n어떤 도움이 필요하신가요?`,
+        options: ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'],
+      },
+    ]);
+  };
+
+  fetchUserName();
+}, []);
 
   useEffect(() => {
     requestMicPermission();
@@ -256,8 +267,13 @@ export default function VoiceChat() {
       <KeyboardAvoidingView
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <Header hideBorder='true' transparentBg='true'>
-          {chatMode === 'voice' ? '보이스 채팅' : 'AI 챗봇 메디씨'}
+        <Header 
+          hideBorder='true' 
+          transparentBg='true' 
+          titleColor={themes.light.textColor.buttonText}
+          iconColor={themes.light.textColor.buttonText}>
+          {/* {chatMode === 'voice' ? '보이스 채팅' : 'AI 챗봇 메디씨'} */}
+          보이스 채팅
         </Header>
 
         {/* 채팅 이용 안내 모달 */}
@@ -291,7 +307,12 @@ export default function VoiceChat() {
                   style={{ transform: [{ scale: scaleAnim }] }} 
                   color={getCircleColor()} 
                 />
-                <TextModeButton onPress={toggleChatMode}>
+                <TextModeButton onPress={() => {
+                    Voice.cancel();
+                    stopPulseAnimation();
+                    setStatus('idle');
+                    setChatMode('text');
+                  }}>
                   <OtherIcons.delete
                     height={20}
                     width={20}
@@ -328,7 +349,7 @@ export default function VoiceChat() {
 }
 
 const Container = styled(LinearGradient).attrs({
-  colors: [themes.light.pointColor.Primary, '#000000'],
+  colors: [themes.light.pointColor.PrimaryDark, '#000000'],
   start: { x: 0, y: 0 },
   end: { x: 0, y: 1 },
 })`
