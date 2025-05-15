@@ -13,7 +13,13 @@ import { getCareRoutine } from '../../api/userCare';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import RoutineTimeline from '../../components/RoutineTimeline';
-import { weekDays } from '../../../assets/data/data';
+import { 
+  weekDays,
+  generateWeeks,
+  getTimeTypeFromScheduleName,
+  convertToPrettyTime,
+  convertToSortValue,
+} from '../../../assets/data/utils';
 
 const { width } = Dimensions.get('window');
 
@@ -26,30 +32,6 @@ const CareRoutine = ({ route }) => {
   console.log('📦 route.params:', route.params);
 
   const insets = useSafeAreaInsets();
-
-  const generateWeeks = centerDate => {
-    const weeks = [];
-    for (let i = -4; i <= 4; i++) {
-      const startOfWeek = centerDate.startOf('week').add(i * 7, 'day');
-      const weekData = [];
-
-      for (let j = 0; j < 7; j++) {
-        const currentDate = startOfWeek.add(j, 'day');
-        weekData.push({
-          day: weekDays[currentDate.day()],
-          date: currentDate.date(),
-          month: currentDate.month() + 1,
-          year: currentDate.year(),
-          fullDate: currentDate,
-          isToday: currentDate.format('YYYY-MM-DD') === today.format('YYYY-MM-DD'),
-        });
-      }
-
-      weeks.push(weekData);
-    }
-
-    return weeks;
-  };
 
   const weeks = generateWeeks(today);
 
@@ -107,31 +89,6 @@ const CareRoutine = ({ route }) => {
     }
     }, [route.params]),
   );
-
-  const getTimeTypeFromScheduleName = scheduleName => {
-    const lowerName = scheduleName.toLowerCase();
-    if (lowerName.includes('아침')) return 'MORNING';
-    if (lowerName.includes('점심')) return 'LUNCH';
-    if (lowerName.includes('저녁')) return 'DINNER';
-    if (lowerName.includes('자기 전')) return 'BEDTIME';
-    return null;
-  };
-
-  const convertToPrettyTime = time24 => {
-    const [hourStr, minuteStr] = time24.split(':');
-    let hour = parseInt(hourStr, 10);
-    const minute = minuteStr;
-    const isPM = hour >= 12;
-    const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-    return `오${isPM ? '후' : '전'} ${displayHour}:${minute}`;
-  };
-
-  const convertToSortValue = time24 => {
-    const [hourStr, minuteStr] = time24.split(':');
-    const hour = parseInt(hourStr, 10);
-    const minute = parseInt(minuteStr, 10);
-    return hour * 100 + minute;
-  };
 
   const fetchCareRoutine = async (startDate, endDate) => {
     try {
