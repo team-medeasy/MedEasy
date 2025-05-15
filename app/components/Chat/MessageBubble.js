@@ -3,7 +3,8 @@ import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import {ChatIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { View, Animated } from 'react-native';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+import {View, Animated} from 'react-native';
 
 const {robot: RobotIcon} = ChatIcons;
 
@@ -56,6 +57,8 @@ const TypingAnimation = () => {
 };
 
 const MessageBubble = ({item}) => {
+  const { fontSizeMode } = useFontSize();
+  
   if (item.type === 'bot') {
     return (
       <BotMessageContainer>
@@ -70,13 +73,13 @@ const MessageBubble = ({item}) => {
         {item.options ? (
           <View style={{ flex: 1 }}>
             <BotMessageBubble>
-              <BotText>{item.text}</BotText>
+              <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
             </BotMessageBubble>
 
             <OptionWrap>
               {item.options.map((option, index) => (
                 <OptionBubble key={index}>
-                  <OptionText>{option}</OptionText>
+                  <OptionText fontSizeMode={fontSizeMode}>{option}</OptionText>
                 </OptionBubble>
               ))}
             </OptionWrap>
@@ -86,20 +89,20 @@ const MessageBubble = ({item}) => {
             {item.isTyping ? (
               <TypingAnimation />
             ) : (
-              <BotText>{item.text}</BotText>
+              <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
             )}
           </BotMessageBubble>
         )}
 
-        <MessageTime>{item.time}</MessageTime>
+        <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
       </BotMessageContainer>
     );
   } else {
     return (
       <UserMessageContainer>
-        <MessageTime>{item.time}</MessageTime>
+        <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
         <UserMessageBubble>
-          <UserText>{item.text}</UserText>
+          <UserText fontSizeMode={fontSizeMode}>{item.text}</UserText>
         </UserMessageBubble>
       </UserMessageContainer>
     );
@@ -133,7 +136,7 @@ const BotMessageBubble = styled.View`
 `;
 
 const BotText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-Medium';
@@ -157,7 +160,7 @@ const OptionBubble = styled.TouchableOpacity`
 
 const OptionText = styled.Text`
   color: ${themes.light.textColor.buttonText};
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
 `;
 
@@ -169,14 +172,14 @@ const UserMessageContainer = styled.View`
 `;
 
 const UserText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-SemiBold';
 `;
 
 const MessageTime = styled.Text`
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   margin: 0px 10px;
   align-self: flex-end;
   color: ${themes.light.textColor.buttonText60};

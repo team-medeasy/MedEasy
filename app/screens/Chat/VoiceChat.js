@@ -5,13 +5,16 @@ import Sound from 'react-native-sound';
 import styled from 'styled-components/native';
 import LinearGradient from 'react-native-linear-gradient';
 
+import { themes } from '../../styles';
+import FontSizes from '../../../assets/fonts/fontSizes';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 import { Header } from '../../components';
 import ChatInfoModal from '../../components/Chat/ChatInfoModal';
-import { themes } from '../../styles';
 import MessageBubble from '../../components/Chat/MessageBubble';
 import MessageInput from '../../components/Chat/MessageInput';
-import { cleanupTempAudioFiles, sendVoiceMessage } from '../../api/voiceChat';
 import { OtherIcons } from '../../../assets/icons';
+
+import { cleanupTempAudioFiles, sendVoiceMessage } from '../../api/voiceChat';
 import { getUser } from '../../api/user';
 
 const recognizerOptions = Platform.OS === 'android' ? {
@@ -23,6 +26,8 @@ const recognizerOptions = Platform.OS === 'android' ? {
 } : {};
 
 export default function VoiceChat() {
+  const {fontSizeMode} = useFontSize();
+  
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const audioPlayer = useRef(null);
   const debounceTimer = useRef(null);
@@ -392,7 +397,7 @@ export default function VoiceChat() {
         {chatMode === 'voice' && (
           <VoiceInputContainer>
             <VoiceCenterContainer>
-              <StatusText>{statusMessage}</StatusText>
+              <StatusText fontSizeMode={fontSizeMode}>{statusMessage}</StatusText>
               <AnimatedCircleContainer>
                 <AnimatedCircle 
                   style={{ transform: [{ scale: scaleAnim }] }} 
@@ -414,7 +419,9 @@ export default function VoiceChat() {
             </VoiceCenterContainer>
             
             <RecognizedTextContainer>
-              <RecognizedText>{recognizedText || '말씀해주세요...'}</RecognizedText>
+              <RecognizedText fontSizeMode={fontSizeMode}>
+                {recognizedText || '말씀해주세요...'}
+              </RecognizedText>
             </RecognizedTextContainer>
           </VoiceInputContainer>
         )}
@@ -486,7 +493,7 @@ const AnimatedCircle = styled(Animated.View)`
 
 const StatusText = styled(Text)`
   margin-bottom: 15px;
-  font-size: 16px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
   font-weight: bold;
   text-align: center;
@@ -506,6 +513,6 @@ const RecognizedTextContainer = styled(View)`
 `;
 
 const RecognizedText = styled(Text)`
-  font-size: 16px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
 `;

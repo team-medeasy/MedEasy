@@ -14,6 +14,7 @@ export const lightTheme = {
     Primary10: 'rgba(0, 0, 0, 0.1)',
     Primary20: 'rgba(0, 0, 0, 0.2)',
     Primary30: 'rgba(0, 0, 0, 0.3)',
+    Primary40: 'rgba(0, 0, 0, 0.4)',
     Primary50: 'rgba(128, 128, 128, 1)',
     Primary70: 'rgba(0, 0, 0, 0.7)',
     buttonText: 'rgba(255, 255, 255, 1)',
