@@ -13,6 +13,7 @@ const Header = ({
   onBackPress, 
   hideBorder = false,
   transparentBg = false,
+  titleColor,
 }) => {
   const navigation = useNavigation();
   const handleBackPress = onBackPress || (() => navigation.goBack());
@@ -36,7 +37,8 @@ const Header = ({
         <Title
           fontSizeMode={fontSizeMode}
           numberOfLines={1}
-          ellipsizeMode="tail">
+          ellipsizeMode="tail"
+          titleColor={titleColor}>
           {children}
         </Title>
         <View width={41} height={41} />
@@ -63,7 +65,7 @@ const Title = styled.Text`
   text-align: center;
   font-family: 'Pretendard-SemiBold';
   font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
-  color: ${themes.light.textColor.textPrimary};
+  color: ${({titleColor}) => titleColor || themes.light.textColor.textPrimary};
 `;
 
 export {Header};
