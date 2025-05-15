@@ -28,6 +28,7 @@ export const InputWithDelete = ({
             autoCapitalize={autoCapitalize}
             secureTextEntry={secureTextEntry}
             fontSizeMode={fontSizeMode}
+            placeholderTextColor={themes.light.textColor.Primary40}
         />
         {value && value.length > 0 && (
             <DeleteButton onPress={() => onChangeText('')}>
