@@ -3,37 +3,43 @@ import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import {ChatIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import { View } from 'react-native';
 
 const {robot: RobotIcon} = ChatIcons;
 
 const MessageBubble = ({item}) => {
   if (item.type === 'bot') {
     return (
-      <BotMessageContainer>
-        <RobotIconContainer>
-          <RobotIcon
-            height={30}
-            width={30}
-            style={{color: themes.light.textColor.buttonText}}
-          />
-        </RobotIconContainer>
-        <BotMessageBubble>
-          <BotText>{item.text}</BotText>
+    <BotMessageContainer>
+      <RobotIconContainer>
+        <RobotIcon
+          height={30}
+          width={30}
+          style={{color: themes.light.textColor.buttonText}}
+        />
+      </RobotIconContainer>
+
+        <View style={{ flex: 1 }}>
+          <BotMessageBubble>
+            <BotText>{item.text}</BotText>
+          </BotMessageBubble>
+
           {item.options && (
-            <BotOptions>
+            <OptionWrap>
               {item.options.map((option, index) => (
-                <OptionButton
-                  key={index}
-                  isLast={index === item.options.length - 1}>
+                <OptionBubble key={index}>
                   <OptionText>{option}</OptionText>
-                </OptionButton>
+                </OptionBubble>
               ))}
-            </BotOptions>
+            </OptionWrap>
           )}
-        </BotMessageBubble>
+
+          <MessageTime>{item.time}</MessageTime>
+        </View>
+
         <MessageTime>{item.time}</MessageTime>
-      </BotMessageContainer>
-    );
+    </BotMessageContainer>
+  );
   } else {
     return (
       <UserMessageContainer>
@@ -69,8 +75,7 @@ const RobotIconContainer = styled.View`
 const BotMessageBubble = styled.View`
   background-color: 'rgba(255, 255, 255, 0.1)';
   padding: 10px 14px;
-  border-radius: 20px;
-  border-top-left-radius: 3px;
+  border-radius: 2px 12px 12px 12px;
   max-width: 65%;
 `;
 
@@ -81,26 +86,26 @@ const BotText = styled.Text`
   font-family: 'Pretendard-Medium';
 `;
 
-const BotOptions = styled.View`
-  margin-top: 15px;
-  margin-bottom: 5px;
-  background-color: ${themes.light.pointColor.Primary10};
-  border-radius: 12px;
+const OptionWrap = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  row-gap: 8px;
+  column-gap: 8px;
 `;
 
-const OptionButton = styled.TouchableOpacity`
-  padding: 10px;
-  margin: 0px 10px;
-  justify-content: center;
-  align-items: center;
-  border-bottom-width: ${({isLast}) => (isLast ? '0px' : '1px')};
-  border-bottom-color: ${themes.light.borderColor.borderPrimary};
+const OptionBubble = styled.TouchableOpacity`
+  background-color: rgba(255, 255, 255, 0.1);  
+  padding: 8px 12px;
+  border-radius: 12px;
+  align-self: flex-start;      
+  flex-shrink: 0;              
 `;
 
 const OptionText = styled.Text`
-  color: ${themes.light.pointColor.Primary};
+  color: ${themes.light.textColor.buttonText};
   font-size: ${FontSizes.body.default};
-  font-family: 'Pretendard-Semibold';
+  font-family: 'Pretendard-Medium';
 `;
 
 const UserMessageContainer = styled.View`
