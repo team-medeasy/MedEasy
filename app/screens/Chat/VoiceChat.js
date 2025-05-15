@@ -267,7 +267,11 @@ export default function VoiceChat() {
       <KeyboardAvoidingView
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <Header hideBorder='true' transparentBg='true' titleColor={themes.light.textColor.buttonText}>
+        <Header 
+          hideBorder='true' 
+          transparentBg='true' 
+          titleColor={themes.light.textColor.buttonText}
+          iconColor={themes.light.textColor.buttonText}>
           {/* {chatMode === 'voice' ? '보이스 채팅' : 'AI 챗봇 메디씨'} */}
           보이스 채팅
         </Header>

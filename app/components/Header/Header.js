@@ -14,6 +14,7 @@ const Header = ({
   hideBorder = false,
   transparentBg = false,
   titleColor,
+  iconColor,
 }) => {
   const navigation = useNavigation();
   const handleBackPress = onBackPress || (() => navigation.goBack());
@@ -31,7 +32,7 @@ const Header = ({
           <HeaderIcons.chevron
             width={17}
             height={17}
-            style={{color: themes.light.textColor.textPrimary}}
+            style={{color: iconColor || themes.light.textColor.textPrimary}}
           />
         </TouchableOpacity>
         <Title
