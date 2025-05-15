@@ -8,7 +8,12 @@ import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
-const Header = ({children, onBackPress, hideBorder = false}) => {
+const Header = ({
+  children, 
+  onBackPress, 
+  hideBorder = false,
+  transparentBg = false,
+}) => {
   const navigation = useNavigation();
   const handleBackPress = onBackPress || (() => navigation.goBack());
   const {fontSizeMode} = useFontSize();
@@ -17,6 +22,7 @@ const Header = ({children, onBackPress, hideBorder = false}) => {
   return (
     <HeaderContainer 
       hideBorder={hideBorder}
+      transparentBg={transparentBg}
       style={{ paddingTop: insets.top }}
     >
       <BackAndTitleContainer>
@@ -41,7 +47,8 @@ const Header = ({children, onBackPress, hideBorder = false}) => {
 
 const HeaderContainer = styled.View`
   justify-content: flex-end;
-  background-color: ${themes.light.bgColor.bgPrimary};
+  background-color: ${({transparentBg}) =>
+    transparentBg ? 'transparent' : themes.light.bgColor.bgPrimary};
   border-bottom-width: ${props => (props.hideBorder ? 0 : 1)}px;
   border-bottom-color: ${themes.light.borderColor.borderPrimary};
 `;

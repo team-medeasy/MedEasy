@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, PermissionsAndroid, Platform, ScrollView, Text, View } from 'react-native';
+import { Animated, FlatList, KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from 'react-native';
 import Voice from '@react-native-voice/voice';
 import Sound from 'react-native-sound';
 import styled from 'styled-components/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { Header } from '../../components';
 import ChatInfoModal from '../../components/Chat/ChatInfoModal';
 import { themes } from '../../styles';
+import MessageBubble from '../../components/Chat/MessageBubble';
+import MessageInput from '../../components/Chat/MessageInput';
 import { cleanupTempAudioFiles, sendVoiceMessage } from '../../api/voiceChat';
+import { OtherIcons } from '../../../assets/icons';
 
 const recognizerOptions = Platform.OS === 'android' ? {
   REQUEST_PERMISSIONS_AUTO: true,
@@ -27,7 +31,18 @@ export default function VoiceChat() {
   const [showInfoModal, setShowInfoModal] = useState(true);
   const [recognizedText, setRecognizedText] = useState('');
   const [statusMessage, setStatusMessage] = useState('준비 중...');
-  const [conversation, setConversation] = useState([]);
+  
+  const [chatMode, setChatMode] = useState('text'); // 'text' 또는 'voice'
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      type: 'bot',
+      text: '복용하는 약에 대해 궁금하신 점이 있으신가요?',
+      options: ['복용 방법', '주의사항', '주변 병원 정보', '그 외 궁금한 점'],
+      time: '오전 9:00',
+    },
+  ]);
+  const [inputText, setInputText] = useState('');
 
   useEffect(() => {
     requestMicPermission();
@@ -44,13 +59,13 @@ export default function VoiceChat() {
     };
   }, []);
 
-  // 상태와 권한이 idle + true일 때 자동 재시작
+  // 상태와 권한이 idle + true일 때 자동 재시작 (음성 모드일 때만)
   useEffect(() => {
-    if (status === 'idle' && hasPermission) {
+    if (status === 'idle' && hasPermission && chatMode === 'voice') {
       console.log('[VOICE] Auto-startListening triggered by status change');
       startListening();
     }
-  }, [status, hasPermission]);
+  }, [status, hasPermission, chatMode]);
 
   useEffect(() => {
     if (status === 'listening' && recognizedText) {
@@ -118,11 +133,13 @@ export default function VoiceChat() {
     stopPulseAnimation();
     setStatus('processing');
     setStatusMessage('메시지 처리 중...');
+    
+    // 음성 인식된 텍스트를 메시지로 추가
+    addMessage(text, 'user');
     processRecognizedText(text);
   }
 
   async function processRecognizedText(text) {
-    setConversation(prev => [...prev, { type: 'user', text }]);
     try {
       await cleanupTempAudioFiles();
       const filePath = await sendVoiceMessage(text);
@@ -149,7 +166,7 @@ export default function VoiceChat() {
       }
       audioPlayer.current.play(success => {
         console.log('[VOICE] Audio play finished:', success);
-        setConversation(prev => [...prev, { type: 'bot', text: '[응답 재생 완료]' }]);
+        addMessage('봇 응답 메시지입니다', 'bot');
         reset(); // 이 시점에서 idle로 돌아감
       });
     });
@@ -179,98 +196,204 @@ export default function VoiceChat() {
 
   function getCircleColor() {
     switch (status) {
-      case 'listening': return themes.light.pointColor.Primary;
+      case 'listening': return themes.light.textColor.buttonText;
       case 'processing': return themes.light.textColor.Primary50;
       case 'playing': return themes.light.pointColor.Secondary;
       default: return themes.light.boxColor.buttonPrimary;
     }
   }
 
+  // 텍스트 채팅 모드에서 메시지 전송
+  const sendTextMessage = () => {
+    if (inputText.trim() === '') return;
+    
+    addMessage(inputText, 'user');
+
+    setTimeout(() => {
+      addMessage('네, 해당 내용에 대해 알려드릴게요!', 'bot');
+    }, 1000);
+
+    setInputText('');
+  };
+
+  // 채팅 모드 전환 (텍스트 <-> 음성)
+  const toggleChatMode = () => {
+    if (chatMode === 'text') {
+      setChatMode('voice');
+      // 음성 모드로 전환 후 즉시 리스닝 시작
+      setTimeout(() => {
+        startListening();
+      }, 500);
+    } else {
+      setChatMode('text');
+      Voice.cancel();
+      stopPulseAnimation();
+      setStatus('idle');
+    }
+  };
+
+  // 공통 메시지 추가 함수
+  const addMessage = (text, type) => {
+    const currentTime = new Date();
+    const hours = currentTime.getHours();
+    const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+    const period = hours >= 12 ? '오후' : '오전';
+    const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+    const formattedTime = `${period} ${formattedHours}:${minutes}`;
+
+    setMessages(prevMessages => [
+      ...prevMessages,
+      {id: Date.now(), type, text, time: formattedTime},
+    ]);
+  };
+
+  const renderMessage = ({item}) => {
+    return <MessageBubble item={item} />;
+  };
+
   return (
     <Container>
-      <Header>보이스 채팅</Header>
-      <CircleContainer>
-        <AnimatedCircle style={{ transform: [{ scale: scaleAnim }] }} color={getCircleColor()} />
-        <StatusText>{statusMessage}</StatusText>
-        <RecognizedTextContainer>
-          <RecognizedText>{recognizedText || '말씀해주세요...'}</RecognizedText>
-        </RecognizedTextContainer>
-        <ConversationList>
-          {conversation.map((msg, idx) => (
-            <ConversationItem key={idx} type={msg.type}>
-              <ConversationText>{msg.type === 'user' ? '나: ' : '메디지: '}{msg.text}</ConversationText>
-            </ConversationItem>
-          ))}
-        </ConversationList>
-      </CircleContainer>
-      <ChatInfoModal
-        visible={showInfoModal}
-        onClose={() => {
-          setShowInfoModal(false);
-          if (hasPermission) setStatus('idle'); // 트리거용
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <Header hideBorder='true' transparentBg='true'>
+          {chatMode === 'voice' ? '보이스 채팅' : 'AI 챗봇 메디씨'}
+        </Header>
+
+        {/* 채팅 이용 안내 모달 */}
+        <ChatInfoModal
+          visible={showInfoModal}
+          onClose={() => {
+            setShowInfoModal(false);
+            if (hasPermission && chatMode === 'voice') setStatus('idle'); // 트리거용
+          }}
+        />
+
+        {/* 채팅 메시지 목록 */}
+        <FlatList
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={{
+            padding: 16,
+            paddingBottom: chatMode === 'voice' ? 200 : 16 // 음성 모드일 때 하단 여백 추가
+          }}
+          showsVerticalScrollIndicator={false} // 스크롤바 숨기기
+        />
+
+        {/* 음성 모드 UI */}
+        {chatMode === 'voice' && (
+          <VoiceInputContainer>
+            <VoiceCenterContainer>
+              <StatusText>{statusMessage}</StatusText>
+              <AnimatedCircleContainer>
+                <AnimatedCircle 
+                  style={{ transform: [{ scale: scaleAnim }] }} 
+                  color={getCircleColor()} 
+                />
+                <TextModeButton onPress={toggleChatMode}>
+                  <OtherIcons.delete
+                    height={20}
+                    width={20}
+                    style={{color: themes.light.textColor.buttonText}}
+                  />
+                </TextModeButton>
+              </AnimatedCircleContainer>
+            </VoiceCenterContainer>
+            
+            <RecognizedTextContainer>
+              <RecognizedText>{recognizedText || '말씀해주세요...'}</RecognizedText>
+            </RecognizedTextContainer>
+          </VoiceInputContainer>
+        )}
+
+        {/* 텍스트 입력 컴포넌트 */}
+        {chatMode === 'text' && (
+          <MessageInput
+            inputText={inputText}
+            setInputText={setInputText}
+            sendMessage={sendTextMessage}
+            toggleVoiceMode={toggleChatMode}
+          />
+        )}
+      </KeyboardAvoidingView>
+      <View
+        style={{
+          width: '100%',
+          height: 20,
         }}
       />
     </Container>
   );
 }
 
-const Container = styled.View`
+const Container = styled(LinearGradient).attrs({
+  colors: [themes.light.pointColor.Primary, '#000000'],
+  start: { x: 0, y: 0 },
+  end: { x: 0, y: 1 },
+})`
   flex: 1;
-  background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
-const CircleContainer = styled.View`
-  flex: 1;
-  justify-content: center;
+const VoiceInputContainer = styled.View`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  z-index: 10;
+`;
+
+const VoiceCenterContainer = styled.View`
   align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+`;
+
+const AnimatedCircleContainer = styled.View`
+  position: relative;
+  align-items: center;
+  justify-content: center;
 `;
 
 const AnimatedCircle = styled(Animated.View)`
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   background-color: ${props => props.color};
-  border-radius: 50px;
+  border-radius: 40px;
+
+    /* iOS 그림자 */
+  shadow-color: ${props => props.color};
+  shadow-offset: 0px 0px;
+  shadow-opacity: 0.8;
+  shadow-radius: 10px;
+
+  /* Android 그림자 (elevation) */
+  elevation: 10;
 `;
 
 const StatusText = styled(Text)`
-  margin-top: 20px;
-  font-size: 18px;
-  color: ${themes.light.textColor.textPrimary};
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: ${themes.light.textColor.buttonText};
   font-weight: bold;
+  text-align: center;
+`;
+
+const TextModeButton = styled(TouchableOpacity)`
+  position: absolute;
+  right: -100px;
+  align-items: center;
+  justify-content: center;
 `;
 
 const RecognizedTextContainer = styled(View)`
-  margin-top: 30px;
-  padding: 15px;
-  width: 90%;
-  background-color: ${themes.light.boxColor.inputPrimary};
+  padding: 12px;
+  background-color: ${themes.light.boxColor.inputPrimary}50;
   border-radius: 10px;
 `;
 
 const RecognizedText = styled(Text)`
   font-size: 16px;
-  color: ${themes.light.textColor.textPrimary};
-  text-align: center;
-`;
-
-const ConversationList = styled(ScrollView)`
-  margin-top: 20px;
-  width: 90%;
-  max-height: 200px;
-`;
-
-const ConversationItem = styled(View)`
-  margin-bottom: 10px;
-  align-self: ${props => (props.type === 'user' ? 'flex-end' : 'flex-start')};
-  background-color: ${props =>
-    props.type === 'user'
-      ? themes.light.pointColor.Primary20
-      : themes.light.boxColor.tagResultPrimary};
-  padding: 10px;
-  border-radius: 8px;
-`;
-
-const ConversationText = styled(Text)`
-  font-size: 14px;
-  color: ${themes.light.textColor.textPrimary};
+  color: ${themes.light.textColor.buttonText};
 `;

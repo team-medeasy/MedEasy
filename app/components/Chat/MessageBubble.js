@@ -59,18 +59,16 @@ const BotMessageContainer = styled.View`
 `;
 
 const RobotIconContainer = styled.View`
-  background-color: ${themes.light.pointColor.Primary};
   width: 40px;
   height: 40px;
   justify-content: center;
   align-items: center;
-  border-radius: 20px;
   margin-right: 10px;
 `;
 
 const BotMessageBubble = styled.View`
-  background-color: ${themes.light.bgColor.bgPrimary};
-  padding: 15px 20px;
+  background-color: 'rgba(255, 255, 255, 0.1)';
+  padding: 10px 14px;
   border-radius: 20px;
   border-top-left-radius: 3px;
   max-width: 65%;
@@ -79,7 +77,7 @@ const BotMessageBubble = styled.View`
 const BotText = styled.Text`
   font-size: ${FontSizes.body.default};
   line-height: 24px;
-  color: ${themes.light.textColor.Primary};
+  color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-Medium';
 `;
 
@@ -128,8 +126,8 @@ const MessageTime = styled.Text`
 `;
 
 const UserMessageBubble = styled.View`
-  background-color: ${themes.light.pointColor.Primary};
-  padding: 15px 20px;
+  background-color: rgba(66, 115, 237, 0.5);
+  padding: 10px 14px;
   border-radius: 20px;
   border-top-right-radius: 3px;
   max-width: 70%;
