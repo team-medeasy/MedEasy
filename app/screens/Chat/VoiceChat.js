@@ -303,7 +303,12 @@ export default function VoiceChat() {
                   style={{ transform: [{ scale: scaleAnim }] }} 
                   color={getCircleColor()} 
                 />
-                <TextModeButton onPress={toggleChatMode}>
+                <TextModeButton onPress={() => {
+                    Voice.cancel();
+                    stopPulseAnimation();
+                    setStatus('idle');
+                    setChatMode('text');
+                  }}>
                   <OtherIcons.delete
                     height={20}
                     width={20}
