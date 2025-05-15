@@ -7,36 +7,30 @@ import FontSizes from '../../../assets/fonts/fontSizes';
 
 const {add: AddIcon, mike: MikeIcon, send: SendIcon} = ChatIcons;
 
-const MessageInput = ({inputText, setInputText, sendMessage}) => {
+const MessageInput = ({inputText, setInputText, sendMessage, toggleVoiceMode}) => {
   return (
     <InputContainer>
-      <AddIconContainer>
-        <AddIcon
-          width={18}
-          height={18}
-          style={{color: themes.light.textColor.Primary30}}
-        />
-      </AddIconContainer>
       <TextInputContainer>
         <Input
           placeholder="무엇이든 물어보세요!"
           value={inputText}
           onChangeText={setInputText}
           multiline={true}
+          placeholderTextColor="rgba(255, 255, 255, 0.6)"
         />
         <SendButton onPress={sendMessage}>
           <SendIcon
             width={18}
             height={18}
-            style={{color: themes.light.textColor.Primary30}}
+            style={{color: 'rgba(255, 255, 255, 0.6)'}}
           />
         </SendButton>
       </TextInputContainer>
-      <MikeIconContainer>
+      <MikeIconContainer onPress={toggleVoiceMode}>
         <MikeIcon
           width={17}
           height={20}
-          style={{color: themes.light.textColor.textPrimary}}
+          style={{color: 'rgba(255, 255, 255, 0.6)'}}
         />
       </MikeIconContainer>
     </InputContainer>
@@ -50,32 +44,20 @@ const InputContainer = styled.View`
   align-items: center;
   width: 100%;
   padding: 10px 10px;
-  background-color: ${themes.light.bgColor.bgPrimary};
-`;
-
-const AddIconContainer = styled.View`
-  width: 40px;
-  height: 40px;
-  border-radius: 100%;
-  justify-content: center;
-  align-items: center;
-  background-color: ${themes.light.boxColor.inputSecondary};
-  flex-shrink: 0;
 `;
 
 const TextInputContainer = styled.View`
   flex: 1;
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
   border-radius: 20px;
   margin: 0px 10px;
   min-height: 40px;
   padding: 5px 0px;
-  background-color: ${themes.light.boxColor.inputSecondary};
+  background-color: rgba(255, 255, 255, 0.1);
 `;
 
-const MikeIconContainer = styled.View`
+const MikeIconContainer = styled(TouchableOpacity)`
   width: 40px;
   height: 40px;
   border-radius: 100%;
@@ -94,6 +76,7 @@ const Input = styled(TextInput)`
   font-family: 'Pretendard-semiBold';
   padding-top: 5px;
   padding-bottom: 5px;
+  color: rgba(255, 255, 255, 0.6);
 `;
 
 const SendButton = styled(TouchableOpacity)`
