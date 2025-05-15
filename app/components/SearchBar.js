@@ -4,7 +4,7 @@ import {TouchableOpacity} from 'react-native';
 import {themes} from './../styles';
 import {OtherIcons} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
-import { useFontSize } from '../../assets/fonts/FontSizeContext';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
 
 const SearchBarContainer = styled.View`
   height: 44px;
@@ -34,12 +34,13 @@ const SearchBar = ({searchQuery, setSearchQuery, onSearch, placeholder}) => {
   return (
     <SearchBarContainer>
       <SearchInput
-      fontSizeMode={fontSizeMode}
+        fontSizeMode={fontSizeMode}
         placeholder={placeholder}
         value={searchQuery}
         onChangeText={setSearchQuery}
         onSubmitEditing={onSearch}
         returnKeyType="search"
+        placeholderTextColor={themes.light.textColor.Primary40}
       />
       <SearchButton style={{padding: 14, marginTop: 7}} onPress={onSearch}>
         <OtherIcons.search

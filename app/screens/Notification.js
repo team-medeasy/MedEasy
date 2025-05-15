@@ -279,10 +279,18 @@ const NotificationItem = styled.View`
 
 const NotiContainer = styled.View`
   flex-direction: row;
+  flex: 1;
 `;
 
 const NotiTextContainer = styled.View`
-  overflow: hidden;
+  flex: 1;
+  flex-shrink: 1;
+`;
+
+const NotificationMessage = styled.Text`
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  color: ${themes.light.textColor.Primary70};
+  font-family: 'Pretendard-Medium';
 `;
 
 const NotificationTitle = styled.Text`
@@ -290,13 +298,6 @@ const NotificationTitle = styled.Text`
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
   margin-bottom: 10px;
-`;
-
-const NotificationMessage = styled.Text`
-  width: 80%;
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
-  color: ${themes.light.textColor.Primary70};
-  font-family: 'Pretendard-Medium';
 `;
 
 const NotiTime = styled.Text`

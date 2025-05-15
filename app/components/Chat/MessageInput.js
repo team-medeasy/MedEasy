@@ -4,14 +4,18 @@ import {TextInput, TouchableOpacity, View} from 'react-native';
 import {themes} from '../../styles';
 import {ChatIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const {add: AddIcon, mike: MikeIcon, send: SendIcon} = ChatIcons;
 
 const MessageInput = ({inputText, setInputText, sendMessage, toggleVoiceMode}) => {
+  const { fontSizeMode } = useFontSize();
+
   return (
     <InputContainer>
       <TextInputContainer>
         <Input
+          fontSizeMode={fontSizeMode}
           placeholder="무엇이든 물어보세요!"
           value={inputText}
           onChangeText={setInputText}
@@ -71,7 +75,7 @@ const Input = styled(TextInput)`
   flex: 1;
   padding-left: 15px;
   padding-right: 10px;
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   max-height: 100px;
   font-family: 'Pretendard-semiBold';
   padding-top: 5px;

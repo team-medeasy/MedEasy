@@ -133,6 +133,7 @@ const Profile = () => {
               value={userName}
               onChangeText={text => setUserName(text)}
               keyboardType="default"
+              placeholder="이름을 입력하세요"
             />
           </View>
           <TestBtn onPress={handleUpdateUserName}>

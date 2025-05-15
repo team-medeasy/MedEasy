@@ -3,49 +3,106 @@ import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import {ChatIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { View } from 'react-native';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+import {View, Animated} from 'react-native';
 
 const {robot: RobotIcon} = ChatIcons;
 
+// 타이핑 애니메이션을 위한 컴포넌트 - 위아래로 움직이는 형태로 수정
+const TypingAnimation = () => {
+  const [dot1] = React.useState(new Animated.Value(0));
+  const [dot2] = React.useState(new Animated.Value(0));
+  const [dot3] = React.useState(new Animated.Value(0));
+
+  React.useEffect(() => {
+    const animateDot = (dot, delay) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(dot, {
+            toValue: 1,
+            duration: 300,
+            delay,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    };
+
+    animateDot(dot1, 0);
+    animateDot(dot2, 150);
+    animateDot(dot3, 300);
+  }, [dot1, dot2, dot3]);
+
+  return (
+    <TypingContainer>
+      <AnimatedDot style={{ transform: [{ translateY: dot1.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -5]
+      }) }] }} />
+      <AnimatedDot style={{ transform: [{ translateY: dot2.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -5]
+      }) }] }} />
+      <AnimatedDot style={{ transform: [{ translateY: dot3.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -5]
+      }) }] }} />
+    </TypingContainer>
+  );
+};
+
 const MessageBubble = ({item}) => {
+  const { fontSizeMode } = useFontSize();
+  
   if (item.type === 'bot') {
     return (
-    <BotMessageContainer>
-      <RobotIconContainer>
-        <RobotIcon
-          height={30}
-          width={30}
-          style={{color: themes.light.textColor.buttonText}}
-        />
-      </RobotIconContainer>
+      <BotMessageContainer>
+        <RobotIconContainer>
+          <RobotIcon
+            height={30}
+            width={30}
+            style={{ color: themes.light.textColor.buttonText }}
+          />
+        </RobotIconContainer>
 
-        <View style={{ flex: 1 }}>
-          <BotMessageBubble>
-            <BotText>{item.text}</BotText>
-          </BotMessageBubble>
+        {item.options ? (
+          <View style={{ flex: 1 }}>
+            <BotMessageBubble>
+              <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
+            </BotMessageBubble>
 
-          {item.options && (
             <OptionWrap>
               {item.options.map((option, index) => (
                 <OptionBubble key={index}>
-                  <OptionText>{option}</OptionText>
+                  <OptionText fontSizeMode={fontSizeMode}>{option}</OptionText>
                 </OptionBubble>
               ))}
             </OptionWrap>
-          )}
+          </View>
+        ) : (
+          <BotMessageBubble>
+            {item.isTyping ? (
+              <TypingAnimation />
+            ) : (
+              <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
+            )}
+          </BotMessageBubble>
+        )}
 
-          <MessageTime>{item.time}</MessageTime>
-        </View>
-
-        <MessageTime>{item.time}</MessageTime>
-    </BotMessageContainer>
-  );
+        <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
+      </BotMessageContainer>
+    );
   } else {
     return (
       <UserMessageContainer>
-        <MessageTime>{item.time}</MessageTime>
+        <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
         <UserMessageBubble>
-          <UserText>{item.text}</UserText>
+          <UserText fontSizeMode={fontSizeMode}>{item.text}</UserText>
         </UserMessageBubble>
       </UserMessageContainer>
     );
@@ -68,8 +125,6 @@ const RobotIconContainer = styled.View`
   width: 40px;
   height: 40px;
   justify-content: center;
-  align-items: center;
-  margin-right: 10px;
 `;
 
 const BotMessageBubble = styled.View`
@@ -77,10 +132,11 @@ const BotMessageBubble = styled.View`
   padding: 10px 14px;
   border-radius: 2px 12px 12px 12px;
   max-width: 65%;
+  margin-top: 10px;
 `;
 
 const BotText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-Medium';
@@ -104,7 +160,7 @@ const OptionBubble = styled.TouchableOpacity`
 
 const OptionText = styled.Text`
   color: ${themes.light.textColor.buttonText};
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
 `;
 
@@ -116,26 +172,42 @@ const UserMessageContainer = styled.View`
 `;
 
 const UserText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-SemiBold';
 `;
 
 const MessageTime = styled.Text`
-  font-size: ${FontSizes.caption.default};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   margin: 0px 10px;
   align-self: flex-end;
-  color: ${themes.light.textColor.Primary30};
+  color: ${themes.light.textColor.buttonText60};
   font-family: 'Pretendard-Medium';
 `;
 
 const UserMessageBubble = styled.View`
   background-color: rgba(66, 115, 237, 0.5);
   padding: 10px 14px;
-  border-radius: 20px;
-  border-top-right-radius: 3px;
+  border-radius: 12px 2px 12px 12px;
   max-width: 70%;
+`;
+
+// 타이핑 애니메이션 스타일 - 점의 스타일 유지
+const TypingContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 4px;
+`;
+
+const AnimatedDot = styled(Animated.View)`
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: ${themes.light.textColor.buttonText};
+  margin: 0 2px;
 `;
 
 export default MessageBubble;
