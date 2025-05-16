@@ -198,15 +198,14 @@ const TypingContainer = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 24px;
-  padding: 0 4px;
+  height: 20px;
 `;
 
 const AnimatedDot = styled(Animated.View)`
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 3px;
-  background-color: ${themes.light.textColor.buttonText};
+  background-color: ${themes.light.textColor.buttonText70};
   margin: 0 2px;
 `;
 
