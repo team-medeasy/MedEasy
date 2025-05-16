@@ -3,6 +3,7 @@ import {Alert, ActivityIndicator, View, Text} from 'react-native';
 import styled from 'styled-components/native';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {Header, SearchResultsList} from '../../components';
 import {getInteresedMedicine} from '../../api/interestedMedicine';
 import {useNavigation} from '@react-navigation/native';
@@ -11,6 +12,7 @@ import EmptyState from '../../components/EmptyState';
 
 const Favorites = () => {
   const navigation = useNavigation();
+  const { fontSizeMode } = useFontSize();
 
   // 데이터 상태 관리
   const [favorites, setFavorites] = useState([]);
@@ -227,7 +229,7 @@ const Favorites = () => {
       return (
         <EmptyContainer>
           {error ? (
-            <EmptyText>{error}</EmptyText>
+            <EmptyText fontSizeMode={fontSizeMode}>{error}</EmptyText>
           ) : (
             <EmptyState
               image={<Images.emptyLike style={{marginBottom: 32}} />}
@@ -238,7 +240,7 @@ const Favorites = () => {
 
           {error && (
             <RetryButton onPress={handleRefresh}>
-              <RetryButtonText>다시 시도</RetryButtonText>
+              <RetryButtonText fontSizeMode={fontSizeMode}>다시 시도</RetryButtonText>
             </RetryButton>
           )}
         </EmptyContainer>
@@ -268,7 +270,7 @@ const Favorites = () => {
           size="small"
           color={themes.light.pointColor.Primary}
         />
-        <LoadingText>준비 중...</LoadingText>
+        <LoadingText fontSizeMode={fontSizeMode}>준비 중...</LoadingText>
       </LoadingContainer>
     );
   };
@@ -300,7 +302,7 @@ const EmptyContainer = styled.View`
 const EmptyText = styled.Text`
   text-align: center;
   font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
 `;
 
@@ -313,7 +315,7 @@ const RetryButton = styled.TouchableOpacity`
 
 const RetryButtonText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.small};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Secondary};
 `;
 
@@ -326,7 +328,7 @@ const LoadingContainer = styled.View`
 const LoadingText = styled.Text`
   margin-top: 10px;
   font-family: 'Pretendard-Medium';
-  font-size: ${FontSizes.body.small};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
 `;
 

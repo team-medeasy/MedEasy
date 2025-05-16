@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import { Swipeable } from 'react-native-gesture-handler';
+import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import {themes} from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
@@ -122,38 +122,40 @@ export const CareListModal = ({
 
       <CareListContainer>
         {careList.map((item) => (
-          <Swipeable
-            key={item.user_id}
-            renderRightActions={() =>
-              item.tag === '내 계정' ? null : renderRightActions(item.user_id, item.name)
-            }
-          >
-            <TouchableCareItem
-              onPress={() => handleCareRoutine(item.user_id, item.name, item.tag)}
+          <GestureHandlerRootView key={item.user_id} style={{ width: '100%' }}>
+            <Swipeable
+              key={item.user_id}
+              renderRightActions={() =>
+                item.tag === '내 계정' ? null : renderRightActions(item.user_id, item.name)
+              }
             >
-              <CareListItem>
-                <LeftContainer>
-                  <IconContainer>
-                    {selectedUserId === item.user_id ? (
-                      <OtherIcons.CheckCircle />
-                    ) : (
-                      <PlaceholderView />
-                    )}
-                  </IconContainer>
-                  <UserInfoContainer>
-                    <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
-                    <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
-                  </UserInfoContainer>
-                </LeftContainer>
-                <Tag
-                  sizeType="small"
-                  colorType={item.tag === "내 계정" ? "resultSecondary" : "resultPrimary"}
-                >
-                  {item.tag}
-                </Tag>
-              </CareListItem>
-            </TouchableCareItem>
-          </Swipeable>
+              <TouchableCareItem
+                onPress={() => handleCareRoutine(item.user_id, item.name, item.tag)}
+              >
+                <CareListItem>
+                  <LeftContainer>
+                    <IconContainer>
+                      {selectedUserId === item.user_id ? (
+                        <OtherIcons.CheckCircle />
+                      ) : (
+                        <PlaceholderView />
+                      )}
+                    </IconContainer>
+                    <UserInfoContainer>
+                      <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
+                      <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
+                    </UserInfoContainer>
+                  </LeftContainer>
+                  <Tag
+                    sizeType="small"
+                    colorType={item.tag === "내 계정" ? "resultSecondary" : "resultPrimary"}
+                  >
+                    {item.tag}
+                  </Tag>
+                </CareListItem>
+              </TouchableCareItem>
+            </Swipeable>
+          </GestureHandlerRootView>
         ))}
       </CareListContainer>
 
