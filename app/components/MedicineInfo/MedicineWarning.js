@@ -32,7 +32,17 @@ const MedicineWarning = ({ item }) => {
           setWarningData(result.data.body);
         } else {
           console.error('[MedicineWarning] 금기 정보 조회 실패:', result.error);
-          throw new Error(result.error);
+          // 404 에러인 경우 (금기정보가 없는 경우)
+          if (result.status === 404) {
+            // 빈 데이터 설정 - 이렇게 하면 각 섹션이 "현재 확인된 주의사항이 없어요"를 표시함
+            setWarningData({
+              combination_contraindications: [],
+              elderly_precaution: '',
+              pregnancy_contraindication: ''
+            });
+          } else {
+            throw new Error(result.error);
+          }
         }
       } catch (err) {
         console.error('금기 정보 로딩 실패:', err);
@@ -161,7 +171,7 @@ const MedicineWarning = ({ item }) => {
 
 export default MedicineWarning;
 
-// 아래는 기존 스타일 정의 - 변경 없이 그대로 유지
+// 아래는 기존 스타일 정의 - 추가된 스타일
 const WarningContainer = styled.View`
   padding: 20px;
   gap: 12px;
@@ -263,3 +273,5 @@ const ErrorContainer = styled.View`
   padding: 20px;
   align-items: center;
 `;
+
+// 금기정보가 없는 경우를 위한 새로운 스타일 추가 (삭제된 부분)
