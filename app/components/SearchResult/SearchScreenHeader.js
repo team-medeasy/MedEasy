@@ -101,7 +101,7 @@ const SearchBarTouchable = styled(TouchableOpacity)`
 `;
 
 const SearchQueryText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -121,7 +121,7 @@ const FeatureSearchContainer = styled.View`
 `;
 
 const FeatureSearchText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   margin-right: 11px;
 `;

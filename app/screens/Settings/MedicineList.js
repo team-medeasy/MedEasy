@@ -194,7 +194,7 @@ const TabButton = styled.TouchableOpacity`
 
 const TabText = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${props =>
     props.active
       ? themes.light.textColor.textPrimary
@@ -217,7 +217,7 @@ const NoResultContainer = styled.View`
 const NoResultText = styled.Text`
   text-align: center;
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
 `;
 

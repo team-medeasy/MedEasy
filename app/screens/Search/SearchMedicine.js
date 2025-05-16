@@ -151,7 +151,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
       case 'up':
         return (
           <OtherIcons.rankingUp
-            width={9.14}
+            width={9}
             height={17}
             style={{color: themes.light.pointColor.Secondary}}
           />
@@ -159,7 +159,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
       case 'down':
         return (
           <OtherIcons.rankingDown
-            width={9.14}
+            width={9}
             height={17}
             style={{color: themes.light.pointColor.Primary}}
           />
@@ -362,8 +362,8 @@ const PopularSearchText = styled.Text`
 `;
 
 const IconContainer = styled.View`
-  width: 9.14px;
-  height: 17px;
+  width: 9;
+  height: 17;
   justify-content: center;
   align-items: center;
 `;

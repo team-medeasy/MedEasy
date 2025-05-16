@@ -75,7 +75,7 @@ const Input = styled(TextInput)`
   flex: 1;
   padding-left: 15px;
   padding-right: 10px;
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   max-height: 100px;
   font-family: 'Pretendard-semiBold';
   padding-top: 5px;

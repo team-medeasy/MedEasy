@@ -47,11 +47,11 @@ const Footer = ({marginTop = 0}) => {
 const FooterContainer = styled.View`
   padding: 10px 20px 130px 20px;
   background-color: ${themes.light.bgColor.footerBG};
-  margin-top: ${({marginTop}) => `${marginTop}px`};
+  margin-top: ${({marginTop}) => `${marginTop}`};
 `;
 
 const FooterText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
   padding: 20px 0;
@@ -63,7 +63,7 @@ const FooterTextContainer = styled.View`
 `;
 
 const StyledText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
   line-height: 21px;

@@ -136,7 +136,7 @@ const BotMessageBubble = styled.View`
 `;
 
 const BotText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-Medium';
@@ -160,7 +160,7 @@ const OptionBubble = styled.TouchableOpacity`
 
 const OptionText = styled.Text`
   color: ${themes.light.textColor.buttonText};
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
 `;
 
@@ -172,14 +172,14 @@ const UserMessageContainer = styled.View`
 `;
 
 const UserText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-SemiBold';
 `;
 
 const MessageTime = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   margin: 0px 10px;
   align-self: flex-end;
   color: ${themes.light.textColor.buttonText60};

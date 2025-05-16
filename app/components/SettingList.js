@@ -217,7 +217,7 @@ const Container = styled.View`
 
 const SettingCategory = styled.View`
   margin-bottom: 10px;
-  border-bottom-width: ${({ lastItem }) => (lastItem ? 0 : 10)}px;
+  border-bottom-width: ${({ lastItem }) => (lastItem ? 0 : 10)};
   border-color: ${themes.light.borderColor.borderSecondary};
 `;
 
@@ -228,7 +228,7 @@ const SettingItem = styled.TouchableOpacity`
 `;
 
 const SettingText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
   margin-left: 20px;
@@ -236,7 +236,7 @@ const SettingText = styled.Text`
 `;
 
 const VersionText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
   margin-left: auto;
