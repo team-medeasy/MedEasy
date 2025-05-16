@@ -91,7 +91,6 @@ const ChevronAndSearchContainer = styled.View`
 `;
 
 const SearchBarTouchable = styled(TouchableOpacity)`
-  height: 44px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
