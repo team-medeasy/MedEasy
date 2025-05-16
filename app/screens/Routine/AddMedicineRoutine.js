@@ -255,7 +255,7 @@ const Container = styled.View`
 `;
 
 const HeaderContainer = styled.View`
-  ${Platform.OS === 'ios' && `padding-top: 10px;`}
+  padding-top: 10px;
   padding-bottom: 10px;
   background-color: ${themes.light.bgColor.headerBG};
 `;

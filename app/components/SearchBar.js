@@ -14,13 +14,14 @@ const SearchBarContainer = styled.View`
   border-radius: 10px;
   background-color: ${({theme}) => themes.light.boxColor.inputSecondary};
   flex: 1;
-  padding: 13px 0 13px 15px;
+  padding-left: 15px;
 `;
 
 const SearchInput = styled.TextInput`
   font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   flex: 1;
+  color: ${themes.light.textColor.textPrimary};
 `;
 
 const SearchButton = styled(TouchableOpacity)`

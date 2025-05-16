@@ -38,9 +38,14 @@ const InputContainer = styled.View`
 `;
 
 const BtnContainer = styled.View`
-  margin-top: auto;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding-left: 20px;
   padding-right: 20px;
+  padding-bottom: 30px;
+  align-items: center;
 `;
 
 const TextInput = styled.TextInput`
