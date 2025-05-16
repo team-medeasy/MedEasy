@@ -170,7 +170,7 @@ const WarningContainer = styled.View`
 const SectionTitle = styled.Text`
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
-  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
 `;
 
 const CautionItem = styled.View`
@@ -197,21 +197,21 @@ const TextContainer = styled.View`
 
 const CautionTitle = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode] + 2}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode] + 2};
   color: ${themes.light.textColor.textPrimary};
   margin-bottom: 4px;
 `;
 
 const CautionDescription = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary70};
   line-height: 22px;
 `;
 
 const LoadingText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
   margin-top: 10px;
   text-align: center;
@@ -219,7 +219,7 @@ const LoadingText = styled.Text`
 
 const ErrorText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.pointColor.Secondary};
   margin-top: 10px;
   text-align: center;
@@ -250,7 +250,7 @@ const WarningIcon = styled.Text`
 
 const ToggleText = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
   color: ${themes.light.pointColor.Primary};
 `;
 

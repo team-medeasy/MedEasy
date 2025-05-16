@@ -174,13 +174,13 @@ const InfoContainer = styled.View`
 `;
 
 const MedicineName = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-bold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const Description = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-medium';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -194,7 +194,7 @@ const ModifyRoutineButton = styled.TouchableOpacity`
 
 const ModifyRoutineText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.pointColor.Primary};
   text-decoration: underline;
   text-decoration-color: ${themes.light.pointColor.Primary};

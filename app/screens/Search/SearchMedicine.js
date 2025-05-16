@@ -141,7 +141,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
       case 'up':
         return (
           <OtherIcons.rankingUp
-            width={9.14}
+            width={9}
             height={17}
             style={{color: themes.light.pointColor.Secondary}}
           />
@@ -149,13 +149,13 @@ const SearchMedicineScreen = ({navigation, route}) => {
       case 'down':
         return (
           <OtherIcons.rankingDown
-            width={9.14}
+            width={9}
             height={17}
             style={{color: themes.light.pointColor.Primary}}
           />
         );
       case 'stay':
-        return <RankingStayText>-</RankingStayText>;
+        return <RankingStayText fontSizeMode={fontSizeMode}>-</RankingStayText>;
       default:
         return null;
     }
@@ -231,7 +231,7 @@ const SearchMedicineScreen = ({navigation, route}) => {
                 onPress={() => handlePopularSearchClick(item.term)}>
                 <RankingText fontSizeMode={fontSizeMode}>{item.rank}</RankingText>
                 <PopularSearchText fontSizeMode={fontSizeMode}>{item.term}</PopularSearchText>
-                <IconContainer>
+                <IconContainer fontSizeMode={fontSizeMode}>
                   {getRankChangeIcon(item.rankChange)}
                 </IconContainer>
               </PopularSearchItemButton>
@@ -282,19 +282,19 @@ const SearchSectionHeader = styled.View`
 `;
 
 const SearchTitle = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Semibold';
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const ClearAllText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
 `;
 
 const NoRecentSearchesText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Semibold';
   color: ${themes.light.textColor.Primary30};
   text-align: center;
@@ -323,7 +323,7 @@ const RecentSearchItemButton = styled(TouchableOpacity)`
 `;
 
 const RecentSearchItemText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -337,7 +337,7 @@ const PopularSearchItemButton = styled(TouchableOpacity)`
 `;
 
 const RankingText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Bold';
   font-weight: bold;
   color: ${themes.light.pointColor.Primary};
@@ -345,27 +345,27 @@ const RankingText = styled.Text`
 `;
 
 const PopularSearchText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.textPrimary};
   flex: 1;
 `;
 
 const IconContainer = styled.View`
-  width: 9.14px;
-  height: 17px;
+  width: 9;
+  height: 17;
   justify-content: center;
   align-items: center;
 `;
 
 const RankingStayText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   text-align: center;
   color: ${themes.light.textColor.Primary30};
 `;
 
 const UpdateDateText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   margin-right: 20px;
   color: ${themes.light.textColor.Primary30};

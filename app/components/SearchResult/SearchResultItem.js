@@ -84,13 +84,13 @@ const InfoContainer = styled.View`
 `;
 
 const ManufacturerText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.Primary50};
 `;
 
 const MedicineNameText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
 `;

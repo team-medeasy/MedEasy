@@ -154,7 +154,7 @@ const ButtonContainer = styled(TouchableOpacity)`
 const ButtonText = styled(Text)`
   color: ${props => props.color || themes.light.textColor.buttonText};
   font-size: ${props => props.fontSize || 
-    props.fontSizeMode ? `${FontSizes.heading[props.fontSizeMode]}px` : FontSizes.heading.default};
+    props.fontSizeMode ? `${FontSizes.heading[props.fontSizeMode]}` : FontSizes.heading.default};
   font-family: ${props => props.fontFamily || 'KimjungchulGothic-Bold'};
 `;
 
@@ -173,7 +173,7 @@ const DualTextButtonContainer = styled(TouchableOpacity)`
 
 const DualTextButtonText = styled(Text)`
   font-size: ${props => props.fontSize || 
-    props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}px` : FontSizes.body.default};
+    props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}` : FontSizes.body.default};
   font-family: ${props => props.fontFamily || 'Pretendard-SemiBold'};
   color: ${props => props.color || themes.light.textColor.buttonText};
 `;
@@ -194,7 +194,7 @@ const IconTextButtonContainer = styled(TouchableOpacity)`
 const IconTextButtonText = styled(Text)`
   color: ${({ color }) => color || themes.light.textColor.buttonText};
   font-size: ${props => props.fontSize || 
-    props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}px` : FontSizes.body.default};
+    props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}` : FontSizes.body.default};
   font-family: ${({ fontFamily }) => fontFamily || 'Pretendard-SemiBold'};
 `;
 

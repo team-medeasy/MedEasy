@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   InteractionManager,
+  ActivityIndicator,
   Alert,
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
@@ -20,7 +21,6 @@ import {
   SimilarMedicineItem,
 } from './../../components';
 import MedicineWarning from '../../components/MedicineInfo/MedicineWarning';
-import MedicineDetailShimmer from '../../components/MedicineInfo/MedicineDetailShimmer';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {OtherIcons} from '../../../assets/icons';
@@ -37,6 +37,11 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const isMounted = useRef(true);
+
+  const safeParse = (val) => {
+    const parsed = parseFloat(val);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
 
   // medicine_id로 약품 정보 가져오기
   const fetchMedicineData = async () => {
@@ -264,20 +269,21 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   };
 
-  // 로딩 중 표시 - Shimmer Effect 적용
   if (isLoading) {
     return (
       <Container>
         <HeaderComponent isModal={isModal}>
           {title || '약 정보를 불러오는 중...'}
         </HeaderComponent>
-        <ScrollView>
-          <MedicineDetailShimmer />
-        </ScrollView>
+        <LoadingContainer>
+          <ActivityIndicator size="large" color={themes.light.pointColor.Primary} />
+          <EmptyText fontSizeMode={fontSizeMode}>
+            약 정보를 불러오는 중입니다...
+          </EmptyText>
+        </LoadingContainer>
       </Container>
     );
   }
-
   // 데이터가 없는 경우 처리
   if (!medicine) {
     return (
@@ -441,7 +447,7 @@ const LoadingContainer = styled.View`
 
 const EmptyText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
 `;
 
@@ -511,7 +517,7 @@ const Usage = ({label, value, borderBottomWidth = 1, fontSizeMode}) => {
 const HeadingText = styled.Text`
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
 `;
 
 export default MedicineDetailScreen;

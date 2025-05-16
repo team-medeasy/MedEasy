@@ -169,7 +169,7 @@ export const CareListModal = ({
 };
 
 const Title = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
   padding-top: 30px;
@@ -212,14 +212,14 @@ const UserInfoContainer = styled.View`
 `;
 
 const UserName = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
   margin-bottom: 4px;
 `;
 
 const UserEmail = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -232,7 +232,7 @@ const UnderlinedButton = styled.TouchableOpacity`
 const UnderlinedButtonText = styled.Text`
   color: ${themes.light.textColor.Primary50};
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   text-decoration: underline;
   text-decoration-color: ${themes.light.textColor.Primary50};
 `;
@@ -256,7 +256,7 @@ const DeleteButton = styled.TouchableOpacity`
 
 const DeleteText = styled.Text`
   color: ${themes.light.textColor.buttonText};
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};;
   font-family: 'Pretendard-Bold';
 `;
 

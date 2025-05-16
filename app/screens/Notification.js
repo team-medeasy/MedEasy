@@ -288,20 +288,20 @@ const NotiTextContainer = styled.View`
 `;
 
 const NotificationMessage = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
 `;
 
 const NotificationTitle = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
   margin-bottom: 10px;
 `;
 
 const NotiTime = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   color: ${themes.light.textColor.Primary30};
   font-family: 'Pretendard-SemiBold';
 `;

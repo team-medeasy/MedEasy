@@ -18,7 +18,7 @@ const SearchBarContainer = styled.View`
 `;
 
 const SearchInput = styled.TextInput`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   flex: 1;
 `;

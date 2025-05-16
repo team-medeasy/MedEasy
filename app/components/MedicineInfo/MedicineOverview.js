@@ -268,14 +268,14 @@ const MedicineImage = styled.Image.attrs({
 const MedicineInfoSub = styled.Text`
   flex: 1;
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText70};
 `;
 
 const MedicineInfoName = styled.Text`
   flex: 1;
   font-family: 'Pretendard-Bold';
-  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
 `;
 

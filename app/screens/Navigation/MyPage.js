@@ -75,7 +75,7 @@ const HeaderContainer = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   font-weight: bold;
   color: ${themes.light.textColor.buttonText};
@@ -99,13 +99,13 @@ const TextContainer = styled.View`
 `;
 
 const UserText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
 `;
 
 const SmallText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'KimjungchulGothic-Regular';
   color: ${themes.light.textColor.buttonText60};
 `;

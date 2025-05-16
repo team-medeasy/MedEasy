@@ -96,14 +96,14 @@ const AppearanceLabel = styled.Text`
   color: ${themes.light.textColor.Primary50};
   font-family: 'Pretendard-Medium';
   font-size: ${({fontSizeMode, size}) => 
-    size === 'large' ? FontSizes.body[fontSizeMode] : FontSizes.caption[fontSizeMode]}px;
+    size === 'large' ? FontSizes.body[fontSizeMode] : FontSizes.caption[fontSizeMode]};
 `;
 
 const AppearanceValue = styled.Text`
   color: ${themes.light.pointColor.Primary};
   font-family: 'Pretendard-Bold';
   font-size: ${({fontSizeMode, size}) => 
-    size === 'large' ? FontSizes.body[fontSizeMode] : FontSizes.caption[fontSizeMode]}px;
+    size === 'large' ? FontSizes.body[fontSizeMode] : FontSizes.caption[fontSizeMode]};
 `;
 
 const ColorContainer = styled.View`

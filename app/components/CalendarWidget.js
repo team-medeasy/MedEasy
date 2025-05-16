@@ -205,7 +205,7 @@ const DayContainer = styled.View`
 `;
 
 const DayText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Bold';
 `;
 

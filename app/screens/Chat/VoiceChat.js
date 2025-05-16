@@ -493,7 +493,7 @@ const AnimatedCircle = styled(Animated.View)`
 
 const StatusText = styled(Text)`
   margin-bottom: 15px;
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
   font-weight: bold;
   text-align: center;
@@ -513,6 +513,6 @@ const RecognizedTextContainer = styled(View)`
 `;
 
 const RecognizedText = styled(Text)`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
 `;

@@ -45,7 +45,7 @@ const DateTimePickerModal = ({
 
 const ModalTitle = styled.Text`
   font-family: 'KimjungchulGothic-Bold';
-  font-size: ${({ fontSizeMode }) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.title[fontSizeMode]};
   color: ${themes.light.textColor.textPrimary};
   margin-top: 15px;
 `;

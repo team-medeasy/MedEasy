@@ -67,7 +67,7 @@ const StyledInput = styled.TextInput`
     padding: 18px 0;
     font-family: 'Pretendard-SemiBold';
     font-size: ${props => 
-        props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}px` : FontSizes.body.default};
+        props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}` : FontSizes.body.default};
     color: ${themes.light.textColor.textPrimary};
 `;
 
@@ -80,6 +80,6 @@ const LabelText = styled.Text`
     padding: 18px 0;
     font-family: 'Pretendard-SemiBold';
     font-size: ${props => 
-        props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}px` : FontSizes.body.default};
+        props.fontSizeMode ? `${FontSizes.body[props.fontSizeMode]}` : FontSizes.body.default};
     color: ${themes.light.textColor.textPrimary};
 `;
