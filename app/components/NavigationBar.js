@@ -118,6 +118,8 @@ const TabNavigator = () => {
         screenOptions={{
           tabBarStyle: {
             paddingTop: 3,
+            backgroundColor: themes.light.bgColor.bgPrimary,
+            elevation: 0,
           },
           tabBarActiveTintColor: themes.light.pointColor.Primary,
           tabBarInactiveTintColor: themes.light.textColor.Primary20,
@@ -259,6 +261,10 @@ const NavigationBar = () => {
 
 const MainContainer = styled.View`
   flex: 1;
+  ${Platform.OS === 'android' && `
+    padding-bottom: 15px;
+    background-color: ${themes.light.bgColor.bgPrimary};
+  `}
 `;
 
 const StyledCameraButton = styled.TouchableOpacity`
