@@ -47,7 +47,7 @@ const Footer = ({marginTop = 0}) => {
 const FooterContainer = styled.View`
   padding: 10px 20px 130px 20px;
   background-color: ${themes.light.bgColor.footerBG};
-  margin-top: ${({marginTop}) => `${marginTop}`};
+  margin-top: ${({marginTop}) => `${marginTop}px`};
 `;
 
 const FooterText = styled.Text`
