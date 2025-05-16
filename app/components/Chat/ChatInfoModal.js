@@ -4,15 +4,18 @@ import {Button} from '..';
 import {themes} from '../../styles';
 import {LogoIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import CustomModal from '../CustomModal';
 
 const ChatInfoModal = ({visible, onClose}) => {
+  const {fontSizeMode} = useFontSize();
+
   return (
     <CustomModal visible={visible} onClose={onClose} height="60%">
       <CautionContainer>
-        <Title>AI 채팅 이용 안내</Title>
+        <Title fontSizeMode={fontSizeMode}>AI 채팅 이용 안내</Title>
         <LogoIcons.chatCaution width={178} height={139} />
-        <CautionText>
+        <CautionText fontSizeMode={fontSizeMode}>
           제공되는 모든 의약품 정보는 참고용으로만 제공됩니다. AI의 답변은 전문
           의료 상담이 아니므로, 구체적인 복용법 및 치료에 관해서는 반드시 의사
           또는 약사와 상담 후 결정하시기 바랍니다.
@@ -29,14 +32,14 @@ const CautionContainer = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: ${FontSizes.title.default};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
   padding: 30px;
 `;
 
 const CautionText = styled.Text`
-  font-size: ${FontSizes.body.default};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
   padding: 30px 20px;

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {FlatList, View, Text, ActivityIndicator} from 'react-native';
 import {Header, MedicineListItem} from '../../components';
 import {themes} from '../../styles';
@@ -19,6 +20,7 @@ const MedicineList = () => {
   const [currentMedicines, setCurrentMedicines] = useState([]);
   const [previousMedicines, setPreviousMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
+  const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
   useEffect(() => {
     fetchMedicineData();
@@ -117,6 +119,7 @@ const MedicineList = () => {
           />
         )}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{paddingBottom: insets.bottom}}
         ListEmptyComponent={
           <EmptyContainer>
             <EmptyState

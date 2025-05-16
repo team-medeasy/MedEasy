@@ -256,6 +256,7 @@ const Favorites = () => {
           refreshing={loadingMore}
           onRefresh={handleRefresh}
           footer={false}
+          useBottomInset='true'
         />
       );
     }
@@ -287,7 +288,6 @@ const Container = styled.View`
 
 const ListContainer = styled.View`
   flex: 1;
-  margin: 10px 0 20px 0;
 `;
 
 const EmptyContainer = styled.View`
