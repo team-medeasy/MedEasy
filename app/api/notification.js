@@ -14,3 +14,9 @@ export const markAllNotificationsAsRead = () =>
 
 export const getUnreadNotification = () =>
   notificationApi.get('/notification/is_unread');
+
+// 알림 동의 상태 업데이트
+export const updateNotificationAgreement = async (agreed) =>
+  notificationApi.patch('/notification/user/agree', {
+    agree: agreed
+  });
