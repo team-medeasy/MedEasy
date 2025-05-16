@@ -33,7 +33,7 @@ export const CameraSearchPlaceholder = () => {
 };
 
 const Container = styled.View`
-  padding: 0 ${padding};
+  padding: 0 ${padding}px;
   margin-bottom: 32px;
 `;
 

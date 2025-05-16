@@ -772,10 +772,10 @@ const HeaderBottomRow = styled.View`
 
 const ToggleContainer = styled.View`
   flex-direction: row;
-  width: ${TOGGLE_WIDTH * 2 + TOGGLE_PADDING * 2};
-  height: ${TOGGLE_HEIGHT};
+  width: ${TOGGLE_WIDTH * 2 + TOGGLE_PADDING * 2}px;
+  height: ${TOGGLE_HEIGHT}px;
   background-color: rgba(255, 255, 255, 0.2);
-  border-radius: ${TOGGLE_HEIGHT / 2};
+  border-radius: ${TOGGLE_HEIGHT / 2}px;
   padding: 0;
   align-items: center;
   position: relative;
