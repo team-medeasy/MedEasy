@@ -3,7 +3,7 @@ import styled from 'styled-components/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {SearchResultItem} from './SearchResultItem';
 import {Footer} from './../index';
-import {FlatList, ActivityIndicator, View, Dimensions} from 'react-native';
+import {FlatList, ActivityIndicator, Platform, Dimensions} from 'react-native';
 import {themes} from '../../styles';
 
 export const SearchResultsList = ({
@@ -39,7 +39,12 @@ export const SearchResultsList = ({
             onEndReached={onEndReached}
             onEndReachedThreshold={onEndReachedThreshold}
             contentContainerStyle={{
-              paddingBottom: useBottomInset ? insets.bottom : 0,
+              paddingBottom:
+                useBottomInset
+                  ? Platform.OS === 'android'
+                    ? insets.bottom + 10
+                    : insets.bottom
+                  : 0,
             }}
             ListFooterComponent={() => (
               <>
