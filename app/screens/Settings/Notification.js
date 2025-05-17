@@ -123,6 +123,7 @@ const Notification = () => {
           value={isEnabled}
           disabled={isLoading}
           trackColor={{false: '#ccc', true: themes.light.pointColor.Primary}}
+          thumbColor={themes.light.bgColor.bgPrimary}
         />
       </SwitchWrapper>
     </Container>

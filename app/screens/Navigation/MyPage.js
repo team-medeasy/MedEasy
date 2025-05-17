@@ -10,11 +10,14 @@ import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
 import { getUser } from '../../api/user';
 import { useFocusEffect } from '@react-navigation/native';
+import { Platform } from 'react-native';
 
 const MyPage = () => {
   const {fontSizeMode} = useFontSize();
   const [userName, setUserName] = useState('');
   const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
+
+  const heartIcon = Platform.OS === 'ios' ? '🩵' : '💙';
 
   useFocusEffect(
       useCallback(() => {
@@ -43,7 +46,7 @@ const MyPage = () => {
         <ProfileContainer>
           <TextContainer>
             <UserText fontSizeMode={fontSizeMode}>
-              안녕하세요, {userName}님🩵
+              안녕하세요, {userName}님{heartIcon}
             </UserText>
             <SmallText fontSizeMode={fontSizeMode}>
               오늘도 건강한 하루 되세요!

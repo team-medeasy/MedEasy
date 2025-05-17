@@ -344,6 +344,14 @@ export default function VoiceChat() {
   };
 
   const handleBotOptionPress = async (option) => {
+  // 이전에 재생 중이던 음성 중지
+  if (audioPlayer.current) {
+    audioPlayer.current.stop(() => {
+      audioPlayer.current.release();
+      audioPlayer.current = null;
+    });
+  }
+
   if (option === '오늘 복용 일정 확인') {
     try {
       await cleanupTempAudioFiles(); 
@@ -365,14 +373,21 @@ export default function VoiceChat() {
         { id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true },
       ]);
 
-      // 오디오 재생
-      const sound = new Sound(filePath, '', (error) => {
+      // 새로운 음성 재생
+      audioPlayer.current = new Sound(filePath, '', (error) => {
         if (error) {
           console.error('사운드 로딩 실패:', error);
           return;
         }
-        sound.play((success) => {
-          if (!success) console.error('재생 실패');
+
+        audioPlayer.current.play((success) => {
+          if (!success) {
+            console.error('재생 실패');
+          }
+
+          // 재생 끝나면 해제
+          audioPlayer.current.release();
+          audioPlayer.current = null;
         });
       });
 
