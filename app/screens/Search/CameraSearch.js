@@ -734,7 +734,7 @@ const CameraContainer = styled.View`
 
 const Header = styled.View`
   position: absolute;
-  top: ${Platform.OS === 'ios' ? 60 : 20}px;
+  top: ${Platform.OS === 'ios' ? 60 : 20};
   left: 0;
   right: 0;
   padding: 0 20px;
@@ -761,7 +761,7 @@ const HeaderButton = styled.View`
 
 const Title = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
 `;
 
@@ -782,7 +782,7 @@ const ToggleContainer = styled.View`
 `;
 
 const ToggleOption = styled.TouchableOpacity`
-  width: ${TOGGLE_WIDTH}px;
+  width: ${TOGGLE_WIDTH};
   height: 100%;
   justify-content: center;
   align-items: center;
@@ -792,7 +792,7 @@ const ToggleButton = styled.View``;
 
 const ToggleText = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${({isActive}) => (isActive ? 'black' : 'rgba(255, 255, 255, 0.8)')};
   font-weight: ${({isActive}) => (isActive ? 'bold' : 'normal')};
 `;
@@ -819,7 +819,7 @@ const MaskContainer = styled.View`
 
 const BottomContainer = styled.View`
   position: absolute;
-  bottom: ${Platform.OS === 'ios' ? 40 : 20}px;
+  bottom: ${Platform.OS === 'ios' ? 40 : 20};
   left: 0;
   right: 0;
   align-items: center;
@@ -830,7 +830,7 @@ const Hint = styled.View`
   flex-direction: row;
   align-items: center;
   border-radius: 12px;
-  max-width: ${windowWidth - 80}px;
+  max-width: ${windowWidth - 80};
 `;
 
 const HintIconWrapper = styled.View`
@@ -843,14 +843,14 @@ const HintTextWrapper = styled.View`
 
 const HintTitle = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
   margin-bottom: 4px;
 `;
 
 const HintText = styled.Text`
   font-family: 'Pretendard-Regular';
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   color: ${themes.light.textColor.buttonText70};
   line-height: 16px;
 `;

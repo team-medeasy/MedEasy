@@ -14,7 +14,7 @@ import MessageBubble from '../../components/Chat/MessageBubble';
 import MessageInput from '../../components/Chat/MessageInput';
 import { OtherIcons } from '../../../assets/icons';
 
-import { cleanupTempAudioFiles, sendVoiceMessage } from '../../api/voiceChat';
+import { cleanupTempAudioFiles, getRoutineVoice, sendVoiceMessage } from '../../api/voiceChat';
 import { getUser } from '../../api/user';
 
 const recognizerOptions = Platform.OS === 'android' ? {
@@ -343,9 +343,72 @@ export default function VoiceChat() {
     ]);
   };
 
-  const renderMessage = ({item}) => {
-    return <MessageBubble item={item} />;
-  };
+  const handleBotOptionPress = async (option) => {
+  // 이전에 재생 중이던 음성 중지
+  if (audioPlayer.current) {
+    audioPlayer.current.stop(() => {
+      audioPlayer.current.release();
+      audioPlayer.current = null;
+    });
+  }
+
+  if (option === '오늘 복용 일정 확인') {
+    try {
+      await cleanupTempAudioFiles(); 
+      const { text, filePath, action } = await getRoutineVoice();
+
+      console.log('[DEBUG] 복약 일정 텍스트:', text);
+      console.log('[DEBUG] 음성 파일 경로:', filePath);
+      console.log('[DEBUG] 프론트엔드 액션:', action);
+
+      const currentTime = new Date();
+      const formattedTime = `${currentTime.getHours()}:${String(currentTime.getMinutes()).padStart(2, '0')}`;
+
+      // 메시지 추가
+      const typingMsgId = Date.now();
+      setTypingMessageId(typingMsgId);
+      setIsTyping(true);
+      setMessages(prev => [
+        ...prev,
+        { id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true },
+      ]);
+
+      // 새로운 음성 재생
+      audioPlayer.current = new Sound(filePath, '', (error) => {
+        if (error) {
+          console.error('사운드 로딩 실패:', error);
+          return;
+        }
+
+        audioPlayer.current.play((success) => {
+          if (!success) {
+            console.error('재생 실패');
+          }
+
+          // 재생 끝나면 해제
+          audioPlayer.current.release();
+          audioPlayer.current = null;
+        });
+      });
+
+      // 메시지 업데이트
+      setTimeout(() => {
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === typingMsgId ? { ...msg, text, isTyping: false } : msg
+          )
+        );
+        setIsTyping(false);
+      }, 1000);
+    } catch (err) {
+      console.error('[ERROR] 복약 일정 확인 실패:', err);
+    }
+  }
+};
+
+  const renderMessage = ({ item }) => {
+  return <MessageBubble item={item} onOptionPress={handleBotOptionPress} />;
+};
 
   return (
     <Container>
@@ -493,7 +556,7 @@ const AnimatedCircle = styled(Animated.View)`
 
 const StatusText = styled(Text)`
   margin-bottom: 15px;
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
   font-weight: bold;
   text-align: center;
@@ -513,6 +576,6 @@ const RecognizedTextContainer = styled(View)`
 `;
 
 const RecognizedText = styled(Text)`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
 `;

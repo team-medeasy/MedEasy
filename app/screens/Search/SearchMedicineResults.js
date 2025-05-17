@@ -439,6 +439,9 @@ const SearchMedicineResultsScreen = ({route, navigation}) => {
 const Container = styled.View`
   flex: 1;
   background-color: ${themes.light.bgColor.bgPrimary};
+  ${Platform.OS === 'android' && `
+    padding-top: 10px;
+  `}
 `;
 
 const SearchResultContainer = styled.View`

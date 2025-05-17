@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {FlatList, View, Text, ActivityIndicator} from 'react-native';
+import {FlatList, ActivityIndicator, Platform} from 'react-native';
 import {Header, MedicineListItem} from '../../components';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -119,7 +119,12 @@ const MedicineList = () => {
           />
         )}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: insets.bottom}}
+        contentContainerStyle={{
+          paddingBottom:
+            Platform.OS === 'android'
+              ? insets.bottom + 10
+              : insets.bottom
+          }}
         ListEmptyComponent={
           <EmptyContainer>
             <EmptyState
@@ -194,7 +199,7 @@ const TabButton = styled.TouchableOpacity`
 
 const TabText = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${props =>
     props.active
       ? themes.light.textColor.textPrimary
@@ -217,7 +222,7 @@ const NoResultContainer = styled.View`
 const NoResultText = styled.Text`
   text-align: center;
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
 `;
 

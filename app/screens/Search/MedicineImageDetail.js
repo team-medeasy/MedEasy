@@ -69,8 +69,8 @@ const ImageContainer = styled.View`
 const MedicineImage = styled.Image.attrs({
   resizeMode: 'contain',
 })`
-  width: ${Dimensions.get('window').height}px;
-  height: ${Dimensions.get('window').width}px;
+  width: ${Dimensions.get('window').height};
+  height: ${Dimensions.get('window').width};
   transform: rotate(-90deg);
 `;
 

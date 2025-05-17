@@ -78,20 +78,20 @@ const NewsContainer = styled.View`
 
 const NewsTitle = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const NewsDate = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
 `;
 
 const NewsContent = styled.Text`
   padding: 16px 28px;
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary70};
   background-color: ${themes.light.bgColor.bgSecondary};
   line-height: 21px;

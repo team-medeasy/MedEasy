@@ -6,7 +6,7 @@ import {ChatIcons} from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
-const {add: AddIcon, mike: MikeIcon, send: SendIcon} = ChatIcons;
+const {voice: VoiceIcon, mike: MikeIcon, send: SendIcon} = ChatIcons;
 
 const MessageInput = ({inputText, setInputText, sendMessage, toggleVoiceMode}) => {
   const { fontSizeMode } = useFontSize();
@@ -30,13 +30,13 @@ const MessageInput = ({inputText, setInputText, sendMessage, toggleVoiceMode}) =
           />
         </SendButton>
       </TextInputContainer>
-      <MikeIconContainer onPress={toggleVoiceMode}>
-        <MikeIcon
-          width={17}
-          height={20}
+      <VoiceIconContainer onPress={toggleVoiceMode}>
+        <VoiceIcon
+          width={44}
+          height={44}
           style={{color: 'rgba(255, 255, 255, 0.6)'}}
         />
-      </MikeIconContainer>
+      </VoiceIconContainer>
     </InputContainer>
   );
 };
@@ -48,6 +48,7 @@ const InputContainer = styled.View`
   align-items: center;
   width: 100%;
   padding: 10px 10px;
+  gap: 10px;
 `;
 
 const TextInputContainer = styled.View`
@@ -55,8 +56,7 @@ const TextInputContainer = styled.View`
   flex-direction: row;
   align-items: center;
   border-radius: 20px;
-  margin: 0px 10px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 5px 0px;
   background-color: rgba(255, 255, 255, 0.1);
 `;
@@ -71,11 +71,18 @@ const MikeIconContainer = styled(TouchableOpacity)`
   flex-shrink: 0;
 `;
 
+const VoiceIconContainer = styled(TouchableOpacity)`
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 5px;
+`;
+
 const Input = styled(TextInput)`
   flex: 1;
   padding-left: 15px;
   padding-right: 10px;
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   max-height: 100px;
   font-family: 'Pretendard-semiBold';
   padding-top: 5px;

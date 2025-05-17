@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState, useRef} from 'react';
 import {resetNavigate} from './Navigation/NavigationRef';
 import styled from 'styled-components/native';
 import {
@@ -7,6 +7,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {themes} from '../styles';
@@ -50,11 +51,16 @@ const Notification = ({route, navigation}) => {
   const [loading, setLoading] = useState(false);
   const [hasMoreData, setHasMoreData] = useState(true);
   const PAGE_SIZE = 10;
-
+  const isMounted = useRef(true); // 컴포넌트 마운트 상태 추적
+  
   // 화면에서 벗어날 때 콜백 호출을 위한 로직
   useEffect(() => {
-    // 화면이 언마운트될 때 onGoBack 콜백 실행
+    // 컴포넌트가 마운트되었음을 표시
+    isMounted.current = true;
+    
+    // 화면이 언마운트될 때 onGoBack 콜백 실행 및 마운트 상태 변경
     return () => {
+      isMounted.current = false;
       if (route.params?.onGoBack) {
         console.log('알림 화면 종료: onGoBack 콜백 실행');
         route.params.onGoBack();
@@ -68,6 +74,10 @@ const Notification = ({route, navigation}) => {
     try {
       setLoading(true);
       const res = await getNotificationList({page: page, size: PAGE_SIZE});
+      
+      // 컴포넌트가 언마운트되었으면 상태 업데이트하지 않음
+      if (!isMounted.current) return;
+      
       const notificationData = res.data.body;
       console.log(`알림 목록 (페이지 ${page}): `, notificationData);
 
@@ -100,7 +110,10 @@ const Notification = ({route, navigation}) => {
     } catch (err) {
       console.error('알림 목록 불러오기 실패:', err);
     } finally {
-      setLoading(false);
+      // 컴포넌트가 마운트된 상태일 때만 로딩 상태 업데이트
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -124,13 +137,16 @@ const Notification = ({route, navigation}) => {
       await markAllNotificationsAsRead();
       console.log('모든 알림이 읽음 처리되었습니다.');
       
-      // 현재 알림 목록을 읽음 상태로 UI 업데이트
-      setNotifications(prev => 
-        prev.map(notification => ({
-          ...notification,
-          is_read: true
-        }))
-      );
+      // 컴포넌트가 마운트된 상태일 때만 UI 업데이트
+      if (isMounted.current) {
+        // 현재 알림 목록을 읽음 상태로 UI 업데이트
+        setNotifications(prev => 
+          prev.map(notification => ({
+            ...notification,
+            is_read: true
+          }))
+        );
+      }
     } catch (error) {
       console.error('전체 알림 읽음 처리 실패:', error);
     }
@@ -147,7 +163,10 @@ const Notification = ({route, navigation}) => {
     handleMarkAllAsRead().then(() => {
       // 새로고침 로직 - 첫 페이지부터 다시 로드
       fetchNotifications(0, true).finally(() => {
-        setRefreshing(false);
+        // 컴포넌트가 마운트된 상태일 때만 UI 업데이트
+        if (isMounted.current) {
+          setRefreshing(false);
+        }
       });
     });
   }, [loading]);
@@ -209,17 +228,22 @@ const Notification = ({route, navigation}) => {
 
   const renderFooter = () => {
     if (!loading) return null;
+    
+    // ActivityIndicator 관련 Android 문제 해결을 위한 플랫폼별 스타일
+    const indicatorStyle = Platform.OS === 'android' 
+      ? { height: 36, width: 36 } 
+      : {};
 
     return (
       <View
         style={{
-          flex: 1,
+          paddingVertical: 20,
+          borderTopWidth: 0,
           alignItems: 'center',
-          justifyContent: 'center',
-          padding: 20,
         }}>
         <ActivityIndicator
-          size="medium"
+          style={indicatorStyle}
+          size="small"
           color={themes.light.pointColor.Primary}
         />
         <Text
@@ -242,7 +266,10 @@ const Notification = ({route, navigation}) => {
         data={notifications}
         renderItem={renderItem}
         keyExtractor={item => item.notification_id.toString()}
-        contentContainerStyle={{paddingBottom: 100, flexGrow: 1}}
+        contentContainerStyle={{
+          paddingBottom: 100, 
+          flexGrow: 1
+        }}
         refreshing={refreshing}
         onRefresh={onRefresh}
         onEndReached={loadMoreNotifications}
@@ -288,20 +315,20 @@ const NotiTextContainer = styled.View`
 `;
 
 const NotificationMessage = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
 `;
 
 const NotificationTitle = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
   margin-bottom: 10px;
 `;
 
 const NotiTime = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   color: ${themes.light.textColor.Primary30};
   font-family: 'Pretendard-SemiBold';
 `;

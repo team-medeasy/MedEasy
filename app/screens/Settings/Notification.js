@@ -123,6 +123,7 @@ const Notification = () => {
           value={isEnabled}
           disabled={isLoading}
           trackColor={{false: '#ccc', true: themes.light.pointColor.Primary}}
+          thumbColor={themes.light.bgColor.bgPrimary}
         />
       </SwitchWrapper>
     </Container>
@@ -140,13 +141,13 @@ const TitleContainer = styled.View`
 `;
 
 const LargeText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: KimjungchulGothic-Bold;
   color: ${themes.light.textColor.textPrimary};
 `;
 
 const SmallText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: Pretendard-Medium;
   color: ${themes.light.textColor.Primary50};
 `;
@@ -230,7 +231,7 @@ const SwitchWrapper = styled.View`
 `;
 
 const Label = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: Pretendard-Medium;
   color: ${themes.light.textColor.textPrimary};
 `;

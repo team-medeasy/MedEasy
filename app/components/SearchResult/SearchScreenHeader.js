@@ -91,7 +91,6 @@ const ChevronAndSearchContainer = styled.View`
 `;
 
 const SearchBarTouchable = styled(TouchableOpacity)`
-  height: 44px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -102,7 +101,7 @@ const SearchBarTouchable = styled(TouchableOpacity)`
 `;
 
 const SearchQueryText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.textPrimary};
 `;
@@ -122,7 +121,7 @@ const FeatureSearchContainer = styled.View`
 `;
 
 const FeatureSearchText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   margin-right: 11px;
 `;

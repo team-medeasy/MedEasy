@@ -89,7 +89,7 @@ export const FilterModal = ({
 };
 
 const Title = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
   padding: 30px 0;
@@ -127,7 +127,7 @@ const FilterOptionText = styled.Text`
       ? themes.light.textColor.buttonText
       : themes.light.textColor.Primary50};
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
 `;
 
 const RowView = styled.View`

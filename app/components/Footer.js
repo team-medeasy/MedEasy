@@ -51,7 +51,7 @@ const FooterContainer = styled.View`
 `;
 
 const FooterText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
   padding: 20px 0;
@@ -63,7 +63,7 @@ const FooterTextContainer = styled.View`
 `;
 
 const StyledText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.captionSm[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary30};
   line-height: 21px;

@@ -200,7 +200,7 @@ const Section = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-Bold';
 `;
 
@@ -225,7 +225,7 @@ const TestBtn = styled(TouchableOpacity)`
 
 const BtnTitle = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
 `;
 

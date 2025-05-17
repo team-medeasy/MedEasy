@@ -321,7 +321,7 @@ const Header = styled.View`
 `;
 
 const HeaderText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
 `;
@@ -337,7 +337,7 @@ const ReturnButton = styled.TouchableOpacity`
 `;
 
 const ButtonText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]};
   font-family: 'Pretendart-Medium';
   color: ${themes.light.pointColor.Primary10};
 `;
@@ -351,7 +351,7 @@ const DayContainerWrapper = styled.View`
 const WeekContainer = styled.View`
   flex-direction: row;
   justify-content: space-around;
-  width: ${width}px;
+  width: ${width};
   padding: 20px 20px;
 `;
 
@@ -366,13 +366,13 @@ const DayBox = styled.TouchableOpacity`
 `;
 
 const DayText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.buttonText};
 `;
 
 const DateText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.buttonText};
 `;

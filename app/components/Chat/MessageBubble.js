@@ -56,7 +56,7 @@ const TypingAnimation = () => {
   );
 };
 
-const MessageBubble = ({item}) => {
+const MessageBubble = ({item, onOptionPress}) => {
   const { fontSizeMode } = useFontSize();
   
   if (item.type === 'bot') {
@@ -78,9 +78,9 @@ const MessageBubble = ({item}) => {
 
             <OptionWrap>
               {item.options.map((option, index) => (
-                <OptionBubble key={index}>
+                <OptionBubble key={index} onPress={() => onOptionPress?.(option)}>
                   <OptionText fontSizeMode={fontSizeMode}>{option}</OptionText>
-                </OptionBubble>
+                  </OptionBubble>
               ))}
             </OptionWrap>
           </View>
@@ -136,7 +136,7 @@ const BotMessageBubble = styled.View`
 `;
 
 const BotText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-Medium';
@@ -160,7 +160,7 @@ const OptionBubble = styled.TouchableOpacity`
 
 const OptionText = styled.Text`
   color: ${themes.light.textColor.buttonText};
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
 `;
 
@@ -172,14 +172,14 @@ const UserMessageContainer = styled.View`
 `;
 
 const UserText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-SemiBold';
 `;
 
 const MessageTime = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   margin: 0px 10px;
   align-self: flex-end;
   color: ${themes.light.textColor.buttonText60};
@@ -198,15 +198,14 @@ const TypingContainer = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 24px;
-  padding: 0 4px;
+  height: 20px;
 `;
 
 const AnimatedDot = styled(Animated.View)`
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 3px;
-  background-color: ${themes.light.textColor.buttonText};
+  background-color: ${themes.light.textColor.buttonText70};
   margin: 0 2px;
 `;
 

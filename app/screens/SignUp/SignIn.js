@@ -31,9 +31,14 @@ const Container2 = styled.View`
 `;
 
 const BtnContainer = styled.View`
-  margin-top: auto;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding-left: 20px;
   padding-right: 20px;
+  padding-bottom: 30px;
+  align-items: center;
 `;
 
 // 로딩 오버레이 컴포넌트 스타일
@@ -145,7 +150,7 @@ const SignInScreen = ({navigation, route}) => {
             value={password}
             onChangeText={setPassword}
             placeholder="비밀번호 입력"
-            keyboardType="email-address"
+            keyboardType="default"
             secureTextEntry={true}
             editable={!isLoading}
           />

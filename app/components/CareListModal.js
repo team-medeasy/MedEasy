@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components/native';
-import { Swipeable } from 'react-native-gesture-handler';
+import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import {themes} from '../styles';
 import FontSizes from '../../assets/fonts/fontSizes';
@@ -122,38 +122,40 @@ export const CareListModal = ({
 
       <CareListContainer>
         {careList.map((item) => (
-          <Swipeable
-            key={item.user_id}
-            renderRightActions={() =>
-              item.tag === '내 계정' ? null : renderRightActions(item.user_id, item.name)
-            }
-          >
-            <TouchableCareItem
-              onPress={() => handleCareRoutine(item.user_id, item.name, item.tag)}
+          <GestureHandlerRootView key={item.user_id} style={{ width: '100%' }}>
+            <Swipeable
+              key={item.user_id}
+              renderRightActions={() =>
+                item.tag === '내 계정' ? null : renderRightActions(item.user_id, item.name)
+              }
             >
-              <CareListItem>
-                <LeftContainer>
-                  <IconContainer>
-                    {selectedUserId === item.user_id ? (
-                      <OtherIcons.CheckCircle />
-                    ) : (
-                      <PlaceholderView />
-                    )}
-                  </IconContainer>
-                  <UserInfoContainer>
-                    <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
-                    <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
-                  </UserInfoContainer>
-                </LeftContainer>
-                <Tag
-                  sizeType="small"
-                  colorType={item.tag === "내 계정" ? "resultSecondary" : "resultPrimary"}
-                >
-                  {item.tag}
-                </Tag>
-              </CareListItem>
-            </TouchableCareItem>
-          </Swipeable>
+              <TouchableCareItem
+                onPress={() => handleCareRoutine(item.user_id, item.name, item.tag)}
+              >
+                <CareListItem>
+                  <LeftContainer>
+                    <IconContainer>
+                      {selectedUserId === item.user_id ? (
+                        <OtherIcons.CheckCircle />
+                      ) : (
+                        <PlaceholderView />
+                      )}
+                    </IconContainer>
+                    <UserInfoContainer>
+                      <UserName fontSizeMode={fontSizeMode}>{item.name}</UserName>
+                      <UserEmail fontSizeMode={fontSizeMode}>{item.email}</UserEmail>
+                    </UserInfoContainer>
+                  </LeftContainer>
+                  <Tag
+                    sizeType="small"
+                    colorType={item.tag === "내 계정" ? "resultSecondary" : "resultPrimary"}
+                  >
+                    {item.tag}
+                  </Tag>
+                </CareListItem>
+              </TouchableCareItem>
+            </Swipeable>
+          </GestureHandlerRootView>
         ))}
       </CareListContainer>
 
@@ -169,7 +171,7 @@ export const CareListModal = ({
 };
 
 const Title = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.textPrimary};
   padding-top: 30px;
@@ -212,14 +214,14 @@ const UserInfoContainer = styled.View`
 `;
 
 const UserName = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-Bold';
   color: ${themes.light.textColor.textPrimary};
   margin-bottom: 4px;
 `;
 
 const UserEmail = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
 `;
@@ -232,7 +234,7 @@ const UnderlinedButton = styled.TouchableOpacity`
 const UnderlinedButtonText = styled.Text`
   color: ${themes.light.textColor.Primary50};
   font-family: 'Pretendard-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   text-decoration: underline;
   text-decoration-color: ${themes.light.textColor.Primary50};
 `;
@@ -256,7 +258,7 @@ const DeleteButton = styled.TouchableOpacity`
 
 const DeleteText = styled.Text`
   color: ${themes.light.textColor.buttonText};
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};;
   font-family: 'Pretendard-Bold';
 `;
 

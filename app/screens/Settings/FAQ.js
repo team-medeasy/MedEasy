@@ -94,7 +94,7 @@ const FAQContainer = styled.View`
 
 const FAQTitle = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.textPrimary};
   flex-wrap: wrap;
 `;
@@ -102,7 +102,7 @@ const FAQTitle = styled.Text`
 const FAQContent = styled.Text`
   padding: 16px 28px;
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary70};
   background-color: ${themes.light.bgColor.bgSecondary};
   line-height: 26px;

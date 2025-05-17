@@ -65,7 +65,7 @@ const Title = styled.Text`
   flex: 1;
   text-align: center;
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${({titleColor}) => titleColor || themes.light.textColor.textPrimary};
 `;
 
