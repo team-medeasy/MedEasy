@@ -19,7 +19,7 @@ export const SearchResultItem = ({item, onPress}) => {
           <PlaceholderImage />
         )}
       </ImageContainer>
-      <InfoContainer>
+      <InfoContainer fontSizeMode={fontSizeMode}>
         <ManufacturerText 
           numberOfLines={1} // 한 줄로 제한
           ellipsizeMode="tail"
@@ -79,7 +79,12 @@ const MedicineImage = styled.Image.attrs({
 const InfoContainer = styled.View`
   flex: 1;
   height: 100%;
-  gap: 7px;
+  gap: ${({fontSizeMode}) =>
+    fontSizeMode === 'large'
+      ? '4px'
+      : fontSizeMode === 'medium'
+      ? '6px'
+      : '7px'};
   justify-content: center;
 `;
 
