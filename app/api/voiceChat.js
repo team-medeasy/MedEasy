@@ -1,50 +1,85 @@
-import axios from 'axios';
 import { Buffer } from 'buffer';
 import { getAccessToken } from './storage';
 import RNFS from 'react-native-fs';
 
 /**
- * 음성 메시지를 전송하고, 서버로부터 받은 오디오 바이너리를 임시 파일로 저장 후 경로를 반환합니다.
+ * 음성 메시지를 WebSocket으로 전송하고, 서버로부터 받은 전체 응답(JSON)을 파싱해
+ * 텍스트 메시지, 음성 파일 경로, 클라이언트 액션을 포함한 정보를 반환합니다.
  * @param {string} message - 전송할 텍스트 메시지
- * @returns {Promise<string>} - 임시 파일 경로
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
  */
 export const sendVoiceMessage = async (message) => {
-  try {
-    const token = await getAccessToken();
-    if (!token) {
-      throw new Error('인증 토큰이 없습니다. 로그인이 필요합니다.');
+  return new Promise(async (resolve, reject) => {
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('인증 토큰이 없습니다. 로그인이 필요합니다.');
+
+      const socketUrl = `wss://ai.medeasy.dev/ws/message/voice?jwt_token=Bearer ${token}`;
+      const socket = new WebSocket(socketUrl);
+
+      socket.onopen = () => {
+        
+        console.log('[WebSocket] 연결됨 - sendVoiceMessage');
+
+        const payload = {
+          message,
+          server_action: null,
+          data: null,
+        };
+
+        socket.send(JSON.stringify(payload));
+      };
+
+      socket.onmessage = async (event) => {
+        try {
+          const {
+            result_code,
+            result_message,
+            text_message,
+            audio_base64,
+            audio_format = 'mp3',
+            client_action,
+          } = JSON.parse(event.data);
+
+          if (result_code !== 200) {
+            throw new Error(`서버 응답 실패: ${result_message}`);
+          }
+
+          const timestamp = Date.now();
+          const filePath = `${RNFS.CachesDirectoryPath}/voice_response_${timestamp}.${audio_format}`;
+          await RNFS.writeFile(filePath, audio_base64, 'base64');
+
+          console.log('음성 응답 저장 완료:', filePath);
+
+          socket.close();
+          resolve({
+            text: text_message,
+            filePath,
+            action: client_action,
+          });
+        } catch (err) {
+          console.error('[WebSocket] 응답 처리 중 오류:', err);
+          socket.close();
+          reject(err);
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error('[WebSocket] 오류 발생:', error);
+        socket.close();
+        reject(error);
+      };
+
+      socket.onclose = () => {
+        console.log('[WebSocket] 연결 종료 - sendVoiceMessage');
+      };
+    } catch (error) {
+      console.error('[WebSocket] 음성 메시지 전송 실패:', error);
+      reject(error);
     }
-
-    const response = await axios.post(
-      'https://ai.medeasy.dev/v2/chat/message/voice',
-      { message },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          Accept: 'audio/mpeg',
-        },
-        responseType: 'arraybuffer',
-      }
-    );
-
-    // ArrayBuffer를 base64 문자열로 변환
-    const base64 = Buffer.from(response.data, 'binary').toString('base64');
-
-    // 임시 파일 경로 생성
-    const timestamp = Date.now();
-    const tempFilePath = `${RNFS.CachesDirectoryPath}/voice_response_${timestamp}.mp3`;
-
-    // base64 데이터를 파일로 저장
-    await RNFS.writeFile(tempFilePath, base64, 'base64');
-    console.log('음성 응답을 임시 파일에 저장:', tempFilePath);
-
-    return tempFilePath;
-  } catch (error) {
-    console.error('[Voice API] 음성 메시지 전송 실패:', error);
-    throw error;
-  }
+  });
 };
+
 
 /**
  * 캐시 디렉터리 내 임시 음성 파일(voice_response_*.mp3)을 조회,
@@ -59,9 +94,7 @@ export const cleanupTempAudioFiles = async () => {
     for (const file of files) {
       if (file.name.startsWith('voice_response_') && file.name.endsWith('.mp3')) {
         const timestamp = Number(
-          file.name
-            .replace('voice_response_', '')
-            .replace('.mp3', '')
+          file.name.replace('voice_response_', '').replace('.mp3', '')
         );
         if (now - timestamp > expireTime) {
           await RNFS.unlink(file.path);
@@ -75,45 +108,82 @@ export const cleanupTempAudioFiles = async () => {
 };
 
 /**
- * 복약 일정 텍스트 + 음성 응답을 가져와 mp3로 저장 후 반환합니다.
+ * 복약 일정 텍스트 + 음성 응답을 WebSocket으로 가져와 mp3로 저장 후 반환합니다.
  * @returns {Promise<{ text: string, filePath: string, action: string }>}
  */
 export const getRoutineVoice = async () => {
-  try {
-    const token = await getAccessToken();
-    console.log('[DEBUG] getRoutineVoice에서 사용하는 토큰:', token);
+  return new Promise(async (resolve, reject) => {
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('인증 토큰이 없습니다.');
 
-    if (!token) throw new Error('인증 토큰이 없습니다.');
+      const socketUrl = `wss://ai.medeasy.dev/ws/message/voice?jwt_token=Bearer ${token}`;
+      const socket = new WebSocket(socketUrl);
 
-    const response = await axios.get('https://ai.medeasy.dev/v2/chat/message/routine', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      socket.onopen = () => {
+        console.log('[WebSocket] 연결됨 - getRoutineVoice');
 
-    const { text_response, audio_base64, audio_format = 'mp3', action } = response.data;
+        const payload = {
+          message: '오늘 복약 루틴 조회',
+          server_action: 'GET_ROUTINE_LIST_TODAY',
+          data: null,
+        };
 
-    const timestamp = Date.now();
-    const filePath = `${RNFS.CachesDirectoryPath}/routine_voice_${timestamp}.${audio_format}`;
-    const base64Stripped = audio_base64.replace(/^data:audio\/\w+;base64,/, '');
-    await RNFS.writeFile(filePath, base64Stripped, 'base64');
+        socket.send(JSON.stringify(payload));
+      };
 
-    console.log('복약 일정 응답 저장 완료:', filePath);
+      socket.onmessage = async (event) => {
+        try {
+          const {
+            result_code,
+            result_message,
+            text_message,
+            audio_base64,
+            audio_format = 'mp3',
+            client_action,
+          } = JSON.parse(event.data);
 
-    return {
-      text: text_response,
-      filePath,
-      action,
-    };
-  } catch (err) {
-    console.error('[Voice API] 복약 일정 조회 실패:', err);
-    throw err;
-  }
+          if (result_code !== 200) {
+            throw new Error(`서버 응답 실패: ${result_message}`);
+          }
+
+          const timestamp = Date.now();
+          const filePath = `${RNFS.CachesDirectoryPath}/routine_voice_${timestamp}.${audio_format}`;
+          await RNFS.writeFile(filePath, audio_base64, 'base64');
+
+          console.log('복약 일정 응답 저장 완료:', filePath);
+
+          socket.close();
+          resolve({
+            text: text_message,
+            filePath,
+            action: client_action,
+          });
+        } catch (err) {
+          console.error('[WebSocket] 복약 일정 응답 처리 중 오류:', err);
+          socket.close();
+          reject(err);
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error('[WebSocket] 오류 발생:', error);
+        socket.close();
+        reject(error);
+      };
+
+      socket.onclose = () => {
+        console.log('[WebSocket] 연결 종료 - getRoutineVoice');
+      };
+    } catch (err) {
+      console.error('[WebSocket] 복약 일정 조회 실패:', err);
+      reject(err);
+    }
+  });
 };
-
 
 export default {
   sendVoiceMessage,
   cleanupTempAudioFiles,
-  getRoutineVoice
+  getRoutineVoice,
 };
