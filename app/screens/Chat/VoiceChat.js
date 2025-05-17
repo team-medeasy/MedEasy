@@ -14,7 +14,7 @@ import MessageBubble from '../../components/Chat/MessageBubble';
 import MessageInput from '../../components/Chat/MessageInput';
 import { OtherIcons } from '../../../assets/icons';
 
-import { cleanupTempAudioFiles, sendVoiceMessage } from '../../api/voiceChat';
+import { cleanupTempAudioFiles, getRoutineVoice, sendVoiceMessage } from '../../api/voiceChat';
 import { getUser } from '../../api/user';
 
 const recognizerOptions = Platform.OS === 'android' ? {
@@ -343,9 +343,57 @@ export default function VoiceChat() {
     ]);
   };
 
-  const renderMessage = ({item}) => {
-    return <MessageBubble item={item} />;
-  };
+  const handleBotOptionPress = async (option) => {
+  if (option === '오늘 복용 일정 확인') {
+    try {
+      await cleanupTempAudioFiles(); 
+      const { text, filePath, action } = await getRoutineVoice();
+
+      console.log('[DEBUG] 복약 일정 텍스트:', text);
+      console.log('[DEBUG] 음성 파일 경로:', filePath);
+      console.log('[DEBUG] 프론트엔드 액션:', action);
+
+      const currentTime = new Date();
+      const formattedTime = `${currentTime.getHours()}:${String(currentTime.getMinutes()).padStart(2, '0')}`;
+
+      // 메시지 추가
+      const typingMsgId = Date.now();
+      setTypingMessageId(typingMsgId);
+      setIsTyping(true);
+      setMessages(prev => [
+        ...prev,
+        { id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true },
+      ]);
+
+      // 오디오 재생
+      const sound = new Sound(filePath, '', (error) => {
+        if (error) {
+          console.error('사운드 로딩 실패:', error);
+          return;
+        }
+        sound.play((success) => {
+          if (!success) console.error('재생 실패');
+        });
+      });
+
+      // 메시지 업데이트
+      setTimeout(() => {
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === typingMsgId ? { ...msg, text, isTyping: false } : msg
+          )
+        );
+        setIsTyping(false);
+      }, 1000);
+    } catch (err) {
+      console.error('[ERROR] 복약 일정 확인 실패:', err);
+    }
+  }
+};
+
+  const renderMessage = ({ item }) => {
+  return <MessageBubble item={item} onOptionPress={handleBotOptionPress} />;
+};
 
   return (
     <Container>

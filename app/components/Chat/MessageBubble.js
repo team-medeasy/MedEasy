@@ -56,7 +56,7 @@ const TypingAnimation = () => {
   );
 };
 
-const MessageBubble = ({item}) => {
+const MessageBubble = ({item, onOptionPress}) => {
   const { fontSizeMode } = useFontSize();
   
   if (item.type === 'bot') {
@@ -78,9 +78,9 @@ const MessageBubble = ({item}) => {
 
             <OptionWrap>
               {item.options.map((option, index) => (
-                <OptionBubble key={index}>
+                <OptionBubble key={index} onPress={() => onOptionPress?.(option)}>
                   <OptionText fontSizeMode={fontSizeMode}>{option}</OptionText>
-                </OptionBubble>
+                  </OptionBubble>
               ))}
             </OptionWrap>
           </View>
