@@ -74,7 +74,46 @@ export const cleanupTempAudioFiles = async () => {
   }
 };
 
+/**
+ * 복약 일정 텍스트 + 음성 응답을 가져와 mp3로 저장 후 반환합니다.
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const getRoutineVoice = async () => {
+  try {
+    const token = await getAccessToken();
+    console.log('[DEBUG] getRoutineVoice에서 사용하는 토큰:', token);
+
+    if (!token) throw new Error('인증 토큰이 없습니다.');
+
+    const response = await axios.get('https://ai.medeasy.dev/v2/chat/message/routine', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const { text_response, audio_base64, audio_format = 'mp3', action } = response.data;
+
+    const timestamp = Date.now();
+    const filePath = `${RNFS.CachesDirectoryPath}/routine_voice_${timestamp}.${audio_format}`;
+    const base64Stripped = audio_base64.replace(/^data:audio\/\w+;base64,/, '');
+    await RNFS.writeFile(filePath, base64Stripped, 'base64');
+
+    console.log('복약 일정 응답 저장 완료:', filePath);
+
+    return {
+      text: text_response,
+      filePath,
+      action,
+    };
+  } catch (err) {
+    console.error('[Voice API] 복약 일정 조회 실패:', err);
+    throw err;
+  }
+};
+
+
 export default {
   sendVoiceMessage,
   cleanupTempAudioFiles,
+  getRoutineVoice
 };
