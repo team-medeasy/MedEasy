@@ -33,7 +33,7 @@ class WebSocketManager {
       const token = await getAccessToken();
       if (!token) throw new Error('인증 토큰이 없습니다. 로그인이 필요합니다.');
 
-      const socketUrl = `wss://ai.medeasy.dev/ws/message/voice?jwt_token=Bearer ${token}`;
+      const socketUrl = `wss://ai.medeasy.dev/ws/message/voice?jwt_token=Bearer%20${token}`;
       this.socket = new WebSocket(socketUrl);
 
       this.socket.onopen = () => {
