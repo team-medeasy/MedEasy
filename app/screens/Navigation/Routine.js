@@ -486,7 +486,7 @@ const Routine = ({route}) => {
             right: 0,
             zIndex: 10,
           }}>
-          <TodayContainer>
+          <TodayContainer fontSizeMode={fontSizeMode}>
             <TodayHeader today={today} selectedDate={selectedDate} />
             <MedicineListButton
               onPress={() => navigation.navigate('MedicineList')}>
@@ -625,6 +625,12 @@ const TodayContainer = styled.View`
   align-items: center;
   justify-content: space-between;
   padding: 20px 30px;
+  padding: ${({ fontSizeMode }) =>
+    fontSizeMode === 'large'
+      ? '20px 10px'
+      : fontSizeMode === 'medium'
+      ? '20px 20px'
+      : '20px 30px'};
 `;
 
 export default Routine;
