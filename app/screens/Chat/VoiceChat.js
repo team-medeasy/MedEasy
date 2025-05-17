@@ -4,6 +4,7 @@ import Voice from '@react-native-voice/voice';
 import Sound from 'react-native-sound';
 import styled from 'styled-components/native';
 import LinearGradient from 'react-native-linear-gradient';
+import { PermissionsAndroid } from 'react-native';
 
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -14,7 +15,8 @@ import MessageBubble from '../../components/Chat/MessageBubble';
 import MessageInput from '../../components/Chat/MessageInput';
 import { OtherIcons } from '../../../assets/icons';
 
-import { cleanupTempAudioFiles, getRoutineVoice, sendVoiceMessage } from '../../api/voiceChat';
+import WebSocketManager from '../../api/WebSocketManager';
+import { cleanupTempAudioFiles, getRoutineVoice } from '../../api/voiceChat';
 import { getUser } from '../../api/user';
 
 const recognizerOptions = Platform.OS === 'android' ? {
@@ -32,6 +34,7 @@ export default function VoiceChat() {
   const audioPlayer = useRef(null);
   const debounceTimer = useRef(null);
   const flatListRef = useRef(null);
+  const wsManager = useRef(null);
 
   const [status, setStatus] = useState('idle');
   const [hasPermission, setHasPermission] = useState(false);
@@ -44,6 +47,23 @@ export default function VoiceChat() {
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [typingMessageId, setTypingMessageId] = useState(null);
+
+  // 웹소켓 매니저 초기화
+  useEffect(() => {
+    wsManager.current = WebSocketManager.getInstance();
+    
+    // 컴포넌트 마운트 시 연결
+    wsManager.current.connect().catch(err => {
+      console.error('[VoiceChat] WebSocket 연결 실패:', err);
+    });
+    
+    // 컴포넌트 언마운트 시 연결 해제
+    return () => {
+      if (wsManager.current) {
+        wsManager.current.disconnect();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -188,8 +208,13 @@ export default function VoiceChat() {
   async function processRecognizedText(text, typingMsgId) {
     try {
       await cleanupTempAudioFiles();
-      // 서버로부터 응답 받기
-      const { text: responseText, filePath } = await sendVoiceMessage(text);
+      
+      // WebSocketManager를 통해 메시지 전송
+      const response = await wsManager.current.sendMessage(text);
+      
+      // 응답에서 텍스트와 파일 경로 추출
+      const { text: responseText, filePath } = response;
+      
       // 응답 음성 재생 및 메시지 표시
       playBotResponse(filePath, typingMsgId, responseText);
     } catch (error) {
@@ -299,8 +324,8 @@ export default function VoiceChat() {
       {id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true},
     ]);
 
-    // API 호출하여 실제 응답 받아오기
-    sendVoiceMessage(userMessage)
+    // WebSocketManager를 통해 메시지 전송
+    wsManager.current.sendMessage(userMessage)
       .then(({ text: responseText, filePath }) => {
         // 타이핑 메시지를 실제 메시지로 교체
         setMessages(prevMessages => 
@@ -437,9 +462,10 @@ export default function VoiceChat() {
         console.error('[ERROR] 복약 일정 확인 실패:', err);
       }
     } else {
-      // 다른 옵션들에 대한 처리도 추가
+      // 다른 옵션들에 대한 처리
       try {
-        const { text, filePath } = await sendVoiceMessage(option);
+        // WebSocketManager를 통해 메시지 전송
+        const { text, filePath } = await wsManager.current.sendMessage(option);
         
         const currentTime = new Date();
         const hours = currentTime.getHours();
