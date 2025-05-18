@@ -24,8 +24,11 @@ import MedicineWarning from '../../components/MedicineInfo/MedicineWarning';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {OtherIcons} from '../../../assets/icons';
-import {getSimilarMedicines, getMedicineById} from '../../api/medicine';
+import {getSimilarMedicines, getMedicineById, getMedicineAudioUrl} from '../../api/medicine';
 import {getUserMedicinesCurrent} from '../../api/user';
+import Sound from 'react-native-sound';
+
+Sound.setCategory('Playback', true);
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {medicineId, isModal, basicInfo, item, title} = route.params;
@@ -35,6 +38,8 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const [similarMedicines, setSimilarMedicines] = useState([]);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentSound, setCurrentSound] = useState(null);
 
   const isMounted = useRef(true);
 
@@ -269,6 +274,58 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   };
 
+  const handleAudioPress = async (medicineId) => {
+  if (isPlaying && currentSound) {
+    currentSound.stop();
+    currentSound.release();
+    setCurrentSound(null);
+    setIsPlaying(false);
+    return;
+  }
+
+  try {
+    const response = await getMedicineAudioUrl(medicineId);
+    const audioUrl = response.data.body;
+
+    if (audioUrl) {
+      const sound = new Sound(audioUrl, '', (error) => {
+        if (error) {
+          console.error('오디오 로딩 실패:', error);
+          Alert.alert('오류', '오디오 파일을 로드하는 데 실패했습니다.');
+          setIsPlaying(false);
+          return;
+        }
+
+        sound.setVolume(1.0);
+        setIsPlaying(true);
+        setCurrentSound(sound);
+
+        sound.play((success) => {
+          if (!success) {
+            Alert.alert('오류', '오디오 재생에 실패했습니다.');
+          }
+          setIsPlaying(false);
+          setCurrentSound(null);
+          sound.release();
+        });
+      });
+    } else {
+      Alert.alert('안내', '이 약에 대한 음성 정보가 없습니다.');
+    }
+  } catch (error) {
+    Alert.alert('오류', '음성 파일을 가져오는 데 실패했습니다.');
+  }
+};
+
+useEffect(() => {
+  return () => {
+    if (currentSound) {
+      currentSound.stop();
+      currentSound.release();
+    }
+  };
+}, [currentSound]);
+
   if (isLoading) {
     return (
       <Container>
@@ -405,6 +462,21 @@ const MedicineDetailScreen = ({route, navigation}) => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
+          <VoiceContainer>
+            <BubbleComponent>
+                <Bubble>
+                  <BubbleText>음성 안내</BubbleText>
+                </Bubble>
+              <OtherIcons.ToolTip style={{ marginLeft: 40 }}/>
+            </BubbleComponent>
+            <VoiceButton onPress={() => handleAudioPress(medicine.item_id)}>
+              <OtherIcons.Speaker
+                width={25}
+                height={25}
+                style={{color: themes.light.pointColor.Primary}}
+              />
+            </VoiceButton>
+          </VoiceContainer>
         {isRegistered ? (
           <Button
             title="루틴 추가 완료!"
@@ -450,6 +522,63 @@ const EmptyText = styled.Text`
   font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
 `;
+
+const VoiceContainer = styled.View`
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  right: 20px;
+  ${Platform.OS === 'ios' &&
+  `
+      bottom: 130px;
+    `}
+  ${Platform.OS === 'android' &&
+  `
+      bottom: 110px;
+    `}
+`;
+
+const BubbleComponent = styled.View`
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  right: 0px;
+  bottom: 30px;
+`;
+
+const Bubble = styled.View`
+  background-color: ${themes.light.boxColor.buttonPrimary};
+  border-radius: 8px;
+  padding: 8px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const BubbleText = styled.Text`
+  color: ${themes.light.textColor.buttonText};
+  font-family: 'KimjungchulGothic-Bold';
+  font-size: ${FontSizes.caption.large};
+`;
+
+const VoiceButton = styled.TouchableOpacity`
+  position: absolute;
+  right: 0px;
+  background-color: ${themes.light.bgColor.bgPrimary};
+  width: 50px;
+  height: 50px;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+  /* Android 그림자 */
+  elevation: 5;
+
+  /* iOS 그림자 */
+  shadow-color: #000;
+  shadow-offset: 2px 2px;
+  shadow-opacity: 0.2;
+  shadow-radius: 4px;
+`;
+
 
 const Usage = ({label, value, borderBottomWidth = 1, fontSizeMode}) => {
   const [expanded, setExpanded] = useState(false);

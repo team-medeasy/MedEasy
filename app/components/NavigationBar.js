@@ -199,6 +199,12 @@ const TabNavigator = () => {
       </Tab.Navigator>
       <CameraButton onPress={handleCameraPress} />
       <ChatContainer>
+        <ChatBubbleComponent>
+          <ChatBubble>
+          <BubbleText>AI 복약 매니저</BubbleText>
+        </ChatBubble>
+        <OtherIcons.ToolTip style={{ marginLeft: 70 }}/>
+        </ChatBubbleComponent>
         <ChatButton onPress={handleChatPress}>
           <OtherIcons.chat
             width={25}
@@ -288,33 +294,27 @@ const StyledCameraButton = styled.TouchableOpacity`
 
 const ChatContainer = styled.View``;
 
-const ChatBuble = styled.View`
+const ChatBubbleComponent = styled.View`
   position: absolute;
-  background-color: ${themes.light.boxColor.buttonPrimary};
-  width: 110px;
-  height: 60px;
+  justify-content: center;
+  align-items: center;
   right: 20px;
   ${Platform.OS === 'ios' &&
   `
-      bottom: 170px;
+      bottom: 160px;
     `}
   ${Platform.OS === 'android' &&
   `
       bottom: 140px;
     `}
-  border-radius: 15px;
-  justify-content: center;
-  align-items: center;
 `;
 
-const BubbleTail = styled.View`
-  position: absolute;
+const ChatBubble = styled.View`
   background-color: ${themes.light.boxColor.buttonPrimary};
-  width: 20px;
-  height: 20px;
-  right: 15px;
-  bottom: -6px;
-  transform: rotate(45deg);
+  border-radius: 8px;
+  padding: 8px;
+  justify-content: center;
+  align-items: center;
 `;
 
 const BubbleText = styled.Text`
