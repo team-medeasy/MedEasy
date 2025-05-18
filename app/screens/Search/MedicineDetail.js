@@ -405,6 +405,21 @@ const MedicineDetailScreen = ({route, navigation}) => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
+          <VoiceContainer>
+            <BubbleComponent>
+                <Bubble>
+                  <BubbleText>음성 안내</BubbleText>
+                </Bubble>
+              <OtherIcons.ToolTip style={{ marginLeft: 40 }}/>
+            </BubbleComponent>
+            <VoiceButton >
+              <OtherIcons.Speaker
+                width={25}
+                height={25}
+                style={{color: themes.light.pointColor.Primary}}
+              />
+            </VoiceButton>
+          </VoiceContainer>
         {isRegistered ? (
           <Button
             title="루틴 추가 완료!"
@@ -450,6 +465,63 @@ const EmptyText = styled.Text`
   font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
 `;
+
+const VoiceContainer = styled.View`
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  right: 20px;
+  ${Platform.OS === 'ios' &&
+  `
+      bottom: 130px;
+    `}
+  ${Platform.OS === 'android' &&
+  `
+      bottom: 110px;
+    `}
+`;
+
+const BubbleComponent = styled.View`
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  right: 0px;
+  bottom: 30px;
+`;
+
+const Bubble = styled.View`
+  background-color: ${themes.light.boxColor.buttonPrimary};
+  border-radius: 8px;
+  padding: 8px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const BubbleText = styled.Text`
+  color: ${themes.light.textColor.buttonText};
+  font-family: 'KimjungchulGothic-Bold';
+  font-size: ${FontSizes.caption.large};
+`;
+
+const VoiceButton = styled.TouchableOpacity`
+  position: absolute;
+  right: 0px;
+  background-color: ${themes.light.bgColor.bgPrimary};
+  width: 50px;
+  height: 50px;
+  border-radius: 20px;
+  justify-content: center;
+  align-items: center;
+  /* Android 그림자 */
+  elevation: 5;
+
+  /* iOS 그림자 */
+  shadow-color: #000;
+  shadow-offset: 2px 2px;
+  shadow-opacity: 0.2;
+  shadow-radius: 4px;
+`;
+
 
 const Usage = ({label, value, borderBottomWidth = 1, fontSizeMode}) => {
   const [expanded, setExpanded] = useState(false);
