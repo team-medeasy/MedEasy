@@ -273,13 +273,11 @@ const Home = () => {
         {/* 약 알림 */}
         <PillReminderContainer>
           <TextContainer>
-            <TouchableOpacity onPress={openModal}>
-              <ReminderText fontSizeMode={fontSizeMode}>
+            <ReminderText fontSizeMode={fontSizeMode}>
               {todayRoutine
                 ? `${userName}님,\n까먹은 약이 있어요.`
                 : `${userName}님,\n건강한 하루 보내세요!`}
-              </ReminderText>
-            </TouchableOpacity>
+            </ReminderText>
 
             {/* 모달 컴포넌트 */}
             {CareListModalComponent}
@@ -338,7 +336,7 @@ const Home = () => {
                 />
               </ButtonContent>
             </AddButton>
-            {/* <AddButton onPress={handleAddHospitalVisit}>
+            <AddButton onPress={openModal}>
               <ButtonContent>
                 <ButtonInfo>
                   <RoutineIcons.hospital
@@ -349,7 +347,7 @@ const Home = () => {
                       marginRight: 10,
                     }}
                   />
-                  <ButtonText>병원 진료 추가하기</ButtonText>
+                  <ButtonText fontSizeMode={fontSizeMode}>보호 대상 관리</ButtonText>
                 </ButtonInfo>
                 <HeaderIcons.chevron
                   height={16}
@@ -359,7 +357,7 @@ const Home = () => {
                   }}
                 />
               </ButtonContent>
-            </AddButton> */}
+            </AddButton>
           </ButtonContainer>
         </PillReminderContainer>
 
