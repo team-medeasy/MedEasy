@@ -469,6 +469,19 @@ export default function VoiceChat() {
     // console.log('[VOICE] Volume:', e.value);
   }
 
+  const handleApiError = (error, typingMsgId, fallbackText = '죄송합니다. 요청을 처리하는 중 오류가 발생했습니다.') => {
+  console.error('[VoiceChat] API 오류:', error);
+  setMessages(prevMessages =>
+    prevMessages.map(msg =>
+      msg.id === typingMsgId
+        ? { ...msg, text: fallbackText, isTyping: false }
+        : msg
+    )
+  );
+  setIsTyping(false);
+  reset('오류 발생 - 재시도');
+};
+
   function finalizeRecognition(text) {
     clearTimeout(debounceTimer.current);
     Voice.stop().catch(() => {});
@@ -510,19 +523,7 @@ export default function VoiceChat() {
       // 응답 음성 재생 및 메시지 표시
       playBotResponse(filePath, typingMsgId, responseText, action);
     } catch (error) {
-      console.error('[VoiceChat] API 오류:', error);
-      
-      // 타이핑 메시지를 오류 메시지로 업데이트
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === typingMsgId 
-            ? {...msg, text: '죄송합니다. 응답을 받아오는 데 실패했습니다.', isTyping: false} 
-            : msg
-        )
-      );
-      
-      setIsTyping(false);
-      reset('처리 실패 - 재시작');
+      handleApiError(error, typingMsgId, '죄송합니다. 응답을 받아오는 데 실패했습니다.');
     }
   }
 
@@ -682,17 +683,7 @@ export default function VoiceChat() {
         playAudioFile(filePath);
       }
     } catch (error) {
-      console.error('[VoiceChat] API 오류:', error);
-      
-      // 오류 시 타이핑 메시지를 오류 메시지로 교체
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === typingMsgId 
-            ? {...msg, text: '죄송합니다. 응답을 받아오는 데 실패했습니다.', isTyping: false} 
-            : msg
-        )
-      );
-      setIsTyping(false);
+      handleApiError(error, typingMsgId, '죄송합니다. 응답을 받아오는 데 실패했습니다.');
     }
   };
 
@@ -797,21 +788,7 @@ export default function VoiceChat() {
         reset();
       }
     } catch (err) {
-      console.error(`[ERROR] ${option} 처리 실패:`, err);
-      
-      // 오류 메시지로 업데이트
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === typingMsgId ? { 
-            ...msg, 
-            text: '죄송합니다. 요청을 처리하는 중 오류가 발생했습니다.', 
-            isTyping: false 
-          } : msg
-        )
-      );
-      
-      setIsTyping(false);
-      reset('오류 발생 - 재시도');
+      handleApiError(err, typingMsgId);
     }
   };
 
