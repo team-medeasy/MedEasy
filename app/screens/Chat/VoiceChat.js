@@ -19,6 +19,7 @@ import { OtherIcons } from '../../../assets/icons';
 import WebSocketManager from '../../api/WebSocketManager';
 import { cleanupTempAudioFiles, getRoutineVoice } from '../../api/voiceChat';
 import { getUser } from '../../api/user';
+import { DEFAULT_BOT_OPTIONS } from '../../../assets/data/utils';
 
 // 음성 인식 옵션 - 플랫폼별 설정
 const recognizerOptions = Platform.OS === 'android' ? {
@@ -78,15 +79,12 @@ export default function VoiceChat() {
         if (response && response.text_message) {
           console.log('초기 메시지 수신:', response.text_message);
           
-          // 기본 옵션 (필요한 경우 서버에서 옵션을 추출하는 로직 추가)
-          const defaultOptions = ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'];
-          
           setInitialWelcomeMessage({
             id: Date.now(),
             type: 'bot',
             text: response.text_message,
             time: formatTimeString(),
-            options: defaultOptions,
+            options: DEFAULT_BOT_OPTIONS,
           });
           
           // 음성 데이터가 있으면 저장
@@ -471,6 +469,19 @@ export default function VoiceChat() {
     // console.log('[VOICE] Volume:', e.value);
   }
 
+  const handleApiError = (error, typingMsgId, fallbackText = '죄송합니다. 요청을 처리하는 중 오류가 발생했습니다.') => {
+  console.error('[VoiceChat] API 오류:', error);
+  setMessages(prevMessages =>
+    prevMessages.map(msg =>
+      msg.id === typingMsgId
+        ? { ...msg, text: fallbackText, isTyping: false }
+        : msg
+    )
+  );
+  setIsTyping(false);
+  reset('오류 발생 - 재시도');
+};
+
   function finalizeRecognition(text) {
     clearTimeout(debounceTimer.current);
     Voice.stop().catch(() => {});
@@ -512,19 +523,7 @@ export default function VoiceChat() {
       // 응답 음성 재생 및 메시지 표시
       playBotResponse(filePath, typingMsgId, responseText, action);
     } catch (error) {
-      console.error('[VoiceChat] API 오류:', error);
-      
-      // 타이핑 메시지를 오류 메시지로 업데이트
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === typingMsgId 
-            ? {...msg, text: '죄송합니다. 응답을 받아오는 데 실패했습니다.', isTyping: false} 
-            : msg
-        )
-      );
-      
-      setIsTyping(false);
-      reset('처리 실패 - 재시작');
+      handleApiError(error, typingMsgId, '죄송합니다. 응답을 받아오는 데 실패했습니다.');
     }
   }
 
@@ -534,9 +533,6 @@ export default function VoiceChat() {
 
     setStatus('playing');
     setStatusMessage('응답 듣는 중...');
-    
-    // 기본 옵션 (서버에서 옵션을 별도로 보내지 않는 경우)
-    const defaultOptions = ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'];
 
     if (audioPlayer.current) {
       audioPlayer.current.stop();
@@ -550,7 +546,7 @@ export default function VoiceChat() {
       setMessages(prevMessages => 
         prevMessages.map(msg => 
           msg.id === typingMsgId 
-            ? {...msg, text: responseText, isTyping: false, options: defaultOptions} 
+            ? {...msg, text: responseText, isTyping: false, options: DEFAULT_BOT_OPTIONS} 
             : msg
         )
       );
@@ -569,7 +565,7 @@ export default function VoiceChat() {
         setMessages(prevMessages => 
           prevMessages.map(msg => 
             msg.id === typingMsgId 
-              ? {...msg, text: responseText, isTyping: false, options: defaultOptions} 
+              ? {...msg, text: responseText, isTyping: false, options: DEFAULT_BOT_OPTIONS} 
               : msg
           )
         );
@@ -586,7 +582,7 @@ export default function VoiceChat() {
         setMessages(prevMessages => 
           prevMessages.map(msg => 
             msg.id === typingMsgId 
-              ? {...msg, text: responseText, isTyping: false, options: defaultOptions} 
+              ? {...msg, text: responseText, isTyping: false, options: DEFAULT_BOT_OPTIONS} 
               : msg
           )
         );
@@ -672,14 +668,11 @@ export default function VoiceChat() {
       // WebSocketManager를 통해 메시지 전송
       const { text: responseText, filePath, action } = await wsManager.current.sendMessage(userMessage);
       
-      // 기본 옵션
-      const defaultOptions = ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'];
-      
       // 타이핑 메시지를 실제 메시지로 교체
       setMessages(prevMessages => 
         prevMessages.map(msg => 
           msg.id === typingMsgId 
-            ? {...msg, text: responseText, isTyping: false, options: defaultOptions} 
+            ? {...msg, text: responseText, isTyping: false, options: DEFAULT_BOT_OPTIONS} 
             : msg
         )
       );
@@ -690,17 +683,7 @@ export default function VoiceChat() {
         playAudioFile(filePath);
       }
     } catch (error) {
-      console.error('[VoiceChat] API 오류:', error);
-      
-      // 오류 시 타이핑 메시지를 오류 메시지로 교체
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === typingMsgId 
-            ? {...msg, text: '죄송합니다. 응답을 받아오는 데 실패했습니다.', isTyping: false} 
-            : msg
-        )
-      );
-      setIsTyping(false);
+      handleApiError(error, typingMsgId, '죄송합니다. 응답을 받아오는 데 실패했습니다.');
     }
   };
 
@@ -768,14 +751,11 @@ export default function VoiceChat() {
       if (option === '오늘 복용 일정 확인') {
         await cleanupTempAudioFiles(); 
         const { text, filePath, action } = await getRoutineVoice();
-        
-        // 기본 옵션
-        const defaultOptions = ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'];
-        
+
         // 메시지 업데이트
         setMessages(prev =>
           prev.map(msg =>
-            msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: defaultOptions } : msg
+            msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
           )
         );
         
@@ -790,14 +770,11 @@ export default function VoiceChat() {
       } else {
         // 기타 옵션 처리
         const { text, filePath, action } = await wsManager.current.sendMessage(option);
-        
-        // 기본 옵션
-        const defaultOptions = ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'];
-        
+
         // 메시지 업데이트
         setMessages(prev =>
           prev.map(msg =>
-            msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: defaultOptions } : msg
+            msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
           )
         );
         
@@ -811,21 +788,7 @@ export default function VoiceChat() {
         reset();
       }
     } catch (err) {
-      console.error(`[ERROR] ${option} 처리 실패:`, err);
-      
-      // 오류 메시지로 업데이트
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === typingMsgId ? { 
-            ...msg, 
-            text: '죄송합니다. 요청을 처리하는 중 오류가 발생했습니다.', 
-            isTyping: false 
-          } : msg
-        )
-      );
-      
-      setIsTyping(false);
-      reset('오류 발생 - 재시도');
+      handleApiError(err, typingMsgId);
     }
   };
 
