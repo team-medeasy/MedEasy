@@ -7,11 +7,11 @@ class WebSocketManager {
   constructor() {
     this.socket = null;
     this.isConnected = false;
-    this.pendingCallback = null; // ✅ 단일 콜백 저장
+    this.pendingCallback = null;
     this.connectCallbacks = [];
     this.messageQueue = [];
-    this.initialMessageCallback = null;
-    this.manualDisconnect = false; // ✅ 수동 종료 여부
+    this.initialMessageCallback = null; // 초기 메시지 콜백
+    this.manualDisconnect = false;
   }
 
   static getInstance() {
@@ -53,19 +53,19 @@ class WebSocketManager {
       this.socket.onmessage = (event) => {
         try {
           const response = JSON.parse(event.data);
+          console.log('[WebSocketManager] 응답 받음:', response);
 
-          // ✅ 초기 메시지 처리 (ID 없는 경우) --- 수정 필요
+          // 초기 메시지 처리 (콜백이 있고 pending 콜백이 없는 경우)
           if (this.initialMessageCallback && !this.pendingCallback) {
             this.initialMessageCallback(response);
             console.log("[WebSocketManager] 초기 응답 텍스트: ", response.text_message);
             return;
           }
 
-          // ✅ 일반 메시지 처리
+          // 일반 메시지 처리
           if (this.pendingCallback) {
             this.pendingCallback(response);
             console.log("[WebSocketManager] 응답 텍스트: ", response.text_message);
-
             this.pendingCallback = null;
           } else {
             console.log('[WebSocketManager] 처리할 콜백이 없습니다:', response);
@@ -85,8 +85,7 @@ class WebSocketManager {
         this.isConnected = false;
 
         if (!this.manualDisconnect) {
-          console.log('[WebSocketManager] 수동 종료가 아니므로 재연결이 필요하면 여기에 추가');
-          // 자동 재연결이 필요하면 여기에 retry 로직 추가 가능
+          console.log('[WebSocketManager] 자동 재연결 로직은 구현되지 않았습니다.');
         }
       };
     } catch (error) {
@@ -95,6 +94,10 @@ class WebSocketManager {
     }
   }
 
+  /**
+   * 초기 메시지를 수신할 콜백 함수 설정
+   * @param {Function} callback - 초기 메시지를 처리할 콜백 함수
+   */
   setInitialMessageCallback(callback) {
     this.initialMessageCallback = callback;
   }
@@ -120,11 +123,7 @@ class WebSocketManager {
   }
 
   /**
-   * 메시지를 전송하고 서버 응답(JSON)으로부터 텍스트, 오디오 파일 경로 등을 반환합니다.
-   * @param {string} message - 전송할 텍스트 메시지
-   * @param {string|null} serverAction - 서버에 전달할 액션
-   * @param {any|null} data - 추가 데이터
-   * @returns {Promise<{ text: string, filePath: string, action: string }>}
+   * 메시지를 전송하고 서버 응답을 반환합니다.
    */
   async sendMessage(message, serverAction = null, data = null) {
     const payload = {
@@ -135,7 +134,7 @@ class WebSocketManager {
 
     return new Promise(async (resolve, reject) => {
       try {
-        // ✅ 콜백 저장 (단일)
+        // 콜백 저장 (단일)
         this.pendingCallback = async (response) => {
           try {
             const {
@@ -149,6 +148,16 @@ class WebSocketManager {
 
             if (result_code !== 200) {
               reject(new Error(`서버 응답 실패: ${result_message}`));
+              return;
+            }
+
+            // 음성 데이터가 없는 경우 처리
+            if (!audio_base64) {
+              resolve({
+                text: text_message,
+                filePath: null,
+                action: client_action,
+              });
               return;
             }
 

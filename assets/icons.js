@@ -88,6 +88,8 @@ import SearchGeneralIcon from './icons/search.svg';
 import ChevronDownIcon from './icons/chevron_down.svg';
 import KakaoIcon from './icons/kakao.svg';
 import CheckCircleIcon from './icons/check_circle.svg';
+import ToolTipIcon from './icons/tooltip.svg';
+import SpeakerIcon from './icons/speaker.svg';
 
 // 이미지 에셋
 import EmptyLikeImage from './images/emptyLike.svg';
@@ -198,6 +200,8 @@ export const OtherIcons = {
   chevronDown: ChevronDownIcon,
   kakao: KakaoIcon,
   CheckCircle: CheckCircleIcon,
+  ToolTip: ToolTipIcon,
+  Speaker: SpeakerIcon
 };
 
 export const Images = {
