@@ -422,8 +422,8 @@ const Routine = ({route}) => {
   );
 
   return (
-    <Container style={{paddingTop: insets.top}}>
-      <Header>
+    <Container>
+      <Header style={{paddingTop: insets.top}}>
         <HeaderText fontSizeMode={fontSizeMode}>루틴</HeaderText>
         <ReturnButton
           onPress={() => {
@@ -525,13 +525,18 @@ const Routine = ({route}) => {
   );
 };
 
-const Container = styled.View`
+const Container = styled(LinearGradient).attrs(() => ({
+  colors: [
+    themes.light.pointColor.Primary,
+    themes.light.pointColor.PrimaryDark,
+  ],
+  start: {x: 0, y: 0},
+  end: {x: 0, y: 0.3},
+}))`
   flex: 1;
-  background-color: ${themes.light.pointColor.Primary};
 `;
 
 const Header = styled.View`
-  background-color: ${themes.light.pointColor.Primary};
   flex-direction: row;
   padding: 0px 20px;
   padding-top: 10px;
@@ -556,9 +561,9 @@ const ReturnButton = styled.TouchableOpacity`
 `;
 
 const ButtonText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
-  color: ${themes.light.pointColor.Primary20};
+  color: ${themes.light.pointColor.Primary10};
 `;
 
 const MedicineListButton = styled(ReturnButton)`
@@ -571,13 +576,11 @@ const MedicineListButton = styled(ReturnButton)`
 const MedicineListText = styled(ButtonText)`
   color: ${themes.light.textColor.Primary50};
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
 `;
 
 // 페이징을 위한 컨테이너
-const DayContainerWrapper = styled.View`
-  background-color: ${themes.light.pointColor.Primary};
-`;
+const DayContainerWrapper = styled.View``;
 
 // 주차 단위 컨테이너
 const WeekContainer = styled.View`
