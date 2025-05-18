@@ -24,8 +24,11 @@ import MedicineWarning from '../../components/MedicineInfo/MedicineWarning';
 import FontSizes from '../../../assets/fonts/fontSizes';
 import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 import {OtherIcons} from '../../../assets/icons';
-import {getSimilarMedicines, getMedicineById} from '../../api/medicine';
+import {getSimilarMedicines, getMedicineById, getMedicineAudioUrl} from '../../api/medicine';
 import {getUserMedicinesCurrent} from '../../api/user';
+import Sound from 'react-native-sound';
+
+Sound.setCategory('Playback', true);
 
 const MedicineDetailScreen = ({route, navigation}) => {
   const {medicineId, isModal, basicInfo, item, title} = route.params;
@@ -35,6 +38,8 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const [similarMedicines, setSimilarMedicines] = useState([]);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentSound, setCurrentSound] = useState(null);
 
   const isMounted = useRef(true);
 
@@ -269,6 +274,58 @@ const MedicineDetailScreen = ({route, navigation}) => {
     }
   };
 
+  const handleAudioPress = async (medicineId) => {
+  if (isPlaying && currentSound) {
+    currentSound.stop();
+    currentSound.release();
+    setCurrentSound(null);
+    setIsPlaying(false);
+    return;
+  }
+
+  try {
+    const response = await getMedicineAudioUrl(medicineId);
+    const audioUrl = response.data.body;
+
+    if (audioUrl) {
+      const sound = new Sound(audioUrl, '', (error) => {
+        if (error) {
+          console.error('오디오 로딩 실패:', error);
+          Alert.alert('오류', '오디오 파일을 로드하는 데 실패했습니다.');
+          setIsPlaying(false);
+          return;
+        }
+
+        sound.setVolume(1.0);
+        setIsPlaying(true);
+        setCurrentSound(sound);
+
+        sound.play((success) => {
+          if (!success) {
+            Alert.alert('오류', '오디오 재생에 실패했습니다.');
+          }
+          setIsPlaying(false);
+          setCurrentSound(null);
+          sound.release();
+        });
+      });
+    } else {
+      Alert.alert('안내', '이 약에 대한 음성 정보가 없습니다.');
+    }
+  } catch (error) {
+    Alert.alert('오류', '음성 파일을 가져오는 데 실패했습니다.');
+  }
+};
+
+useEffect(() => {
+  return () => {
+    if (currentSound) {
+      currentSound.stop();
+      currentSound.release();
+    }
+  };
+}, [currentSound]);
+
   if (isLoading) {
     return (
       <Container>
@@ -412,7 +469,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
                 </Bubble>
               <OtherIcons.ToolTip style={{ marginLeft: 40 }}/>
             </BubbleComponent>
-            <VoiceButton >
+            <VoiceButton onPress={() => handleAudioPress(medicine.item_id)}>
               <OtherIcons.Speaker
                 width={25}
                 height={25}
