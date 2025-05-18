@@ -85,6 +85,7 @@ export default function VoiceChat() {
             text: response.text_message,
             time: formatTimeString(),
             options: DEFAULT_BOT_OPTIONS,
+            isInitialMessage: true, // 초기 메시지임을 표시하는 플래그
           });
           
           // 음성 데이터가 있으면 저장
@@ -163,7 +164,7 @@ export default function VoiceChat() {
     // 모달이 닫혀있고 메시지가 없는 경우에만 메시지 설정
     if (!showInfoModal && messages.length === 0) {
       if (initialWelcomeMessage) {
-        // 서버에서 받은 초기 메시지 사용
+        // 서버에서 받은 초기 메시지 사용 (옵션 유지)
         setMessages([initialWelcomeMessage]);
         
         // 저장된 음성이 있으면 재생
@@ -171,7 +172,7 @@ export default function VoiceChat() {
           playAudioFile(initialWelcomeAudio);
         }
       } else {
-        // 서버 메시지가 없으면 기본 메시지 사용
+        // 서버 메시지가 없으면 기본 메시지 사용 (옵션 유지)
         setMessages([
           {
             id: Date.now(),
@@ -179,6 +180,7 @@ export default function VoiceChat() {
             text: `${userName || '사용자'}님, 안녕하세요☺️\n어떤 도움이 필요하신가요?`,
             time: formatTimeString(),
             options: ['약 검색', '루틴 등록', '처방전 촬영', '의약품 촬영', '오늘 복용 일정 확인'],
+            isInitialMessage: true, // 초기 메시지임을 표시하는 플래그 추가
           },
         ]);
       }
@@ -546,7 +548,7 @@ export default function VoiceChat() {
       setMessages(prevMessages => 
         prevMessages.map(msg => 
           msg.id === typingMsgId 
-            ? {...msg, text: responseText, isTyping: false, options: DEFAULT_BOT_OPTIONS} 
+            ? {...msg, text: responseText, isTyping: false} 
             : msg
         )
       );
@@ -565,7 +567,7 @@ export default function VoiceChat() {
         setMessages(prevMessages => 
           prevMessages.map(msg => 
             msg.id === typingMsgId 
-              ? {...msg, text: responseText, isTyping: false, options: DEFAULT_BOT_OPTIONS} 
+              ? {...msg, text: responseText, isTyping: false} 
               : msg
           )
         );
@@ -582,7 +584,7 @@ export default function VoiceChat() {
         setMessages(prevMessages => 
           prevMessages.map(msg => 
             msg.id === typingMsgId 
-              ? {...msg, text: responseText, isTyping: false, options: DEFAULT_BOT_OPTIONS} 
+              ? {...msg, text: responseText, isTyping: false} 
               : msg
           )
         );
@@ -672,7 +674,7 @@ export default function VoiceChat() {
       setMessages(prevMessages => 
         prevMessages.map(msg => 
           msg.id === typingMsgId 
-            ? {...msg, text: responseText, isTyping: false, options: DEFAULT_BOT_OPTIONS} 
+            ? {...msg, text: responseText, isTyping: false} 
             : msg
         )
       );
@@ -755,7 +757,7 @@ export default function VoiceChat() {
         // 메시지 업데이트
         setMessages(prev =>
           prev.map(msg =>
-            msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
+            msg.id === typingMsgId ? { ...msg, text, isTyping: false } : msg
           )
         );
         
@@ -810,11 +812,11 @@ export default function VoiceChat() {
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <Header 
-hideBorder='true' 
+          hideBorder='true' 
           transparentBg='true' 
           titleColor={themes.light.textColor.buttonText}
           iconColor={themes.light.textColor.buttonText}>
-          보이스 채팅
+          AI 채팅
         </Header>
 
         {/* 채팅 이용 안내 모달 */}
