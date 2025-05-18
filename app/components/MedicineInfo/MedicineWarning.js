@@ -190,7 +190,7 @@ export default MedicineWarning;
 
 // 아래는 기존 스타일 정의 - 추가된 스타일
 const WarningContainer = styled.View`
-  padding: 32px 20px 8px 20px;
+  padding: 20px 20px 8px 20px;
 `;
 
 const SectionTitle = styled.Text`
