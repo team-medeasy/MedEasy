@@ -70,7 +70,8 @@ const MessageBubble = ({item, onOptionPress}) => {
           />
         </RobotIconContainer>
 
-        {item.options ? (
+        {/* 초기 메시지이거나 명시적으로 옵션이 있는 경우에만 옵션 표시 */}
+        {(item.isInitialMessage && item.options) ? (
           <View style={{ flex: 1 }}>
             <BotMessageBubble>
               <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
@@ -80,7 +81,7 @@ const MessageBubble = ({item, onOptionPress}) => {
               {item.options.map((option, index) => (
                 <OptionBubble key={index} onPress={() => onOptionPress?.(option)}>
                   <OptionText fontSizeMode={fontSizeMode}>{option}</OptionText>
-                  </OptionBubble>
+                </OptionBubble>
               ))}
             </OptionWrap>
           </View>
@@ -102,7 +103,11 @@ const MessageBubble = ({item, onOptionPress}) => {
       <UserMessageContainer>
         <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
         <UserMessageBubble>
-          <UserText fontSizeMode={fontSizeMode}>{item.text}</UserText>
+          {item.isVoiceRecognizing ? (
+            <TypingAnimation />
+          ) : (
+            <UserText fontSizeMode={fontSizeMode}>{item.text}</UserText>
+          )}
         </UserMessageBubble>
       </UserMessageContainer>
     );
