@@ -15,7 +15,11 @@ import {Header} from '../components/Header/Header';
 import {RoutineIcons, Images} from './../../assets/icons';
 import FontSizes from '../../assets/fonts/fontSizes';
 import {useFontSize} from '../../assets/fonts/FontSizeContext';
-import {getNotificationList, markNotificationAsRead, markAllNotificationsAsRead} from '../api/notification';
+import {
+  getNotificationList,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+} from '../api/notification';
 import EmptyState from '../components/EmptyState';
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
@@ -52,12 +56,12 @@ const Notification = ({route, navigation}) => {
   const [hasMoreData, setHasMoreData] = useState(true);
   const PAGE_SIZE = 10;
   const isMounted = useRef(true); // 컴포넌트 마운트 상태 추적
-  
+
   // 화면에서 벗어날 때 콜백 호출을 위한 로직
   useEffect(() => {
     // 컴포넌트가 마운트되었음을 표시
     isMounted.current = true;
-    
+
     // 화면이 언마운트될 때 onGoBack 콜백 실행 및 마운트 상태 변경
     return () => {
       isMounted.current = false;
@@ -74,10 +78,10 @@ const Notification = ({route, navigation}) => {
     try {
       setLoading(true);
       const res = await getNotificationList({page: page, size: PAGE_SIZE});
-      
+
       // 컴포넌트가 언마운트되었으면 상태 업데이트하지 않음
       if (!isMounted.current) return;
-      
+
       const notificationData = res.data.body;
       console.log(`알림 목록 (페이지 ${page}): `, notificationData);
 
@@ -136,15 +140,15 @@ const Notification = ({route, navigation}) => {
     try {
       await markAllNotificationsAsRead();
       console.log('모든 알림이 읽음 처리되었습니다.');
-      
+
       // 컴포넌트가 마운트된 상태일 때만 UI 업데이트
       if (isMounted.current) {
         // 현재 알림 목록을 읽음 상태로 UI 업데이트
-        setNotifications(prev => 
+        setNotifications(prev =>
           prev.map(notification => ({
             ...notification,
-            is_read: true
-          }))
+            is_read: true,
+          })),
         );
       }
     } catch (error) {
@@ -217,8 +221,12 @@ const Notification = ({route, navigation}) => {
             />
           ) : null}
           <NotiTextContainer>
-            <NotificationTitle fontSizeMode={fontSizeMode}>{item.title}</NotificationTitle>
-            <NotificationMessage fontSizeMode={fontSizeMode}>{item.content}</NotificationMessage>
+            <NotificationTitle fontSizeMode={fontSizeMode}>
+              {item.title}
+            </NotificationTitle>
+            <NotificationMessage fontSizeMode={fontSizeMode}>
+              {item.content}
+            </NotificationMessage>
           </NotiTextContainer>
         </NotiContainer>
         <NotiTime fontSizeMode={fontSizeMode}>{item.formatted_time}</NotiTime>
@@ -228,11 +236,10 @@ const Notification = ({route, navigation}) => {
 
   const renderFooter = () => {
     if (!loading) return null;
-    
+
     // ActivityIndicator 관련 Android 문제 해결을 위한 플랫폼별 스타일
-    const indicatorStyle = Platform.OS === 'android' 
-      ? { height: 36, width: 36 } 
-      : {};
+    const indicatorStyle =
+      Platform.OS === 'android' ? {height: 36, width: 36} : {};
 
     return (
       <View
@@ -267,8 +274,8 @@ const Notification = ({route, navigation}) => {
         renderItem={renderItem}
         keyExtractor={item => item.notification_id.toString()}
         contentContainerStyle={{
-          paddingBottom: 100, 
-          flexGrow: 1
+          paddingBottom: 100,
+          flexGrow: 1,
         }}
         refreshing={refreshing}
         onRefresh={onRefresh}
@@ -297,7 +304,7 @@ const Container = styled.View`
 const NotificationItem = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  padding: 20px;
+  padding: 16px 20px;
   background-color: ${props =>
     props.isRead === false
       ? `${themes.light.pointColor.Primary10}`
@@ -318,13 +325,14 @@ const NotificationMessage = styled.Text`
   font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   color: ${themes.light.textColor.Primary70};
   font-family: 'Pretendard-Medium';
+  line-height: 16px;
 `;
 
 const NotificationTitle = styled.Text`
   font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 `;
 
 const NotiTime = styled.Text`
