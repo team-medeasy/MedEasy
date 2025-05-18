@@ -103,7 +103,11 @@ const MessageBubble = ({item, onOptionPress}) => {
       <UserMessageContainer>
         <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
         <UserMessageBubble>
-          <UserText fontSizeMode={fontSizeMode}>{item.text}</UserText>
+          {item.isVoiceRecognizing ? (
+            <TypingAnimation />
+          ) : (
+            <UserText fontSizeMode={fontSizeMode}>{item.text}</UserText>
+          )}
         </UserMessageBubble>
       </UserMessageContainer>
     );
