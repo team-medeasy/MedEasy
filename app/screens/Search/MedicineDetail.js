@@ -8,6 +8,9 @@ import {
   InteractionManager,
   ActivityIndicator,
   Alert,
+  Easing,
+  Animated,
+  StyleSheet,
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
@@ -33,7 +36,7 @@ Sound.setCategory('Playback', true);
 const MedicineDetailScreen = ({route, navigation}) => {
   const {medicineId, isModal, basicInfo, item, title} = route.params;
   const {fontSizeMode} = useFontSize();
-  
+
   const [medicine, setMedicine] = useState(basicInfo || item || null);
   const [similarMedicines, setSimilarMedicines] = useState([]);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -52,7 +55,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
   const fetchMedicineData = async () => {
     try {
       setIsLoading(true);
-      
+
       // 기존 item 객체가 전달된 경우
       if (item && !medicineId) {
         // 기본 정보만 먼저 매핑하여 빠르게 렌더링
@@ -95,11 +98,11 @@ const MedicineDetailScreen = ({route, navigation}) => {
             setIsLoading(false);
           }
         });
-      } 
+      }
       // medicineId로 API 호출하여 데이터 가져오기
       else if (medicineId) {
         console.log('약품 ID로 상세 정보 가져오기:', medicineId);
-        
+
         // 기본 정보가 전달된 경우 우선 표시
         if (basicInfo) {
           setMedicine({
@@ -107,12 +110,12 @@ const MedicineDetailScreen = ({route, navigation}) => {
             ...basicInfo
           });
         }
-        
+
         const response = await getMedicineById(medicineId);
-        
+
         if (response.data?.result?.result_code === 200) {
           const medicineData = response.data.body;
-          
+
           // 기본 정보 매핑
           const mappedMedicine = {
             item_id: medicineData.id,
@@ -137,7 +140,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
             atpn_qesitm: medicineData.precautions,
             se_qesitm: medicineData.side_effects,
           };
-          
+
           setMedicine(mappedMedicine);
         } else {
           console.error('약품 정보 API 오류:', response);
@@ -155,7 +158,7 @@ const MedicineDetailScreen = ({route, navigation}) => {
   // 컴포넌트 마운트 시 데이터 가져오기
   useEffect(() => {
     fetchMedicineData();
-    
+
     return () => {
       isMounted.current = false;
     };
@@ -275,56 +278,79 @@ const MedicineDetailScreen = ({route, navigation}) => {
   };
 
   const handleAudioPress = async (medicineId) => {
-  if (isPlaying && currentSound) {
-    currentSound.stop();
-    currentSound.release();
-    setCurrentSound(null);
-    setIsPlaying(false);
-    return;
-  }
-
-  try {
-    const response = await getMedicineAudioUrl(medicineId);
-    const audioUrl = response.data.body;
-
-    if (audioUrl) {
-      const sound = new Sound(audioUrl, '', (error) => {
-        if (error) {
-          console.error('오디오 로딩 실패:', error);
-          Alert.alert('오류', '오디오 파일을 로드하는 데 실패했습니다.');
-          setIsPlaying(false);
-          return;
-        }
-
-        sound.setVolume(1.0);
-        setIsPlaying(true);
-        setCurrentSound(sound);
-
-        sound.play((success) => {
-          if (!success) {
-            Alert.alert('오류', '오디오 재생에 실패했습니다.');
-          }
-          setIsPlaying(false);
-          setCurrentSound(null);
-          sound.release();
-        });
-      });
-    } else {
-      Alert.alert('안내', '이 약에 대한 음성 정보가 없습니다.');
-    }
-  } catch (error) {
-    Alert.alert('오류', '음성 파일을 가져오는 데 실패했습니다.');
-  }
-};
-
-useEffect(() => {
-  return () => {
-    if (currentSound) {
+    if (isPlaying && currentSound) {
       currentSound.stop();
       currentSound.release();
+      setCurrentSound(null);
+      setIsPlaying(false);
+      return;
+    }
+
+    try {
+      const response = await getMedicineAudioUrl(medicineId);
+      const audioUrl = response.data.body;
+
+      if (audioUrl) {
+        const sound = new Sound(audioUrl, '', (error) => {
+          if (error) {
+            console.error('오디오 로딩 실패:', error);
+            Alert.alert('오류', '오디오 파일을 로드하는 데 실패했습니다.');
+            setIsPlaying(false);
+            return;
+          }
+
+          sound.setVolume(1.0);
+          setIsPlaying(true);
+          setCurrentSound(sound);
+
+          sound.play((success) => {
+            if (!success) {
+              Alert.alert('오류', '오디오 재생에 실패했습니다.');
+            }
+            setIsPlaying(false);
+            setCurrentSound(null);
+            sound.release();
+          });
+        });
+      } else {
+        Alert.alert('안내', '이 약에 대한 음성 정보가 없습니다.');
+      }
+    } catch (error) {
+      Alert.alert('오류', '음성 파일을 가져오는 데 실패했습니다.');
     }
   };
-}, [currentSound]);
+
+  useEffect(() => {
+    return () => {
+      if (currentSound) {
+        currentSound.stop();
+        currentSound.release();
+      }
+    };
+  }, [currentSound]);
+
+  const bubbleOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(bubbleOpacity, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+
+    const timeout = setTimeout(() => {
+      Animated.timing(bubbleOpacity, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    }, 4000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
 
   if (isLoading) {
     return (
@@ -373,7 +399,7 @@ useEffect(() => {
 
           {/* 약품 금기 정보 컴포넌트 추가 */}
           <MedicineWarning item={medicine} />
-          
+
           {/* 섹션 분리선 - bgSecondary로 배경색 구분 */}
           <View style={{
             height: 10,
@@ -462,21 +488,21 @@ useEffect(() => {
           paddingBottom: 30,
           alignItems: 'center',
         }}>
-          <VoiceContainer>
-            <BubbleComponent>
-                <Bubble>
-                  <BubbleText>음성 안내</BubbleText>
-                </Bubble>
-              <OtherIcons.ToolTip style={{ marginLeft: 40 }}/>
-            </BubbleComponent>
-            <VoiceButton onPress={() => handleAudioPress(medicine.item_id)}>
-              <OtherIcons.Speaker
-                width={25}
-                height={25}
-                style={{color: themes.light.pointColor.Primary}}
-              />
-            </VoiceButton>
-          </VoiceContainer>
+        <VoiceContainer>
+          <Animated.View style={[styles.bubbleComponent, { opacity: bubbleOpacity }]}>
+            <Bubble>
+              <BubbleText>음성 안내</BubbleText>
+            </Bubble>
+            <OtherIcons.ToolTip style={{ marginLeft: 40 }}/>
+          </Animated.View>
+          <VoiceButton onPress={() => handleAudioPress(medicine.item_id)}>
+            <OtherIcons.Speaker
+              width={25}
+              height={25}
+              style={{color: themes.light.pointColor.Primary}}
+            />
+          </VoiceButton>
+        </VoiceContainer>
         {isRegistered ? (
           <Button
             title="루틴 추가 완료!"
@@ -579,6 +605,15 @@ const VoiceButton = styled.TouchableOpacity`
   shadow-radius: 4px;
 `;
 
+const styles = StyleSheet.create({
+  bubbleComponent: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    right: 0,
+    bottom: 30,
+  },
+});
 
 const Usage = ({label, value, borderBottomWidth = 1, fontSizeMode}) => {
   const [expanded, setExpanded] = useState(false);
