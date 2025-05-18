@@ -1,6 +1,6 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import styled from 'styled-components/native';
-import {Platform, AppState} from 'react-native'; // AppState 추가
+import {Platform, AppState, Animated, Easing, StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
@@ -64,24 +64,24 @@ const TabNavigator = () => {
   const refreshUserInfo = useCallback(async () => {
     try {
       console.log('[NavigationBar] 토큰 검증 및 사용자 정보 갱신 시작');
-      
+
       // 토큰 유효성 확인 및 필요시 갱신
       const isTokenValid = await validateAndRefreshToken();
-      
+
       if (isTokenValid) {
         // 사용자 정보 새로 가져오기
         const userResponse = await getUser();
         console.log('[NavigationBar] 사용자 정보 갱신:', userResponse.data);
-        
+
         const userData = userResponse.data?.body || {};
-        
+
         // 사용자 정보 저장
         await setUserInfo({
           name: userData.name || '',
           gender: userData.gender || '',
           birthday: userData.birthday || '',
         });
-        
+
         console.log('[NavigationBar] 사용자 정보 갱신 완료');
       } else {
         console.warn('[NavigationBar] 토큰이 유효하지 않아 사용자 정보를 갱신하지 못했습니다');
@@ -97,7 +97,7 @@ const TabNavigator = () => {
   useEffect(() => {
     // 컴포넌트 마운트 시 즉시 사용자 정보 갱신
     refreshUserInfo();
-    
+
     // 앱 상태 변경 리스너 설정 (백그라운드 → 포그라운드)
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === 'active') {
@@ -105,12 +105,35 @@ const TabNavigator = () => {
         refreshUserInfo();
       }
     });
-    
+
     // 컴포넌트 언마운트 시 리스너 정리
     return () => {
       subscription.remove();
     };
   }, [refreshUserInfo]);
+
+  const bubbleOpacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(bubbleOpacity, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+
+    const timeout = setTimeout(() => {
+      Animated.timing(bubbleOpacity, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    }, 4000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
 
   return (
     <MainContainer>
@@ -199,12 +222,12 @@ const TabNavigator = () => {
       </Tab.Navigator>
       <CameraButton onPress={handleCameraPress} />
       <ChatContainer>
-        <ChatBubbleComponent>
+        <Animated.View style={[chatBubbleStyles.container, { opacity: bubbleOpacity }]}>
           <ChatBubble>
-          <BubbleText>AI 복약 매니저</BubbleText>
-        </ChatBubble>
-        <OtherIcons.ToolTip style={{ marginLeft: 70 }}/>
-        </ChatBubbleComponent>
+            <BubbleText>AI 복약 매니저</BubbleText>
+          </ChatBubble>
+          <OtherIcons.ToolTip style={{ marginLeft: 70 }}/>
+        </Animated.View>
         <ChatButton onPress={handleChatPress}>
           <OtherIcons.chat
             width={25}
@@ -349,5 +372,15 @@ const ChatButton = styled.TouchableOpacity`
   shadow-opacity: 0.2;
   shadow-radius: 4px;
 `;
+
+const chatBubbleStyles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    right: 20,
+    bottom: Platform.OS === 'ios' ? 160 : 140,
+  },
+});
 
 export default NavigationBar;
