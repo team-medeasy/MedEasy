@@ -18,8 +18,8 @@ const Footer = ({marginTop = 0}) => {
           borderBottomWidth: 1,
           borderBottomColor: themes.light.borderColor.borderPrimary,
         }}>
-        모든 의약품 정보는 참고용으로 제공되며, 정확한 복용법은 의사 및 약사와
-        상담하시기 바랍니다.{'\n'}위 정보는 식품의약품안전처 오픈API(의약품
+        모든 의약품 정보는 참고용으로 제공되며, 정확한 복용 방법은 의사 및 약사와
+        상담하시기 바랍니다.{'\n'}위 정보는 식품의약품안전처 공공 데이터 API(의약품
         낱알식별 정보, 의약품개요정보)에서 제공하는 정보입니다.
       </FooterText>
 
