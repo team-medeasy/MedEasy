@@ -9,7 +9,7 @@ import {Images} from '../../assets/icons';
 
 // 타임라인 컨테이너 스타일
 const TimelineContainer = styled.View`
-  padding-left: 30px;
+  padding: 0 24px;
   position: relative;
 `;
 
@@ -31,8 +31,8 @@ const RoutineTimeline = ({
   toggleTimeCheck,
   toggleCheck,
   routineMode = 'default', // 기본값 설정
-  emptyTitle = "루틴이 없습니다.", // 기본 빈 상태 제목
-  emptyDescription = "현재 등록된 루틴이 없습니다.", // 기본 빈 상태 설명
+  emptyTitle = '루틴이 없습니다.', // 기본 빈 상태 제목
+  emptyDescription = '현재 등록된 루틴이 없습니다.', // 기본 빈 상태 설명
 }) => {
   // 애니메이션 값 설정
   const heightAnim = useRef(new Animated.Value(0)).current;
@@ -44,17 +44,18 @@ const RoutineTimeline = ({
   useEffect(() => {
     // 날짜가 변경되었거나 루틴 길이가 변경된 경우
     const dateChanged = previousDateRef.current !== selectedDateString;
-    const routinesLengthChanged = previousRoutinesLengthRef.current !== allRoutines.length;
-    
+    const routinesLengthChanged =
+      previousRoutinesLengthRef.current !== allRoutines.length;
+
     // 현재 값 저장
     previousDateRef.current = selectedDateString;
     previousRoutinesLengthRef.current = allRoutines.length;
-    
+
     // 애니메이션 값 초기화 및 재시작
     if (dateChanged || routinesLengthChanged) {
       // 애니메이션 리셋
       heightAnim.setValue(0);
-      
+
       // 루틴이 있는 경우에만 애니메이션 실행
       if (allRoutines.length > 0) {
         Animated.timing(heightAnim, {
@@ -67,7 +68,7 @@ const RoutineTimeline = ({
   }, [allRoutines, selectedDateString, heightAnim]);
 
   // 전체 타임라인 컨테이너의 레이아웃을 측정하여 실제 높이 설정
-  const onTimelineLayout = (event) => {
+  const onTimelineLayout = event => {
     const {height} = event.nativeEvent.layout;
     setTimelineHeight(height);
   };
@@ -81,11 +82,11 @@ const RoutineTimeline = ({
   return (
     <TimelineContainer onLayout={onTimelineLayout}>
       {/* 루틴 데이터가 있을 때만 타임라인 세로줄 렌더링 */}
-      {allRoutines.length > 0 && (
+      {/* {allRoutines.length > 0 && (
         <AnimatedGradient
           colors={[pointColor.pointPrimaryDark, pointColor.primary20]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
+          start={{x: 0.5, y: 0}}
+          end={{x: 0.5, y: 1}}
           style={{
             position: 'absolute',
             left: 22,
@@ -96,16 +97,14 @@ const RoutineTimeline = ({
             zIndex: 0,
           }}
         />
-      )}
+      )} */}
 
       {/* 루틴 데이터가 없을 경우 빈 상태 UI 표시 */}
       {allRoutines.length === 0 ? (
         <EmptyContainer>
           <EmptyState
             image={
-              <Images.emptyRoutine
-                style={{ marginBottom: 32, marginTop: 80 }}
-              />
+              <Images.emptyRoutine style={{marginBottom: 32, marginTop: 80}} />
             }
             title={emptyTitle}
             description={emptyDescription}
@@ -120,7 +119,9 @@ const RoutineTimeline = ({
             routine={routine}
             index={index}
             allLength={allRoutines.length}
-            checkedItems={routineMode === 'care' ? routine.checkedItems || {} : checkedItems} // care 모드일 때와 아닐 때 checkedItems 전달 방식 구분
+            checkedItems={
+              routineMode === 'care' ? routine.checkedItems || {} : checkedItems
+            } // care 모드일 때와 아닐 때 checkedItems 전달 방식 구분
             selectedDateString={selectedDateString}
             toggleTimeCheck={toggleTimeCheck}
             toggleCheck={toggleCheck}

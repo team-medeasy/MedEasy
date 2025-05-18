@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import { ActivityIndicator, TouchableOpacity } from 'react-native';
-import { getContraindicationInfo } from '../../api/dur';
-import { themes } from '../../styles';
+import {ActivityIndicator, TouchableOpacity} from 'react-native';
+import {getContraindicationInfo} from '../../api/dur';
+import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { useFontSize } from '../../../assets/fonts/FontSizeContext';
-import { RoutineIcons, OtherIcons } from '../../../assets/icons';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+import {RoutineIcons, OtherIcons} from '../../../assets/icons';
 
-const MedicineWarning = ({ item }) => {
-  const { fontSizeMode } = useFontSize();
+const MedicineWarning = ({item}) => {
+  const {fontSizeMode} = useFontSize();
   const [warningData, setWarningData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,7 +38,7 @@ const MedicineWarning = ({ item }) => {
             setWarningData({
               combination_contraindications: [],
               elderly_precaution: '',
-              pregnancy_contraindication: ''
+              pregnancy_contraindication: '',
             });
           } else {
             throw new Error(result.error);
@@ -70,22 +70,25 @@ const MedicineWarning = ({ item }) => {
             warningData.combination_contraindications
               .map(item => `- ${item.item_name}`)
               .join('\n')
-          : '현재 확인된 주의사항이 없어요.'
+          : '현재 확인된 주의사항이 없어요.',
     },
     {
       key: 'elderly',
       title: '노인주의',
       hasWarning: !!warningData?.elderly_precaution,
       isBlue: false,
-      description: warningData?.elderly_precaution || '현재 확인된 주의사항이 없어요.'
+      description:
+        warningData?.elderly_precaution || '현재 확인된 주의사항이 없어요.',
     },
     {
       key: 'pregnancy',
       title: '임부금기',
       hasWarning: !!warningData?.pregnancy_contraindication,
       isBlue: false,
-      description: warningData?.pregnancy_contraindication || '현재 확인된 주의사항이 없어요.'
-    }
+      description:
+        warningData?.pregnancy_contraindication ||
+        '현재 확인된 주의사항이 없어요.',
+    },
   ];
 
   return (
@@ -94,12 +97,13 @@ const MedicineWarning = ({ item }) => {
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => setExpanded(!expanded)}
-          style={{ width: '100%' }}
-        >
+          style={{width: '100%'}}>
           <ToggleButton>
             <ToggleTextContainer>
               <WarningIcon>🚫</WarningIcon>
-              <ToggleText fontSizeMode={fontSizeMode}>약품 금기 정보 확인하기</ToggleText>
+              <ToggleText fontSizeMode={fontSizeMode}>
+                약품 금기 정보 확인하기
+              </ToggleText>
             </ToggleTextContainer>
             {expanded ? (
               <OtherIcons.chevronDown
@@ -107,14 +111,14 @@ const MedicineWarning = ({ item }) => {
                 height={17}
                 style={{
                   color: themes.light.pointColor.Primary,
-                  transform: [{ rotate: '180deg' }]
+                  transform: [{rotate: '180deg'}],
                 }}
               />
             ) : (
               <OtherIcons.chevronDown
                 width={17}
                 height={17}
-                style={{ color: themes.light.pointColor.Primary }}
+                style={{color: themes.light.pointColor.Primary}}
               />
             )}
           </ToggleButton>
@@ -125,43 +129,56 @@ const MedicineWarning = ({ item }) => {
         <>
           {loading ? (
             <LoadingContainer>
-              <ActivityIndicator size="small" color={themes.light.textColor.Primary50} />
-              <LoadingText fontSizeMode={fontSizeMode}>안전 정보를 불러오는 중...</LoadingText>
+              <ActivityIndicator
+                size="small"
+                color={themes.light.textColor.Primary50}
+              />
+              <LoadingText fontSizeMode={fontSizeMode}>
+                안전 정보를 불러오는 중...
+              </LoadingText>
             </LoadingContainer>
           ) : error ? (
             <ErrorContainer>
               <ErrorText fontSizeMode={fontSizeMode}>{error}</ErrorText>
             </ErrorContainer>
           ) : (
-            sections.map(({ key, title, hasWarning, isBlue, description }, index) => {
-              const iconColor = hasWarning
-                ? isBlue
-                  ? blueColor
-                  : redColor
-                : blueColor;
+            sections.map(
+              ({key, title, hasWarning, isBlue, description}, index) => {
+                const iconColor = hasWarning
+                  ? isBlue
+                    ? blueColor
+                    : redColor
+                  : blueColor;
 
-              const backgroundColor = hasWarning
-                ? isBlue
-                  ? themes.light.pointColor.Primary10
-                  : themes.light.pointColor.Secondary20
-                : themes.light.pointColor.Primary10;
+                const backgroundColor = hasWarning
+                  ? isBlue
+                    ? themes.light.pointColor.Primary10
+                    : themes.light.pointColor.Secondary20
+                  : themes.light.pointColor.Primary10;
 
-              return (
-                <CautionItem key={key} isLastItem={index === sections.length - 1}>
-                  <SquareIconWrapper backgroundColor={backgroundColor}>
-                    <RoutineIcons.medicine
-                      width={18}
-                      height={18}
-                      color={iconColor}
-                    />
-                  </SquareIconWrapper>
-                  <TextContainer>
-                    <CautionTitle fontSizeMode={fontSizeMode}>{title}</CautionTitle>
-                    <CautionDescription fontSizeMode={fontSizeMode}>{description}</CautionDescription>
-                  </TextContainer>
-                </CautionItem>
-              );
-            })
+                return (
+                  <CautionItem
+                    key={key}
+                    isLastItem={index === sections.length - 1}>
+                    <SquareIconWrapper backgroundColor={backgroundColor}>
+                      <RoutineIcons.medicine
+                        width={18}
+                        height={18}
+                        color={iconColor}
+                      />
+                    </SquareIconWrapper>
+                    <TextContainer>
+                      <CautionTitle fontSizeMode={fontSizeMode}>
+                        {title}
+                      </CautionTitle>
+                      <CautionDescription fontSizeMode={fontSizeMode}>
+                        {description}
+                      </CautionDescription>
+                    </TextContainer>
+                  </CautionItem>
+                );
+              },
+            )
           )}
         </>
       )}
@@ -173,55 +190,52 @@ export default MedicineWarning;
 
 // 아래는 기존 스타일 정의 - 추가된 스타일
 const WarningContainer = styled.View`
-  padding: 20px;
-  gap: 12px;
+  padding: 32px 20px 8px 20px;
 `;
 
 const SectionTitle = styled.Text`
   color: ${themes.light.textColor.textPrimary};
   font-family: 'Pretendard-Bold';
-  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
 `;
 
 const CautionItem = styled.View`
   flex-direction: row;
-  gap: 12px;
-  padding-top: 10px;
-  padding-bottom: 15px;
-  border-bottom-width: ${props => (props.isLastItem ? '0' : '1px')};
-  border-bottom-color: ${themes.light.borderColor.borderSecondary};
+  gap: 16px;
+  padding: 12px 0;
 `;
 
 const SquareIconWrapper = styled.View`
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  background-color: ${({ backgroundColor }) => backgroundColor || '#E6F2FF'};
+  background-color: ${({backgroundColor}) => backgroundColor || '#E6F2FF'};
   align-items: center;
   justify-content: center;
 `;
 
 const TextContainer = styled.View`
   flex: 1;
+  padding: 4px 0;
+  gap: 6px;
 `;
 
 const CautionTitle = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode] + 2};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode] + 2};
   color: ${themes.light.textColor.textPrimary};
-  margin-bottom: 4px;
 `;
 
 const CautionDescription = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary70};
   line-height: 22px;
 `;
 
 const LoadingText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.Primary50};
   margin-top: 10px;
   text-align: center;
@@ -229,7 +243,7 @@ const LoadingText = styled.Text`
 
 const ErrorText = styled.Text`
   font-family: 'Pretendard-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.pointColor.Secondary};
   margin-top: 10px;
   text-align: center;
@@ -260,7 +274,7 @@ const WarningIcon = styled.Text`
 
 const ToggleText = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   color: ${themes.light.pointColor.Primary};
 `;
 

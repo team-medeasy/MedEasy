@@ -30,7 +30,7 @@ const Routine = ({route}) => {
   const flatListRef = useRef(null);
   const navigation = useNavigation();
   const paramDate = route.params?.selectedDate; // 스크롤할 날짜 파라미터
-  const { fontSizeMode } = useFontSize();
+  const {fontSizeMode} = useFontSize();
 
   const insets = useSafeAreaInsets(); // SafeArea 인셋 가져오기
 
@@ -261,8 +261,7 @@ const Routine = ({route}) => {
       routineMap[dateKey] = {};
 
       day.user_schedule_dtos.forEach(schedule => {
-        const timeType =
-          getTimeTypeFromScheduleName(schedule.name);
+        const timeType = getTimeTypeFromScheduleName(schedule.name);
 
         if (!routineMap[dateKey][timeType]) {
           routineMap[dateKey][timeType] = {};
@@ -292,8 +291,7 @@ const Routine = ({route}) => {
       // 각 스케줄 처리
       dayData.user_schedule_dtos.forEach(schedule => {
         // 스케줄 이름으로 시간대 결정, 없으면 시간으로 판단
-        const timeType =
-          getTimeTypeFromScheduleName(schedule.name);
+        const timeType = getTimeTypeFromScheduleName(schedule.name);
 
         // 해당 스케줄의 약물 정보 처리
         if (schedule.routine_dtos && schedule.routine_dtos.length > 0) {
@@ -415,15 +413,17 @@ const Routine = ({route}) => {
           }
           onPress={() => setSelectedDate(dayInfo)}>
           <DayText fontSizeMode={fontSizeMode}>{dayInfo.day}</DayText>
-          <DateText isToday={dayInfo.isToday} fontSizeMode={fontSizeMode}>{dayInfo.date}</DateText>
+          <DateText isToday={dayInfo.isToday} fontSizeMode={fontSizeMode}>
+            {dayInfo.date}
+          </DateText>
         </DayBox>
       ))}
     </WeekContainer>
   );
 
   return (
-    <Container style={{ paddingTop: insets.top }}>
-      <Header>
+    <Container>
+      <Header style={{paddingTop: insets.top}}>
         <HeaderText fontSizeMode={fontSizeMode}>루틴</HeaderText>
         <ReturnButton
           onPress={() => {
@@ -445,8 +445,8 @@ const Routine = ({route}) => {
             }
           }}>
           <OtherIcons.return
-            width={11}
-            height={11}
+            width={14}
+            height={14}
             style={{color: themes.light.pointColor.Primary10}}
           />
           <ButtonText fontSizeMode={fontSizeMode}>돌아가기</ButtonText>
@@ -490,10 +490,12 @@ const Routine = ({route}) => {
             <TodayHeader today={today} selectedDate={selectedDate} />
             <MedicineListButton
               onPress={() => navigation.navigate('MedicineList')}>
-              <MedicineListText fontSizeMode={fontSizeMode}>전체 목록</MedicineListText>
+              <MedicineListText fontSizeMode={fontSizeMode}>
+                전체 목록
+              </MedicineListText>
               <HeaderIcons.chevron
-                width={11}
-                height={11}
+                width={14}
+                height={14}
                 style={{
                   transform: [{rotate: '180deg'}],
                   color: themes.light.textColor.Primary50,
@@ -523,13 +525,18 @@ const Routine = ({route}) => {
   );
 };
 
-const Container = styled.View`
+const Container = styled(LinearGradient).attrs(() => ({
+  colors: [
+    themes.light.pointColor.Primary,
+    themes.light.pointColor.PrimaryDark,
+  ],
+  start: {x: 0, y: 0},
+  end: {x: 0, y: 0.3},
+}))`
   flex: 1;
-  background-color: ${themes.light.pointColor.Primary};
 `;
 
 const Header = styled.View`
-  background-color: ${themes.light.pointColor.Primary};
   flex-direction: row;
   padding: 0px 20px;
   padding-top: 10px;
@@ -537,7 +544,7 @@ const Header = styled.View`
 `;
 
 const HeaderText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.title[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
   color: ${themes.light.textColor.buttonText};
   padding-left: 10px;
@@ -545,17 +552,17 @@ const HeaderText = styled.Text`
 
 const ReturnButton = styled.TouchableOpacity`
   flex-direction: row;
-  padding: 4px 10px;
+  padding: 6px 10px;
   justify-content: center;
   align-items: center;
   gap: 7px;
-  border: 1px solid ${themes.light.pointColor.Primary20};
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
 `;
 
 const ButtonText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]};
-  font-family: 'Pretendart-Medium';
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
   color: ${themes.light.pointColor.Primary10};
 `;
 
@@ -568,14 +575,12 @@ const MedicineListButton = styled(ReturnButton)`
 
 const MedicineListText = styled(ButtonText)`
   color: ${themes.light.textColor.Primary50};
-  font-family: 'Pretendart-Medium';
-  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
 `;
 
 // 페이징을 위한 컨테이너
-const DayContainerWrapper = styled.View`
-  background-color: ${themes.light.pointColor.Primary};
-`;
+const DayContainerWrapper = styled.View``;
 
 // 주차 단위 컨테이너
 const WeekContainer = styled.View`
@@ -596,13 +601,13 @@ const DayBox = styled.TouchableOpacity`
 `;
 
 const DayText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.buttonText};
 `;
 
 const DateText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-SemiBold';
   color: ${themes.light.textColor.buttonText};
 `;
@@ -625,7 +630,7 @@ const TodayContainer = styled.View`
   align-items: center;
   justify-content: space-between;
   padding: 20px 30px;
-  padding: ${({ fontSizeMode }) =>
+  padding: ${({fontSizeMode}) =>
     fontSizeMode === 'large'
       ? '20px 10px'
       : fontSizeMode === 'medium'
