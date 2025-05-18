@@ -445,8 +445,8 @@ const Routine = ({route}) => {
             }
           }}>
           <OtherIcons.return
-            width={11}
-            height={11}
+            width={14}
+            height={14}
             style={{color: themes.light.pointColor.Primary10}}
           />
           <ButtonText fontSizeMode={fontSizeMode}>돌아가기</ButtonText>
@@ -494,8 +494,8 @@ const Routine = ({route}) => {
                 전체 목록
               </MedicineListText>
               <HeaderIcons.chevron
-                width={11}
-                height={11}
+                width={14}
+                height={14}
                 style={{
                   transform: [{rotate: '180deg'}],
                   color: themes.light.textColor.Primary50,
@@ -547,18 +547,18 @@ const HeaderText = styled.Text`
 
 const ReturnButton = styled.TouchableOpacity`
   flex-direction: row;
-  padding: 4px 10px;
+  padding: 6px 10px;
   justify-content: center;
   align-items: center;
   gap: 7px;
-  border: 1px solid ${themes.light.pointColor.Primary20};
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   border-radius: 20px;
 `;
 
 const ButtonText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
-  font-family: 'Pretendart-Medium';
-  color: ${themes.light.pointColor.Primary10};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
+  color: ${themes.light.pointColor.Primary20};
 `;
 
 const MedicineListButton = styled(ReturnButton)`
@@ -570,8 +570,8 @@ const MedicineListButton = styled(ReturnButton)`
 
 const MedicineListText = styled(ButtonText)`
   color: ${themes.light.textColor.Primary50};
-  font-family: 'Pretendart-Medium';
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
+  font-family: 'Pretendard-SemiBold';
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
 `;
 
 // 페이징을 위한 컨테이너
