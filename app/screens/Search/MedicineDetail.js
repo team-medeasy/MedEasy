@@ -11,6 +11,7 @@ import {
   Easing,
   Animated,
   StyleSheet,
+  Platform,
 } from 'react-native';
 import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {themes} from '../../styles';
@@ -564,13 +565,6 @@ const VoiceContainer = styled.View`
     `}
 `;
 
-const BubbleComponent = styled.View`
-  position: absolute;
-  justify-content: center;
-  align-items: center;
-  right: 0px;
-  bottom: 30px;
-`;
 
 const Bubble = styled.View`
   background-color: ${themes.light.boxColor.buttonPrimary};
@@ -589,6 +583,7 @@ const BubbleText = styled.Text`
 const VoiceButton = styled.TouchableOpacity`
   position: absolute;
   right: 0px;
+  ${Platform.OS === 'android' && `bottom: 0px;`}
   background-color: ${themes.light.bgColor.bgPrimary};
   width: 50px;
   height: 50px;
@@ -611,7 +606,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     right: 0,
-    bottom: 30,
+    bottom: Platform.OS === 'ios' ? 30 : 60,
   },
 });
 
