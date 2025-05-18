@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import FontSizes from '../../assets/fonts/fontSizes';
-import { pointColor, themes } from '../styles';
-import { RoutineIcons } from '../../assets/icons';
-import { useFontSize } from '../../assets/fonts/FontSizeContext';
+import {pointColor, themes} from '../styles';
+import {RoutineIcons} from '../../assets/icons';
+import {useFontSize} from '../../assets/fonts/FontSizeContext';
 import LinearGradient from 'react-native-linear-gradient';
 
 const RoutineCard = ({
@@ -20,9 +20,9 @@ const RoutineCard = ({
   routineMode = 'default', // 루틴 모드 prop
 }) => {
   const navigation = useNavigation();
-  const { fontSizeMode } = useFontSize();
+  const {fontSizeMode} = useFontSize();
 
-  const handleMedicinePress = (medicineId) => {
+  const handleMedicinePress = medicineId => {
     if (routineMode === 'care') {
       // care 모드일 때 다른 페이지로 네비게이션
       navigation.navigate('MedicineDetail', {
@@ -40,6 +40,7 @@ const RoutineCard = ({
     <RoutineBoxContainer isInModal={isInModal}>
       {!isInModal && (
         <>
+          {/*
           <TimelinePoint
             type={routine.type}
             isFirst={index === 0}
@@ -50,14 +51,13 @@ const RoutineCard = ({
             isFirst={index === 0}
             isLast={index === allLength - 1}
           />
-          {/* {allLength > 1 && index !== allLength - 1 && 
+          {allLength > 1 && index !== allLength - 1 && 
           <TimelineLine 
             colors={[pointColor.primary20, pointColor.pointPrimaryDark]} // 밝은색 → 진한색
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}/>} */}
         </>
       )}
-
 
       <RoutineContainer isInModal={isInModal} backgroundColor={backgroundColor}>
         {routine.type === 'medicine' ? (
@@ -66,7 +66,7 @@ const RoutineCard = ({
               <RoutineIcons.medicine
                 width={22}
                 height={22}
-                style={{ color: themes.light.pointColor.Primary }}
+                style={{color: themes.light.pointColor.Primary}}
               />
             </IconContainer>
             <TextContainer>
@@ -78,18 +78,18 @@ const RoutineCard = ({
                 medicine =>
                   checkedItems[
                     `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
-                  ]
+                  ],
               ) ? (
                 <RoutineIcons.checkOn
                   width={26}
                   height={26}
-                  style={{ color: themes.light.pointColor.Primary }}
+                  style={{color: themes.light.pointColor.Primary}}
                 />
               ) : (
                 <RoutineIcons.checkOff
                   width={26}
                   height={26}
-                  style={{ color: themes.light.boxColor.inputSecondary }}
+                  style={{color: themes.light.boxColor.inputSecondary}}
                 />
               )}
             </CheckBox>
@@ -108,8 +108,7 @@ const RoutineCard = ({
                         `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                       ]
                     }
-                    onPress={() => handleMedicinePress(medicine.medicine_id)}
-                  >
+                    onPress={() => handleMedicinePress(medicine.medicine_id)}>
                     {medicine.nickname}
                   </MedicineText>
                   <MedicineCount
@@ -118,22 +117,20 @@ const RoutineCard = ({
                       checkedItems[
                         `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                       ]
-                    }
-                  >
+                    }>
                     {`${medicine.dose}개`}
                   </MedicineCount>
                   <CheckBox
                     onPress={() =>
                       toggleCheck(medicine.medicine_id, routine.timeKey)
-                    }
-                  >
+                    }>
                     {checkedItems[
                       `${selectedDateString}-${routine.timeKey}-${medicine.medicine_id}`
                     ] ? (
                       <RoutineIcons.checkOn
                         width={26}
                         height={26}
-                        style={{ color: themes.light.pointColor.Primary }}
+                        style={{color: themes.light.pointColor.Primary}}
                       />
                     ) : (
                       <RoutineIcons.checkOff
@@ -194,7 +191,7 @@ const TimelineLine = styled(LinearGradient)`
 `;
 
 const RoutineContainer = styled.View`
-  background-color: ${({ isInModal, backgroundColor }) =>
+  background-color: ${({isInModal, backgroundColor}) =>
     backgroundColor
       ? backgroundColor
       : isInModal
@@ -202,7 +199,7 @@ const RoutineContainer = styled.View`
       : themes.light.bgColor.bgPrimary};
   padding: 0 20px;
   border-radius: 10px;
-  ${({ isInModal }) =>
+  /* ${({isInModal}) =>
     isInModal
       ? `
     margin-left: 0;
@@ -211,7 +208,7 @@ const RoutineContainer = styled.View`
       : `
     margin-left: 24px;
     margin-right: 20px;
-  `};
+  `}; */
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
 `;
 
@@ -232,19 +229,22 @@ const TextContainer = styled.View`
 `;
 
 const TypeText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-ExtraBold';
 `;
 
 const TimeText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   color: ${themes.light.textColor.Primary50};
 `;
 
 const Routines = styled.View``;
 
-const RoutineList = styled.View``;
+const RoutineList = styled.View`
+  padding: 16px 0;
+  gap: 6px;
+`;
 
 const MedicineItem = styled.View`
   flex-direction: row;
@@ -253,14 +253,15 @@ const MedicineItem = styled.View`
 `;
 
 const MedicineText = styled.Text`
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
-  padding: 20px;
   width: 80%;
+  padding: 8px;
   overflow: hidden;
-  text-decoration-line: ${({ isChecked }) =>
+  line-height: 20px;
+  text-decoration-line: ${({isChecked}) =>
     isChecked ? 'line-through' : 'none'};
-  color: ${({ isChecked }) =>
+  color: ${({isChecked}) =>
     isChecked
       ? themes.light.textColor.Primary50
       : themes.light.textColor.textPrimary};
@@ -268,12 +269,12 @@ const MedicineText = styled.Text`
 
 const MedicineCount = styled.Text`
   position: absolute;
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
   right: 45px;
-  text-decoration-line: ${({ isChecked }) =>
+  text-decoration-line: ${({isChecked}) =>
     isChecked ? 'line-through' : 'none'};
-  color: ${({ isChecked }) =>
+  color: ${({isChecked}) =>
     isChecked
       ? themes.light.textColor.Primary50
       : themes.light.textColor.textPrimary};
