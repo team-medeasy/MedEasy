@@ -4,6 +4,7 @@ import Voice from '@react-native-voice/voice';
 import Sound from 'react-native-sound';
 import styled from 'styled-components/native';
 import LinearGradient from 'react-native-linear-gradient';
+import { PermissionsAndroid } from 'react-native';
 
 import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -14,7 +15,8 @@ import MessageBubble from '../../components/Chat/MessageBubble';
 import MessageInput from '../../components/Chat/MessageInput';
 import { OtherIcons } from '../../../assets/icons';
 
-import { cleanupTempAudioFiles, getRoutineVoice, sendVoiceMessage } from '../../api/voiceChat';
+import WebSocketManager from '../../api/WebSocketManager';
+import { cleanupTempAudioFiles, getRoutineVoice } from '../../api/voiceChat';
 import { getUser } from '../../api/user';
 
 const recognizerOptions = Platform.OS === 'android' ? {
@@ -32,6 +34,7 @@ export default function VoiceChat() {
   const audioPlayer = useRef(null);
   const debounceTimer = useRef(null);
   const flatListRef = useRef(null);
+  const wsManager = useRef(null);
 
   const [status, setStatus] = useState('idle');
   const [hasPermission, setHasPermission] = useState(false);
@@ -44,6 +47,23 @@ export default function VoiceChat() {
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [typingMessageId, setTypingMessageId] = useState(null);
+
+  // 웹소켓 매니저 초기화
+  useEffect(() => {
+    wsManager.current = WebSocketManager.getInstance();
+    
+    // 컴포넌트 마운트 시 연결
+    wsManager.current.connect().catch(err => {
+      console.error('[VoiceChat] WebSocket 연결 실패:', err);
+    });
+    
+    // 컴포넌트 언마운트 시 연결 해제
+    return () => {
+      if (wsManager.current) {
+        wsManager.current.disconnect();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -188,8 +208,15 @@ export default function VoiceChat() {
   async function processRecognizedText(text, typingMsgId) {
     try {
       await cleanupTempAudioFiles();
-      const filePath = await sendVoiceMessage(text);
-      playBotResponse(filePath, typingMsgId);
+      
+      // WebSocketManager를 통해 메시지 전송
+      const response = await wsManager.current.sendMessage(text);
+      
+      // 응답에서 텍스트와 파일 경로 추출
+      const { text: responseText, filePath } = response;
+      
+      // 응답 음성 재생 및 메시지 표시
+      playBotResponse(filePath, typingMsgId, responseText);
     } catch (error) {
       console.error('[VoiceChat] API error:', error);
       // 타이핑 메시지 제거
@@ -201,7 +228,7 @@ export default function VoiceChat() {
     }
   }
 
-  function playBotResponse(path, typingMsgId) {
+  function playBotResponse(path, typingMsgId, responseText) {
     console.log('[VOICE] playBotResponse:', path);
     Voice.cancel();
 
@@ -227,7 +254,7 @@ export default function VoiceChat() {
         setMessages(prevMessages => 
           prevMessages.map(msg => 
             msg.id === typingMsgId 
-              ? {...msg, text: '봇 응답 메시지입니다', isTyping: false} 
+              ? {...msg, text: responseText, isTyping: false} 
               : msg
           )
         );
@@ -297,17 +324,41 @@ export default function VoiceChat() {
       {id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true},
     ]);
 
-    setTimeout(() => {
-      // 타이핑 메시지를 실제 메시지로 교체
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === typingMsgId 
-            ? {...msg, text: '네, 해당 내용에 대해 알려드릴게요!', isTyping: false} 
-            : msg
-        )
-      );
-      setIsTyping(false);
-    }, 1000);
+    // WebSocketManager를 통해 메시지 전송
+    wsManager.current.sendMessage(userMessage)
+      .then(({ text: responseText, filePath }) => {
+        // 타이핑 메시지를 실제 메시지로 교체
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === typingMsgId 
+              ? {...msg, text: responseText, isTyping: false} 
+              : msg
+          )
+        );
+        setIsTyping(false);
+        
+        // 텍스트 모드에서도 음성 재생 (선택적)
+        audioPlayer.current?.release();
+        audioPlayer.current = new Sound(filePath, '', error => {
+          if (error) {
+            console.error('[VoiceChat] Sound load error:', error);
+            return;
+          }
+          audioPlayer.current.play();
+        });
+      })
+      .catch(error => {
+        console.error('[VoiceChat] API error:', error);
+        // 오류 시 타이핑 메시지를 오류 메시지로 교체
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === typingMsgId 
+              ? {...msg, text: '응답을 받아오는 데 실패했습니다.', isTyping: false} 
+              : msg
+          )
+        );
+        setIsTyping(false);
+      });
   };
 
   // 채팅 모드 전환 (텍스트 <-> 음성)
@@ -344,71 +395,129 @@ export default function VoiceChat() {
   };
 
   const handleBotOptionPress = async (option) => {
-  // 이전에 재생 중이던 음성 중지
-  if (audioPlayer.current) {
-    audioPlayer.current.stop(() => {
-      audioPlayer.current.release();
-      audioPlayer.current = null;
-    });
-  }
+    // 이전에 재생 중이던 음성 중지
+    if (audioPlayer.current) {
+      audioPlayer.current.stop(() => {
+        audioPlayer.current.release();
+        audioPlayer.current = null;
+      });
+    }
 
-  if (option === '오늘 복용 일정 확인') {
-    try {
-      await cleanupTempAudioFiles(); 
-      const { text, filePath, action } = await getRoutineVoice();
+    // 선택한 옵션을 사용자 메시지로 먼저 표시
+    addMessage(option, 'user');
 
-      console.log('[DEBUG] 복약 일정 텍스트:', text);
-      console.log('[DEBUG] 음성 파일 경로:', filePath);
-      console.log('[DEBUG] 프론트엔드 액션:', action);
+    if (option === '오늘 복용 일정 확인') {
+      try {
+        await cleanupTempAudioFiles(); 
+        const { text, filePath, action } = await getRoutineVoice();
 
-      const currentTime = new Date();
-      const formattedTime = `${currentTime.getHours()}:${String(currentTime.getMinutes()).padStart(2, '0')}`;
+        console.log('[DEBUG] 복약 일정 텍스트:', text);
+        console.log('[DEBUG] 음성 파일 경로:', filePath);
+        console.log('[DEBUG] 프론트엔드 액션:', action);
 
-      // 메시지 추가
-      const typingMsgId = Date.now();
-      setTypingMessageId(typingMsgId);
-      setIsTyping(true);
-      setMessages(prev => [
-        ...prev,
-        { id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true },
-      ]);
+        const currentTime = new Date();
+        const hours = currentTime.getHours();
+        const minutes = String(currentTime.getMinutes()).padStart(2, '0'); 
+        const period = hours >= 12 ? '오후' : '오전';
+        const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+        const formattedTime = `${period} ${formattedHours}:${minutes}`;
 
-      // 새로운 음성 재생
-      audioPlayer.current = new Sound(filePath, '', (error) => {
-        if (error) {
-          console.error('사운드 로딩 실패:', error);
-          return;
-        }
+        // 메시지 추가
+        const typingMsgId = Date.now();
+        setTypingMessageId(typingMsgId);
+        setIsTyping(true);
+        setMessages(prev => [
+          ...prev,
+          { id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true },
+        ]);
 
-        audioPlayer.current.play((success) => {
-          if (!success) {
-            console.error('재생 실패');
+        // 새로운 음성 재생
+        audioPlayer.current = new Sound(filePath, '', (error) => {
+          if (error) {
+            console.error('사운드 로딩 실패:', error);
+            return;
           }
 
-          // 재생 끝나면 해제
-          audioPlayer.current.release();
-          audioPlayer.current = null;
-        });
-      });
+          audioPlayer.current.play((success) => {
+            if (!success) {
+              console.error('재생 실패');
+            }
 
-      // 메시지 업데이트
-      setTimeout(() => {
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === typingMsgId ? { ...msg, text, isTyping: false } : msg
-          )
-        );
-        setIsTyping(false);
-      }, 1000);
-    } catch (err) {
-      console.error('[ERROR] 복약 일정 확인 실패:', err);
+            // 재생 끝나면 해제
+            audioPlayer.current.release();
+            audioPlayer.current = null;
+          });
+        });
+
+        // 메시지 업데이트
+        setTimeout(() => {
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === typingMsgId ? { ...msg, text, isTyping: false } : msg
+            )
+          );
+          setIsTyping(false);
+        }, 1000);
+      } catch (err) {
+        console.error('[ERROR] 복약 일정 확인 실패:', err);
+      }
+    } else {
+      // 다른 옵션들에 대한 처리
+      try {
+        // WebSocketManager를 통해 메시지 전송
+        const { text, filePath } = await wsManager.current.sendMessage(option);
+        
+        const currentTime = new Date();
+        const hours = currentTime.getHours();
+        const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+        const period = hours >= 12 ? '오후' : '오전';
+        const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+        const formattedTime = `${period} ${formattedHours}:${minutes}`;
+        
+        // 타이핑 메시지 추가
+        const typingMsgId = Date.now();
+        setTypingMessageId(typingMsgId);
+        setIsTyping(true);
+        setMessages(prev => [
+          ...prev,
+          { id: typingMsgId, type: 'bot', text: '...', time: formattedTime, isTyping: true },
+        ]);
+        
+        // 음성 재생
+        audioPlayer.current = new Sound(filePath, '', (error) => {
+          if (error) {
+            console.error('사운드 로딩 실패:', error);
+            return;
+          }
+          
+          audioPlayer.current.play((success) => {
+            if (!success) {
+              console.error('재생 실패');
+            }
+            
+            audioPlayer.current.release();
+            audioPlayer.current = null;
+          });
+        });
+        
+        // 메시지 업데이트
+        setTimeout(() => {
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === typingMsgId ? { ...msg, text, isTyping: false } : msg
+            )
+          );
+          setIsTyping(false);
+        }, 1000);
+      } catch (err) {
+        console.error(`[ERROR] ${option} 처리 실패:`, err);
+      }
     }
-  }
-};
+  };
 
   const renderMessage = ({ item }) => {
-  return <MessageBubble item={item} onOptionPress={handleBotOptionPress} />;
-};
+    return <MessageBubble item={item} onOptionPress={handleBotOptionPress} />;
+  };
 
   return (
     <Container>
