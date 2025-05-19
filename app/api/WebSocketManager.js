@@ -3,7 +3,7 @@ import { getAccessToken } from './storage';
 
 class WebSocketManager {
   static instance = null;
-
+  
   constructor() {
     this.socket = null;
     this.isConnected = false;
@@ -137,8 +137,6 @@ class WebSocketManager {
         // 콜백 저장 (단일)
         this.pendingCallback = async (response) => {
           try {
-            console.log('[WebSocketManager] 원본 응답:', JSON.stringify(response, null, 2));
-
             const {
               result_code,
               result_message,
@@ -146,7 +144,6 @@ class WebSocketManager {
               audio_base64,
               audio_format = 'mp3',
               client_action,
-              data: responseData, // 서버 응답의 data 필드
             } = response;
 
             if (result_code !== 200) {
@@ -154,21 +151,12 @@ class WebSocketManager {
               return;
             }
 
-            // 디버깅을 위한 로그 추가
-            console.log('[WebSocketManager] 파싱된 응답:', {
-              text: text_message,
-              action: client_action,
-              hasData: !!responseData,
-              dataType: responseData ? (Array.isArray(responseData) ? 'array' : typeof responseData) : null
-            });
-
             // 음성 데이터가 없는 경우 처리
             if (!audio_base64) {
               resolve({
                 text: text_message,
                 filePath: null,
                 action: client_action,
-                data: responseData, // 데이터 필드 추가
               });
               return;
             }
@@ -183,7 +171,6 @@ class WebSocketManager {
               text: text_message,
               filePath,
               action: client_action,
-              data: responseData, // 데이터 필드 추가
             });
           } catch (err) {
             console.error('[WebSocketManager] 응답 처리 중 오류:', err);
