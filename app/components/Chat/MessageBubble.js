@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {themes} from '../../styles';
-import {ChatIcons} from '../../../assets/icons';
+import { themes } from '../../styles';
+import { ChatIcons } from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import {useFontSize} from '../../../assets/fonts/FontSizeContext';
-import {View, Animated} from 'react-native';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
+import { View, Animated } from 'react-native';
 
-const {robot: RobotIcon} = ChatIcons;
+const { robot: RobotIcon } = ChatIcons;
 
 // 타이핑 애니메이션을 위한 컴포넌트 - 위아래로 움직이는 형태로 수정
 const TypingAnimation = () => {
@@ -40,25 +40,45 @@ const TypingAnimation = () => {
 
   return (
     <TypingContainer>
-      <AnimatedDot style={{ transform: [{ translateY: dot1.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -5]
-      }) }] }} />
-      <AnimatedDot style={{ transform: [{ translateY: dot2.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -5]
-      }) }] }} />
-      <AnimatedDot style={{ transform: [{ translateY: dot3.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -5]
-      }) }] }} />
+      <AnimatedDot style={{
+        transform: [{
+          translateY: dot1.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, -5]
+          })
+        }]
+      }} />
+      <AnimatedDot style={{
+        transform: [{
+          translateY: dot2.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, -5]
+          })
+        }]
+      }} />
+      <AnimatedDot style={{
+        transform: [{
+          translateY: dot3.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, -5]
+          })
+        }]
+      }} />
     </TypingContainer>
   );
 };
 
-const MessageBubble = ({item, onOptionPress}) => {
+const MessageBubble = ({ item, onOptionPress }) => {
   const { fontSizeMode } = useFontSize();
-  
+
+  console.log('MessageBubble rendering:', {
+    id: item.id,
+    type: item.type,
+    isInitialMessage: item.isInitialMessage,
+    hasOptions: item.options && item.options.length > 0,
+    text: item.text?.substring(0, 20) // 텍스트 앞부분만 표시
+  });
+
   if (item.type === 'bot') {
     return (
       <BotMessageContainer>
@@ -71,7 +91,7 @@ const MessageBubble = ({item, onOptionPress}) => {
         </RobotIconContainer>
 
         {/* 초기 메시지이거나 명시적으로 옵션이 있는 경우에만 옵션 표시 */}
-        {(item.isInitialMessage && item.options) ? (
+        {(item.options && item.isInitialMessage) ? (
           <View style={{ flex: 1 }}>
             <BotMessageBubble>
               <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
@@ -141,7 +161,7 @@ const BotMessageBubble = styled.View`
 `;
 
 const BotText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-Medium';
@@ -165,7 +185,7 @@ const OptionBubble = styled.TouchableOpacity`
 
 const OptionText = styled.Text`
   color: ${themes.light.textColor.buttonText};
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   font-family: 'Pretendard-Medium';
 `;
 
@@ -177,14 +197,14 @@ const UserMessageContainer = styled.View`
 `;
 
 const UserText = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   line-height: 24px;
   color: ${themes.light.textColor.buttonText};
   font-family: 'Pretendard-SemiBold';
 `;
 
 const MessageTime = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]};
   margin: 0px 10px;
   align-self: flex-end;
   color: ${themes.light.textColor.buttonText60};
