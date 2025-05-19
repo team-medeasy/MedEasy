@@ -17,7 +17,7 @@ import MessageInput from '../../components/Chat/MessageInput';
 import { OtherIcons } from '../../../assets/icons';
 
 import WebSocketManager from '../../api/WebSocketManager';
-import { cleanupTempAudioFiles, getRoutineVoice, registerPrescription, registerRoutineList } from '../../api/voiceChat';
+import { capturePillsPhoto, cleanupTempAudioFiles, getRoutineVoice, registerPrescription } from '../../api/voiceChat';
 import { getUser } from '../../api/user';
 import { DEFAULT_BOT_OPTIONS } from '../../../assets/data/utils';
 import { useNavigation } from '@react-navigation/native';
@@ -852,7 +852,27 @@ export default function VoiceChat() {
         setIsTyping(false);
         reset();
 
-      }
+      } else if (option === '의약품 촬영') {
+          const { text, filePath, action } = await capturePillsPhoto();
+
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
+            )
+          );
+
+          if (filePath) {
+            playAudioFile(filePath);
+          }
+
+          if (action === 'CAPTURE_PILLS_PHOTO') {
+            console.log('[VOICE] client_action: CAPTURE_PILLS_PHOTO - 약 사진 촬영 화면으로 이동합니다.');
+            navigation.navigate('Camera');
+          }
+
+          setIsTyping(false);
+          reset();
+        }
        else {
         const { text, filePath, action } = await wsManager.current.sendMessage(option);
 

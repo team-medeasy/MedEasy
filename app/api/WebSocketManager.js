@@ -224,6 +224,20 @@ async registerRoutineList(data) {
   return this.sendMessage('루틴 등록', 'REGISTER_ROUTINE_LIST', data);
 }
 
+/**
+ * 알약 촬영 요청
+ */
+async capturePillsPhoto() {
+  return this.sendMessage('의약품 촬영', 'CAPTURE_PILLS_PHOTO_REQUEST', null);
+}
+
+/**
+ * 알약 사진 업로드
+ */
+async uploadPrescriptionPhoto() {
+  return this.sendMessage('알약 사진 업로드', 'UPLOAD_PILLS_PHOTO', null);
+}
+
   /**
    * 24시간 이상 지난 임시 mp3 파일 삭제
    */
