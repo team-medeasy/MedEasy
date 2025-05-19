@@ -29,8 +29,40 @@ export const getRoutineVoice = async () => {
   return manager.getRoutineVoice();
 };
 
+/**
+ * 처방전 복용 일정 등록 요청
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const registerPrescription = async () => {
+  const manager = WebSocketManager.getInstance();
+  return manager.registerPrescription();
+};
+
+/**
+ * 처방전 사진 업로드 요청
+ * @param {string} image
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const uploadPrescriptionPhoto = async (image) => {
+  const manager = WebSocketManager.getInstance();
+  return manager.uploadPrescriptionPhoto(image);
+};
+
+/**
+ * 복약 루틴 목록 등록 요청
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const registerRoutineList = async (routineList) => {
+  const manager = WebSocketManager.getInstance();
+  return manager.registerRoutineList(routineList);
+};
+
+
 export default {
   sendVoiceMessage,
   cleanupTempAudioFiles,
   getRoutineVoice,
+  registerPrescription,
+  uploadPrescriptionPhoto,
+  registerRoutineList
 };
