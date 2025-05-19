@@ -46,6 +46,11 @@
 
 ---
 
+## 🛠️ 시스템 아키텍처
+![System Architecture](docs/architecture.jpg)
+
+---
+
 ## 📋 ERD 설계
 ```mermaid
 erDiagram
@@ -105,6 +110,22 @@ erDiagram
     USER ||--|{ NOTIFICATION : "복용 알림 관리"
 ```
 ---
+
+## 🌐 외부 API 및 서비스
+
+| 구분 | 서비스 / API | 용도 |
+|------|---------------|------|
+| 🏥 **공공데이터 포털** | 의약품 정보 개방 시스템 API | 알약 이름, 성분, 금기사항 조회 |
+| 🧠 **OpenAI GPT-4.1-Nano** | LangGraph 기반 대화형 복약 상담 | 자연어 이해 및 복약 루틴 추출 |
+| 🧾 **Naver Clova OCR** | 처방전 이미지 문자 인식 | 약 이름, 용량 등 정보 추출 |
+| 📷 **Vertex AI (GCP)** | 알약 이미지 분류 | 알약 이름, 제형, 색상 예측 |
+| 🔈 **GCP Text-to-Speech** | 약 설명 음성 안내 | 시각장애 또는 고령자 지원 |
+| 📲 **FCM / APNs** | 푸시 알림 발송 | 복약 시간, 누락 시 보호자 알림 |
+| ☁️ **GCP Load Balancer** | 트래픽 분산 | 앱 안정성 확보 |
+| 🐳 **K3S + Compute Engine** | 백엔드 운영 및 배포 | 경량 쿠버네티스 클러스터 기반 운영 |
+
+---
+
 ## ⭐️ 팀 소개
 
 | Profile | Name | Role | Contact |
