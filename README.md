@@ -1,6 +1,17 @@
 # 💊 메디지(MedEasy) - 디지털 소외 계층을 위한 대화형 복약 어플리케이션
 ![Cover](docs/cover.png)
 
+
+<div align="center">
+    
+[![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/medeasy.dev)
+[![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:team.medeasy@gmail.com)
+[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store)
+[![App Store](https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com)
+[![Website](https://img.shields.io/badge/Homepage-000000?style=for-the-badge&logo=homeadvisor&logoColor=white)](https://medeasy.dev)
+
+</div>
+
 > [!NOTE]
 > 고령자와 같이 시력이 좋지 않은 **디지털 소외 계층**은 복약 관리 앱의 복잡한 사용법으로 인해 접근이 어려워, **약을 복용하지 않거나 중복 복용**하는 등의 문제가 자주 발생하며 보호자의 도움이 필요하다.
 > 
