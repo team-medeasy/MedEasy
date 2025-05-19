@@ -1,9 +1,11 @@
+// WebSocketManager.js 수정
+
 import RNFS from 'react-native-fs';
 import { getAccessToken } from './storage';
 
 class WebSocketManager {
   static instance = null;
-  
+
   constructor() {
     this.socket = null;
     this.isConnected = false;
@@ -12,6 +14,7 @@ class WebSocketManager {
     this.messageQueue = [];
     this.initialMessageCallback = null; // 초기 메시지 콜백
     this.manualDisconnect = false;
+    this.dataHandlers = {}; // client_action과 data를 처리하기 위한 핸들러
   }
 
   static getInstance() {
@@ -62,6 +65,11 @@ class WebSocketManager {
             return;
           }
 
+          // client_action과 data에 대한 특별 처리
+          if (response.client_action && this.dataHandlers[response.client_action]) {
+            this.dataHandlers[response.client_action](response.data);
+          }
+
           // 일반 메시지 처리
           if (this.pendingCallback) {
             this.pendingCallback(response);
@@ -85,7 +93,9 @@ class WebSocketManager {
         this.isConnected = false;
 
         if (!this.manualDisconnect) {
-          console.log('[WebSocketManager] 자동 재연결 로직은 구현되지 않았습니다.');
+          // 자동 재연결 로직
+          console.log('[WebSocketManager] 5초 후 재연결 시도...');
+          setTimeout(() => this.connect(), 5000);
         }
       };
     } catch (error) {
@@ -100,6 +110,15 @@ class WebSocketManager {
    */
   setInitialMessageCallback(callback) {
     this.initialMessageCallback = callback;
+  }
+
+  /**
+   * client_action에 따른 데이터 처리 핸들러 등록
+   * @param {string} action - 처리할 client_action
+   * @param {Function} handler - data를 처리할 핸들러 함수
+   */
+  registerDataHandler(action, handler) {
+    this.dataHandlers[action] = handler;
   }
 
   async waitForConnection() {
@@ -144,6 +163,7 @@ class WebSocketManager {
               audio_base64,
               audio_format = 'mp3',
               client_action,
+              data: responseData,
             } = response;
 
             if (result_code !== 200) {
@@ -157,6 +177,7 @@ class WebSocketManager {
                 text: text_message,
                 filePath: null,
                 action: client_action,
+                data: responseData,
               });
               return;
             }
@@ -171,6 +192,7 @@ class WebSocketManager {
               text: text_message,
               filePath,
               action: client_action,
+              data: responseData,
             });
           } catch (err) {
             console.error('[WebSocketManager] 응답 처리 중 오류:', err);
@@ -204,39 +226,50 @@ class WebSocketManager {
   }
 
   /**
- * 처방전 등록 요청
- */
-async registerPrescription() {
-  return this.sendMessage('처방전 복용 일정 등록', 'PRESCRIPTION_ROUTINE_REGISTER_REQUEST', null);
-}
+   * 처방전 등록 요청
+   */
+  async registerPrescription() {
+    return this.sendMessage('처방전 복용 일정 등록', 'PRESCRIPTION_ROUTINE_REGISTER_REQUEST', null);
+  }
 
-/**
- * 처방전 사진 업로드
- */
-async uploadPrescriptionPhoto() {
-  return this.sendMessage('처방전 사진 업로드', 'UPLOAD_PRESCRIPTION_PHOTO', null);
-}
+  /**
+   * 처방전 사진 업로드
+   * @param {string} base64Image - Base64로 인코딩된 이미지 데이터
+   */
+  async uploadPrescriptionPhoto(base64Image) {
+    return this.sendMessage('처방전 사진 업로드', 'UPLOAD_PRESCRIPTION_PHOTO', base64Image);
+  }
 
-/**
- * 복약 루틴 목록 등록 요청
- */
-async registerRoutineList(data) {
-  return this.sendMessage('루틴 등록', 'REGISTER_ROUTINE_LIST', data);
-}
+  /**
+   * 복약 루틴 목록 등록 요청
+   * @param {Array} routineData - 등록할 루틴 데이터 배열
+   */
+  async registerRoutineList(routineData) {
+    return this.sendMessage('루틴 등록', 'REGISTER_ROUTINE_LIST', routineData);
+  }
 
-/**
- * 알약 촬영 요청
- */
-async capturePillsPhoto() {
-  return this.sendMessage('의약품 촬영', 'CAPTURE_PILLS_PHOTO_REQUEST', null);
-}
+  /**
+   * 알약 촬영 요청
+   */
+  async capturePillsPhoto() {
+    return this.sendMessage('의약품 촬영', 'CAPTURE_PILLS_PHOTO_REQUEST', null);
+  }
 
-/**
- * 알약 사진 업로드
- */
-async uploadPrescriptionPhoto() {
-  return this.sendMessage('알약 사진 업로드', 'UPLOAD_PILLS_PHOTO', null);
-}
+  /**
+   * 알약 사진 업로드
+   * @param {string} base64Image - Base64로 인코딩된 이미지 데이터
+   */
+  async uploadPillsPhoto(base64Image) {
+    return this.sendMessage('알약 사진 업로드', 'UPLOAD_PILLS_PHOTO', base64Image);
+  }
+
+  /**
+   * 약 검색 요청
+   * @param {string} query - 검색할 약 이름이나 키워드
+   */
+  async searchMedicines(query) {
+    return this.sendMessage(`약 검색: ${query}`, 'SEARCH_MEDICINES', { query });
+  }
 
   /**
    * 24시간 이상 지난 임시 mp3 파일 삭제
