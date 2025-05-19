@@ -57,6 +57,15 @@ export const registerRoutineList = async (routineList) => {
   return manager.registerRoutineList(routineList);
 };
 
+/**
+ * 의약품 촬영 요청
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const capturePillsPhoto = async () => {
+  const manager = WebSocketManager.getInstance();
+  return manager.capturePillsPhoto();
+};
+
 
 export default {
   sendVoiceMessage,
@@ -64,5 +73,6 @@ export default {
   getRoutineVoice,
   registerPrescription,
   uploadPrescriptionPhoto,
-  registerRoutineList
+  registerRoutineList,
+  capturePillsPhoto,
 };
