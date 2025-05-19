@@ -204,6 +204,27 @@ class WebSocketManager {
   }
 
   /**
+ * 처방전 등록 요청
+ */
+async registerPrescription() {
+  return this.sendMessage('처방전 복용 일정 등록', 'PRESCRIPTION_ROUTINE_REGISTER_REQUEST', null);
+}
+
+/**
+ * 처방전 사진 업로드
+ */
+async uploadPrescriptionPhoto() {
+  return this.sendMessage('처방전 사진 업로드', 'UPLOAD_PRESCRIPTION_PHOTO', null);
+}
+
+/**
+ * 복약 루틴 목록 등록 요청
+ */
+async registerRoutineList(data) {
+  return this.sendMessage('루틴 등록', 'REGISTER_ROUTINE_LIST', data);
+}
+
+  /**
    * 24시간 이상 지난 임시 mp3 파일 삭제
    */
   async cleanupTempAudioFiles() {
