@@ -580,6 +580,9 @@ export default function VoiceChat() {
       
       // 응답 음성 재생 및 메시지 표시
       playBotResponse(filePath, typingMsgId, responseText, action);
+
+      // 액션 처리
+      handleAction(action);
     } catch (error) {
       handleApiError(error, typingMsgId, '죄송합니다. 응답을 받아오는 데 실패했습니다.');
     }
@@ -748,6 +751,9 @@ export default function VoiceChat() {
       if (filePath) {
         playAudioFile(filePath);
       }
+
+      // 액션 처리
+      handleAction(action);
     } catch (error) {
       handleApiError(error, typingMsgId, '죄송합니다. 응답을 받아오는 데 실패했습니다.');
     }
@@ -788,6 +794,31 @@ export default function VoiceChat() {
     ]);
   };
 
+  // 액션 처리를 위한 별도 함수
+  const handleAction = (action) => {
+    if (!action) return;
+    
+    console.log(`[VOICE] 액션 처리: ${action}`);
+    
+    switch (action) {
+      case 'CAPTURE_PRESCRIPTION':
+        console.log('[VOICE] client_action: CAPTURE_PRESCRIPTION - 카메라 화면으로 이동합니다.');
+        navigation.navigate('Camera');
+        break;
+        
+      case 'CAPTURE_PILLS_PHOTO':
+        console.log('[VOICE] client_action: CAPTURE_PILLS_PHOTO - 약 사진 촬영 화면으로 이동합니다.');
+        navigation.navigate('Camera');
+        break;
+        
+      // 필요한 다른 액션 케이스 추가 가능
+      
+      default:
+        console.log(`[VOICE] 정의되지 않은 액션: ${action}`);
+        break;
+    }
+  };
+
   // 봇 옵션 선택 처리
   const handleBotOptionPress = async (option) => {
     // 이전에 재생 중이던 음성 중지
@@ -813,82 +844,38 @@ export default function VoiceChat() {
     ]);
 
     try {
+      let response;
+      
       if (option === '오늘 복용 일정 확인') {
         await cleanupTempAudioFiles(); 
-        const { text, filePath, action } = await getRoutineVoice();
-
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === typingMsgId ? { ...msg, text, isTyping: false } : msg
-          )
-        );
-
-        if (filePath) {
-          playAudioFile(filePath);
-        }
-
-        setIsTyping(false);
-        reset();
-
+        response = await getRoutineVoice();
       } else if (option === '처방전 촬영') {
-        const { text, filePath, action } = await registerPrescription();
-
-
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
-          )
-        );
-
-        if (filePath) {
-          playAudioFile(filePath);
-        }
-
-        if (action === 'CAPTURE_PRESCRIPTION') {
-          console.log('[VOICE] client_action: CAPTURE_PRESCRIPTION - 카메라 화면으로 이동합니다.');
-          navigation.navigate('Camera');
-        }
-
-        setIsTyping(false);
-        reset();
-
+        response = await registerPrescription();
       } else if (option === '의약품 촬영') {
-          const { text, filePath, action } = await capturePillsPhoto();
-
-          setMessages(prev =>
-            prev.map(msg =>
-              msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
-            )
-          );
-
-          if (filePath) {
-            playAudioFile(filePath);
-          }
-
-          if (action === 'CAPTURE_PILLS_PHOTO') {
-            console.log('[VOICE] client_action: CAPTURE_PILLS_PHOTO - 약 사진 촬영 화면으로 이동합니다.');
-            navigation.navigate('Camera');
-          }
-
-          setIsTyping(false);
-          reset();
-        }
-       else {
-        const { text, filePath, action } = await wsManager.current.sendMessage(option);
-
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
-          )
-        );
-
-        if (filePath) {
-          playAudioFile(filePath);
-        }
-
-        setIsTyping(false);
-        reset();
+        response = await capturePillsPhoto();
+      } else {
+        response = await wsManager.current.sendMessage(option);
       }
+      
+      const { text, filePath, action } = response;
+      
+      // 응답 메시지 표시
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
+        )
+      );
+      
+      // 음성 재생
+      if (filePath) {
+        playAudioFile(filePath);
+      }
+      
+      // 액션 처리
+      handleAction(action);
+      
+      setIsTyping(false);
+      reset();
     } catch (err) {
       handleApiError(err, typingMsgId);
     }
