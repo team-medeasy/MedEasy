@@ -1,71 +1,64 @@
-# 💊 내 손 안의 복약 도우미 - 메디지(MedEasy)
-![Thumbnail](docs/thumbnail.png)
+# 💊 메디지(MedEasy) - 디지털 소외 계층을 위한 대화형 복약 어플리케이션
+![Cover](docs/cover.png)
 
-> 병원에서 처방받은 약, 까먹고 안 먹은 적이 있진 않으신가요?
+
+<div align="center">
+    
+[![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/medeasy.dev)
+[![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:team.medeasy@gmail.com)
+[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store)
+[![App Store](https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com)
+[![Website](https://img.shields.io/badge/Homepage-000000?style=for-the-badge&logo=homeadvisor&logoColor=white)](https://medeasy.dev)
+
+</div>
+
+> [!NOTE]
+> 고령자와 같이 시력이 좋지 않은 **디지털 소외 계층**은 복약 관리 앱의 복잡한 사용법으로 인해 접근이 어려워, **약을 복용하지 않거나 중복 복용**하는 등의 문제가 자주 발생하며 보호자의 도움이 필요하다.
 > 
-> 여러 개의 약을 받아왔는데 어떤 약이 어떤 역할을 하는지 잘 모르는 채로 약을 먹고 있진 않으신가요?
+> 메디지는 이러한 문제를 해결하기 위해 **MCP와 LangGraph 기반의 음성 대화 인터페이스**를 도입하여 사용자가 별도의 조작 없이도 복약 현황을 관리할 수 있도록 설계되었다.
 > 
-> **메디지**가 복약 알림과 알약 이미지 검색을 통해 쉬운 복약 관리를 도와드릴게요!
-
----
-
-## 📱 프로젝트 개요
-| 항목 | 내용 |
-|-------|-------|
-| **목적** | 간편하고 안전한 복약 관리 시스템 구축 |
-| **주요 대상** | 노년층, 장애인, 만성 질환 환자 |
-| **개발 플랫폼** | 모바일 앱 (Android, iOS) |
-| **개발 기간** | 2025년 2월 ~ 2025년 5월 |
+> 복약 누락 시 **보호자에게 실시간 알림**을 보내고, **보호자 계정과의 연동**을 통해 피보호자의 복약 상태를 원격으로 모니터링할 수 있다.
+> 
+> 또한 95% 이상의 정확도로 **알약 이미지 검색**이 가능해 약에 대한 정보가 부족하거나 시각적 구분이 어려운 사용자도 의약품 정보를 쉽게 확인할 수 있다.
 
 ---
 
 ## 🚀 주요 기능
-- 📸 **처방전 촬영** → OCR을 통한 약 정보 자동 등록  
-- 🔎 **공공 API 기반 검색** → 정확한 약 정보 제공  
-- 📆 **복약 일정 관리** → 사용자 루틴 기반 일정 관리  
-- 🛜 **NFC 태그 인식** → 복약 상태 실시간 체크  
-- 🔔 **알림 기능** → 복약 시간 알림 및 누락 방지  
-- 🤖 **제약 정보 챗봇** → AI 기반 약 정보 질의응답  
+| 💊 복용 루틴           | 💬 AI 채팅             | 🔎 의약품 검색         |
+|--------------------|---------------------|----------------------|
+| ![복용 루틴](docs/1.png) | ![AI 채팅](docs/2.png)   | ![의약품 검색](docs/3.png) |
+
+| 🫂 보호 대상 관리           | 🚫 금기 정보         | 💬 NFC 태그            |
+|--------------------|------------------------|----------------------|
+| ![보호 대상 관리](docs/5.png) | ![금기 정보](docs/4.png) | ![NFC 태그](docs/6.png)   |
 
 ---
 
-## 🏆 기획 배경
-- **평균 수명 증가**와 함께 **노년층 및 만성 질환 환자**의 비율 증가  
-- 복약 일정 관리 및 약 정보 접근의 어려움  
-- 약 오남용 방지 및 복약 일정 관리를 통해 **환자의 안전성 강화**  
+## 🎯 기대 효과
+
+| 번호 | 내용 |
+|------|------|
+| **01** | 음성 대화를 통한 복약 관리로<br>**디지털 취약 계층의 정보 접근성 향상** |
+| **02** | NFC 태그 기반 복약 체크와 푸시 알림으로<br>**백그라운드에서 복약 관리** |
+| **03** | 약 95% 정확도의 의약품 촬영 기능으로<br>**약 이름 없이도 간편한 검색 가능** |
+| **04** | 복용 금기 및 약물 간 상호작용 정보 제공으로<br>**부작용 및 오남용 예방** |
+| **05** | 가족 또는 간병인의 실시간 복약 현황 확인으로<br>**돌봄 효율 향상** |
 
 ---
 
 ## 🏗️ 기술 스택
-### 💻 **Frontend**
-- ![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=for-the-badge&logo=react&logoColor=white)  
-
-### 🛠️ **Backend**
-- ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white)  
-- ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)  
-- ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)  
-
-### 🤖 **AI & Data Processing**
-- ![Gemini](https://img.shields.io/badge/Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)  
-- ![LangChain](https://img.shields.io/badge/LangChain-0055A5?style=for-the-badge)  
-- ![Naver Clova OCR](https://img.shields.io/badge/Naver_Clova_OCR-03C75A?style=for-the-badge&logo=ncloud&logoColor=white)  
-
-### ☁️ **Cloud & Infrastructure**
-- ![Amazon ECR](https://img.shields.io/badge/Amazon_ECR-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)  
-- ![Google Compute Engine](https://img.shields.io/badge/Google_Compute_Engine-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)  
-
-### 🚀 **Deployment & Version Control**
-- ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)  
-- ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)  
+| 구분 | 기술 스택 |
+|------|-----------|
+| 💻 **Frontend** | ![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=for-the-badge&logo=react&logoColor=white) |
+| 🛠️ **Backend** | ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white) |
+| 🤖 **AI & Data Processing** | ![Gemini](https://img.shields.io/badge/Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white) ![LangChain](https://img.shields.io/badge/LangChain-0055A5?style=for-the-badge) ![Naver Clova OCR](https://img.shields.io/badge/Naver_Clova_OCR-03C75A?style=for-the-badge&logo=ncloud&logoColor=white) |
+| ☁️ **Cloud & Infrastructure** | ![Amazon ECR](https://img.shields.io/badge/Amazon_ECR-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white) ![Google Compute Engine](https://img.shields.io/badge/Google_Compute_Engine-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white) |
+| 🚀 **Deployment & Version Control** | ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white) |
 
 ---
 
-## 🌟 주요 화면
-| 주요 화면 | 설명 |
-|-----------|-------|
-| ![처방전 촬영](https://via.placeholder.com/300) | 처방전을 촬영하면 OCR을 통해 약 정보를 자동 등록 |
-| ![복약 일정 관리](https://via.placeholder.com/300) | 사용자 맞춤 복약 일정 등록 및 관리 |
-| ![NFC 태그 체크](https://via.placeholder.com/300) | NFC 태그를 통해 복약 상태 체크 가능 |
+## 🛠️ 시스템 아키텍처
+![System Architecture](docs/architecture.jpg)
 
 ---
 
@@ -128,6 +121,22 @@ erDiagram
     USER ||--|{ NOTIFICATION : "복용 알림 관리"
 ```
 ---
+
+## 🌐 외부 API 및 서비스
+
+| 구분 | 서비스 / API | 용도 |
+|------|---------------|------|
+| 🏥 **공공데이터 포털** | 의약품 정보 개방 시스템 API | 알약 이름, 성분, 금기사항 조회 |
+| 🧠 **OpenAI GPT-4.1-Nano** | LangGraph 기반 대화형 복약 상담 | 자연어 이해 및 복약 루틴 추출 |
+| 🧾 **Naver Clova OCR** | 처방전 이미지 문자 인식 | 약 이름, 용량 등 정보 추출 |
+| 📷 **Vertex AI (GCP)** | 알약 이미지 분류 | 알약 이름, 제형, 색상 예측 |
+| 🔈 **GCP Text-to-Speech** | 약 설명 음성 안내 | 시각장애 또는 고령자 지원 |
+| 📲 **FCM / APNs** | 푸시 알림 발송 | 복약 시간, 누락 시 보호자 알림 |
+| ☁️ **GCP Load Balancer** | 트래픽 분산 | 앱 안정성 확보 |
+| 🐳 **K3S + Compute Engine** | 백엔드 운영 및 배포 | 경량 쿠버네티스 클러스터 기반 운영 |
+
+---
+
 ## ⭐️ 팀 소개
 
 | Profile | Name | Role | Contact |

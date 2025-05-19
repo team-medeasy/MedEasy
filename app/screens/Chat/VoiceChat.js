@@ -17,9 +17,10 @@ import MessageInput from '../../components/Chat/MessageInput';
 import { OtherIcons } from '../../../assets/icons';
 
 import WebSocketManager from '../../api/WebSocketManager';
-import { cleanupTempAudioFiles, getRoutineVoice } from '../../api/voiceChat';
+import { capturePillsPhoto, cleanupTempAudioFiles, getRoutineVoice, registerPrescription } from '../../api/voiceChat';
 import { getUser } from '../../api/user';
 import { DEFAULT_BOT_OPTIONS } from '../../../assets/data/utils';
+import { useNavigation } from '@react-navigation/native';
 
 // 음성 인식 옵션 - 플랫폼별 설정
 const recognizerOptions = Platform.OS === 'android' ? {
@@ -32,6 +33,7 @@ const recognizerOptions = Platform.OS === 'android' ? {
 
 export default function VoiceChat() {
   const {fontSizeMode} = useFontSize();
+  const navigation = useNavigation();
   
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const audioPlayer = useRef(null);
@@ -811,43 +813,79 @@ export default function VoiceChat() {
     ]);
 
     try {
-      // 옵션에 따른 처리
       if (option === '오늘 복용 일정 확인') {
         await cleanupTempAudioFiles(); 
         const { text, filePath, action } = await getRoutineVoice();
 
-        // 메시지 업데이트
         setMessages(prev =>
           prev.map(msg =>
             msg.id === typingMsgId ? { ...msg, text, isTyping: false } : msg
           )
         );
-        
-        // 음성 재생
+
         if (filePath) {
           playAudioFile(filePath);
         }
-        
-        // 타이핑 상태 해제
+
         setIsTyping(false);
         reset();
-      } else {
-        // 기타 옵션 처리
-        const { text, filePath, action } = await wsManager.current.sendMessage(option);
 
-        // 메시지 업데이트
+      } else if (option === '처방전 촬영') {
+        const { text, filePath, action } = await registerPrescription();
+
+
         setMessages(prev =>
           prev.map(msg =>
             msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
           )
         );
-        
-        // 음성 재생
+
         if (filePath) {
           playAudioFile(filePath);
         }
-        
-        // 타이핑 상태 해제
+
+        if (action === 'CAPTURE_PRESCRIPTION') {
+          console.log('[VOICE] client_action: CAPTURE_PRESCRIPTION - 카메라 화면으로 이동합니다.');
+          navigation.navigate('Camera');
+        }
+
+        setIsTyping(false);
+        reset();
+
+      } else if (option === '의약품 촬영') {
+          const { text, filePath, action } = await capturePillsPhoto();
+
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
+            )
+          );
+
+          if (filePath) {
+            playAudioFile(filePath);
+          }
+
+          if (action === 'CAPTURE_PILLS_PHOTO') {
+            console.log('[VOICE] client_action: CAPTURE_PILLS_PHOTO - 약 사진 촬영 화면으로 이동합니다.');
+            navigation.navigate('Camera');
+          }
+
+          setIsTyping(false);
+          reset();
+        }
+       else {
+        const { text, filePath, action } = await wsManager.current.sendMessage(option);
+
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === typingMsgId ? { ...msg, text, isTyping: false, options: DEFAULT_BOT_OPTIONS } : msg
+          )
+        );
+
+        if (filePath) {
+          playAudioFile(filePath);
+        }
+
         setIsTyping(false);
         reset();
       }

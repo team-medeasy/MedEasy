@@ -36,12 +36,14 @@ const MyPage = () => {
     );
 
   return (
-    <Container style={{ paddingTop: insets.top }}>
+    <Container>
       <ScrollContent>
         {/* 헤더 */}
         <HeaderContainer>
-          <Title fontSizeMode={fontSizeMode}>내 정보</Title>
-        </HeaderContainer>
+                <Header style={{paddingTop: insets.top}}>
+                  <HeaderText fontSizeMode={fontSizeMode}>내 정보</HeaderText>
+                </Header>
+              </HeaderContainer>
         {/* 웰컴 메시지, 프로필 설정 */}
         <ProfileContainer>
           <TextContainer>
@@ -73,14 +75,18 @@ const Container = styled.View`
 
 const HeaderContainer = styled.View`
   justify-content: flex-end;
-  background-color: ${themes.light.boxColor.buttonPrimary};
-  padding: 10px 20px;
+  padding-top: 10px;
 `;
 
-const Title = styled.Text`
+const Header = styled.View`
+  flex-direction: row;
+  padding: 0px 20px;
+  justify-content: space-between;
+`;
+
+const HeaderText = styled.Text`
   font-size: ${({fontSizeMode}) => FontSizes.title[fontSizeMode]};
   font-family: 'KimjungchulGothic-Bold';
-  font-weight: bold;
   color: ${themes.light.textColor.buttonText};
 `;
 

@@ -423,36 +423,37 @@ const Routine = ({route}) => {
 
   return (
     <Container>
-      <Header style={{paddingTop: insets.top}}>
-        <HeaderText fontSizeMode={fontSizeMode}>루틴</HeaderText>
-        <ReturnButton
-          onPress={() => {
-            // 오늘 날짜로 선택 날짜 변경
-            setSelectedDate({
-              day: weekDays[today.day()],
-              date: today.date(),
-              month: today.month() + 1,
-              year: today.year(),
-              fullDate: today,
-            });
-
-            // 오늘 날짜가 있는 페이지(4번 인덱스)로 스크롤
-            if (flatListRef.current) {
-              flatListRef.current.scrollToIndex({
-                index: 4,
-                animated: true,
+      <HeaderContainer>
+        <Header style={{paddingTop: insets.top}}>
+          <HeaderText fontSizeMode={fontSizeMode}>루틴</HeaderText>
+          <ReturnButton
+            onPress={() => {
+              // 오늘 날짜로 선택 날짜 변경
+              setSelectedDate({
+                day: weekDays[today.day()],
+                date: today.date(),
+                month: today.month() + 1,
+                year: today.year(),
+                fullDate: today,
               });
-            }
-          }}>
-          <OtherIcons.return
-            width={14}
-            height={14}
-            style={{color: themes.light.pointColor.Primary10}}
-          />
-          <ButtonText fontSizeMode={fontSizeMode}>돌아가기</ButtonText>
-        </ReturnButton>
-      </Header>
 
+              // 오늘 날짜가 있는 페이지(4번 인덱스)로 스크롤
+              if (flatListRef.current) {
+                flatListRef.current.scrollToIndex({
+                  index: 4,
+                  animated: true,
+                });
+              }
+            }}>
+            <OtherIcons.return
+              width={14}
+              height={14}
+              style={{color: themes.light.pointColor.Primary10}}
+            />
+            <ButtonText fontSizeMode={fontSizeMode}>돌아가기</ButtonText>
+          </ReturnButton>
+        </Header>
+      </HeaderContainer>
       {/* 페이징 가능한 DayContainer */}
       <DayContainerWrapper>
         <FlatList
@@ -534,6 +535,11 @@ const Container = styled(LinearGradient).attrs(() => ({
   end: {x: 0, y: 0.3},
 }))`
   flex: 1;
+`;
+
+const HeaderContainer = styled.View`
+  justify-content: flex-end;
+  padding-top: 10px;
 `;
 
 const Header = styled.View`

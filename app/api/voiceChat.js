@@ -186,6 +186,44 @@ export const rejectRoutineRegistration = async () => {
   );
 };
 
+/**
+ * 처방전 복용 일정 등록 요청
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const registerPrescription = async () => {
+  const manager = WebSocketManager.getInstance();
+  return manager.registerPrescription();
+};
+
+/**
+ * 처방전 사진 업로드 요청
+ * @param {string} image
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const uploadPrescriptionPhoto = async (image) => {
+  const manager = WebSocketManager.getInstance();
+  return manager.uploadPrescriptionPhoto(image);
+};
+
+/**
+ * 복약 루틴 목록 등록 요청
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const registerRoutineList = async (routineList) => {
+  const manager = WebSocketManager.getInstance();
+  return manager.registerRoutineList(routineList);
+};
+
+/**
+ * 의약품 촬영 요청
+ * @returns {Promise<{ text: string, filePath: string, action: string }>}
+ */
+export const capturePillsPhoto = async () => {
+  const manager = WebSocketManager.getInstance();
+  return manager.capturePillsPhoto();
+};
+
+
 export default {
   initializeConnection,
   setInitialMessageCallback,
@@ -193,12 +231,9 @@ export default {
   sendVoiceMessage,
   cleanupTempAudioFiles,
   getRoutineVoice,
-  requestPrescriptionCapture,
-  uploadPrescriptionImage,
+
+  registerPrescription,
+  uploadPrescriptionPhoto,
   registerRoutineList,
-  searchMedicineByImage,
-  searchMedicineByText,
-  modifyPrescription,
-  confirmRoutineRegistration,
-  rejectRoutineRegistration
+  capturePillsPhoto,
 };
