@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState, useCallback, useMemo} from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -17,19 +17,19 @@ import {
   useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
-import {useNavigation, useIsFocused} from '@react-navigation/native';
-import {cropCenterArea} from '../../api/services/cameraService';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { cropCenterArea } from '../../services/cameraService';
 import styled from 'styled-components/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Svg, {Rect, Mask, Defs} from 'react-native-svg';
-import {CameraIcons, HeaderIcons} from '../../../assets/icons';
-import {themes} from '../../styles';
+import Svg, { Rect, Mask, Defs } from 'react-native-svg';
+import { CameraIcons, HeaderIcons } from '../../../assets/icons';
+import { themes } from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import {useFontSize} from '../../../assets/fonts/FontSizeContext';
-import {launchImageLibrary} from 'react-native-image-picker';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 // --- Constants ---
-const {width: windowWidth, height: windowHeight} = Dimensions.get('window');
+const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 const PREVIEW_SIZE = windowWidth - 60; // 양쪽 30px 여백 제외
 const BORDER_RADIUS = 24;
 const OVERLAY_OPACITY = 0.6;
@@ -47,8 +47,8 @@ const CameraSearchScreen = () => {
   // --- Hooks ---
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const {hasPermission, requestPermission} = useCameraPermission();
-  const {fontSizeMode} = useFontSize();
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const { fontSizeMode } = useFontSize();
 
   // --- State ---
   const [activeIndex, setActiveIndex] = useState(0);
@@ -123,7 +123,7 @@ const CameraSearchScreen = () => {
         '카메라 권한 필요',
         '사진 검색을 위해 카메라 권한이 필요합니다. 설정에서 권한을 활성화해 주세요.',
         [
-          {text: '취소', onPress: () => navigation.goBack(), style: 'cancel'},
+          { text: '취소', onPress: () => navigation.goBack(), style: 'cancel' },
           {
             text: '설정으로 이동',
             onPress: () => {
@@ -364,7 +364,7 @@ const CameraSearchScreen = () => {
       }
 
       try {
-        const {locationX, locationY} = event.nativeEvent;
+        const { locationX, locationY } = event.nativeEvent;
         const point = {
           x: Math.round(locationX),
           y: Math.round(locationY),
@@ -385,14 +385,14 @@ const CameraSearchScreen = () => {
 
   const onCameraLayout = useCallback(
     event => {
-      const {width: layoutWidth, height: layoutHeight} =
+      const { width: layoutWidth, height: layoutHeight } =
         event.nativeEvent.layout;
       if (
         layoutWidth !== cameraLayout.width ||
         layoutHeight !== cameraLayout.height
       ) {
         console.log('Camera layout updated:', layoutWidth, layoutHeight);
-        setCameraLayout({width: layoutWidth, height: layoutHeight});
+        setCameraLayout({ width: layoutWidth, height: layoutHeight });
       }
     },
     [cameraLayout.width, cameraLayout.height],
@@ -454,20 +454,20 @@ const CameraSearchScreen = () => {
         <HeaderTopRow>
           <HeaderButtonWrapper
             onPress={handleGoBack}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             disabled={isProcessing}>
             <HeaderButton>
               <HeaderIcons.chevron
                 width={20}
                 height={20}
-                style={{color: themes.light.textColor.buttonText}}
+                style={{ color: themes.light.textColor.buttonText }}
               />
             </HeaderButton>
           </HeaderButtonWrapper>
           <Title fontSizeMode={fontSizeMode}>사진으로 검색하기</Title>
           <HeaderButtonWrapper
             onPress={toggleFlash}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             disabled={isProcessing}>
             <HeaderButton
               style={{
@@ -493,13 +493,13 @@ const CameraSearchScreen = () => {
         <HeaderBottomRow>
           <ToggleContainer>
             <Animated.View
-              style={[styles.toggleBackground, {transform: [{translateX}]}]}
+              style={[styles.toggleBackground, { transform: [{ translateX }] }]}
             />
             <ToggleOption
               onPress={() => handleToggle(0)}
               disabled={isProcessing}>
               <ToggleButton>
-                <ToggleText 
+                <ToggleText
                   isActive={activeIndex === 0}
                   fontSizeMode={fontSizeMode}
                 >
@@ -511,7 +511,7 @@ const CameraSearchScreen = () => {
               onPress={() => handleToggle(1)}
               disabled={isProcessing}>
               <ToggleButton>
-                <ToggleText 
+                <ToggleText
                   isActive={activeIndex === 1}
                   fontSizeMode={fontSizeMode}
                 >
@@ -563,7 +563,7 @@ const CameraSearchScreen = () => {
               left: focusPoint.x - FOCUS_INDICATOR_SIZE / 2,
               top: focusPoint.y - FOCUS_INDICATOR_SIZE / 2,
               opacity: focusIndicatorOpacity,
-              transform: [{scale: focusIndicatorScale}],
+              transform: [{ scale: focusIndicatorScale }],
             },
           ]}
           pointerEvents="none"
@@ -616,13 +616,13 @@ const CameraSearchScreen = () => {
         {/* Hint (Pill mode only) */}
         {!isPrescriptionMode && (
           <Animated.View
-            style={{opacity: activeIndex === 0 ? 1 : 0, marginBottom: 25}}>
+            style={{ opacity: activeIndex === 0 ? 1 : 0, marginBottom: 25 }}>
             <Hint>
               <HintIconWrapper>
                 <CameraIcons.tip
                   width={20}
                   height={20}
-                  style={{color: themes.light.textColor.buttonText}}
+                  style={{ color: themes.light.textColor.buttonText }}
                 />
               </HintIconWrapper>
               <HintTextWrapper>
@@ -647,7 +647,7 @@ const CameraSearchScreen = () => {
           <CaptureButton
             onPress={handleCapture}
             disabled={isProcessing}
-            style={isProcessing ? {opacity: 0.7} : {}}>
+            style={isProcessing ? { opacity: 0.7 } : {}}>
             <CaptureButtonInner />
           </CaptureButton>
           <ButtonItem
@@ -761,7 +761,7 @@ const HeaderButton = styled.View`
 
 const Title = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
 `;
 
@@ -792,9 +792,9 @@ const ToggleButton = styled.View``;
 
 const ToggleText = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
-  color: ${({isActive}) => (isActive ? 'black' : 'rgba(255, 255, 255, 0.8)')};
-  font-weight: ${({isActive}) => (isActive ? 'bold' : 'normal')};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
+  color: ${({ isActive }) => (isActive ? 'black' : 'rgba(255, 255, 255, 0.8)')};
+  font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
 `;
 
 const LoadingContainer = styled.View`
@@ -843,14 +843,14 @@ const HintTextWrapper = styled.View`
 
 const HintTitle = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
   margin-bottom: 4px;
 `;
 
 const HintText = styled.Text`
   font-family: 'Pretendard-Regular';
-  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]};
   color: ${themes.light.textColor.buttonText70};
   line-height: 16px;
 `;
