@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, View } from 'react-native';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { FlatList, KeyboardAvoidingView, Platform, View, AppState, InteractionManager, Alert, BackHandler } from 'react-native';
 import Voice from '@react-native-voice/voice';
 import styled from 'styled-components/native';
 import LinearGradient from 'react-native-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import RNFS from 'react-native-fs';
 
 import { themes } from '../../styles';
@@ -28,13 +28,15 @@ import useWebSocketChat from '../../hooks/useWebSocketChat';
 export default function VoiceChat() {
   const { fontSizeMode } = useFontSize();
   const navigation = useNavigation();
+  const route = useRoute();
   const flatListRef = useRef(null);
+  const appStateRef = useRef(AppState.currentState);
 
   // 커스텀 훅 사용
   const {
     status, hasPermission, statusMessage, voiceActive,
     startListening, reset, setVoiceActive, setStatus, activeVoiceMessageId,
-    setStatusMessage  // 이 부분을 추가
+    setStatusMessage
   } = useVoiceRecognition();
 
   const { playAudioFile, cleanupAudio, isPlaying } = useAudioPlayer();
@@ -49,7 +51,8 @@ export default function VoiceChat() {
   const {
     sendMessage, getRoutineVoice, registerPrescription,
     uploadPrescriptionPhoto, registerRoutineList, capturePillsPhoto,
-    uploadPillsPhoto, cleanupTempAudioFiles, setInitialMessageCallback
+    uploadPillsPhoto, cleanupTempAudioFiles, setInitialMessageCallback,
+    registerActionHandler
   } = useWebSocketChat();
 
   const [showInfoModal, setShowInfoModal] = useState(true);
@@ -59,6 +62,10 @@ export default function VoiceChat() {
   const [initialWelcomeMessage, setInitialWelcomeMessage] = useState(null);
   const [initialWelcomeAudio, setInitialWelcomeAudio] = useState(null);
   const [audioPlaybackInProgress, setAudioPlaybackInProgress] = useState(false);
+  const [errorCount, setErrorCount] = useState(0);
+  const [reconnecting, setReconnecting] = useState(false);
+  const [lastSentMessage, setLastSentMessage] = useState(null);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
 
   // 웰컴 오디오 저장 함수
   const saveWelcomeAudio = async (base64Audio, audioFormat = 'mp3') => {
@@ -67,10 +74,10 @@ export default function VoiceChat() {
       const filePath = `${RNFS.CachesDirectoryPath}/welcome_${timestamp}.${audioFormat}`;
 
       await RNFS.writeFile(filePath, base64Audio, 'base64');
-      console.log('초기 음성 파일 저장 완료:', filePath);
+      console.log('[AUDIO] 초기 음성 파일 저장 완료:', filePath);
       return filePath;
     } catch (error) {
-      console.error('초기 음성 파일 저장 오류:', error);
+      console.error('[AUDIO] 초기 음성 파일 저장 오류:', error);
       return null;
     }
   };
@@ -85,49 +92,339 @@ export default function VoiceChat() {
     return `${period} ${formattedHours}:${minutes}`;
   };
 
-  // 상태 메시지 관리를 위한 useEffect 추가
+  // 앱 상태 변화 감지
   useEffect(() => {
-    // 오디오 재생 중일 때 상태 메시지 변경
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('[CHAT] 앱이 포그라운드로 돌아옴');
+        // 앱이 백그라운드에서 포그라운드로 돌아올 때
+        cleanupTempAudioFiles(); // 임시 파일 정리
+
+        // 음성 모드였다면 상태 초기화
+        if (chatMode === 'voice') {
+          reset('준비 중...'); // 상태 초기화
+          setAudioPlaybackInProgress(false);
+        }
+      } else if (nextAppState.match(/inactive|background/) && appStateRef.current === 'active') {
+        console.log('[CHAT] 앱이 백그라운드로 전환됨');
+        // 앱이 포그라운드에서 백그라운드로 갈 때
+        cleanupAudio(); // 오디오 재생 중지
+        Voice.cancel().catch(() => { }); // 음성 인식 중지
+      }
+
+      appStateRef.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [chatMode]);
+
+  // 화면 포커스 변화 감지
+  useFocusEffect(
+    useCallback(() => {
+      console.log('[CHAT] 화면 포커스 얻음');
+
+      // 백 버튼 핸들러 (안드로이드)
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        // 오디오 및 음성 인식 정리
+        cleanupAudio();
+        Voice.cancel().catch(() => { });
+        stopPulseAnimation();
+        return false; // 기본 뒤로가기 동작 허용
+      });
+
+      return () => {
+        console.log('[CHAT] 화면 포커스 잃음');
+        backHandler.remove();
+
+        // 화면 이탈 시 정리
+        cleanupAudio();
+        Voice.cancel().catch(() => { });
+        stopPulseAnimation();
+      };
+    }, [])
+  );
+
+  // 상태 메시지 관리
+  useEffect(() => {
     if (audioPlaybackInProgress && chatMode === 'voice') {
       setStatus('processing');
       setStatusMessage('응답 듣는 중...');
     } else if (!audioPlaybackInProgress && status === 'processing' && chatMode === 'voice') {
-      // 재생 완료 후 idle 상태로 변경되었을 때만 메시지 변경
       setStatusMessage('곧 다시 듣기 시작합니다...');
-      // 상태는 그대로 유지 (자동 재시작 타이머가 동작할 수 있도록)
     }
   }, [audioPlaybackInProgress, chatMode]);
 
-  // 오디오 재생 함수 (재생 완료 콜백 추가)
-  // playAudioWithCompletion 함수
-  const playAudioWithCompletion = (filePath) => {
-    if (!filePath) return;
-
-    // 오디오 재생 시작 상태 설정
-    setAudioPlaybackInProgress(true);
-    // 상태 메시지 즉시 변경 (useEffect가 늦게 실행될 수 있으므로)
-    if (chatMode === 'voice') {
-      setStatus('processing');
-      setStatusMessage('응답 듣는 중...');
-    }
-
-    console.log('[AUDIO] 재생 시작:', filePath);
-
-    // 오디오 재생 (재생 완료 콜백 추가)
-    playAudioFile(filePath, () => {
-      console.log('[AUDIO] 재생 완료, 0.5초 후 음성 인식 재개');
-
-      // 상태 메시지 변경
-      if (chatMode === 'voice') {
-        setStatusMessage('곧 다시 듣기 시작합니다...');
-      }
-
-      // 약간의 지연 후 오디오 재생 완료 상태 설정
+  // 오디오 재생 함수 (안정성 개선)
+  const playAudioWithCompletion = useCallback((filePath) => {
+    if (!filePath) {
+      console.log('[AUDIO] 재생할 파일 경로가 없음');
+      setAudioPlaybackInProgress(true);
       setTimeout(() => {
         setAudioPlaybackInProgress(false);
-      }, 500); // 500ms(0.5초) 지연
+      }, 1000);
+      return;
+    }
+
+    // 오디오 파일이 존재하는지 확인
+    RNFS.exists(filePath)
+      .then(exists => {
+        if (!exists) {
+          console.log('[AUDIO] 파일이 존재하지 않음:', filePath);
+          setAudioPlaybackInProgress(false);
+          return;
+        }
+
+        // 오디오 재생 시작 상태 설정
+        setAudioPlaybackInProgress(true);
+        if (chatMode === 'voice') {
+          setStatus('processing');
+          setStatusMessage('응답 듣는 중...');
+        }
+
+        console.log('[AUDIO] 재생 시작:', filePath);
+
+        // 오디오 재생 (재생 완료 콜백 추가)
+        playAudioFile(filePath, () => {
+          console.log('[AUDIO] 재생 완료, 0.5초 후 음성 인식 재개');
+
+          if (chatMode === 'voice') {
+            setStatusMessage('곧 다시 듣기 시작합니다...');
+          }
+
+          setTimeout(() => {
+            setAudioPlaybackInProgress(false);
+          }, 500);
+        });
+      })
+      .catch(error => {
+        console.error('[AUDIO] 파일 확인 오류:', error);
+        setAudioPlaybackInProgress(false);
+      });
+  }, [chatMode, playAudioFile]);
+
+  // 네비게이션 파라미터 감지하여 카메라 결과 처리
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // route.params에서 사진 URI 및 기타 데이터 확인
+      const { photoUri, isPrescription, actionType, timestamp, photoProcessed } = route.params || {};
+
+      // photoProcessed 플래그가 있는 경우에만 처리
+      if (photoUri && timestamp && photoProcessed === true && !isProcessingImage) {
+        console.log(`[CHAT] 카메라에서 돌아옴, 이미지 처리 시작`);
+        setIsProcessingImage(true);
+
+        // 사용자 업로드 메시지 추가
+        const userMessage = isPrescription
+          ? '처방전 사진을 업로드했어요'
+          : '알약 사진을 업로드했어요';
+        addMessage(userMessage, 'user');
+
+        // 스크롤 처리
+        setTimeout(() => {
+          if (flatListRef.current) {
+            flatListRef.current.scrollToEnd({ animated: true });
+          }
+        }, 50);
+
+        // 이미지를 Base64로 변환
+        RNFS.readFile(photoUri, 'base64')
+          .then(base64Image => {
+            // 액션 타입 결정
+            const actionToUse = isPrescription ? 'PRESCRIPTION' : 'PILLS';
+
+            // 처리 중 메시지 시작
+            const typingMsgId = startTypingMessage();
+
+            // 이미지 전송 처리 - 이미 사용자 메시지를 추가했으므로 true로 설정
+            handleImageUpload(base64Image, actionToUse, typingMsgId, true);
+
+            // 파라미터 초기화
+            navigation.setParams({
+              photoUri: null,
+              isPrescription: null,
+              actionType: null,
+              timestamp: null,
+              photoProcessed: null
+            });
+          })
+          .catch(error => {
+            console.error('[CHAT] 이미지 변환 오류:', error);
+            addMessage('이미지 처리 중 오류가 발생했습니다', 'bot');
+            navigation.setParams({
+              photoUri: null,
+              isPrescription: null,
+              actionType: null,
+              timestamp: null,
+              photoProcessed: null
+            });
+          })
+          .finally(() => {
+            setIsProcessingImage(false);
+          });
+      }
     });
+
+    return unsubscribe;
+  }, [navigation, isProcessingImage, addMessage, startTypingMessage]);
+
+  // 이미지 업로드 핸들러 함수
+  const handleImageUpload = async (base64Image, actionType, typingMsgId, skipProcessingMessage = false) => {
+    try {
+      // 1. 타이핑 메시지 제거 (있는 경우)
+      if (typingMsgId) {
+        removeActiveVoiceMessage(typingMsgId);
+      }
+
+      // 2. 사용자 업로드 메시지 추가 - 이미 추가된 경우 스킵
+      // 일반적인 경우에만 사용자 메시지 추가
+      if (!skipProcessingMessage) {
+        const userMessage = actionType === 'PRESCRIPTION'
+          ? '처방전 사진을 업로드했어요'
+          : '알약 사진을 업로드했어요';
+        addMessage(userMessage, 'user');
+
+        // 스크롤 처리
+        await new Promise(resolve => setTimeout(resolve, 50));
+        if (flatListRef.current) {
+          flatListRef.current.scrollToEnd({ animated: true });
+        }
+      }
+
+      // 3. 분석 중 메시지 - 이미 추가된 경우 스킵
+      if (!skipProcessingMessage) {
+        const processingMessage = actionType === 'PRESCRIPTION'
+          ? '업로드된 처방전을 분석 중입니다. 잠시만 기다려주세요.'
+          : '알약을 분석 중입니다. 잠시만 기다려주세요.';
+        addMessage(processingMessage, 'bot', DEFAULT_BOT_OPTIONS);
+
+        // 스크롤 처리
+        await new Promise(resolve => setTimeout(resolve, 50));
+        if (flatListRef.current) {
+          flatListRef.current.scrollToEnd({ animated: true });
+        }
+      }
+
+      // 4. API 호출
+      let response;
+      const startTime = Date.now();
+
+      if (actionType === 'PRESCRIPTION') {
+        console.log('[CHAT] 처방전 이미지 업로드 시작');
+        response = await uploadPrescriptionPhoto(base64Image);
+      } else {
+        console.log('[CHAT] 알약 이미지 업로드 시작');
+        response = await uploadPillsPhoto(base64Image);
+      }
+
+      // 5. 응답 처리
+      const { text, filePath, action, data } = response;
+
+      // 6. 최소 대기 시간 설정
+      const responseTime = Date.now() - startTime;
+      if (responseTime < 1500) {
+        await new Promise(resolve => setTimeout(resolve, 1500 - responseTime));
+      }
+
+      // 7. 분석 결과 메시지 추가
+      addMessage(text, 'bot', DEFAULT_BOT_OPTIONS);
+
+      // 8. 음성 파일 재생 및 추가 처리
+      if (filePath) {
+        playAudioWithCompletion(filePath);
+      } else {
+        setAudioPlaybackInProgress(true);
+        setTimeout(() => {
+          setAudioPlaybackInProgress(false);
+        }, 1000);
+      }
+
+      // 9. 액션 처리
+      if (action) {
+        handleClientAction(action, navigation, { data });
+      }
+
+    } catch (error) {
+      console.error('[CHAT] 이미지 업로드 오류:', error);
+      addMessage('죄송합니다. 이미지 처리 중 오류가 발생했습니다.', 'bot');
+      setAudioPlaybackInProgress(false);
+    }
   };
+
+  // 클라이언트 액션 핸들러 등록
+  useEffect(() => {
+    // 처방전 촬영 액션 핸들러
+    registerActionHandler('CAPTURE_PRESCRIPTION', (data) => {
+      console.log('[CHAT] 처방전 촬영 액션 수신');
+      navigation.navigate('Camera', {
+        actionType: 'PRESCRIPTION',
+        sourceScreen: 'VoiceChat'
+      });
+    });
+
+    // 알약 촬영 액션 핸들러
+    registerActionHandler('CAPTURE_PILLS_PHOTO', (data) => {
+      console.log('[CHAT] 알약 촬영 액션 수신');
+      navigation.navigate('Camera', {
+        actionType: 'PILLS',
+        sourceScreen: 'VoiceChat'
+      });
+    });
+
+    // 처방전/알약 정보 응답 처리 - 수정된 부분
+    registerActionHandler('REVIEW_PRESCRIPTION_REGISTER_RESPONSE', (data, message) => {
+      console.log('[CHAT] 처방전 정보 응답 수신:', data?.length || 0, '개 항목');
+
+      // 메시지가 있으면 채팅에 표시
+      if (message && message.text_message) {
+        // 처방전 분석 결과 메시지 추가
+        addMessage(message.text_message, 'bot', DEFAULT_BOT_OPTIONS);
+
+        // 음성 파일이 있으면 재생
+        if (message.audio_base64) {
+          // 음성 파일 처리 및 재생
+          const handleAudio = async () => {
+            try {
+              const timestamp = Date.now();
+              const filePath = `${RNFS.CachesDirectoryPath}/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
+              await RNFS.writeFile(filePath, message.audio_base64, 'base64');
+              playAudioWithCompletion(filePath);
+            } catch (error) {
+              console.error('[CHAT] 음성 파일 처리 오류:', error);
+            }
+          };
+          handleAudio();
+        }
+      }
+    });
+
+    registerActionHandler('REVIEW_PILLS_PHOTO_SEARCH_RESPONSE', (data, message) => {
+      console.log('[CHAT] 알약 검색 결과 응답 수신:', data?.length || 0, '개 항목');
+
+      // 메시지가 있으면 채팅에 표시
+      if (message && message.text_message) {
+        // 알약 분석 결과 메시지 추가
+        addMessage(message.text_message, 'bot', DEFAULT_BOT_OPTIONS);
+
+        // 음성 파일이 있으면 재생
+        if (message.audio_base64) {
+          // 음성 파일 처리 및 재생
+          const handleAudio = async () => {
+            try {
+              const timestamp = Date.now();
+              const filePath = `${RNFS.CachesDirectoryPath}/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
+              await RNFS.writeFile(filePath, message.audio_base64, 'base64');
+              playAudioWithCompletion(filePath);
+            } catch (error) {
+              console.error('[CHAT] 음성 파일 처리 오류:', error);
+            }
+          };
+          handleAudio();
+        }
+      }
+    });
+  }, [registerActionHandler, navigation, addMessage, playAudioWithCompletion]);
 
   // 웹소켓 매니저 초기화 및 웰컴 메시지 처리
   useEffect(() => {
@@ -498,8 +795,6 @@ export default function VoiceChat() {
       }, 100);
     }
   }, [messages, chatMode, isTyping]);
-
-
 
   return (
     <Container>
