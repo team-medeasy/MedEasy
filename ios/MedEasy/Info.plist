@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>메디지</string>
 	<key>CFBundleExecutable</key>
@@ -43,12 +43,12 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>KAKAO_APP_KEY</key>
-	<string>9779801f476eafda8410589c1fb3fc92</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<true/>
 	<key>FirebaseMessagingAutoInitEnabled</key>
 	<true/>
+	<key>KAKAO_APP_KEY</key>
+	<string>9779801f476eafda8410589c1fb3fc92</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kakao9779801f476eafda8410589c1fb3fc92</string>
@@ -60,15 +60,6 @@
 	<true/>
 	<key>NFCReaderUsageDescription</key>
 	<string>복약 체크를 위해 NFC 태깅 권한이 필요합니다.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>음성 인식을 위해 마이크 접근 권한이 필요합니다</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>음성 인식 기능을 사용하기 위해 권한이 필요합니다</string>
-	<key>com.apple.developer.nfc.readersession.formats</key>
-	<array>
-		<string>NDEF</string>
-		<string>TAG</string>
-	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -76,14 +67,18 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>카메라 접근 권한이 필요합니다</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>챗봇 음성 인식 기능을 사용하기 위해 마이크 권한이 필요합니다.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>의약품 및 처방전 인식을 위해 갤러리 접근 권한이 필요합니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>의약품 및 처방전 인식을 위해 갤러리 접근 권한이 필요합니다.</string>
+	<key>NSRemoteNotificationUsageDescription</key>
+	<string>복약 알림을 받기 위해 권한이 필요합니다</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>챗봇 음성 인식 기능을 사용하기 위해 권한이 필요합니다</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>위치 기반 서비스를 사용하기 위해 권한이 필요합니다</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>사진 저장을 위해 갤러리 접근 권한이 필요합니다</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>사진 저장을 위해 갤러리 접근 권한이 필요합니다</string>
-	<key>NSRemoteNotificationUsageDescription</key>
-	<string>알림을 받기 위해 권한이 필요합니다</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-Regular.otf</string>
@@ -115,5 +110,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>com.apple.developer.nfc.readersession.formats</key>
+	<array>
+		<string>NDEF</string>
+		<string>TAG</string>
+	</array>
 </dict>
 </plist>
