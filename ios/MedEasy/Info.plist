@@ -58,13 +58,25 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+<<<<<<< HEAD
+=======
+	<key>NSMicrophoneUsageDescription</key>
+	<string>음성 채팅을 위해 사용자의 음성을 녹음할 수 있도록 마이크 접근 권한이 필요합니다</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>사용자의 음성을 텍스트로 변환해 음성 채팅 기능에서 활용하기 위해 권한이 필요합니다</string>ray>
+>>>>>>> 816b7c445c85e3c140536d5bce27a5b79d860d40
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
+<<<<<<< HEAD
 	<string>메디지는 약의 촬영과 처방전 촬영을 통해 약 정보를 인식하고 복약 일정을 등록하기 위해 카메라 접근 권한이 필요합니다. 권한을 허용하시면 처방전 및 약품 인식 기능을 사용하실 수 있습니다.</string>
+=======
+
+	<string>약 사진 및 처방전 촬영을 위해 카메라 접근 권한이 필요합니다</string>
+>>>>>>> 816b7c445c85e3c140536d5bce27a5b79d860d40
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>메디지는 주변 약국 검색 및 위치 기반 서비스를 제공하기 위해 위치 정보 접근 권한이 필요합니다. 이 정보는 사용자에게 가까운 약국을 추천하고 더 정확한 서비스를 제공하는 데 사용됩니다.</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -108,5 +120,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>com.apple.developer.nfc.readersession.formats</key>
+	<array>
+		<string>NDEF</string>
+		<string>TAG</string>
+	</array>
 </dict>
 </plist>
