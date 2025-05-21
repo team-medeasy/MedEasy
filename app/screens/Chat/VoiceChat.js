@@ -514,6 +514,12 @@ export default function VoiceChat() {
             handleAudio();
           }
         }
+        // 화면 이동 호출
+        handleClientAction(
+          'REVIEW_PILLS_PHOTO_SEARCH_RESPONSE',
+          navigation,
+          { data }
+        );
       },
     );
   }, [registerActionHandler, navigation, addMessage, playAudioWithCompletion]);
