@@ -16,7 +16,7 @@ import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
 const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
   // route.params에서 photoUri 가져오기
-  const { photoUri } = route.params || {};
+  const { photoUri, prescriptionData } = route.params || {};
 
   const {fontSizeMode} = useFontSize();
   
@@ -99,10 +99,35 @@ const PrescriptionSearchResultsScreen = ({ navigation, route }) => {
     }
   };
 
-  // 컴포넌트 마운트 시 API 호출
   useEffect(() => {
+  if (prescriptionData && prescriptionData.length > 0) {
+    // VoiceChat에서 온 데이터 처리
+    const formattedResults = prescriptionData.map((item, index) => ({
+      item_name: item.medicine_name,
+      entp_name: item.entp_name || '정보 없음',
+      item_image: item.image_url,
+      class_name: item.class_name || '일반의약품',
+      etc_otc_name: item.etc_otc_name || '일반의약품',
+      original_id: item.medicine_id,
+      uniqueKey: `${item.medicine_id}_${index}`,
+      dose: item.dose,
+      total_days: item.total_days,
+      total_quantity: item.total_quantity,
+      day_of_weeks: item.day_of_weeks,
+      user_schedules: item.user_schedules,
+      isModified: false
+    }));
+
+    setOriginalResponseData(prescriptionData);
+    setSearchResults(formattedResults);
+    setLoading(false);
+    setNoResults(false);
+  } else {
+    // 기존 흐름 유지 (사진 분석)
     analyzePrescription();
-  }, [photoUri]);
+  }
+}, [prescriptionData, photoUri]);
+
 
   // 약 상세 정보로 이동 처리
   const handleSearchResultPress = async (item) => {
