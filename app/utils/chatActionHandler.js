@@ -1,16 +1,16 @@
 // utils/chatActionHandler.js
-import { Linking } from 'react-native';
+import {Linking} from 'react-native';
 
 /**
  * 클라이언트 액션 처리 함수
  * 서버에서 받은 client_action에 따라 적절한 화면으로 이동하거나 기능을 수행합니다.
- * 
+ *
  * @param {string} action - 서버에서 전달받은 client_action 값
  * @param {object} navigation - React Navigation의 navigation 객체
  * @param {object} options - 추가 옵션 (data 등)
  */
 export const handleClientAction = (action, navigation, options = {}) => {
-  const { data } = options;
+  const {data} = options;
 
   console.log('[ActionHandler] 처리할 액션:', action);
   console.log('[ActionHandler] 데이터:', data);
@@ -21,7 +21,7 @@ export const handleClientAction = (action, navigation, options = {}) => {
       console.log('[ActionHandler] 처방전 촬영 요청');
       navigation.navigate('Camera', {
         actionType: 'PRESCRIPTION',
-        sourceScreen: 'VoiceChat'
+        sourceScreen: 'VoiceChat',
       });
       break;
 
@@ -36,7 +36,8 @@ export const handleClientAction = (action, navigation, options = {}) => {
       // 처방전 정보를 담아서 검토 화면으로 이동
       navigation.navigate('PrescriptionSearchResults', {
         prescriptionData: data,
-        fromVoiceChat: true
+        fromVoiceChat: true,
+        onRoutineRegistered: options?.onRoutineRegistered,
       });
       break;
 
@@ -45,7 +46,7 @@ export const handleClientAction = (action, navigation, options = {}) => {
       console.log('[ActionHandler] 알약 촬영 요청');
       navigation.navigate('Camera', {
         actionType: 'PILLS',
-        sourceScreen: 'VoiceChat'
+        sourceScreen: 'VoiceChat',
       });
       break;
 
@@ -60,7 +61,7 @@ export const handleClientAction = (action, navigation, options = {}) => {
       // 알약 검색 결과를 담아서 검토 화면으로 이동
       navigation.navigate('CameraSearchResults', {
         pillsData: data,
-        fromVoiceChat: true
+        fromVoiceChat: true,
       });
       break;
 
