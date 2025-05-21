@@ -24,7 +24,7 @@ export const CameraSearchResultItem = ({item, onPress}) => {
             sizeType="small"
             colorType="resultPrimary"
             overflowMode="ellipsis"
-            maxWidth="80"
+            maxWidth="120"
           >
             {item.etc_otc_name || '정보 없음'}
           </Tag>
