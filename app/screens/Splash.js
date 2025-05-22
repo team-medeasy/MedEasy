@@ -9,29 +9,29 @@ import LinearGradient from 'react-native-linear-gradient';
 const Splash = () => {
   return (
     <Container
-    colors={[pointColor.pointPrimaryDark, pointColor.gradient]} // 밝은색 → 진한색
-    start={{ x: 0.5, y: 0 }}
-    end={{ x: 0.5, y: 1 }}
+      colors={[pointColor.pointPrimaryDark, pointColor.gradient]} // 밝은색 → 진한색
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
     >
       <TextContainer>
         <SmallLine>복잡한 약 정보를 간단하게</SmallLine>
         <BigLine>내 손 안의</BigLine>
-        <BigLine>의학 도우미</BigLine>
+        <BigLine>복약 도우미</BigLine>
       </TextContainer>
       <LogoContainer>
         <MainLogoWrapper>
-          <Logo 
-            width={500} 
-            height={500} 
+          <Logo
+            width={500}
+            height={500}
             style={{
               opacity: 0.5,
               transform: [{ rotate: '8deg' }],
               color: pointColor.primary20
-            }} 
+            }}
           />
         </MainLogoWrapper>
         <SubLogoWrapper>
-          <Logo_kr width={82} style={{ color: themes.light.textColor.buttonText}}/>
+          <Logo_kr width={82} style={{ color: themes.light.textColor.buttonText }} />
         </SubLogoWrapper>
       </LogoContainer>
     </Container>
