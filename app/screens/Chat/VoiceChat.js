@@ -417,21 +417,18 @@ export default function VoiceChat() {
     // 처방전 촬영 액션 핸들러
     registerActionHandler('CAPTURE_PRESCRIPTION', data => {
       console.log('[CHAT] 처방전 촬영 액션 수신');
-      navigation.navigate('Camera', {
-        actionType: 'PRESCRIPTION',
-        sourceScreen: 'VoiceChat',
-      });
     });
 
     // 알약 촬영 액션 핸들러
     registerActionHandler('CAPTURE_PILLS_PHOTO', data => {
       console.log('[CHAT] 알약 촬영 액션 수신');
-      navigation.navigate('Camera', {
-        actionType: 'PILLS',
-        sourceScreen: 'VoiceChat',
-      });
     });
 
+    // 알약 사진 업로드 액션 핸들러
+    registerActionHandler('UPLOAD_PILLS_PHOTO', data => {
+      console.log('[CHAT] 알약 사진 업로드 액션 수신');
+    });
+    
     // 처방전/알약 정보 응답 처리 - 수정된 부분
     registerActionHandler(
       'REVIEW_PRESCRIPTION_REGISTER_RESPONSE',

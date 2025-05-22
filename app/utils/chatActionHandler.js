@@ -50,6 +50,15 @@ export const handleClientAction = (action, navigation, options = {}) => {
       });
       break;
 
+    case 'UPLOAD_PILLS_PHOTO':
+      // 알약 촬영 액션
+      console.log('[ActionHandler] 알약 사진 업로드 요청');
+      navigation.navigate('Camera', {
+        actionType: 'PILLS',
+        sourceScreen: 'VoiceChat',
+      });
+      break;
+
     case 'REVIEW_PILLS_PHOTO_SEARCH_RESPONSE':
       // 알약 검색 결과 검토 액션
       console.log('[ActionHandler] 알약 검색 결과 검토');
