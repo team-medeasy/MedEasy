@@ -35,7 +35,7 @@ export const appleLogin = async () => {
     console.log('애플 로그인 성공', appleAuthResponse);
 
     // 사용자 정보 추출
-    const { identityToken, fullName, email, user } = appleAuthResponse;
+    const { identityToken, authorizationCode, fullName, email, user } = appleAuthResponse;
 
     // FCM 토큰 가져오기
     const fcmToken = await getFCMToken();
@@ -44,6 +44,7 @@ export const appleLogin = async () => {
     // 서버에 애플 토큰 전송하여 자체 토큰 받기
     const response = await api.post('/open-api/auth/apple', {
       identity_token: identityToken,
+      authorization_code: authorizationCode,
       first_name: fullName?.givenName || null, // 첫 로그인에만 제공됨
       last_name: fullName?.familyName || null, // 첫 로그인에만 제공됨
       fcm_token: fcmToken || ''
