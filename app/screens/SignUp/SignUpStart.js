@@ -1,14 +1,16 @@
 import React from 'react';
-import {SafeAreaView, TouchableOpacity, Text, View} from 'react-native';
+import { SafeAreaView, TouchableOpacity, Text, View, Platform } from 'react-native';
 import styled from 'styled-components/native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {IconTextButton} from '../../components';
-import {themes, fonts} from './../../styles';
-import {OtherIcons, Images} from './../../../assets/icons';
-const {kakao: KakaoIcon} = OtherIcons;
+import { IconTextButton } from '../../components';
+import { themes, fonts } from './../../styles';
+import { OtherIcons, Images } from './../../../assets/icons';
+const { kakao: KakaoIcon } = OtherIcons;
 
-// kakaologin
-import { handleKakaoLogin } from '../../api/services/authService';
+// 로그인 서비스 import
+import { handleKakaoLogin, handleAppleLogin } from '../../api/services/authService'; // handleAppleLogin 추가
+
+// 애플 로그인 (iOS 전용)
+import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
 
 import FontSizes from '../../../assets/fonts/fontSizes';
 
@@ -34,6 +36,12 @@ const ButtonContainer = styled.View`
   gap: 12px;
 `;
 
+const AppleButtonStyled = styled(AppleButton)`
+  width: 100%;
+  height: 50px;
+  margin-bottom: 12px;
+`;
+
 const EmailBtn = styled(TouchableOpacity)`
   justify-content: center;
   align-items: center;
@@ -53,13 +61,22 @@ const SignUpContainer = styled.View`
   gap: 4px;
 `;
 
-const SignUpStartScreen = ({navigation}) => {
+const SignUpStartScreen = ({ navigation }) => {
   // 카카오 로그인 처리 함수
   const onKakaoLogin = async () => {
     try {
       await handleKakaoLogin(navigation);
     } catch (error) {
       console.error('카카오 로그인 화면 처리 오류:', error);
+    }
+  };
+
+  // 애플 로그인 처리 함수
+  const onAppleLogin = async () => {
+    try {
+      await handleAppleLogin(navigation);
+    } catch (error) {
+      console.error('애플 로그인 화면 처리 오류:', error);
     }
   };
 
@@ -79,37 +96,33 @@ const SignUpStartScreen = ({navigation}) => {
       </ImageContainer>
 
       <ButtonContainer>
+        {Platform.OS === 'ios' && (
+          <AppleButtonStyled
+            buttonStyle={AppleButton.Style.BLACK}
+            buttonType={AppleButton.Type.SIGN_IN}
+            onPress={onAppleLogin}
+          />
+        )}
         <IconTextButton
           onPress={onKakaoLogin}
           icon={
             <KakaoIcon
               height={18}
               width={18}
-              style={{color: themes.light.textColor.buttonText}}
+              style={{ color: themes.light.textColor.buttonText }}
             />
           }
           title="카카오톡으로 시작하기"
         />
-        <IconTextButton
-          onPress={() => console.log('Google 로그인')}
-          icon={
-            <FontAwesome
-              name="google"
-              size={20}
-              color={themes.light.textColor.buttonText}
-            />
-          }
-          title="Google로 시작하기"
-        />
 
         <SignUpContainer>
           <EmailBtn
-            style={{padding: 8}}
+            style={{ padding: 8 }}
             onPress={() => navigation.navigate('SignUpName')}>
             <EmailBtnText>회원가입</EmailBtnText>
           </EmailBtn>
           <EmailBtn
-            style={{padding: 8}}
+            style={{ padding: 8 }}
             onPress={() => navigation.navigate('SignIn')}>
             <EmailBtnText>이메일 로그인</EmailBtnText>
           </EmailBtn>
