@@ -90,6 +90,7 @@ import KakaoIcon from './icons/kakao.svg';
 import CheckCircleIcon from './icons/check_circle.svg';
 import ToolTipIcon from './icons/tooltip.svg';
 import SpeakerIcon from './icons/speaker.svg';
+import AppleIcon from './icons/apple.svg'
 
 // 이미지 에셋
 import EmptyLikeImage from './images/emptyLike.svg';
@@ -201,7 +202,8 @@ export const OtherIcons = {
   kakao: KakaoIcon,
   CheckCircle: CheckCircleIcon,
   ToolTip: ToolTipIcon,
-  Speaker: SpeakerIcon
+  Speaker: SpeakerIcon,
+  Apple: AppleIcon
 };
 
 export const Images = {
