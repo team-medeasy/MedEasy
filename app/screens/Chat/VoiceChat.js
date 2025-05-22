@@ -5,8 +5,6 @@ import {
   Platform,
   View,
   AppState,
-  InteractionManager,
-  Alert,
   BackHandler,
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
@@ -180,9 +178,9 @@ export default function VoiceChat() {
         backHandler.remove();
 
         // 화면 이탈 시 정리
-        cleanupAudio();
-        Voice.cancel().catch(() => {});
-        stopPulseAnimation();
+          cleanupAudio();
+          Voice.cancel().catch(() => {});
+          stopPulseAnimation();
       };
     }, []),
   );
@@ -205,10 +203,14 @@ export default function VoiceChat() {
   const playAudioWithCompletion = useCallback(
     filePath => {
       if (!filePath) {
-        console.log('[AUDIO] 재생할 파일 경로가 없음');
+        console.log('[AUDIO] 재생할 파일 경로가 없음, 상태 초기화');
         setAudioPlaybackInProgress(true);
         setTimeout(() => {
           setAudioPlaybackInProgress(false);
+          // 음성 모드일 때만 상태 초기화
+          if (chatMode === 'voice') {
+            setStatus('idle');
+          }
         }, 1000);
         return;
       }
@@ -219,10 +221,15 @@ export default function VoiceChat() {
           if (!exists) {
             console.log('[AUDIO] 파일이 존재하지 않음:', filePath);
             setAudioPlaybackInProgress(false);
+            // 음성 인식 재개를 위한 상태 초기화
+            if (chatMode === 'voice') {
+              reset('준비 완료');
+            }
             return;
           }
 
           // 오디오 재생 시작 상태 설정
+          console.log('[AUDIO] 새 오디오 재생 시작, 이전 상태 초기화');
           setAudioPlaybackInProgress(true);
           if (chatMode === 'voice') {
             setStatus('processing');
@@ -231,6 +238,9 @@ export default function VoiceChat() {
 
           console.log('[AUDIO] 재생 시작:', filePath);
 
+          // 기존 오디오 정리 후 새 오디오 재생
+          cleanupAudio();
+          
           // 오디오 재생 (재생 완료 콜백 추가)
           playAudioFile(filePath, () => {
             console.log('[AUDIO] 재생 완료, 0.5초 후 음성 인식 재개');
@@ -240,16 +250,33 @@ export default function VoiceChat() {
             }
 
             setTimeout(() => {
+              console.log('[AUDIO] 오디오 재생 완료 후 상태 변경');
               setAudioPlaybackInProgress(false);
+              // 음성 모드일 때만 상태 초기화하여 자동 재시작 트리거
+              if (chatMode === 'voice') {
+                console.log('[AUDIO] 음성 인식 자동 재시작을 위한 상태 설정');
+                setStatus('idle');
+                // 더 긴 지연 시간으로 상태 안정화 대기
+                setTimeout(() => {
+                  console.log('[AUDIO] 강제 음성 인식 재시작');
+                  if (!voiceActive && hasPermission && status !== 'listening') {
+                    handleStartListening();
+                  }
+                }, 300);
+              }
             }, 500);
           });
         })
         .catch(error => {
           console.error('[AUDIO] 파일 확인 오류:', error);
           setAudioPlaybackInProgress(false);
+          // 음성 인식 재개를 위한 상태 초기화
+          if (chatMode === 'voice') {
+            reset('준비 완료');
+          }
         });
     },
-    [chatMode, playAudioFile],
+    [chatMode, playAudioFile, setStatus, voiceActive, hasPermission, handleStartListening, cleanupAudio, setStatusMessage], // 필요한 의존성들
   );
 
   // 네비게이션 파라미터 감지하여 카메라 결과 처리
@@ -412,7 +439,6 @@ export default function VoiceChat() {
     }
   };
 
-  // 클라이언트 액션 핸들러 등록
   useEffect(() => {
     // 처방전 촬영 액션 핸들러
     registerActionHandler('CAPTURE_PRESCRIPTION', data => {
@@ -575,6 +601,15 @@ export default function VoiceChat() {
   useEffect(() => {
     let timeoutId;
 
+    console.log('[VOICE] 자동 재시작 조건 체크:', {
+      chatMode,
+      isTyping,
+      voiceActive,
+      status,
+      hasPermission,
+      audioPlaybackInProgress,
+    });
+
     if (
       chatMode === 'voice' &&
       !isTyping &&
@@ -590,10 +625,15 @@ export default function VoiceChat() {
         console.log('[VOICE] 자동 재시작 실행');
         handleStartListening();
       }, 1000);
+    } else {
+      console.log('[VOICE] 자동 재시작 조건 불만족');
     }
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      if (timeoutId) {
+        console.log('[VOICE] 자동 재시작 타이머 클리어');
+        clearTimeout(timeoutId);
+      }
     };
   }, [
     status,

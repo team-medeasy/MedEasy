@@ -108,24 +108,19 @@ const SignUpStartScreen = ({navigation}) => {
       </ImageContainer>
 
       <ButtonContainer>
-        {/* {Platform.OS === 'ios' && (
-          <AppleButtonStyled
-            buttonStyle={AppleButton.Style.BLACK}
-            buttonType={AppleButton.Type.SIGN_IN}
+        {Platform.OS === 'ios' && (
+          <IconTextButton
             onPress={onAppleLogin}
+            icon={
+              <OtherIcons.Apple
+                height={18}
+                width={18}
+                style={{color: themes.light.textColor.buttonText}}
+              />
+            }
+            title="Apple로 시작하기"
           />
-        )} */}
-        <IconTextButton
-          onPress={onAppleLogin}
-          icon={
-            <OtherIcons.Apple
-              height={18}
-              width={18}
-              style={{color: themes.light.textColor.buttonText}}
-            />
-          }
-          title="Apple로 시작하기"
-        />
+        )}
         <IconTextButton
           onPress={onKakaoLogin}
           icon={
