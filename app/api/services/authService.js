@@ -1,81 +1,63 @@
-// api/services/authService.js
 import { login, signUp } from '../auth';
-import { kakaoLogin } from './kakaoAuth';
-import { appleLogin } from './appleAuth';
+import { kakaoLogin, deleteKakaoAccount } from './kakaoAuth';
+import { appleLogin, deleteAppleAccount } from './appleAuth';
 import { getUser } from '../user';
-
 import {
   setAccessToken,
   setRefreshToken,
   removeAccessToken,
   removeRefreshToken,
   setUserInfo,
-  setTokenExpiryTime,  // 추가
-  removeTokenExpiryTime  // 추가
+  setTokenExpiryTime,
+  removeTokenExpiryTime,
+  setLoginProvider,
+  removeLoginProvider,
+  removeUserInfo,
+  getLoginProvider
 } from '../storage';
 import { setAuthToken } from '..';
+import api from '../index';
 
 export const handleLogin = async credentials => {
   try {
-    // 로그인 결과에서 만료 시간도 받아옴
     const { accessToken, refreshToken, accessTokenExpiredAt } = await login(credentials);
-
-    console.log('로그인 응답:', { accessToken, refreshToken, accessTokenExpiredAt });
 
     if (accessToken) {
       await setAccessToken(accessToken);
       setAuthToken(accessToken);
+      await setLoginProvider('email');
 
-      // 토큰 만료 시간 저장
       if (accessTokenExpiredAt) {
         const expiryTime = new Date(accessTokenExpiredAt).getTime();
         await setTokenExpiryTime(expiryTime);
-        console.log('토큰 만료 시간 저장:', new Date(expiryTime).toLocaleString());
       } else {
-        // 만료 시간이 없으면 기본값으로 1시간 설정
         const oneHourLater = Date.now() + 60 * 60 * 1000;
         await setTokenExpiryTime(oneHourLater);
-        console.log('기본 토큰 만료 시간 설정:', new Date(oneHourLater).toLocaleString());
       }
 
-      // 토큰 설정 후 사용자 정보 가져오기
       try {
         const userResponse = await getUser();
-        console.log('getUser API 전체 응답:', userResponse);
-
         const userData = userResponse.data?.data || userResponse.data?.body || userResponse.data;
-
-        console.log('사용자 정보 로드 완료:', userData);
-
-        // 사용자 정보 저장
         await setUserInfo({
           name: userData.name || '',
           gender: userData.gender || '',
           birthday: userData.birthday || '',
         });
-        return userData; // 컴포넌트에서 사용할 수 있도록 반환
-
+        return userData;
       } catch (userError) {
-        console.error('사용자 정보 로드 실패:', userError);
         // 사용자 정보 로드 실패해도 로그인은 성공으로 처리
       }
     } else {
-      console.warn('ACCESS_TOKEN is undefined. Removing key from storage.');
       await removeAccessToken();
-      await removeTokenExpiryTime();  // 추가: 만료 시간도 함께 제거
+      await removeTokenExpiryTime();
     }
 
     if (refreshToken) {
       await setRefreshToken(refreshToken);
     } else {
-      console.warn('REFRESH_TOKEN is undefined. Removing key from storage.');
       await removeRefreshToken();
     }
-
-    console.log('로그인 성공!');
   } catch (error) {
-    console.error('로그인 실패:', error.response?.data || error.message);
-
     if (error.response?.status === 401) {
       alert('이메일 또는 비밀번호가 잘못되었습니다.');
     } else if (error.response?.status === 404) {
@@ -85,40 +67,26 @@ export const handleLogin = async credentials => {
         '로그인 실패: ' + (error.response?.data?.message || error.response?.data?.result_message || '알 수 없는 오류'),
       );
     }
-
     throw error;
   }
 };
 
+// 카카오 로그인
 export const handleKakaoLogin = async (navigation) => {
   try {
-    // 카카오 로그인 결과에서 만료 시간도 받아옴
-    const result = await kakaoLogin();
-
+    const result = await kakaoLogin(); // 내부에서 setLoginProvider('kakao')!
     if (result?.accessToken) {
-      console.log('카카오 로그인 성공:', result);
-
-      // 토큰 만료 시간 저장
+      // 토큰 만료 시간 등 저장 (아래 동일)
       if (result.accessTokenExpiredAt) {
-        const expiryTime = new Date(result.accessTokenExpiredAt).getTime();
-        await setTokenExpiryTime(expiryTime);
-        console.log('카카오 토큰 만료 시간 저장:', new Date(expiryTime).toLocaleString());
+        await setTokenExpiryTime(new Date(result.accessTokenExpiredAt).getTime());
       } else {
-        // 만료 시간이 없으면 기본값으로 1시간 설정
-        const oneHourLater = Date.now() + 60 * 60 * 1000;
-        await setTokenExpiryTime(oneHourLater);
-        console.log('카카오 기본 토큰 만료 시간 설정:', new Date(oneHourLater).toLocaleString());
+        await setTokenExpiryTime(Date.now() + 60 * 60 * 1000);
       }
-
       navigation.reset({ index: 0, routes: [{ name: 'NavigationBar' }] });
       return result;
     }
   } catch (error) {
-    console.error('카카오 로그인 실패:', error);
-
-    // 오류 응답에 따른 처리
     if (error.response?.status === 404) {
-      // 사용자가 등록되지 않은 경우, 회원가입 화면으로 이동
       alert('카카오 계정으로 먼저 회원가입이 필요합니다.');
       navigation.navigate('SignUpName');
     } else {
@@ -128,43 +96,24 @@ export const handleKakaoLogin = async (navigation) => {
   }
 };
 
-// 애플 로그인 처리 함수 추가
+// 애플 로그인
 export const handleAppleLogin = async (navigation) => {
   try {
-    // 애플 로그인 결과에서 만료 시간도 받아옴
-    const result = await appleLogin();
-
+    const result = await appleLogin(); // 내부에서 setLoginProvider('apple')!
     if (result?.accessToken) {
-      console.log('애플 로그인 성공:', result);
-
-      // 토큰 만료 시간 저장 - appleAuth.js에서 이미 처리했으므로 여기서는 생략 가능
-      // 하지만 일관성을 위해 유지
       if (result.accessTokenExpiredAt) {
-        const expiryTime = new Date(result.accessTokenExpiredAt).getTime();
-        await setTokenExpiryTime(expiryTime);
-        console.log('애플 토큰 만료 시간 저장:', new Date(expiryTime).toLocaleString());
+        await setTokenExpiryTime(new Date(result.accessTokenExpiredAt).getTime());
       } else {
-        // 만료 시간이 없으면 기본값으로 1시간 설정
-        const oneHourLater = Date.now() + 60 * 60 * 1000;
-        await setTokenExpiryTime(oneHourLater);
-        console.log('애플 기본 토큰 만료 시간 설정:', new Date(oneHourLater).toLocaleString());
+        await setTokenExpiryTime(Date.now() + 60 * 60 * 1000);
       }
-
       navigation.reset({ index: 0, routes: [{ name: 'NavigationBar' }] });
       return result;
     }
   } catch (error) {
-    console.error('애플 로그인 실패:', error);
-
-    // 취소된 경우는 별도 처리
     if (error.code === 'ERR_CANCELED') {
-      console.log('사용자가 애플 로그인을 취소했습니다.');
       return;
     }
-
-    // 오류 응답에 따른 처리
     if (error.response?.status === 404) {
-      // 사용자가 등록되지 않은 경우, 회원가입 화면으로 이동
       alert('애플 계정으로 먼저 회원가입이 필요합니다.');
       navigation.navigate('SignUpName');
     } else {
@@ -181,42 +130,33 @@ export const handleSignUp = async (data, navigation) => {
     const requestData = {
       email: data.email,
       password: data.password,
-      name, // 성+이름 형태로 서버에 전송
+      name,
       birthday: data.birthday || null,
       gender: data.gender || null,
     };
 
-    console.log('회원가입 요청 데이터:', requestData);
-    // 회원가입 응답에서 accessToken, refreshToken, accessTokenExpiredAt 추출
     const response = await signUp(requestData);
     const { accessToken, refreshToken, accessTokenExpiredAt } = response;
-
-    console.log('회원가입 응답:', response.data);
 
     if (accessToken) {
       await setAccessToken(accessToken);
       setAuthToken(accessToken);
+      await setLoginProvider('email');
 
-      // 토큰 만료 시간 저장
       if (accessTokenExpiredAt) {
         const expiryTime = new Date(accessTokenExpiredAt).getTime();
         await setTokenExpiryTime(expiryTime);
-        console.log('토큰 만료 시간 저장:', new Date(expiryTime).toLocaleString());
       } else {
-        // 만료 시간이 없으면 기본값으로 1시간 설정
         const oneHourLater = Date.now() + 60 * 60 * 1000;
         await setTokenExpiryTime(oneHourLater);
-        console.log('기본 토큰 만료 시간 설정:', new Date(oneHourLater).toLocaleString());
       }
 
-      // 회원가입 후 사용자 정보 저장 - 이미 요청 데이터에 있으므로 바로 저장 가능
       await setUserInfo({
         name: requestData.name,
         gender: requestData.gender,
         birthday: requestData.birthday,
       });
     } else {
-      console.warn('ACCESS_TOKEN is undefined. Removing key from storage.');
       await removeAccessToken();
       await removeTokenExpiryTime();
     }
@@ -224,61 +164,69 @@ export const handleSignUp = async (data, navigation) => {
     if (refreshToken) {
       await setRefreshToken(refreshToken);
     } else {
-      console.warn('REFRESH_TOKEN is undefined. Removing key from storage.');
       await removeRefreshToken();
     }
 
-    console.log('회원가입 성공!');
-
-    // 회원가입 성공 후 자동 로그인 실행
     await handleLogin({ email: data.email, password: data.password });
 
-    // 홈화면으로 이동
     navigation.reset({ index: 0, routes: [{ name: 'NavigationBar' }] });
 
     return response.data;
   } catch (error) {
-    console.error(
-      '회원가입 실패:',
-      JSON.stringify(error.response?.data, null, 2),
-    );
-
     if (error.response?.status === 409) {
       alert('이미 가입된 이메일입니다. 로그인해주세요.');
     } else if (error.response?.data?.message) {
       alert(`회원가입 실패: ${error.response.data.message}`);
     } else if (error.response?.data?.result_message) {
-      // 서버에서 다른 키로 오류 메시지 반환할 경우 처리
       alert(`회원가입 실패: ${error.response.data.result_message}`);
     } else {
       alert('회원가입 실패: 알 수 없는 오류');
     }
-
     throw error;
   }
 };
 
-// 로그아웃 시 토큰 관련 데이터 모두 제거하는 함수 추가
 export const handleLogout = async (navigation) => {
+  await removeAccessToken();
+  await removeRefreshToken();
+  await removeTokenExpiryTime();
+  await removeLoginProvider();
+  await removeUserInfo();
+  setAuthToken(null);
+  if (navigation) navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
+  return true;
+};
+
+/**
+ * 계정 삭제(회원 탈퇴) 처리 함수
+ * provider: 'apple', 'kakao', 'email'
+ */
+export const handleAccountDelete = async (navigation) => {
+  const provider = await getLoginProvider();
   try {
-    // 모든 토큰 관련 데이터 제거
-    await removeAccessToken();
-    await removeRefreshToken();
-    await removeTokenExpiryTime();
-
-    // 인증 헤더 제거
-    setAuthToken(null);
-
-    console.log('로그아웃 성공');
-
-    // 로그인 화면으로 이동
-    if (navigation) {
-      navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
+    if (provider === 'apple') {
+      await deleteAppleAccount(navigation);
+    } else if (provider === 'kakao') {
+      await deleteKakaoAccount(navigation);
+    } else {
+      await api.post('/user/delete', {}, {
+        headers: {
+          Authorization: undefined,
+          'Content-Type': 'application/json',
+        }
+      });
+      await removeAccessToken();
+      await removeRefreshToken();
+      await removeTokenExpiryTime();
+      await removeLoginProvider();
+      await removeUserInfo();
+      setAuthToken(null);
+      if (navigation) navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
+      alert('계정이 삭제되었습니다.');
     }
-
     return true;
-  } catch (error) {
-    console.error('로그아웃 실패:', error);
-    return false;
+  } catch (e) {
+    alert('계정 삭제에 실패했습니다. 다시 시도해 주세요.');
+    throw e;
   }
 };

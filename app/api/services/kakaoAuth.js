@@ -1,11 +1,11 @@
-// api/services/kakaoAuth.js
 import { login, logout, getProfile } from '@react-native-seoul/kakao-login';
-import { 
-  getFCMToken, 
-  setAccessToken, 
-  setRefreshToken, 
+import {
+  getFCMToken,
+  setAccessToken,
+  setRefreshToken,
   setUserInfo,
-  setTokenExpiryTime  // 추가: 토큰 만료 시간 저장 함수
+  setTokenExpiryTime,
+  setLoginProvider
 } from '../storage';
 import { setAuthToken } from '..';
 import api from '../index';
@@ -15,66 +15,42 @@ import api from '../index';
  */
 export const kakaoLogin = async () => {
   try {
-    // 카카오 SDK로 로그인
     const token = await login();
-    console.log('카카오 로그인 성공', token);
-    
-    // 카카오 프로필 정보 가져오기 (선택사항)
     const profile = await getProfile();
-    console.log('카카오 프로필', profile);
-    
-    // FCM 토큰 가져오기
     const fcmToken = await getFCMToken();
-    console.log('FCM 토큰:', fcmToken || '없음');
-    
-    // 서버에 카카오 토큰 전송하여 자체 토큰 받기
+
     const response = await api.post('/open-api/auth/kakao', {
       access_token: token.accessToken,
       fcm_token: fcmToken || ''
     }, {
       headers: {
-        Authorization: undefined, // 이전 인증 헤더가 있을 경우 제거
+        Authorization: undefined,
         'Content-Type': 'application/json',
       },
     });
-    
-    console.log('서버 카카오 로그인 응답:', response.data);
-    
-    // 응답에서 토큰 정보 확인 및 저장
-    const { 
-      access_token, 
+
+    const {
+      access_token,
       refresh_token,
-      access_token_expired_at  // 만료 시간 추출
+      access_token_expired_at
     } = response.data.body || {};
-    
+
     if (access_token) {
-      // 액세스 토큰 저장 및 설정
       await setAccessToken(access_token);
       setAuthToken(access_token);
-      
-      // 토큰 만료 시간 저장
-      if (access_token_expired_at) {
-        const expiryTime = new Date(access_token_expired_at).getTime();
-        await setTokenExpiryTime(expiryTime);
-        console.log('[카카오 로그인] 토큰 만료 시간 저장:', new Date(expiryTime).toLocaleString());
-      } else {
-        // 만료 시간이 없으면 기본값으로 1시간 설정
-        const oneHourLater = Date.now() + 60 * 60 * 1000;
-        await setTokenExpiryTime(oneHourLater);
-        console.log('[카카오 로그인] 기본 토큰 만료 시간 설정:', new Date(oneHourLater).toLocaleString());
-      }
-      
-      // 사용자 정보는 최소한으로만 저장 (이름만)
+      await setLoginProvider('kakao');
+
+      const expiryTime = access_token_expired_at
+        ? new Date(access_token_expired_at).getTime()
+        : Date.now() + 60 * 60 * 1000;
+      await setTokenExpiryTime(expiryTime);
+
       await setUserInfo({
         name: profile?.nickname || '',
       });
-      
-      // 리프레시 토큰 저장
-      if (refresh_token) {
-        await setRefreshToken(refresh_token);
-      }
-      
-      // 결과 반환 (만료 시간 포함)
+
+      if (refresh_token) await setRefreshToken(refresh_token);
+
       return {
         accessToken: access_token,
         refreshToken: refresh_token,
@@ -83,31 +59,22 @@ export const kakaoLogin = async () => {
     } else {
       throw new Error('서버에서 토큰을 받지 못했습니다.');
     }
-    
   } catch (error) {
-    console.error('카카오 로그인 실패:', error.response?.data || error);
-    
-    // 사용자 친화적인 에러 메시지를 오류 객체에 추가
     if (error.response?.status === 404) {
       error.userMessage = '카카오 계정으로 먼저 회원가입이 필요합니다.';
     } else {
       error.userMessage = '카카오 로그인에 실패했습니다: ' + (error.message || '알 수 없는 오류');
     }
-    
     throw error;
   }
 };
 
 /**
- * 카카오 로그아웃 함수
+ * 카카오 계정 탈퇴(회원 삭제)
+ * TODO: 실제 카카오 연결 끊기 및 서버 연동 구현 필요
  */
-export const kakaoLogout = async () => {
-  try {
-    const message = await logout();
-    console.log('카카오 로그아웃 성공:', message);
-    return message;
-  } catch (error) {
-    console.error('카카오 로그아웃 실패:', error);
-    throw error;
-  }
+export const deleteKakaoAccount = async (navigation) => {
+  alert('카카오 계정 탈퇴는 추후 지원 예정입니다.');
+  // TODO: 카카오 연결 해제 및 서버 /user/kakao/delete 구현
+  return;
 };

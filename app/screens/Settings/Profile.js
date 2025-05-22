@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, TouchableOpacity, View } from 'react-native';
+import { Alert, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import Dialog from 'react-native-dialog';
@@ -12,15 +12,25 @@ import { SettingsIcons } from '../../../assets/icons';
 
 import { deleteUser, getUser, updateUserName } from '../../api/user';
 import { useSignUp } from '../../api/context/SignUpContext';
-import { clearAuthData, removeAccessToken, removeRefreshToken, removeUserInfo } from '../../api/storage';
+import {
+  clearAuthData,
+  removeAccessToken,
+  removeRefreshToken,
+  removeUserInfo,
+  getLoginProvider,
+} from '../../api/storage';
+
+import { handleAccountDelete } from '../../api/services/authService';
 
 const Profile = () => {
   const navigation = useNavigation();
-  const {fontSizeMode} = useFontSize();
+  const { fontSizeMode } = useFontSize();
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isDialogVisible, setDialogVisible] = useState(false);
   const [password, setPassword] = useState('');
+  const [provider, setProvider] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const { resetSignUpData, updateSignUpData } = useSignUp();
 
@@ -29,7 +39,6 @@ const Profile = () => {
       try {
         const response = await getUser();
         const userData = response.data.body;
-        console.log('받아온 유저 데이터:', userData);
         setUserName(userData.name || '');
         setUserEmail(userData.email || '');
       } catch (error) {
@@ -37,6 +46,12 @@ const Profile = () => {
       }
     };
     fetchUser();
+
+    // 로그인 방식(provider) 불러오기
+    (async () => {
+      const p = await getLoginProvider();
+      setProvider(p);
+    })();
   }, []);
 
   const handleUpdateUserName = async () => {
@@ -45,48 +60,38 @@ const Profile = () => {
       return;
     }
     try {
-      console.log('서버에 보낼 이름:', userName);  
       await updateUserName({ name: userName });
-
-      // SignUpContext 업데이트
-      updateSignUpData({
-        firstName: userName,
-      })
-
-      Alert.alert('완료', '이름이 성공적으로 수정되었습니다.'); 
+      updateSignUpData({ firstName: userName });
+      Alert.alert('완료', '이름이 성공적으로 수정되었습니다.');
     } catch (error) {
-      console.error('이름 수정 오류:', error);
       Alert.alert('오류', error.response?.data?.message || '이름 수정에 실패했습니다.');
     }
-  };  
+  };
 
   const handleLogout = async () => {
     try {
-      console.log('로그아웃 시작');
-
       await removeAccessToken();
       await removeRefreshToken();
       await removeUserInfo();
       await clearAuthData();
       resetSignUpData();
-      console.log('SignUpContext 데이터 초기화 완료');
-
       navigation.reset({
         index: 0,
         routes: [{ name: 'Auth' }],
       });
     } catch (error) {
-      console.error('로그아웃 중 오류 발생:', error);
       Alert.alert('오류', '로그아웃 중 문제가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
-  const confirmDeleteAccount = async () => {
+  // 이메일 계정 삭제 (비밀번호 필요)
+  const confirmDeleteAccountEmail = async () => {
     if (!password) {
       Alert.alert('오류', '비밀번호를 입력해주세요.');
       return;
     }
     try {
+      setLoading(true);
       await deleteUser(password);
       Alert.alert('완료', '계정이 삭제되었습니다.', [
         {
@@ -99,7 +104,6 @@ const Profile = () => {
             await removeUserInfo();
             await clearAuthData();
             resetSignUpData();
-
             navigation.reset({
               index: 0,
               routes: [{
@@ -113,10 +117,36 @@ const Profile = () => {
         }
       ]);
     } catch (error) {
-      console.error('계정 삭제 오류:', error);
       Alert.alert('오류', error.response?.data?.message || '계정 삭제에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
     }
   };
+
+  // 소셜(애플/카카오) 계정 삭제
+  const confirmDeleteAccountSocial = async () => {
+    try {
+      setLoading(true);
+      await handleAccountDelete(navigation);
+      setDialogVisible(false);
+      setPassword('');
+    } catch (error) {
+      Alert.alert(
+        '오류',
+        error.response?.data?.message || error.userMessage || error.message || '계정 삭제에 실패했습니다. 다시 시도해주세요.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 계정 삭제 버튼 클릭 시
+  const handleDeletePress = () => {
+    setDialogVisible(true);
+  };
+
+  // 다이얼로그 삭제 버튼 핸들러
+  const dialogDeleteHandler = provider === 'email' ? confirmDeleteAccountEmail : confirmDeleteAccountSocial;
 
   return (
     <Container>
@@ -124,11 +154,8 @@ const Profile = () => {
 
       <Section>
         <Title fontSizeMode={fontSizeMode}>이름</Title>
-        <View style={{
-          flexDirection: 'row',
-          gap: 15,
-        }}>
-          <View style={{flex: 1}}>
+        <View style={{ flexDirection: 'row', gap: 15 }}>
+          <View style={{ flex: 1 }}>
             <InputWithDelete
               value={userName}
               onChangeText={text => setUserName(text)}
@@ -144,28 +171,28 @@ const Profile = () => {
 
       <Section>
         <Title fontSizeMode={fontSizeMode}>이메일</Title>
-        <ReadOnlyInput text={userEmail}/>
+        <ReadOnlyInput text={userEmail} />
       </Section>
 
       <ButtonContainer>
         <IconTextButton
           onPress={handleLogout}
           icon={
-            <SettingsIcons.logout 
-              width={16} 
-              height={16} 
-              color={themes.light.textColor.buttonText} 
+            <SettingsIcons.logout
+              width={16}
+              height={16}
+              color={themes.light.textColor.buttonText}
             />
           }
           title="로그아웃"
         />
         <IconTextButton
-          onPress={() => setDialogVisible(true)}
+          onPress={handleDeletePress}
           icon={
-            <SettingsIcons.trashcan 
-              width={16} 
-              height={16} 
-              color={themes.light.textColor.buttonText} 
+            <SettingsIcons.trashcan
+              width={16}
+              height={16}
+              color={themes.light.textColor.buttonText}
             />
           }
           title="계정 삭제"
@@ -175,15 +202,28 @@ const Profile = () => {
 
       <Dialog.Container visible={isDialogVisible}>
         <Dialog.Title>계정 삭제</Dialog.Title>
-        <Dialog.Description>계정을 삭제하려면 비밀번호를 입력하세요.</Dialog.Description>
-        <Dialog.Input
-          placeholder="비밀번호 입력"
-          secureTextEntry
-          onChangeText={setPassword}
-          value={password}
-        />
+        {/* provider에 따라 입력창 및 설명 분기 */}
+        {provider === 'email' ? (
+          <>
+            <Dialog.Description>계정을 삭제하려면 비밀번호를 입력하세요.</Dialog.Description>
+            <Dialog.Input
+              placeholder="비밀번호 입력"
+              secureTextEntry
+              onChangeText={setPassword}
+              value={password}
+            />
+          </>
+        ) : (
+          <>
+            <Dialog.Description>
+              정말로 계정을 삭제하시겠습니까?
+              {provider === 'kakao' && '\n카카오 계정 탈퇴는 추후 지원 예정입니다.'}
+            </Dialog.Description>
+          </>
+        )}
+        {loading && <ActivityIndicator size="small" color={themes.light.textColor.Primary30} style={{ marginVertical: 8 }} />}
         <Dialog.Button label="취소" onPress={() => setDialogVisible(false)} />
-        <Dialog.Button label="삭제" onPress={confirmDeleteAccount} />
+        <Dialog.Button label="삭제" onPress={dialogDeleteHandler} />
       </Dialog.Container>
     </Container>
   );
@@ -200,7 +240,7 @@ const Section = styled.View`
 `;
 
 const Title = styled.Text`
-  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]};
   font-family: 'Pretendard-Bold';
 `;
 
@@ -225,7 +265,7 @@ const TestBtn = styled(TouchableOpacity)`
 
 const BtnTitle = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   color: ${themes.light.textColor.buttonText};
 `;
 
