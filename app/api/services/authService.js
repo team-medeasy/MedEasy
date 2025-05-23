@@ -1,8 +1,8 @@
-// api/services/authService.js
 import { login, signUp } from '../auth';
 import { kakaoLogin } from './kakaoAuth';
-import { appleLogin } from './appleAuth';
+import { appleLogin, appleDeleteAccount } from './appleAuth';
 import { getUser } from '../user';
+import { deleteAccount } from '../auth'; // 회원탈퇴 함수 추가
 
 import {
   setAccessToken,
@@ -10,8 +10,11 @@ import {
   removeAccessToken,
   removeRefreshToken,
   setUserInfo,
-  setTokenExpiryTime,  // 추가
-  removeTokenExpiryTime  // 추가
+  setTokenExpiryTime,
+  removeTokenExpiryTime,
+  clearAuthData,
+  AUTH_TYPES,
+  getAuthType
 } from '../storage';
 import { setAuthToken } from '..';
 
@@ -62,7 +65,7 @@ export const handleLogin = async credentials => {
     } else {
       console.warn('ACCESS_TOKEN is undefined. Removing key from storage.');
       await removeAccessToken();
-      await removeTokenExpiryTime();  // 추가: 만료 시간도 함께 제거
+      await removeTokenExpiryTime();
     }
 
     if (refreshToken) {
@@ -258,13 +261,25 @@ export const handleSignUp = async (data, navigation) => {
   }
 };
 
-// 로그아웃 시 토큰 관련 데이터 모두 제거하는 함수 추가
+// 로그아웃 시 토큰 관련 데이터 모두 제거하는 함수
 export const handleLogout = async (navigation) => {
   try {
+    // 로그인 방식 확인
+    const authType = await getAuthType();
+
+    // 로그인 방식에 따라 추가 로그아웃 처리
+    if (authType === AUTH_TYPES.KAKAO) {
+      try {
+        // 카카오 로그아웃 처리
+        const { kakaoLogout } = require('./kakaoAuth');
+        await kakaoLogout();
+      } catch (e) {
+        console.warn('카카오 로그아웃 실패, 로컬 데이터만 삭제됨:', e);
+      }
+    }
+
     // 모든 토큰 관련 데이터 제거
-    await removeAccessToken();
-    await removeRefreshToken();
-    await removeTokenExpiryTime();
+    await clearAuthData();
 
     // 인증 헤더 제거
     setAuthToken(null);
@@ -280,5 +295,49 @@ export const handleLogout = async (navigation) => {
   } catch (error) {
     console.error('로그아웃 실패:', error);
     return false;
+  }
+};
+
+// 회원 탈퇴 함수
+export const handleDeleteAccount = async (navigation) => {
+  try {
+    // 로그인 방식 확인
+    const authType = await getAuthType();
+
+    let result;
+
+    // 로그인 방식에 따라 탈퇴 처리
+    if (authType === AUTH_TYPES.APPLE) {
+      result = await appleDeleteAccount();
+    } else if (authType === AUTH_TYPES.KAKAO) {
+      // TODO: 카카오 탈퇴 구현 후 사용
+      alert('카카오 회원 탈퇴 기능은 아직 구현되지 않았습니다.');
+      throw new Error('카카오 회원 탈퇴 기능은 아직 구현되지 않았습니다.');
+    } else {
+      // 이메일 또는 기본 탈퇴
+      result = await deleteAccount();
+    }
+
+    // 탈퇴 성공시 모든 인증 데이터 삭제
+    await clearAuthData();
+
+    // 인증 헤더 제거
+    setAuthToken(null);
+
+    // 탈퇴 성공 메시지
+    alert('회원 탈퇴가 완료되었습니다.');
+
+    // 로그인 화면으로 이동
+    if (navigation) {
+      navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
+    }
+
+    return result;
+  } catch (error) {
+    console.error('회원 탈퇴 실패:', error);
+
+    // 사용자 친화적인 에러 메시지 표시
+    alert(error.userMessage || '회원 탈퇴에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
+    throw error;
   }
 };

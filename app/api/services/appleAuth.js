@@ -5,7 +5,9 @@ import {
   setAccessToken,
   setRefreshToken,
   setUserInfo,
-  setTokenExpiryTime
+  setTokenExpiryTime,
+  setAuthType,
+  AUTH_TYPES
 } from '../storage';
 import { setAuthToken } from '..';
 import api from '../index';
@@ -35,7 +37,7 @@ export const appleLogin = async () => {
     console.log('애플 로그인 성공', appleAuthResponse);
 
     // 사용자 정보 추출
-    const { identityToken, fullName, email, user } = appleAuthResponse;
+    const { identityToken, authorizationCode, fullName, email, user } = appleAuthResponse;
 
     // FCM 토큰 가져오기
     const fcmToken = await getFCMToken();
@@ -44,6 +46,7 @@ export const appleLogin = async () => {
     // 서버에 애플 토큰 전송하여 자체 토큰 받기
     const response = await api.post('/open-api/auth/apple', {
       identity_token: identityToken,
+      authorization_code: authorizationCode,
       first_name: fullName?.givenName || null, // 첫 로그인에만 제공됨
       last_name: fullName?.familyName || null, // 첫 로그인에만 제공됨
       fcm_token: fcmToken || ''
@@ -97,6 +100,9 @@ export const appleLogin = async () => {
         await setRefreshToken(refresh_token);
       }
 
+      // 로그인 방식 저장 - 애플 로그인
+      await setAuthType(AUTH_TYPES.APPLE);
+
       // 결과 반환 (만료 시간 포함)
       return {
         accessToken: access_token,
@@ -106,6 +112,11 @@ export const appleLogin = async () => {
           name: userName || 'Apple 사용자',
           email: email || '',
           appleUserId: user
+        },
+        // 애플 인증 정보 저장 (탈퇴 시 필요할 수 있음)
+        appleAuthInfo: {
+          identityToken,
+          authorizationCode
         }
       };
     } else {
@@ -122,6 +133,45 @@ export const appleLogin = async () => {
       error.userMessage = '로그인이 취소되었습니다.';
     } else {
       error.userMessage = '애플 로그인에 실패했습니다: ' + (error.message || '알 수 없는 오류');
+    }
+
+    throw error;
+  }
+};
+
+/**
+ * 애플 로그인 사용자 탈퇴 함수
+ */
+export const appleDeleteAccount = async () => {
+  try {
+    // 애플 SDK로 새로운 인증 코드 요청 
+    const appleAuthResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [],  // 기본적인 승인만 필요
+    });
+
+    // authorization_code를 가져옴
+    const { authorizationCode } = appleAuthResponse;
+
+    if (!authorizationCode) {
+      throw new Error('애플 인증 코드를 얻지 못했습니다.');
+    }
+
+    // auth.js의 deleteAppleAccount 호출하도록 변경
+    const { deleteAppleAccount } = require('../auth');
+    const result = await deleteAppleAccount(authorizationCode);
+
+    console.log('애플 계정 탈퇴 성공:', result);
+    return result;
+
+  } catch (error) {
+    console.error('애플 계정 탈퇴 실패:', error);
+
+    // 사용자 친화적인 에러 메시지 추가
+    if (error.code === 'ERR_CANCELED') {
+      error.userMessage = '애플 인증이 취소되었습니다.';
+    } else {
+      error.userMessage = '애플 계정 탈퇴에 실패했습니다: ' + (error.message || '알 수 없는 오류');
     }
 
     throw error;
