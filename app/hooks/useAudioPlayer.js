@@ -65,8 +65,6 @@ export default function useAudioPlayer() {
     return new Promise(resolve => {
       if (currentSound.current) {
         currentSound.current.stop(() => {
-          currentSound.current.release();
-          currentSound.current = null;
           setIsPlaying(false);
           console.log('[AUDIO] 재생 강제 종료 완료');
           resolve(); // 여기서 비로소 종료 완료
