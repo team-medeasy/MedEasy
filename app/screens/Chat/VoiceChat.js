@@ -603,7 +603,7 @@ export default function VoiceChat() {
 
     console.log('[VOICE] 자동 재시작 조건 체크:', {
       chatMode,
-      isTyping,
+      // isTyping,
       voiceActive,
       status,
       hasPermission,
@@ -613,7 +613,7 @@ export default function VoiceChat() {
     // 조건을 더 엄격하게 확인하고 안정화 시간을 늘림
     if (
       chatMode === 'voice' &&
-      !isTyping &&
+      // !isTyping &&
       !voiceActive &&
       status === 'idle' &&
       hasPermission &&
@@ -626,7 +626,7 @@ export default function VoiceChat() {
         // 재시작 직전에 한 번 더 조건 확인
         if (
           chatMode === 'voice' &&
-          !isTyping &&
+          // !isTyping &&
           !voiceActive &&
           status === 'idle' &&
           hasPermission &&
@@ -652,7 +652,7 @@ export default function VoiceChat() {
     status,
     hasPermission,
     chatMode,
-    isTyping,
+    // isTyping,
     voiceActive,
     audioPlaybackInProgress,
     handleStartListening // 의존성 배열에 추가
