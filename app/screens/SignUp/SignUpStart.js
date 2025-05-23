@@ -1,16 +1,28 @@
 import React from 'react';
-import { SafeAreaView, TouchableOpacity, Text, View, Platform } from 'react-native';
+import {
+  SafeAreaView,
+  TouchableOpacity,
+  Text,
+  View,
+  Platform,
+} from 'react-native';
 import styled from 'styled-components/native';
-import { IconTextButton } from '../../components';
-import { themes, fonts } from './../../styles';
-import { OtherIcons, Images } from './../../../assets/icons';
-const { kakao: KakaoIcon } = OtherIcons;
+import {IconTextButton} from '../../components';
+import {themes, fonts} from './../../styles';
+import {OtherIcons, Images} from './../../../assets/icons';
+const {kakao: KakaoIcon} = OtherIcons;
 
 // 로그인 서비스 import
-import { handleKakaoLogin, handleAppleLogin } from '../../api/services/authService'; // handleAppleLogin 추가
+import {
+  handleKakaoLogin,
+  handleAppleLogin,
+} from '../../api/services/authService'; // handleAppleLogin 추가
 
 // 애플 로그인 (iOS 전용)
-import { appleAuth, AppleButton } from '@invertase/react-native-apple-authentication';
+import {
+  appleAuth,
+  AppleButton,
+} from '@invertase/react-native-apple-authentication';
 
 import FontSizes from '../../../assets/fonts/fontSizes';
 
@@ -61,7 +73,7 @@ const SignUpContainer = styled.View`
   gap: 4px;
 `;
 
-const SignUpStartScreen = ({ navigation }) => {
+const SignUpStartScreen = ({navigation}) => {
   // 카카오 로그인 처리 함수
   const onKakaoLogin = async () => {
     try {
@@ -97,10 +109,16 @@ const SignUpStartScreen = ({ navigation }) => {
 
       <ButtonContainer>
         {Platform.OS === 'ios' && (
-          <AppleButtonStyled
-            buttonStyle={AppleButton.Style.BLACK}
-            buttonType={AppleButton.Type.SIGN_IN}
+          <IconTextButton
             onPress={onAppleLogin}
+            icon={
+              <OtherIcons.Apple
+                height={18}
+                width={18}
+                style={{color: themes.light.textColor.buttonText}}
+              />
+            }
+            title="Apple로 시작하기"
           />
         )}
         <IconTextButton
@@ -109,7 +127,7 @@ const SignUpStartScreen = ({ navigation }) => {
             <KakaoIcon
               height={18}
               width={18}
-              style={{ color: themes.light.textColor.buttonText }}
+              style={{color: themes.light.textColor.buttonText}}
             />
           }
           title="카카오톡으로 시작하기"
@@ -117,12 +135,12 @@ const SignUpStartScreen = ({ navigation }) => {
 
         <SignUpContainer>
           <EmailBtn
-            style={{ padding: 8 }}
+            style={{padding: 8}}
             onPress={() => navigation.navigate('SignUpName')}>
             <EmailBtnText>회원가입</EmailBtnText>
           </EmailBtn>
           <EmailBtn
-            style={{ padding: 8 }}
+            style={{padding: 8}}
             onPress={() => navigation.navigate('SignIn')}>
             <EmailBtnText>이메일 로그인</EmailBtnText>
           </EmailBtn>
