@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import {useRef, useState} from 'react';
 import Sound from 'react-native-sound';
 
 export default function useAudioPlayer() {
@@ -18,7 +18,7 @@ export default function useAudioPlayer() {
     Sound.setCategory('Playback');
 
     // 새 사운드 생성
-    const sound = new Sound(filePath, '', (error) => {
+    const sound = new Sound(filePath, '', error => {
       if (error) {
         console.error('오디오 로드 실패:', error);
         // 오류 시 콜백 호출
@@ -31,7 +31,7 @@ export default function useAudioPlayer() {
 
       // 재생 시작
       setIsPlaying(true);
-      sound.play((success) => {
+      sound.play(success => {
         setIsPlaying(false);
 
         if (success) {
@@ -62,17 +62,25 @@ export default function useAudioPlayer() {
 
   // 오디오 정리 함수
   const cleanupAudio = () => {
-    if (currentSound.current) {
-      currentSound.current.stop();
-      currentSound.current.release();
-      currentSound.current = null;
-    }
-    setIsPlaying(false);
+    return new Promise(resolve => {
+      if (currentSound.current) {
+        currentSound.current.stop(() => {
+          currentSound.current.release();
+          currentSound.current = null;
+          setIsPlaying(false);
+          console.log('[AUDIO] 재생 강제 종료 완료');
+          resolve(); // 여기서 비로소 종료 완료
+        });
+      } else {
+        setIsPlaying(false);
+        resolve(); // 재생 중이 아니어도 즉시 resolve
+      }
+    });
   };
 
   return {
     isPlaying,
     playAudioFile,
-    cleanupAudio
+    cleanupAudio,
   };
 }
