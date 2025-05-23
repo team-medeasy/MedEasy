@@ -67,6 +67,7 @@ export default function VoiceChat() {
     finishTypingMessage,
     updateVoiceMessage,
     removeActiveVoiceMessage,
+    forceStopTyping,
   } = useChatMessages();
 
   const {scaleAnim, startPulseAnimation, stopPulseAnimation} =
@@ -207,43 +208,38 @@ export default function VoiceChat() {
         setAudioPlaybackInProgress(true);
         setTimeout(() => {
           setAudioPlaybackInProgress(false);
-          // 음성 모드일 때만 상태 초기화
           if (chatMode === 'voice') {
-            setStatus('idle');
+            setTimeout(() => {
+              console.log('[AUDIO] 자동 재시작을 위한 상태 설정');
+              setStatus('idle');
+            }, 300);
           }
         }, 1000);
         return;
       }
 
-      // 오디오 파일이 존재하는지 확인
       RNFS.exists(filePath)
         .then(exists => {
           if (!exists) {
             console.log('[AUDIO] 파일이 존재하지 않음:', filePath);
             setAudioPlaybackInProgress(false);
-            // 음성 인식 재개를 위한 상태 초기화
             if (chatMode === 'voice') {
               reset('준비 완료');
             }
             return;
           }
 
-          // 오디오 재생 시작 상태 설정
-          console.log('[AUDIO] 새 오디오 재생 시작, 이전 상태 초기화');
+          console.log('[AUDIO] 새 오디오 재생 시작');
           setAudioPlaybackInProgress(true);
           if (chatMode === 'voice') {
             setStatus('processing');
             setStatusMessage('응답 듣는 중...');
           }
 
-          console.log('[AUDIO] 재생 시작:', filePath);
-
-          // 기존 오디오 정리 후 새 오디오 재생
           cleanupAudio();
           
-          // 오디오 재생 (재생 완료 콜백 추가)
           playAudioFile(filePath, () => {
-            console.log('[AUDIO] 재생 완료, 0.5초 후 음성 인식 재개');
+            console.log('[AUDIO] 재생 완료, 음성 인식 재개 준비');
 
             if (chatMode === 'voice') {
               setStatusMessage('곧 다시 듣기 시작합니다...');
@@ -252,31 +248,35 @@ export default function VoiceChat() {
             setTimeout(() => {
               console.log('[AUDIO] 오디오 재생 완료 후 상태 변경');
               setAudioPlaybackInProgress(false);
-              // 음성 모드일 때만 상태 초기화하여 자동 재시작 트리거
+              
               if (chatMode === 'voice') {
                 console.log('[AUDIO] 음성 인식 자동 재시작을 위한 상태 설정');
-                setStatus('idle');
-                // 더 긴 지연 시간으로 상태 안정화 대기
+                
+                // 타이핑 상태 한 번 더 확인하고 해제
                 setTimeout(() => {
-                  console.log('[AUDIO] 강제 음성 인식 재시작');
-                  if (!voiceActive && hasPermission && status !== 'listening') {
-                    handleStartListening();
+                  if (isTyping) {
+                    console.warn('[AUDIO] 타이핑 상태가 여전히 true - 강제 해제');
+                    forceStopTyping();
                   }
-                }, 300);
+                  
+                  setTimeout(() => {
+                    setStatus('idle');
+                    console.log('[AUDIO] 음성 인식 재시작 상태 설정 완료');
+                  }, 100);
+                }, 100);
               }
-            }, 500);
+            }, 300); // 지연 시간을 300ms로 줄임
           });
         })
         .catch(error => {
           console.error('[AUDIO] 파일 확인 오류:', error);
           setAudioPlaybackInProgress(false);
-          // 음성 인식 재개를 위한 상태 초기화
           if (chatMode === 'voice') {
             reset('준비 완료');
           }
         });
     },
-    [chatMode, playAudioFile, setStatus, voiceActive, hasPermission, handleStartListening, cleanupAudio, setStatusMessage], // 필요한 의존성들
+    [chatMode, playAudioFile, setStatus, cleanupAudio, setStatusMessage, isTyping]
   );
 
   // 네비게이션 파라미터 감지하여 카메라 결과 처리
@@ -610,6 +610,7 @@ export default function VoiceChat() {
       audioPlaybackInProgress,
     });
 
+    // 조건을 더 엄격하게 확인하고 안정화 시간을 늘림
     if (
       chatMode === 'voice' &&
       !isTyping &&
@@ -618,13 +619,25 @@ export default function VoiceChat() {
       hasPermission &&
       !audioPlaybackInProgress
     ) {
-      console.log('[VOICE] 자동 재시작 예약됨 (1초 지연)');
+      console.log('[VOICE] 자동 재시작 예약됨 (1.5초 지연)');
 
-      // 대기 시간 1초로 설정
+      // 대기 시간을 1.5초로 늘려서 상태 안정화
       timeoutId = setTimeout(() => {
-        console.log('[VOICE] 자동 재시작 실행');
-        handleStartListening();
-      }, 1000);
+        // 재시작 직전에 한 번 더 조건 확인
+        if (
+          chatMode === 'voice' &&
+          !isTyping &&
+          !voiceActive &&
+          status === 'idle' &&
+          hasPermission &&
+          !audioPlaybackInProgress
+        ) {
+          console.log('[VOICE] 자동 재시작 실행');
+          handleStartListening();
+        } else {
+          console.log('[VOICE] 재시작 직전 조건 변경으로 취소');
+        }
+      }, 1500);
     } else {
       console.log('[VOICE] 자동 재시작 조건 불만족');
     }
@@ -642,6 +655,7 @@ export default function VoiceChat() {
     isTyping,
     voiceActive,
     audioPlaybackInProgress,
+    handleStartListening // 의존성 배열에 추가
   ]);
 
   // 초기 메시지 표시 (웹소켓으로부터 받은 메시지가 있으면 사용, 없으면 기본 메시지)
@@ -746,6 +760,8 @@ export default function VoiceChat() {
   // 음성 인식 결과 처리
   const processRecognizedText = async (text, typingMsgId) => {
     try {
+      console.log('[CHAT] 음성 인식 결과 처리 시작:', text);
+      
       // 임시 음성 파일 정리
       await cleanupTempAudioFiles();
 
@@ -753,17 +769,36 @@ export default function VoiceChat() {
       const response = await sendMessage(text);
       const {text: responseText, filePath, action, data} = response;
 
-      // 응답 메시지 업데이트
+      // 응답 메시지 업데이트 - 즉시 타이핑 상태 해제
       finishTypingMessage(typingMsgId, responseText, DEFAULT_BOT_OPTIONS);
+      
+      // 추가적으로 타이핑 상태를 확실히 해제
+      setTimeout(() => {
+        console.log('[CHAT] 타이핑 상태 강제 해제 확인');
+        // isTyping이 여전히 true라면 강제로 해제
+        if (isTyping) {
+          console.warn('[CHAT] 타이핑 상태가 여전히 true - 강제 해제');
+          forceStopTyping();
+        }
+      }, 50);
 
-      // 음성 재생 (수정된 함수 사용)
+      console.log('[CHAT] 서버 응답 처리 완료, 오디오 재생 준비');
+
+      // 음성 재생
       if (filePath) {
         playAudioWithCompletion(filePath);
       } else {
-        // 음성 파일이 없는 경우에도 약간의 딜레이를 주어 챗봇이 바로 듣기 시작하지 않도록 함
+        // 음성 파일이 없는 경우
         setAudioPlaybackInProgress(true);
         setTimeout(() => {
+          console.log('[CHAT] 음성 파일 없음 - 재생 완료 처리');
           setAudioPlaybackInProgress(false);
+          if (chatMode === 'voice') {
+            setTimeout(() => {
+              console.log('[CHAT] 음성 인식 자동 재시작 트리거');
+              setStatus('idle');
+            }, 500);
+          }
         }, 1000);
       }
 
@@ -772,7 +807,12 @@ export default function VoiceChat() {
         handleClientAction(action, navigation, {data});
       }
 
-      reset();
+      // 상태 초기화
+      setTimeout(() => {
+        reset();
+        console.log('[CHAT] 음성 인식 상태 초기화 완료');
+      }, 200);
+
     } catch (error) {
       console.error('[VOICE] 메시지 처리 오류:', error);
       finishTypingMessage(
@@ -780,8 +820,10 @@ export default function VoiceChat() {
         '죄송합니다. 응답을 받아오는 데 실패했습니다.',
         null,
       );
+      // 오류 시에도 타이핑 상태 확실히 해제
+      forceStopTyping();
       reset('오류 발생');
-      setAudioPlaybackInProgress(false); // 오류 발생 시 재생 상태 초기화
+      setAudioPlaybackInProgress(false);
     }
   };
 
