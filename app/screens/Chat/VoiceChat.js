@@ -179,9 +179,9 @@ export default function VoiceChat() {
         backHandler.remove();
 
         // 화면 이탈 시 정리
-          cleanupAudio();
-          Voice.cancel().catch(() => {});
-          stopPulseAnimation();
+        cleanupAudio();
+        Voice.cancel().catch(() => {});
+        stopPulseAnimation();
       };
     }, []),
   );
@@ -237,7 +237,7 @@ export default function VoiceChat() {
           }
 
           cleanupAudio();
-          
+
           playAudioFile(filePath, () => {
             console.log('[AUDIO] 재생 완료, 음성 인식 재개 준비');
 
@@ -248,17 +248,19 @@ export default function VoiceChat() {
             setTimeout(() => {
               console.log('[AUDIO] 오디오 재생 완료 후 상태 변경');
               setAudioPlaybackInProgress(false);
-              
+
               if (chatMode === 'voice') {
                 console.log('[AUDIO] 음성 인식 자동 재시작을 위한 상태 설정');
-                
+
                 // 타이핑 상태 한 번 더 확인하고 해제
                 setTimeout(() => {
                   if (isTyping) {
-                    console.warn('[AUDIO] 타이핑 상태가 여전히 true - 강제 해제');
+                    console.warn(
+                      '[AUDIO] 타이핑 상태가 여전히 true - 강제 해제',
+                    );
                     forceStopTyping();
                   }
-                  
+
                   setTimeout(() => {
                     setStatus('idle');
                     console.log('[AUDIO] 음성 인식 재시작 상태 설정 완료');
@@ -276,7 +278,14 @@ export default function VoiceChat() {
           }
         });
     },
-    [chatMode, playAudioFile, setStatus, cleanupAudio, setStatusMessage, isTyping]
+    [
+      chatMode,
+      playAudioFile,
+      setStatus,
+      cleanupAudio,
+      setStatusMessage,
+      isTyping,
+    ],
   );
 
   // 네비게이션 파라미터 감지하여 카메라 결과 처리
@@ -454,7 +463,7 @@ export default function VoiceChat() {
     registerActionHandler('UPLOAD_PILLS_PHOTO', data => {
       console.log('[CHAT] 알약 사진 업로드 액션 수신');
     });
-    
+
     // 처방전/알약 정보 응답 처리 - 수정된 부분
     registerActionHandler(
       'REVIEW_PRESCRIPTION_REGISTER_RESPONSE',
@@ -538,13 +547,36 @@ export default function VoiceChat() {
           }
         }
         // 화면 이동 호출
-        handleClientAction(
-          'REVIEW_PILLS_PHOTO_SEARCH_RESPONSE',
-          navigation,
-          { data }
-        );
+        handleClientAction('REVIEW_PILLS_PHOTO_SEARCH_RESPONSE', navigation, {
+          data,
+        });
       },
     );
+
+    // 일반 메시지 처리 핸들러 등록
+    registerActionHandler('DEFAULT_MESSAGE', (data, message) => {
+      console.log('[CHAT] 일반 메시지 수신 처리');
+
+      if (message && message.text_message) {
+        addMessage(message.text_message, 'bot', DEFAULT_BOT_OPTIONS);
+
+        if (message.audio_base64) {
+          const handleAudio = async () => {
+            try {
+              const timestamp = Date.now();
+              const filePath = `${
+                RNFS.CachesDirectoryPath
+              }/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
+              await RNFS.writeFile(filePath, message.audio_base64, 'base64');
+              playAudioWithCompletion(filePath);
+            } catch (error) {
+              console.error('[CHAT] 일반 메시지 음성 처리 오류:', error);
+            }
+          };
+          handleAudio();
+        }
+      }
+    });
   }, [registerActionHandler, navigation, addMessage, playAudioWithCompletion]);
 
   // 웹소켓 매니저 초기화 및 웰컴 메시지 처리
@@ -655,7 +687,7 @@ export default function VoiceChat() {
     // isTyping,
     voiceActive,
     audioPlaybackInProgress,
-    handleStartListening // 의존성 배열에 추가
+    handleStartListening, // 의존성 배열에 추가
   ]);
 
   // 초기 메시지 표시 (웹소켓으로부터 받은 메시지가 있으면 사용, 없으면 기본 메시지)
@@ -761,7 +793,7 @@ export default function VoiceChat() {
   const processRecognizedText = async (text, typingMsgId) => {
     try {
       console.log('[CHAT] 음성 인식 결과 처리 시작:', text);
-      
+
       // 임시 음성 파일 정리
       await cleanupTempAudioFiles();
 
@@ -771,7 +803,7 @@ export default function VoiceChat() {
 
       // 응답 메시지 업데이트 - 즉시 타이핑 상태 해제
       finishTypingMessage(typingMsgId, responseText, DEFAULT_BOT_OPTIONS);
-      
+
       // 추가적으로 타이핑 상태를 확실히 해제
       setTimeout(() => {
         console.log('[CHAT] 타이핑 상태 강제 해제 확인');
@@ -812,7 +844,6 @@ export default function VoiceChat() {
         reset();
         console.log('[CHAT] 음성 인식 상태 초기화 완료');
       }, 200);
-
     } catch (error) {
       console.error('[VOICE] 메시지 처리 오류:', error);
       finishTypingMessage(
