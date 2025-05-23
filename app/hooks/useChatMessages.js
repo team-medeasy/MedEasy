@@ -28,7 +28,7 @@ export default function useChatMessages() {
         time: formatTimeString(),
         options,
         isVoiceRecognizing,
-        isInitialMessage // 이 속성을 추가
+        isInitialMessage
       },
     ]);
 
@@ -74,8 +74,10 @@ export default function useChatMessages() {
     return typingMsgId;
   };
 
-  // 타이핑 메시지 완료
+  // 타이핑 메시지 완료 - 수정된 부분
   const finishTypingMessage = (typingMsgId, text, options = null) => {
+    console.log('[CHAT] 타이핑 메시지 완료:', typingMsgId);
+    
     setMessages(prevMessages =>
       prevMessages.map(msg =>
         msg.id === typingMsgId
@@ -83,7 +85,18 @@ export default function useChatMessages() {
           : msg
       )
     );
+    
+    // 즉시 타이핑 상태 해제 (setTimeout 제거)
     setIsTyping(false);
+    setTypingMessageId(null);
+    console.log('[CHAT] 타이핑 상태 즉시 해제됨');
+  };
+
+  // 강제 타이핑 상태 해제 함수 추가
+  const forceStopTyping = () => {
+    console.log('[CHAT] 강제 타이핑 상태 해제');
+    setIsTyping(false);
+    setTypingMessageId(null);
   };
 
   // 음성 인식 임시 메시지 제거
@@ -102,6 +115,7 @@ export default function useChatMessages() {
     startTypingMessage,
     finishTypingMessage,
     removeActiveVoiceMessage,
+    forceStopTyping, // 새로 추가된 함수
     formatTimeString
   };
 }
