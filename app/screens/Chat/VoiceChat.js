@@ -305,6 +305,17 @@ export default function VoiceChat() {
       isTyping,
     ],
   );
+
+  useEffect(() => {
+  if (isTyping) {
+    const timeoutId = setTimeout(() => {
+      console.warn('[SAFEGUARD] isTyping이 너무 오래 true 상태입니다. 강제 false로 설정합니다.');
+      forceStopTyping(); 
+    }, 5000); // 5초 대기 후 강제 해제
+
+    return () => clearTimeout(timeoutId); // isTyping이 변경되면 기존 타이머 클리어
+  }
+}, [isTyping]);
   
   const playAudioWithImageAnalysisCompletion = useCallback(
     filePath => {
