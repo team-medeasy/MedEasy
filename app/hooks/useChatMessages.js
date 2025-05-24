@@ -117,6 +117,19 @@ export default function useChatMessages() {
     );
   };
 
+  // ===== 추가된 함수: 음성 인식 중인 모든 메시지 정리 =====
+  const clearVoiceRecognizingMessages = () => {
+    console.log('[CHAT] 음성 인식 중인 메시지들 정리');
+    
+    setMessages(prevMessages => 
+      prevMessages.filter(msg => !msg.isVoiceRecognizing)
+    );
+    
+    // 타이핑 상태도 함께 해제
+    setIsTyping(false);
+    setTypingMessageId(null);
+  };
+
   return {
     messages,
     isTyping,
@@ -127,6 +140,7 @@ export default function useChatMessages() {
     finishTypingMessage,
     removeActiveVoiceMessage,
     forceStopTyping,
+    clearVoiceRecognizingMessages,
     formatTimeString
   };
 }
