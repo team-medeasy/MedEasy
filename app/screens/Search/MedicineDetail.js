@@ -56,6 +56,10 @@ const MedicineDetailScreen = ({route, navigation}) => {
     return Number.isFinite(parsed) ? parsed : null;
   };
 
+  useEffect(() => {
+    console.log('[MedicineDetail] 전달받은 상세 정보:', item);
+  }, []);
+
   // medicine_id로 약품 정보 가져오기
   const fetchMedicineData = async () => {
     try {
@@ -622,7 +626,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const Usage = ({label, value='', borderBottomWidth = 1, fontSizeMode}) => {
+const Usage = ({label, value = '', borderBottomWidth = 1, fontSizeMode}) => {
   const [expanded, setExpanded] = useState(false);
   const [shouldShowToggle, setShouldShowToggle] = useState(false);
   const textRef = useRef(null);
