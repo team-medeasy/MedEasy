@@ -45,7 +45,6 @@ export default function useChatMessages() {
     }
 
     setMessages(prevMessages => {
-      // 해당 ID의 메시지가 있는지 확인
       const messageExists = prevMessages.some(msg => msg.id === messageId);
       if (!messageExists) {
         console.warn('[CHAT] 업데이트할 메시지 ID를 찾을 수 없음:', messageId);
@@ -74,10 +73,11 @@ export default function useChatMessages() {
     return typingMsgId;
   };
 
-  // 타이핑 메시지 완료 - 수정된 부분
+  // 타이핑 메시지 완료 - 개선된 버전
   const finishTypingMessage = (typingMsgId, text, options = null) => {
     console.log('[CHAT] 타이핑 메시지 완료:', typingMsgId);
     
+    // 1. 메시지 업데이트
     setMessages(prevMessages =>
       prevMessages.map(msg =>
         msg.id === typingMsgId
@@ -86,17 +86,28 @@ export default function useChatMessages() {
       )
     );
     
-    // 즉시 타이핑 상태 해제 (setTimeout 제거)
-    setIsTyping(false);
-    setTypingMessageId(null);
-    console.log('[CHAT] 타이핑 상태 즉시 해제됨');
+    // 2. 강제 상태 동기화 - 다음 틱에서 확실히 해제
+    Promise.resolve().then(() => {
+      setIsTyping(false);
+      setTypingMessageId(null);
+      console.log('[CHAT] 타이핑 상태 강제 동기화 완료');
+    });
   };
 
-  // 강제 타이핑 상태 해제 함수 추가
+  // 강제 타이핑 상태 해제 함수 - 개선된 버전
   const forceStopTyping = () => {
     console.log('[CHAT] 강제 타이핑 상태 해제');
+    
+    // 즉시 해제
     setIsTyping(false);
     setTypingMessageId(null);
+    
+    // 다음 틱에서도 한번 더 확인하여 완전히 해제
+    Promise.resolve().then(() => {
+      setIsTyping(false);
+      setTypingMessageId(null);
+      console.log('[CHAT] 강제 타이핑 상태 이중 해제 완료');
+    });
   };
 
   // 음성 인식 임시 메시지 제거
@@ -115,7 +126,7 @@ export default function useChatMessages() {
     startTypingMessage,
     finishTypingMessage,
     removeActiveVoiceMessage,
-    forceStopTyping, // 새로 추가된 함수
+    forceStopTyping,
     formatTimeString
   };
 }
