@@ -121,11 +121,44 @@ class WebSocketManager {
             return;
           }
 
-          if (
-            !this.pendingCallback &&
-            !response.client_action &&
-            response.text_message
-          ) {
+          // 액션 핸들러 실행 플래그
+          let actionHandlerExecuted = false;
+
+          // 2. Client Action 핸들러 실행
+          if (response.client_action && this.dataHandlers[response.client_action]) {
+            console.log(
+              `[WebSocketManager] 액션 핸들러 실행: ${response.client_action}`,
+            );
+            
+            // 액션 핸들러 실행 - data와 함께 전체 메시지도 전달
+            this.dataHandlers[response.client_action](response.data, response);
+            actionHandlerExecuted = true;
+            
+            // 특정 액션들은 자체적으로 메시지 처리를 하므로 pendingCallback 스킵
+            const selfHandlingActions = [
+              'REVIEW_PRESCRIPTION_REGISTER_RESPONSE',
+              'REVIEW_PILLS_PHOTO_SEARCH_RESPONSE'
+            ];
+            
+            if (selfHandlingActions.includes(response.client_action)) {
+              console.log(`[WebSocketManager] ${response.client_action} - 자체 메시지 처리, pendingCallback 스킵`);
+              if (this.pendingCallback) {
+                this.pendingCallback = null;
+              }
+              return;
+            }
+          }
+
+          // 3. 대기 중인 콜백이 있으면 실행
+          if (this.pendingCallback) {
+            console.log('[WebSocketManager] 대기 중인 콜백으로 메시지 전달');
+            this.pendingCallback(response);
+            this.pendingCallback = null;
+            return;
+          }
+
+          // 4. 일반 메시지 처리 (액션 핸들러도 없고 pendingCallback도 없는 경우)
+          if (!actionHandlerExecuted && !response.client_action && response.text_message) {
             console.log('[WebSocketManager] 일반 메시지 수신 처리');
 
             if (this.dataHandlers['DEFAULT_MESSAGE']) {
@@ -135,30 +168,9 @@ class WebSocketManager {
                 '[WebSocketManager] DEFAULT_MESSAGE 핸들러가 설정되지 않음',
               );
             }
-
-            return;
-          }
-
-          // 2. Client Action 핸들러 실행
-          if (
-            response.client_action &&
-            this.dataHandlers[response.client_action]
-          ) {
+          } else if (!this.pendingCallback && !actionHandlerExecuted) {
             console.log(
-              `[WebSocketManager] 액션 핸들러 실행: ${response.client_action}`,
-            );
-            // data와 함께 전체 메시지도 전달
-            this.dataHandlers[response.client_action](response.data, response);
-          }
-
-          // 3. 대기 중인 콜백이 있으면 실행
-          if (this.pendingCallback) {
-            console.log('[WebSocketManager] 대기 중인 콜백으로 메시지 전달');
-            this.pendingCallback(response);
-            this.pendingCallback = null;
-          } else {
-            console.log(
-              '[WebSocketManager] 처리할 콜백 없음, 메시지 무시:',
+              '[WebSocketManager] 처리할 핸들러 없음, 메시지 무시:',
               (response.text_message || '').substring(0, 50),
             );
           }
