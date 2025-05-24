@@ -16,6 +16,11 @@ export default function useVoiceRecognition() {
   const recognitionTimeout = useRef(null);
   const partialTextUpdateCallback = useRef(null);
   const finalResultCallback = useRef(null);
+  
+  // 음성 인식 지연 처리를 위한 추가 타이머들
+  const silenceTimer = useRef(null);
+  const lastSpeechTime = useRef(null);
+  const hasReceivedSpeech = useRef(false);
 
   // 권한 요청 함수
   const requestMicPermission = async () => {
@@ -66,9 +71,7 @@ export default function useVoiceRecognition() {
       }
 
       // 이전 음성 인식 세션 정리
-      clearTimeout(debounceTimer.current);
-      clearTimeout(resetTimer.current);
-      clearTimeout(recognitionTimeout.current);
+      clearAllTimers();
 
       try {
         await Voice.stop();
@@ -84,6 +87,8 @@ export default function useVoiceRecognition() {
       // 상태 초기화 및 설정
       setRecognizedText('');
       setVoiceActive(true);
+      hasReceivedSpeech.current = false;
+      lastSpeechTime.current = null;
 
       // 상태 업데이트 하나로 통합하여 렌더링 줄이기
       setStatus('listening');
@@ -94,7 +99,7 @@ export default function useVoiceRecognition() {
       // 음성 인식 시작 - 옵션 간소화
       await Voice.start('ko-KR');
 
-      // 타임아웃 설정 (15초로 늘림)
+      // 전체 타임아웃 설정 (20초로 증가)
       recognitionTimeout.current = setTimeout(() => {
         console.log('[VOICE] 음성 인식 타임아웃');
         if (recognizedText) {
@@ -102,19 +107,27 @@ export default function useVoiceRecognition() {
         } else {
           reset('인식 시간 초과');
         }
-      }, 15000);
+      }, 20000);
 
     } catch (error) {
       console.error('[VOICE] 음성 인식 초기화 오류:', error);
       reset('시작 오류');
-      throw error; // 에러를 상위로 전파하여 적절히 처리
+      throw error;
     }
   };
 
-  // 음성 인식 결과 처리 함수
+  // 모든 타이머를 정리하는 함수
+  const clearAllTimers = () => {
+    clearTimeout(debounceTimer.current);
+    clearTimeout(resetTimer.current);
+    clearTimeout(recognitionTimeout.current);
+    clearTimeout(silenceTimer.current);
+  };
+
+  // 음성 인식 결과 처리 함수 - 수정된 버전
   const finalizeRecognition = (text) => {
     // 타이머 정리
-    clearTimeout(recognitionTimeout.current);
+    clearAllTimers();
 
     console.log('[VOICE] 음성 인식 완료:', text);
 
@@ -136,12 +149,40 @@ export default function useVoiceRecognition() {
     }, 1500);
   };
 
+  // 음성 감지 시간 업데이트 함수
+  const updateLastSpeechTime = () => {
+    lastSpeechTime.current = Date.now();
+    hasReceivedSpeech.current = true;
+  };
+
+  // 침묵 감지 후 종료 처리 함수
+  const handleSilenceDetection = () => {
+    // 음성이 한 번도 감지되지 않았으면 계속 대기
+    if (!hasReceivedSpeech.current) {
+      return;
+    }
+
+    const now = Date.now();
+    const silenceDuration = now - (lastSpeechTime.current || now);
+    
+    // 2.5초 이상 침묵이 지속되면 종료
+    if (silenceDuration >= 2500) {
+      console.log('[VOICE] 침묵 감지로 인한 종료, 침묵 시간:', silenceDuration);
+      if (recognizedText) {
+        finalizeRecognition(recognizedText);
+      } else {
+        reset('음성이 감지되지 않았습니다');
+      }
+    }
+  };
+
   // 이벤트 핸들러들
   const handleSpeechStart = (e) => {
     console.log('[VOICE] 음성 인식 시작됨:', e);
     setStatus('listening');
     setStatusMessage('듣는 중...');
     recognitionAttempts.current = 0;
+    updateLastSpeechTime();
   };
 
   const handleSpeechPartial = ({ value }) => {
@@ -149,6 +190,7 @@ export default function useVoiceRecognition() {
       const partialText = value[0];
       console.log('[VOICE] 부분 인식 결과:', partialText);
       setRecognizedText(partialText);
+      updateLastSpeechTime(); // 부분 인식 시에도 시간 업데이트
 
       // 부분 인식 결과 콜백 호출
       if (partialTextUpdateCallback.current) {
@@ -161,14 +203,19 @@ export default function useVoiceRecognition() {
     if (value && value.length > 0) {
       const text = value[0];
       console.log('[VOICE] 최종 인식 결과:', text);
+      updateLastSpeechTime();
 
-      // 음성 인식 종료 처리
+      // 음성 인식 종료 처리 - 디바운스 시간을 1.5초로 증가
       clearTimeout(debounceTimer.current);
       debounceTimer.current = setTimeout(() => {
         finalizeRecognition(text);
-      }, 500);
+      }, 1500);
     } else {
-      reset('인식된 텍스트 없음');
+      // 결과가 없어도 바로 종료하지 않고 잠시 대기
+      clearTimeout(silenceTimer.current);
+      silenceTimer.current = setTimeout(() => {
+        handleSilenceDetection();
+      }, 1000);
     }
   };
 
@@ -182,53 +229,74 @@ export default function useVoiceRecognition() {
       return;
     }
 
-    // 인식 결과가 없는 경우
+    // 인식 결과가 없는 경우 (오류 코드 7)
     if (error.error?.code === '7' || error.error?.code === 7) {
       recognitionAttempts.current += 1;
 
-      if (recognitionAttempts.current < 3) {
-        console.log('[VOICE] 다시 시도 중...');
+      // 재시도 횟수를 5회로 증가하고, 음성이 감지된 경우에만 재시도
+      if (recognitionAttempts.current < 5 && hasReceivedSpeech.current) {
+        console.log('[VOICE] 다시 시도 중...', recognitionAttempts.current);
         setStatusMessage('다시 듣는 중...');
-        Voice.start('ko-KR').catch(() => reset('재시도 오류'));
+        
+        setTimeout(() => {
+          Voice.start('ko-KR').catch(() => reset('재시도 오류'));
+        }, 500);
+        return;
+      } else if (!hasReceivedSpeech.current) {
+        // 음성이 감지되지 않은 상태에서 오류가 발생하면 계속 대기
+        console.log('[VOICE] 음성 미감지 상태에서 오류 발생, 재시도');
+        setTimeout(() => {
+          Voice.start('ko-KR').catch(() => reset('재시도 오류'));
+        }, 1000);
         return;
       }
     }
 
-    // 그 외 오류
-    finalizeRecognition(recognizedText || '');
-    setStatus('error');
-    setStatusMessage('오류 발생');
+    // 그 외 오류 - 인식된 텍스트가 있으면 사용
+    if (recognizedText) {
+      finalizeRecognition(recognizedText);
+    } else {
+      reset('음성 인식 오류');
+    }
   };
 
   const handleSpeechEnd = () => {
-    console.log('[VOICE] 음성 인식 종료');
+    console.log('[VOICE] 음성 인식 종료 이벤트');
 
     // 이미 최종 결과가 처리되었거나 처리 중이면 무시
     if (status === 'processing' || status === 'idle') {
       return;
     }
 
-    // 음성 인식 종료 후 짧은 지연 시간을 두고 종료 처리
-    // (부분 인식 결과가 추가로 들어올 수 있음)
+    // 음성이 감지되지 않았으면 더 오래 대기
+    if (!hasReceivedSpeech.current) {
+      console.log('[VOICE] 음성 미감지 상태, 계속 대기');
+      return;
+    }
+
+    // 음성 인식 종료 후 더 긴 지연 시간을 두고 종료 처리 (2초로 증가)
     clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
-      finalizeRecognition(recognizedText || '');
-    }, 500);
+      if (recognizedText) {
+        finalizeRecognition(recognizedText);
+      } else {
+        // 텍스트가 없어도 침묵 감지 로직 사용
+        handleSilenceDetection();
+      }
+    }, 2000);
   };
 
   const handleVolumeChanged = (e) => {
-    // 음성 볼륨 변화는 UI 상태 변경에만 사용 (옵션)
+    // 음성 볼륨이 감지되면 시간 업데이트
     const volume = e.value;
-    if (volume > 0.8) {
-      // 볼륨이 큰 경우 UI 효과를 위한 설정 가능
+    if (volume > 0.1) { // 볼륨 임계값을 낮춤
+      updateLastSpeechTime();
     }
   };
 
   // 상태 초기화 함수
   const reset = (message = '준비 중...') => {
-    clearTimeout(debounceTimer.current);
-    clearTimeout(resetTimer.current);
-    clearTimeout(recognitionTimeout.current);
+    clearAllTimers();
 
     Voice.stop().catch(() => { });
 
@@ -241,6 +309,8 @@ export default function useVoiceRecognition() {
     partialTextUpdateCallback.current = null;
     finalResultCallback.current = null;
     recognitionAttempts.current = 0;
+    hasReceivedSpeech.current = false;
+    lastSpeechTime.current = null;
   };
 
   // 훅 초기화 로직
@@ -270,9 +340,7 @@ export default function useVoiceRecognition() {
 
     return () => {
       // 타이머 정리
-      clearTimeout(debounceTimer.current);
-      clearTimeout(resetTimer.current);
-      clearTimeout(recognitionTimeout.current);
+      clearAllTimers();
 
       // Voice 정리
       const cleanup = async () => {
@@ -298,6 +366,6 @@ export default function useVoiceRecognition() {
     reset,
     setVoiceActive,
     setStatus,
-    setStatusMessage  // 이 부분이 추가됨
+    setStatusMessage
   };
 }

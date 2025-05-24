@@ -521,22 +521,23 @@ export default function VoiceChat() {
   };
 
   useEffect(() => {
-    // 처방전 촬영 액션 핸들러
+    // 단순 액션 핸들러들 - 메시지 표시는 pendingCallback에서 처리
     registerActionHandler('CAPTURE_PRESCRIPTION', data => {
       console.log('[CHAT] 처방전 촬영 액션 수신');
+      // 메시지 표시는 pendingCallback에서 처리되므로 여기서는 액션만 처리
     });
 
-    // 알약 촬영 액션 핸들러
     registerActionHandler('CAPTURE_PILLS_PHOTO', data => {
       console.log('[CHAT] 알약 촬영 액션 수신');
+      // 메시지 표시는 pendingCallback에서 처리되므로 여기서는 액션만 처리
     });
 
-    // 알약 사진 업로드 액션 핸들러
     registerActionHandler('UPLOAD_PILLS_PHOTO', data => {
       console.log('[CHAT] 알약 사진 업로드 액션 수신');
+      // 메시지 표시는 pendingCallback에서 처리되므로 여기서는 액션만 처리
     });
 
-    // 처방전/알약 정보 응답 처리 - 수정된 부분
+    // 복합 처리가 필요한 액션 핸들러들 - 자체적으로 메시지 처리
     registerActionHandler(
       'REVIEW_PRESCRIPTION_REGISTER_RESPONSE',
       (data, message) => {
@@ -546,14 +547,13 @@ export default function VoiceChat() {
           '개 항목',
         );
 
-        // 메시지가 있으면 채팅에 표시
+        // 메시지가 있으면 채팅에 표시 (자체 처리)
         if (message && message.text_message) {
-          // 처방전 분석 결과 메시지 추가
+          console.log('[CHAT] 처방전 분석 결과 메시지 추가 (자체 처리)');
           addMessage(message.text_message, 'bot', DEFAULT_BOT_OPTIONS);
 
           // 음성 파일이 있으면 재생
           if (message.audio_base64) {
-            // 음성 파일 처리 및 재생
             const handleAudio = async () => {
               try {
                 const timestamp = Date.now();
@@ -569,6 +569,8 @@ export default function VoiceChat() {
             handleAudio();
           }
         }
+        
+        // 화면 이동 처리
         handleClientAction(
           'REVIEW_PRESCRIPTION_REGISTER_RESPONSE',
           navigation,
@@ -596,14 +598,13 @@ export default function VoiceChat() {
           '개 항목',
         );
 
-        // 메시지가 있으면 채팅에 표시
+        // 메시지가 있으면 채팅에 표시 (자체 처리)
         if (message && message.text_message) {
-          // 알약 분석 결과 메시지 추가
+          console.log('[CHAT] 알약 분석 결과 메시지 추가 (자체 처리)');
           addMessage(message.text_message, 'bot', DEFAULT_BOT_OPTIONS);
 
           // 음성 파일이 있으면 재생
           if (message.audio_base64) {
-            // 음성 파일 처리 및 재생
             const handleAudio = async () => {
               try {
                 const timestamp = Date.now();
@@ -611,6 +612,7 @@ export default function VoiceChat() {
                   RNFS.CachesDirectoryPath
                 }/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
                 await RNFS.writeFile(filePath, message.audio_base64, 'base64');
+                console.log('[CHAT] 알약 분석 결과 음성 재생 시작 (자체 처리)');
                 playAudioWithCompletion(filePath);
               } catch (error) {
                 console.error('[CHAT] 음성 파일 처리 오류:', error);
@@ -619,6 +621,7 @@ export default function VoiceChat() {
             handleAudio();
           }
         }
+        
         // 화면 이동 호출
         handleClientAction('REVIEW_PILLS_PHOTO_SEARCH_RESPONSE', navigation, {
           data,
@@ -715,10 +718,12 @@ export default function VoiceChat() {
       audioPlaybackInProgress,
       isNavigatingAway,
       isImageAnalysisInProgress, // 추가된 조건
+      isTyping,
     });
 
     if (
       chatMode === 'voice' &&
+      !isTyping &&
       !voiceActive &&
       status === 'idle' &&
       hasPermission &&
@@ -732,6 +737,7 @@ export default function VoiceChat() {
         // 재시작 직전에 한 번 더 조건 확인
         if (
           chatMode === 'voice' &&
+          !isTyping &&
           !voiceActive &&
           status === 'idle' &&
           hasPermission &&
@@ -764,6 +770,7 @@ export default function VoiceChat() {
     isNavigatingAway,
     isImageAnalysisInProgress,
     handleStartListening,
+    isTyping,
   ]);
 
   // 초기 메시지 표시 (웹소켓으로부터 받은 메시지가 있으면 사용, 없으면 기본 메시지)
