@@ -68,6 +68,7 @@ export default function VoiceChat() {
     updateVoiceMessage,
     removeActiveVoiceMessage,
     forceStopTyping,
+    clearVoiceRecognizingMessages,
   } = useChatMessages();
 
   const {scaleAnim, startPulseAnimation, stopPulseAnimation} =
@@ -998,6 +999,11 @@ export default function VoiceChat() {
         }
       }, 300);
     } else {
+      console.log('[CHAT] 음성 → 텍스트 모드 전환: 음성 인식 메시지 정리');
+      
+      // 음성 인식 중인 메시지들 제거
+      clearVoiceRecognizingMessages();
+
       setChatMode('text');
       setVoiceActive(false);
       setAudioPlaybackInProgress(false); // 모드 전환 시 재생 상태 초기화
@@ -1154,6 +1160,7 @@ export default function VoiceChat() {
             onSwitchToTextMode={() => {
               Voice.cancel().catch(() => {});
               stopPulseAnimation();
+              clearVoiceRecognizingMessages();
               setStatus('idle');
               setChatMode('text');
               setAudioPlaybackInProgress(false); // 모드 전환 시 재생 상태 초기화
