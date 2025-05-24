@@ -51,52 +51,85 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
 
   // VoiceChat에서 전달된 데이터 처리
   useEffect(() => {
-    if (fromVoiceChat && pillsData && pillsData.length > 0) {
+    const fetchMappedResultsWithDetail = async () => {
       console.log('[CameraResults] 음성챗에서 전달된 데이터 처리 시작');
-      
-      // VoiceChat에서 전달된 데이터 매핑
-      const mappedResults = pillsData.map(pill => ({
-        uniqueKey: `${pill.item_seq}`,
-        id: pill.item_seq || '',
-        item_image: pill.image_url || '',
-        entp_name: pill.entp_name || '정보 없음',
-        etc_otc_name: '전문/일반 정보 없음',
-        class_name: pill.class_name || '정보 없음',
-        item_name: pill.item_name || '정보 없음',
-        chart: pill.chart || '정보 없음',
-        drug_shape: pill.drug_shape || '',
-        color_classes: Array.isArray(pill.color_classes) 
-          ? pill.color_classes.join(', ') 
-          : pill.color_classes || '',
-        print_front: pill.print_front || '',
-        print_back: pill.print_back || '',
-        leng_long: '',
-        leng_short: '',
-        thick: '',
-        original_id: pill.item_seq,
-        indications: Array.isArray(pill.indications) 
-          ? pill.indications.join('\n') 
-          : pill.indications || '',
-        dosage: Array.isArray(pill.dosage) 
-          ? pill.dosage.join('\n') 
-          : pill.dosage || '',
-        storage_method: '',
-        precautions: Array.isArray(pill.precautions) 
-          ? pill.precautions.join('\n') 
-          : pill.precautions || '',
-        side_effects: Array.isArray(pill.side_effects) 
-          ? pill.side_effects.join('\n') 
-          : pill.side_effects || '',
-      }));
 
-      console.log('[CameraResults] 음성챗 데이터 매핑 완료, 항목 수:', mappedResults.length);
-      setSearchResults(mappedResults);
-      setInitialDataLoaded(true);
-      setLoading(false);
-      
-      return;
+      try {
+        const mappedResults = await Promise.all(
+          pillsData.map(async pill => {
+            try {
+              const detail = await getMedicineDetailByItemSeq(pill.item_seq);
+              const medicineId = detail?.body?.id || pill.item_seq;
+
+              return {
+                uniqueKey: `${pill.item_seq}`,
+                id: medicineId,
+                item_image: pill.image_url || '',
+                entp_name: pill.entp_name || '정보 없음',
+                etc_otc_name: '전문/일반 정보 없음',
+                class_name: pill.class_name || '정보 없음',
+                item_name: pill.item_name || '정보 없음',
+                chart: pill.chart || '정보 없음',
+                drug_shape: pill.drug_shape || '',
+                color_classes: Array.isArray(pill.color_classes)
+                  ? pill.color_classes.join(', ')
+                  : pill.color_classes || '',
+                print_front: pill.print_front || '',
+                print_back: pill.print_back || '',
+                leng_long: '',
+                leng_short: '',
+                thick: '',
+                original_id: pill.item_seq,
+                indications: Array.isArray(pill.indications)
+                  ? pill.indications.join('\n')
+                  : pill.indications || '',
+                dosage: Array.isArray(pill.dosage)
+                  ? pill.dosage.join('\n')
+                  : pill.dosage || '',
+                storage_method: '',
+                precautions: Array.isArray(pill.precautions)
+                  ? pill.precautions.join('\n')
+                  : pill.precautions || '',
+                side_effects: Array.isArray(pill.side_effects)
+                  ? pill.side_effects.join('\n')
+                  : pill.side_effects || '',
+              };
+            } catch (err) {
+              console.warn(
+                '[CameraResults] 상세 정보 조회 실패:',
+                pill.item_seq,
+                err,
+              );
+              return {
+                uniqueKey: `${pill.item_seq}`,
+                id: pill.item_seq, // fallback
+                item_image: pill.image_url || '',
+                entp_name: pill.entp_name || '정보 없음',
+                item_name: pill.item_name || '정보 없음',
+              };
+            }
+          }),
+        );
+
+        console.log(
+          '[CameraResults] 음성챗 데이터 매핑 완료, 항목 수:',
+          mappedResults.length,
+        );
+        setSearchResults(mappedResults);
+        setInitialDataLoaded(true);
+        setLoading(false);
+      } catch (err) {
+        console.error('[CameraResults] pillsData 처리 중 오류:', err);
+        setError(true);
+        setLoading(false);
+      }
+    };
+
+    if (fromVoiceChat && pillsData && pillsData.length > 0) {
+      fetchMappedResultsWithDetail();
+      return; // VoiceChat 처리 끝났으면 아래 실행하지 않도록 종료
     }
-    
+
     // 기존 API 호출 로직은 fromVoiceChat이 아닐 때만 실행
     if (fromVoiceChat || apiCallStarted.current) {
       return;
@@ -248,7 +281,7 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
       <Header
         onBackPress={() => {
           console.log('[CameraResults] 뒤로가기 버튼 클릭');
-            navigation.goBack();
+          navigation.goBack();
         }}>
         약 검색 결과
       </Header>
