@@ -8,8 +8,14 @@ import {useFontSize} from '../../../assets/fonts/FontSizeContext';
 
 const {voice: VoiceIcon, mike: MikeIcon, send: SendIcon} = ChatIcons;
 
-const MessageInput = ({inputText, setInputText, sendMessage, toggleVoiceMode}) => {
-  const { fontSizeMode } = useFontSize();
+const MessageInput = ({
+  inputText,
+  setInputText,
+  sendMessage,
+  toggleVoiceMode,
+  onVoicePress,
+}) => {
+  const {fontSizeMode} = useFontSize();
 
   return (
     <InputContainer>
@@ -30,7 +36,11 @@ const MessageInput = ({inputText, setInputText, sendMessage, toggleVoiceMode}) =
           />
         </SendButton>
       </TextInputContainer>
-      <VoiceIconContainer onPress={toggleVoiceMode}>
+      <VoiceIconContainer
+        onPress={() => {
+          if (onVoicePress) onVoicePress(); // isTyping false 등
+          toggleVoiceMode(); // 기존 음성 모드 전환
+        }}>
         <VoiceIcon
           width={44}
           height={44}
