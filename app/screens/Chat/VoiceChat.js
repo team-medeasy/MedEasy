@@ -667,27 +667,22 @@ export default function VoiceChat() {
       if (response && response.text_message) {
         console.log('[WS] 초기 메시지 수신:', response.text_message);
 
-        // 메시지 바로 표시
-        addMessage(
-          response.text_message,
-          'bot',
-          DEFAULT_BOT_OPTIONS,
-          false,
-          true,
-        );
+        // 메시지 저장
+        setInitialWelcomeMessage({
+          text: response.text_message,
+          options: DEFAULT_BOT_OPTIONS,
+        });
 
-        // 음성 있으면 바로 저장 + 재생
+        // 음성 저장
         if (response.audio_base64 && response.audio_format) {
           try {
             const filePath = await saveWelcomeAudio(
               response.audio_base64,
               response.audio_format,
             );
-            if (filePath) {
-              playAudioWithCompletion(filePath); // 💡 저장 후 즉시 재생
-            }
+            setInitialWelcomeAudio(filePath);
           } catch (err) {
-            console.error('[WS] 초기 음성 저장 또는 재생 실패:', err);
+            console.error('[WS] 초기 음성 저장 실패:', err);
           }
         }
       }
@@ -775,61 +770,40 @@ export default function VoiceChat() {
 
   // 초기 메시지 표시 (웹소켓으로부터 받은 메시지가 있으면 사용, 없으면 기본 메시지)
   useEffect(() => {
+    fetchUserInfo();
     if (!showInfoModal && messages.length === 0) {
-      let isResolved = false;
+      console.log('[INIT] 모달 닫힘 이후 초기 메시지 출력');
 
-      const waitForInitialMessage = setTimeout(() => {
-        if (isResolved || messages.length > 0) return;
+      if (initialWelcomeMessage) {
+        addMessage(
+          initialWelcomeMessage.text,
+          'bot',
+          initialWelcomeMessage.options || DEFAULT_BOT_OPTIONS,
+          false,
+          true,
+        );
 
-        if (initialWelcomeMessage) {
-          addMessage(
-            initialWelcomeMessage.text,
-            'bot',
-            initialWelcomeMessage.options || DEFAULT_BOT_OPTIONS,
-            false,
-            true,
-          );
-          if (initialWelcomeAudio) {
-            playAudioWithCompletion(initialWelcomeAudio);
-          }
-        } else {
-          addMessage(
-            `${
-              userName || '사용자'
-            }님, 안녕하세요☺️\n어떤 도움이 필요하신가요?`,
-            'bot',
-            DEFAULT_BOT_OPTIONS,
-            false,
-            true,
-          );
+        if (initialWelcomeAudio) {
+          playAudioWithCompletion(initialWelcomeAudio);
         }
-      }, 1000); // 🔸 최대 1초 기다리기 (조절 가능)
-
-      const checkForWelcomeMessage = setInterval(() => {
-        if (initialWelcomeMessage && messages.length === 0 && !isResolved) {
-          isResolved = true;
-          clearTimeout(waitForInitialMessage);
-          clearInterval(checkForWelcomeMessage);
-
-          addMessage(
-            initialWelcomeMessage.text,
-            'bot',
-            initialWelcomeMessage.options || DEFAULT_BOT_OPTIONS,
-            false,
-            true,
-          );
-          if (initialWelcomeAudio) {
-            playAudioWithCompletion(initialWelcomeAudio);
-          }
-        }
-      }, 100); // 0.1초 단위로 초기 메시지 도착 여부 체크
-
-      return () => {
-        clearTimeout(waitForInitialMessage);
-        clearInterval(checkForWelcomeMessage);
-      };
+      } else {
+        // 메시지가 아직 도착하지 않았을 경우 fallback 메시지
+        addMessage(
+          `${userName || '사용자'}님, 안녕하세요☺️\n어떤 도움이 필요하신가요?`,
+          'bot',
+          DEFAULT_BOT_OPTIONS,
+          false,
+          true,
+        );
+      }
     }
-  }, [showInfoModal, initialWelcomeMessage, messages.length, userName]);
+  }, [
+    showInfoModal,
+    initialWelcomeMessage,
+    initialWelcomeAudio,
+    messages.length,
+    userName,
+  ]);
 
   // 새 메시지가 추가될 때마다 스크롤 맨 아래로 이동
   useEffect(() => {
