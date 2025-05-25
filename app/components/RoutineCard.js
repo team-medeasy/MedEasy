@@ -100,7 +100,7 @@ const RoutineCard = ({
           <Routines>
             <RoutineList>
               {routine.medicines.map(medicine => (
-                <MedicineItem key={medicine.medicine_id}>
+                <MedicineItem key={medicine.routine_id}>
                   <MedicineText
                     fontSizeMode={fontSizeMode}
                     isChecked={
