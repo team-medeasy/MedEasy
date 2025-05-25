@@ -172,7 +172,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
         
         // 별명 설정
         if (routineData.nickname) {
-          console.log('🟢 별명 설정:', routineData.nickname);
+          console.log('🟢 별명 설정(API로부터 받은):', routineData.nickname);
           setMedicineName(routineData.nickname);
         }
         
@@ -307,7 +307,7 @@ const SetMedicineRoutine = ({ route, navigation }) => {
         setMedicine(medicineData);
         
         // 약 이름으로 기본 별명 설정 (수정 모드가 아니고 별명이 아직 설정되지 않았을 때만)
-        if (!isEditing && !medicineName) {
+        if (isPrescriptionMode && !medicineName) {
           console.log('🟢 기본 약 이름으로 별명 설정:', medicineData.item_name || medicineData.medicine_name);
           setMedicineName(medicineData.item_name || medicineData.medicine_name || '');
         }
