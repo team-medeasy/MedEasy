@@ -1,5 +1,6 @@
 import {useRef, useState} from 'react';
 import Sound from 'react-native-sound';
+import RNFS from 'react-native-fs';
 
 export default function useAudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -76,9 +77,29 @@ export default function useAudioPlayer() {
     });
   };
 
+  // 오디오 파일 존재 여부 확인 후 재생 (추가)
+  const playAudioWithCompletion = async (filePath, fallbackCallback = null) => {
+    if (!filePath) {
+      console.warn('[AUDIO] 경로 없음: 오디오 재생 불가');
+      if (fallbackCallback) fallbackCallback();
+      return;
+    }
+
+    const exists = await RNFS.exists(filePath);
+    if (!exists) {
+      console.warn('[AUDIO] 파일이 존재하지 않음:', filePath);
+      if (fallbackCallback) fallbackCallback();
+      return;
+    }
+
+    // 정상 경로일 경우 재생
+    playAudioFile(filePath, fallbackCallback);
+  };
+
   return {
     isPlaying,
     playAudioFile,
     cleanupAudio,
+    playAudioWithCompletion,
   };
 }
