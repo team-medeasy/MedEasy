@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import {useState, useRef} from 'react';
 
 export default function useChatMessages() {
   const [messages, setMessages] = useState([]);
@@ -16,7 +16,13 @@ export default function useChatMessages() {
   };
 
   // 메시지 추가 함수
-  const addMessage = (text, type, options = null, isVoiceRecognizing = false, isInitialMessage = false) => {
+  const addMessage = (
+    text,
+    type,
+    options = null,
+    isVoiceRecognizing = false,
+    isInitialMessage = false,
+  ) => {
     const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
 
     setMessages(prevMessages => [
@@ -28,7 +34,7 @@ export default function useChatMessages() {
         time: formatTimeString(),
         options,
         isVoiceRecognizing,
-        isInitialMessage
+        isInitialMessage,
       },
     ]);
 
@@ -52,9 +58,7 @@ export default function useChatMessages() {
       }
 
       return prevMessages.map(msg =>
-        msg.id === messageId
-          ? { ...msg, text, isVoiceRecognizing: false }
-          : msg
+        msg.id === messageId ? {...msg, text, isVoiceRecognizing: false} : msg,
       );
     });
   };
@@ -67,7 +71,13 @@ export default function useChatMessages() {
 
     setMessages(prevMessages => [
       ...prevMessages,
-      { id: typingMsgId, type: 'bot', text: '...', time: formatTimeString(), isTyping: true },
+      {
+        id: typingMsgId,
+        type: 'bot',
+        text: '...',
+        time: formatTimeString(),
+        isTyping: true,
+      },
     ]);
 
     return typingMsgId;
@@ -76,55 +86,46 @@ export default function useChatMessages() {
   // 타이핑 메시지 완료 - 개선된 버전
   const finishTypingMessage = (typingMsgId, text, options = null) => {
     console.log('[CHAT] 타이핑 메시지 완료:', typingMsgId);
-    
+
     // 1. 메시지 업데이트
     setMessages(prevMessages =>
       prevMessages.map(msg =>
         msg.id === typingMsgId
-          ? { ...msg, text, isTyping: false, options, isInitialMessage: false }
-          : msg
-      )
+          ? {...msg, text, isTyping: false, options, isInitialMessage: false}
+          : msg,
+      ),
     );
-    
-    // 2. 강제 상태 동기화 - 다음 틱에서 확실히 해제
-    Promise.resolve().then(() => {
-      setIsTyping(false);
-      setTypingMessageId(null);
-      console.log('[CHAT] 타이핑 상태 강제 동기화 완료');
-    });
+
+    // 즉시 타이핑 상태 해제 (setTimeout 제거)
+    setIsTyping(false);
+    setTypingMessageId(null);
+    console.log('[CHAT] 타이핑 상태 즉시 해제됨');
   };
 
-  // 강제 타이핑 상태 해제 함수 - 개선된 버전
+  // 강제 타이핑 상태 해제 함수
   const forceStopTyping = () => {
     console.log('[CHAT] 강제 타이핑 상태 해제');
-    
+
     // 즉시 해제
     setIsTyping(false);
     setTypingMessageId(null);
-    
-    // 다음 틱에서도 한번 더 확인하여 완전히 해제
-    Promise.resolve().then(() => {
-      setIsTyping(false);
-      setTypingMessageId(null);
-      console.log('[CHAT] 강제 타이핑 상태 이중 해제 완료');
-    });
   };
 
   // 음성 인식 임시 메시지 제거
-  const removeActiveVoiceMessage = (messageId) => {
+  const removeActiveVoiceMessage = messageId => {
     setMessages(prevMessages =>
-      prevMessages.filter(msg => msg.id !== messageId)
+      prevMessages.filter(msg => msg.id !== messageId),
     );
   };
 
   // ===== 추가된 함수: 음성 인식 중인 모든 메시지 정리 =====
   const clearVoiceRecognizingMessages = () => {
     console.log('[CHAT] 음성 인식 중인 메시지들 정리');
-    
-    setMessages(prevMessages => 
-      prevMessages.filter(msg => !msg.isVoiceRecognizing)
+
+    setMessages(prevMessages =>
+      prevMessages.filter(msg => !msg.isVoiceRecognizing),
     );
-    
+
     // 타이핑 상태도 함께 해제
     setIsTyping(false);
     setTypingMessageId(null);
@@ -141,6 +142,6 @@ export default function useChatMessages() {
     removeActiveVoiceMessage,
     forceStopTyping,
     clearVoiceRecognizingMessages,
-    formatTimeString
+    formatTimeString,
   };
 }
