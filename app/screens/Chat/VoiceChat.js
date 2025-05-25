@@ -793,7 +793,7 @@ export default function VoiceChat() {
           ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item, index) => `msg-${item.id}-${index}`}
           contentContainerStyle={{
             padding: 16,
             paddingBottom:
