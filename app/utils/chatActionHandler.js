@@ -1,7 +1,7 @@
-// utils/chatActionHandler.js
-
 import {Linking} from 'react-native';
+import RNFS from 'react-native-fs';
 import Voice from '@react-native-voice/voice';
+import { DEFAULT_BOT_OPTIONS } from '../../assets/data/utils';
 
 /**
  * 음성 인식 완전 중지 함수
@@ -119,6 +119,79 @@ export const handleClientAction = (action, navigation, options = {}) => {
       console.log('[ActionHandler] 처리되지 않은 액션:', action);
       break;
   }
+};
+
+export const registerCommonActionHandlers = ({
+  registerActionHandler,
+  addMessage,
+  playAudioWithCompletion,
+  navigation,
+  voiceControls,
+}) => {
+  // 처방전 분석 결과
+  registerActionHandler(
+    'REVIEW_PRESCRIPTION_REGISTER_RESPONSE',
+    (data, message) => {
+      console.log('[Action] 처방전 분석 응답 수신:', data?.length || 0);
+
+      if (message?.text_message) {
+        addMessage(message.text_message, 'bot', DEFAULT_BOT_OPTIONS);
+
+        if (message.audio_base64) {
+          const filePath = `${RNFS.CachesDirectoryPath}/voice_${Date.now()}.${message.audio_format || 'mp3'}`;
+          RNFS.writeFile(filePath, message.audio_base64, 'base64')
+            .then(() => playAudioWithCompletion(filePath))
+            .catch(err => console.error('처방전 음성 저장 실패:', err));
+        }
+      }
+
+      handleClientAction('REVIEW_PRESCRIPTION_REGISTER_RESPONSE', navigation, {
+        data,
+        voiceControls,
+        onRoutineRegistered: () => {
+          addMessage('루틴이 성공적으로 등록되었습니다.', 'bot', DEFAULT_BOT_OPTIONS);
+        },
+      });
+    }
+  );
+
+  // 알약 검색 결과
+  registerActionHandler(
+    'REVIEW_PILLS_PHOTO_SEARCH_RESPONSE',
+    (data, message) => {
+      console.log('[Action] 알약 분석 응답 수신:', data?.length || 0);
+
+      if (message?.text_message) {
+        addMessage(message.text_message, 'bot', DEFAULT_BOT_OPTIONS);
+
+        if (message.audio_base64) {
+          const filePath = `${RNFS.CachesDirectoryPath}/voice_${Date.now()}.${message.audio_format || 'mp3'}`;
+          RNFS.writeFile(filePath, message.audio_base64, 'base64')
+            .then(() => playAudioWithCompletion(filePath))
+            .catch(err => console.error('알약 음성 저장 실패:', err));
+        }
+      }
+
+      handleClientAction('REVIEW_PILLS_PHOTO_SEARCH_RESPONSE', navigation, {
+        data,
+        voiceControls,
+      });
+    }
+  );
+
+  // 기본 메시지
+  registerActionHandler('DEFAULT_MESSAGE', (data, message) => {
+    if (message?.text_message) {
+      addMessage(message.text_message, 'bot', DEFAULT_BOT_OPTIONS);
+
+      if (message.audio_base64) {
+        const filePath = `${RNFS.CachesDirectoryPath}/voice_${Date.now()}.${message.audio_format || 'mp3'}`;
+        RNFS.writeFile(filePath, message.audio_base64, 'base64')
+          .then(() => playAudioWithCompletion(filePath))
+          .catch(err => console.error('기본 음성 저장 실패:', err));
+      }
+    }
+  });
 };
 
 export default handleClientAction;
