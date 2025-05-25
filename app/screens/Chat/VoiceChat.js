@@ -507,7 +507,29 @@ export default function VoiceChat() {
     }
   };
 
-  // 음성 인식 결과 처리
+  const toggleChatMode = () => {
+    Voice.cancel().catch(() => {});
+    stopPulseAnimation();
+
+    if (chatMode === 'text') {
+      setChatMode('voice');
+      setTimeout(() => {
+        if (hasPermission && !isTyping) {
+          reset('음성 인식 준비 중...');
+          setTimeout(() => {
+            handleStartListening();
+          }, 500);
+        }
+      }, 300);
+    } else {
+      clearVoiceRecognizingMessages();
+      setChatMode('text');
+      setVoiceActive(false);
+      setAudioPlaybackInProgress(false);
+    }
+  };
+
+  // 원본 코드의 processRecognizedText 함수 수정 - 음성 재생 완료 후 자동 재시작 개선
   const processRecognizedText = async (text, typingMsgId) => {
     try {
       console.log('[CHAT] 음성 인식 결과 처리 시작:', text);
@@ -534,15 +556,20 @@ export default function VoiceChat() {
 
       console.log('[CHAT] 서버 응답 처리 완료, 오디오 재생 준비');
 
-      // 음성 재생
+      // 음성 재생 - 콜백에서 지연 시간 추가
       if (filePath) {
         playAudioWithCompletion(filePath, () => {
           // 재생 완료 후 콜백 내용
+          console.log('[CHAT] 음성 재생 완료 - 상태 업데이트 시작');
           setAudioPlaybackInProgress(false);
+
           if (chatMode === 'voice') {
+            // 자동 재시작을 위한 지연 시간 증가
             setTimeout(() => {
+              console.log('[CHAT] 음성 인식 자동 재시작 준비');
+              setVoiceActive(false);
               setStatus('idle');
-            }, 300);
+            }, 800); // 300ms에서 800ms로 증가
           }
         });
       } else {
@@ -554,10 +581,11 @@ export default function VoiceChat() {
           if (chatMode === 'voice') {
             setTimeout(() => {
               console.log('[CHAT] 음성 인식 자동 재시작 트리거');
+              setVoiceActive(false);
               setStatus('idle');
-            }, 500);
+            }, 1000); // 500ms에서 1000ms로 증가
           }
-        }, 1000);
+        }, 1500); // 1000ms에서 1500ms로 증가
       }
 
       // 액션 처리
@@ -584,7 +612,7 @@ export default function VoiceChat() {
     }
   };
 
-  // 텍스트 채팅 모드에서 메시지 전송
+  // sendTextMessage 함수 수정 - 음성 재생 완료 후 지연 시간 추가
   const sendTextMessage = async () => {
     if (inputText.trim() === '') return;
 
@@ -605,18 +633,18 @@ export default function VoiceChat() {
       // 타이핑 메시지를 실제 메시지로 교체
       finishTypingMessage(typingMsgId, responseText, DEFAULT_BOT_OPTIONS);
 
-      // 음성 재생 (수정된 함수 사용)
-      if (filePath) {
-        playAudioWithCompletion(filePath, () => {
-          // 재생 완료 후 콜백 내용
-          setAudioPlaybackInProgress(false);
-          if (chatMode === 'voice') {
-            setTimeout(() => {
-              setStatus('idle');
-            }, 300);
-          }
-        });
-      }
+      // 음성 재생 - 완료 후 지연 시간 추가
+      playAudioWithCompletion(filePath, () => {
+        setAudioPlaybackInProgress(false);
+        setVoiceActive(false);
+
+        // 음성 모드일 때 자동 재시작을 위한 지연 증가
+        if (chatMode === 'voice') {
+          setTimeout(() => {
+            setStatus('idle');
+          }, 800); // 300ms에서 800ms로 증가
+        }
+      });
 
       // 액션 처리
       if (action) {
@@ -633,34 +661,7 @@ export default function VoiceChat() {
     }
   };
 
-  // 채팅 모드 전환 (텍스트 <-> 음성)
-  const toggleChatMode = () => {
-    Voice.cancel().catch(() => {});
-    stopPulseAnimation();
-
-    if (chatMode === 'text') {
-      setChatMode('voice');
-      setTimeout(() => {
-        if (hasPermission && !isTyping) {
-          reset('음성 인식 준비 중...');
-          setTimeout(() => {
-            handleStartListening();
-          }, 500);
-        }
-      }, 300);
-    } else {
-      console.log('[CHAT] 음성 → 텍스트 모드 전환: 음성 인식 메시지 정리');
-
-      // 음성 인식 중인 메시지들 제거
-      clearVoiceRecognizingMessages();
-
-      setChatMode('text');
-      setVoiceActive(false);
-      setAudioPlaybackInProgress(false); // 모드 전환 시 재생 상태 초기화
-    }
-  };
-
-  // 봇 옵션 선택 처리
+  // handleBotOptionPress 함수 수정 - 음성 재생 완료 후 지연 시간 추가
   const handleBotOptionPress = async option => {
     cleanupAudio();
     addMessage(option, 'user');
@@ -685,15 +686,16 @@ export default function VoiceChat() {
       const {text, filePath, action, data} = response;
       finishTypingMessage(typingMsgId, text, DEFAULT_BOT_OPTIONS);
 
-      // 음성 재생 (수정된 함수 사용)
+      // 음성 재생 - 완료 후 지연 시간 추가
       if (filePath) {
         playAudioWithCompletion(filePath, () => {
           // 재생 완료 후 콜백 내용
           setAudioPlaybackInProgress(false);
           if (chatMode === 'voice') {
             setTimeout(() => {
+              setVoiceActive(false);
               setStatus('idle');
-            }, 300);
+            }, 800); // 300ms에서 800ms로 증가
           }
         });
       } else {
@@ -701,7 +703,13 @@ export default function VoiceChat() {
         setAudioPlaybackInProgress(true);
         setTimeout(() => {
           setAudioPlaybackInProgress(false);
-        }, 1000);
+          if (chatMode === 'voice') {
+            setTimeout(() => {
+              setVoiceActive(false);
+              setStatus('idle');
+            }, 800); // 지연 시간 증가
+          }
+        }, 1500); // 1000ms에서 1500ms로 증가
       }
 
       if (action) {
@@ -719,6 +727,73 @@ export default function VoiceChat() {
       setAudioPlaybackInProgress(false); // 오류 발생 시 재생 상태 초기화
     }
   };
+
+  // 자동 재시작 useEffect 수정 - 지연 시간 증가
+  useEffect(() => {
+    let timeoutId;
+
+    console.log('[VOICE] 자동 재시작 조건 체크:', {
+      chatMode,
+      voiceActive,
+      status,
+      hasPermission,
+      audioPlaybackInProgress,
+      isNavigatingAway,
+      isImageAnalysisInProgress,
+      isTyping,
+    });
+
+    if (
+      chatMode === 'voice' &&
+      !isTyping &&
+      !voiceActive &&
+      status === 'idle' &&
+      hasPermission &&
+      !audioPlaybackInProgress &&
+      !isNavigatingAway &&
+      !isImageAnalysisInProgress
+    ) {
+      console.log('[VOICE] 자동 재시작 예약됨 (2초 지연)');
+
+      timeoutId = setTimeout(() => {
+        // 재시작 직전에 한 번 더 조건 확인
+        if (
+          chatMode === 'voice' &&
+          !isTyping &&
+          !voiceActive &&
+          status === 'idle' &&
+          hasPermission &&
+          !audioPlaybackInProgress &&
+          !isNavigatingAway &&
+          !isImageAnalysisInProgress
+        ) {
+          console.log('[VOICE] 자동 재시작 실행');
+          handleStartListening();
+        } else {
+          console.log('[VOICE] 재시작 직전 조건 변경으로 취소');
+        }
+      }, 2000); // 1500ms에서 2000ms로 증가
+    } else {
+      console.log('[VOICE] 자동 재시작 조건 불만족');
+    }
+
+    return () => {
+      if (timeoutId) {
+        console.log('[VOICE] 자동 재시작 타이머 클리어');
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [
+    status,
+    hasPermission,
+    chatMode,
+    voiceActive,
+    audioPlaybackInProgress,
+    isNavigatingAway,
+    isImageAnalysisInProgress,
+    handleStartListening,
+    isTyping,
+  ]);
 
   // 모달 닫기 핸들러
   const handleCloseModal = () => {
