@@ -38,7 +38,6 @@ import useAudioPlayer from '../../hooks/useAudioPlayer';
 import useChatMessages from '../../hooks/useChatMessages';
 import usePulseAnimation from '../../hooks/usePulseAnimation';
 import useWebSocketChat from '../../hooks/useWebSocketChat';
-import useImageAnalysis from '../../hooks/useImageAnalysis';
 
 export default function VoiceChat() {
   const {fontSizeMode} = useFontSize();
@@ -60,8 +59,7 @@ export default function VoiceChat() {
     setStatusMessage,
   } = useVoiceRecognition();
 
-  const {playAudioFile, cleanupAudio, isPlaying, playAudioWithCompletion} =
-    useAudioPlayer();
+  const {playAudioFile, cleanupAudio, isPlaying} = useAudioPlayer();
 
   const {
     messages,
@@ -101,19 +99,6 @@ export default function VoiceChat() {
   const [isImageAnalysisInProgress, setIsImageAnalysisInProgress] =
     useState(false);
 
-  const {playAudioWithImageAnalysisCompletion, handleImageUpload} =
-    useImageAnalysis({
-      addMessage,
-      startTypingMessage,
-      removeActiveVoiceMessage,
-      playAudioFile,
-      cleanupAudio,
-      setAudioPlaybackInProgress,
-      setIsImageAnalysisInProgress,
-      setStatus,
-      chatMode,
-    });
-
   // 웰컴 오디오 저장 함수
   const saveWelcomeAudio = async (base64Audio, audioFormat = 'mp3') => {
     try {
@@ -127,6 +112,16 @@ export default function VoiceChat() {
       console.error('[AUDIO] 초기 음성 파일 저장 오류:', error);
       return null;
     }
+  };
+
+  // 시간 포맷팅 함수
+  const formatTimeString = () => {
+    const currentTime = new Date();
+    const hours = currentTime.getHours();
+    const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+    const period = hours >= 12 ? '오후' : '오전';
+    const formattedHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
+    return `${period} ${formattedHours}:${minutes}`;
   };
 
   // 음성 제어 함수들을 묶은 객체 생성
@@ -222,6 +217,145 @@ export default function VoiceChat() {
     }
   }, [audioPlaybackInProgress, chatMode]);
 
+  // 오디오 재생 함수 (안정성 개선)
+  const playAudioWithCompletion = useCallback(
+    filePath => {
+      if (!filePath) {
+        console.log('[AUDIO] 재생할 파일 경로가 없음, 상태 초기화');
+        setAudioPlaybackInProgress(true);
+        setTimeout(() => {
+          setAudioPlaybackInProgress(false);
+          if (chatMode === 'voice') {
+            setTimeout(() => {
+              console.log('[AUDIO] 자동 재시작을 위한 상태 설정');
+              setStatus('idle');
+            }, 300);
+          }
+        }, 1000);
+        return;
+      }
+
+      RNFS.exists(filePath)
+        .then(exists => {
+          if (!exists) {
+            console.log('[AUDIO] 파일이 존재하지 않음:', filePath);
+            setAudioPlaybackInProgress(false);
+            if (chatMode === 'voice') {
+              reset('준비 완료');
+            }
+            return;
+          }
+
+          console.log('[AUDIO] 새 오디오 재생 시작');
+          setAudioPlaybackInProgress(true);
+          if (chatMode === 'voice') {
+            setStatus('processing');
+            setStatusMessage('응답 듣는 중...');
+          }
+
+          cleanupAudio();
+
+          playAudioFile(filePath, () => {
+            console.log('[AUDIO] 재생 완료, 음성 인식 재개 준비');
+
+            if (chatMode === 'voice') {
+              setStatusMessage('곧 다시 듣기 시작합니다...');
+            }
+
+            setTimeout(() => {
+              console.log('[AUDIO] 오디오 재생 완료 후 상태 변경');
+              setAudioPlaybackInProgress(false);
+
+              if (chatMode === 'voice') {
+                console.log('[AUDIO] 음성 인식 자동 재시작을 위한 상태 설정');
+
+                // 타이핑 상태 한 번 더 확인하고 해제
+                setTimeout(() => {
+                  if (isTyping) {
+                    console.warn(
+                      '[AUDIO] 타이핑 상태가 여전히 true - 강제 해제',
+                    );
+                    forceStopTyping();
+                  }
+
+                  setTimeout(() => {
+                    setStatus('idle');
+                    console.log('[AUDIO] 음성 인식 재시작 상태 설정 완료');
+                  }, 100);
+                }, 100);
+              }
+            }, 300); // 지연 시간을 300ms로 줄임
+          });
+        })
+        .catch(error => {
+          console.error('[AUDIO] 파일 확인 오류:', error);
+          setAudioPlaybackInProgress(false);
+          if (chatMode === 'voice') {
+            reset('준비 완료');
+          }
+        });
+    },
+    [
+      chatMode,
+      playAudioFile,
+      setStatus,
+      cleanupAudio,
+      setStatusMessage,
+      isTyping,
+    ],
+  );
+
+  const playAudioWithImageAnalysisCompletion = useCallback(
+    filePath => {
+      if (!filePath) {
+        console.log('[AUDIO] 이미지 분석: 재생할 파일 없음, 즉시 상태 해제');
+        setIsImageAnalysisInProgress(false);
+        setAudioPlaybackInProgress(false);
+        return;
+      }
+
+      RNFS.exists(filePath)
+        .then(exists => {
+          if (!exists) {
+            console.log('[AUDIO] 이미지 분석: 파일이 존재하지 않음');
+            setIsImageAnalysisInProgress(false);
+            setAudioPlaybackInProgress(false);
+            return;
+          }
+
+          console.log('[AUDIO] 이미지 분석 결과 음성 재생 시작');
+          setAudioPlaybackInProgress(true);
+
+          cleanupAudio();
+
+          playAudioFile(filePath, () => {
+            console.log('[AUDIO] 이미지 분석 결과 음성 재생 완료');
+
+            // 재생 완료 후 2초 딜레이를 두고 상태 해제
+            setTimeout(() => {
+              console.log('[AUDIO] 이미지 분석 완료 - 음성 인식 재개 허용');
+              setIsImageAnalysisInProgress(false);
+              setAudioPlaybackInProgress(false);
+
+              // 음성 모드인 경우 추가 딜레이 후 음성 인식 상태 설정
+              if (chatMode === 'voice') {
+                setTimeout(() => {
+                  setStatus('idle');
+                  console.log('[AUDIO] 음성 인식 재시작 상태 설정 완료');
+                }, 500);
+              }
+            }, 2000); // 2초 딜레이로 단축
+          });
+        })
+        .catch(error => {
+          console.error('[AUDIO] 이미지 분석: 파일 확인 오류:', error);
+          setIsImageAnalysisInProgress(false);
+          setAudioPlaybackInProgress(false);
+        });
+    },
+    [chatMode, playAudioFile, cleanupAudio, setStatus],
+  );
+
   // 네비게이션 파라미터 감지하여 카메라 결과 처리
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -275,14 +409,7 @@ export default function VoiceChat() {
             const typingMsgId = startTypingMessage();
 
             // 이미지 전송 처리 - 이미 사용자 메시지를 추가했으므로 true로 설정
-            handleImageUpload({
-              base64Image,
-              actionType: actionToUse,
-              uploadPrescriptionPhoto,
-              uploadPillsPhoto,
-              navigation,
-              voiceControls,
-            });
+            handleImageUpload(base64Image, actionToUse, typingMsgId, true);
 
             // 파라미터 초기화
             navigation.setParams({
@@ -317,6 +444,83 @@ export default function VoiceChat() {
 
     return unsubscribe;
   }, [navigation, isProcessingImage, addMessage, startTypingMessage]);
+
+  // 이미지 업로드 핸들러 함수
+  const handleImageUpload = async (
+    base64Image,
+    actionType,
+    typingMsgId,
+    skipProcessingMessage = false,
+  ) => {
+    try {
+      // 1. 타이핑 메시지 제거 (있는 경우)
+      if (typingMsgId) {
+        removeActiveVoiceMessage(typingMsgId);
+      }
+
+      // 2. 분석 중 메시지는 서버에서 보내주므로 클라이언트에서 추가하지 않음
+      // (서버 응답에서 "업로드된 처방전/의약품 사진을 분석 중입니다" 메시지가 온다)
+
+      // 3. API 호출
+      let response;
+      const startTime = Date.now();
+
+      if (actionType === 'PRESCRIPTION') {
+        console.log('[CHAT] 처방전 이미지 업로드 시작');
+        response = await uploadPrescriptionPhoto(base64Image);
+      } else {
+        console.log('[CHAT] 알약 이미지 업로드 시작');
+        response = await uploadPillsPhoto(base64Image);
+      }
+
+      // 4. 응답 처리
+      const {text, filePath, action, data} = response;
+
+      // 5. 최소 대기 시간 설정
+      const responseTime = Date.now() - startTime;
+      if (responseTime < 1500) {
+        await new Promise(resolve => setTimeout(resolve, 1500 - responseTime));
+      }
+
+      // 6. 서버에서 받은 메시지 표시 (이미 분석 중 메시지 포함)
+      addMessage(text, 'bot', DEFAULT_BOT_OPTIONS);
+
+      // 스크롤 처리
+      setTimeout(() => {
+        if (flatListRef.current) {
+          flatListRef.current.scrollToEnd({animated: true});
+        }
+      }, 50);
+
+      // 7. 이미지 분석 전용 음성 재생 사용
+      if (filePath) {
+        playAudioWithImageAnalysisCompletion(filePath);
+      } else {
+        // 음성 파일이 없는 경우 즉시 상태 해제
+        console.log('[CHAT] 이미지 분석 완료 (음성 없음) - 상태 즉시 해제');
+        setIsImageAnalysisInProgress(false);
+        setAudioPlaybackInProgress(false);
+      }
+
+      // 8. 액션 처리는 이미지 분석이 완료된 후 실행
+      if (action) {
+        // 액션 처리를 지연시켜서 음성 재생이 완료된 후 실행
+        setTimeout(
+          () => {
+            handleClientAction(action, navigation, {data, voiceControls});
+          },
+          filePath ? 5000 : 1000,
+        ); // 음성이 있으면 5초, 없으면 1초 후
+      }
+    } catch (error) {
+      console.error('[CHAT] 이미지 업로드 오류:', error);
+      addMessage('죄송합니다. 이미지 처리 중 오류가 발생했습니다.', 'bot');
+
+      // 오류 시에도 이미지 분석 상태 해제
+      setIsImageAnalysisInProgress(false);
+      setAudioPlaybackInProgress(false);
+    }
+  };
 
   useEffect(() => {
     registerCommonActionHandlers({
@@ -507,29 +711,7 @@ export default function VoiceChat() {
     }
   };
 
-  const toggleChatMode = () => {
-    Voice.cancel().catch(() => {});
-    stopPulseAnimation();
-
-    if (chatMode === 'text') {
-      setChatMode('voice');
-      setTimeout(() => {
-        if (hasPermission && !isTyping) {
-          reset('음성 인식 준비 중...');
-          setTimeout(() => {
-            handleStartListening();
-          }, 500);
-        }
-      }, 300);
-    } else {
-      clearVoiceRecognizingMessages();
-      setChatMode('text');
-      setVoiceActive(false);
-      setAudioPlaybackInProgress(false);
-    }
-  };
-
-  // 원본 코드의 processRecognizedText 함수 수정 - 음성 재생 완료 후 자동 재시작 개선
+  // 음성 인식 결과 처리
   const processRecognizedText = async (text, typingMsgId) => {
     try {
       console.log('[CHAT] 음성 인식 결과 처리 시작:', text);
@@ -556,22 +738,9 @@ export default function VoiceChat() {
 
       console.log('[CHAT] 서버 응답 처리 완료, 오디오 재생 준비');
 
-      // 음성 재생 - 콜백에서 지연 시간 추가
+      // 음성 재생
       if (filePath) {
-        playAudioWithCompletion(filePath, () => {
-          // 재생 완료 후 콜백 내용
-          console.log('[CHAT] 음성 재생 완료 - 상태 업데이트 시작');
-          setAudioPlaybackInProgress(false);
-
-          if (chatMode === 'voice') {
-            // 자동 재시작을 위한 지연 시간 증가
-            setTimeout(() => {
-              console.log('[CHAT] 음성 인식 자동 재시작 준비');
-              setVoiceActive(false);
-              setStatus('idle');
-            }, 800); // 300ms에서 800ms로 증가
-          }
-        });
+        playAudioWithCompletion(filePath);
       } else {
         // 음성 파일이 없는 경우
         setAudioPlaybackInProgress(true);
@@ -581,11 +750,10 @@ export default function VoiceChat() {
           if (chatMode === 'voice') {
             setTimeout(() => {
               console.log('[CHAT] 음성 인식 자동 재시작 트리거');
-              setVoiceActive(false);
               setStatus('idle');
-            }, 1000); // 500ms에서 1000ms로 증가
+            }, 500);
           }
-        }, 1500); // 1000ms에서 1500ms로 증가
+        }, 1000);
       }
 
       // 액션 처리
@@ -612,7 +780,7 @@ export default function VoiceChat() {
     }
   };
 
-  // sendTextMessage 함수 수정 - 음성 재생 완료 후 지연 시간 추가
+  // 텍스트 채팅 모드에서 메시지 전송
   const sendTextMessage = async () => {
     if (inputText.trim() === '') return;
 
@@ -633,18 +801,10 @@ export default function VoiceChat() {
       // 타이핑 메시지를 실제 메시지로 교체
       finishTypingMessage(typingMsgId, responseText, DEFAULT_BOT_OPTIONS);
 
-      // 음성 재생 - 완료 후 지연 시간 추가
-      playAudioWithCompletion(filePath, () => {
-        setAudioPlaybackInProgress(false);
-        setVoiceActive(false);
-
-        // 음성 모드일 때 자동 재시작을 위한 지연 증가
-        if (chatMode === 'voice') {
-          setTimeout(() => {
-            setStatus('idle');
-          }, 800); // 300ms에서 800ms로 증가
-        }
-      });
+      // 음성 재생 (수정된 함수 사용)
+      if (filePath) {
+        playAudioWithCompletion(filePath);
+      }
 
       // 액션 처리
       if (action) {
@@ -661,7 +821,34 @@ export default function VoiceChat() {
     }
   };
 
-  // handleBotOptionPress 함수 수정 - 음성 재생 완료 후 지연 시간 추가
+  // 채팅 모드 전환 (텍스트 <-> 음성)
+  const toggleChatMode = () => {
+    Voice.cancel().catch(() => {});
+    stopPulseAnimation();
+
+    if (chatMode === 'text') {
+      setChatMode('voice');
+      setTimeout(() => {
+        if (hasPermission && !isTyping) {
+          reset('음성 인식 준비 중...');
+          setTimeout(() => {
+            handleStartListening();
+          }, 500);
+        }
+      }, 300);
+    } else {
+      console.log('[CHAT] 음성 → 텍스트 모드 전환: 음성 인식 메시지 정리');
+
+      // 음성 인식 중인 메시지들 제거
+      clearVoiceRecognizingMessages();
+
+      setChatMode('text');
+      setVoiceActive(false);
+      setAudioPlaybackInProgress(false); // 모드 전환 시 재생 상태 초기화
+    }
+  };
+
+  // 봇 옵션 선택 처리
   const handleBotOptionPress = async option => {
     cleanupAudio();
     addMessage(option, 'user');
@@ -686,30 +873,15 @@ export default function VoiceChat() {
       const {text, filePath, action, data} = response;
       finishTypingMessage(typingMsgId, text, DEFAULT_BOT_OPTIONS);
 
-      // 음성 재생 - 완료 후 지연 시간 추가
+      // 음성 재생 (수정된 함수 사용)
       if (filePath) {
-        playAudioWithCompletion(filePath, () => {
-          // 재생 완료 후 콜백 내용
-          setAudioPlaybackInProgress(false);
-          if (chatMode === 'voice') {
-            setTimeout(() => {
-              setVoiceActive(false);
-              setStatus('idle');
-            }, 800); // 300ms에서 800ms로 증가
-          }
-        });
+        playAudioWithCompletion(filePath);
       } else {
         // 음성 파일이 없는 경우에도 약간의 딜레이를 주어 챗봇이 바로 듣기 시작하지 않도록 함
         setAudioPlaybackInProgress(true);
         setTimeout(() => {
           setAudioPlaybackInProgress(false);
-          if (chatMode === 'voice') {
-            setTimeout(() => {
-              setVoiceActive(false);
-              setStatus('idle');
-            }, 800); // 지연 시간 증가
-          }
-        }, 1500); // 1000ms에서 1500ms로 증가
+        }, 1000);
       }
 
       if (action) {
@@ -727,73 +899,6 @@ export default function VoiceChat() {
       setAudioPlaybackInProgress(false); // 오류 발생 시 재생 상태 초기화
     }
   };
-
-  // 자동 재시작 useEffect 수정 - 지연 시간 증가
-  useEffect(() => {
-    let timeoutId;
-
-    console.log('[VOICE] 자동 재시작 조건 체크:', {
-      chatMode,
-      voiceActive,
-      status,
-      hasPermission,
-      audioPlaybackInProgress,
-      isNavigatingAway,
-      isImageAnalysisInProgress,
-      isTyping,
-    });
-
-    if (
-      chatMode === 'voice' &&
-      !isTyping &&
-      !voiceActive &&
-      status === 'idle' &&
-      hasPermission &&
-      !audioPlaybackInProgress &&
-      !isNavigatingAway &&
-      !isImageAnalysisInProgress
-    ) {
-      console.log('[VOICE] 자동 재시작 예약됨 (2초 지연)');
-
-      timeoutId = setTimeout(() => {
-        // 재시작 직전에 한 번 더 조건 확인
-        if (
-          chatMode === 'voice' &&
-          !isTyping &&
-          !voiceActive &&
-          status === 'idle' &&
-          hasPermission &&
-          !audioPlaybackInProgress &&
-          !isNavigatingAway &&
-          !isImageAnalysisInProgress
-        ) {
-          console.log('[VOICE] 자동 재시작 실행');
-          handleStartListening();
-        } else {
-          console.log('[VOICE] 재시작 직전 조건 변경으로 취소');
-        }
-      }, 2000); // 1500ms에서 2000ms로 증가
-    } else {
-      console.log('[VOICE] 자동 재시작 조건 불만족');
-    }
-
-    return () => {
-      if (timeoutId) {
-        console.log('[VOICE] 자동 재시작 타이머 클리어');
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [
-    status,
-    hasPermission,
-    chatMode,
-    voiceActive,
-    audioPlaybackInProgress,
-    isNavigatingAway,
-    isImageAnalysisInProgress,
-    handleStartListening,
-    isTyping,
-  ]);
 
   // 모달 닫기 핸들러
   const handleCloseModal = () => {
@@ -868,7 +973,7 @@ export default function VoiceChat() {
           ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
-          keyExtractor={(item, index) => `msg-${item.id}-${index}`}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={{
             padding: 16,
             paddingBottom:
