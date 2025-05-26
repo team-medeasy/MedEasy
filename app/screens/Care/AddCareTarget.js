@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import {Alert, View} from 'react-native';
+import {Alert, View, Keyboard, TouchableWithoutFeedback} from 'react-native';
 import {Header, InputWithDelete, Button} from '../../components';
 import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
@@ -36,40 +36,42 @@ const AddCareTarget = () => {
   };
 
   return (
-    <Container>
-      <Header>관리 대상 추가</Header>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <Container>
+        <Header>관리 대상 추가</Header>
 
-      <TextContainer>
-        <LargeText fontSizeMode={fontSizeMode}>
-          추가할 관리 대상의 인증번호를 입력해주세요.
-        </LargeText>
-        <SmallText fontSizeMode={fontSizeMode}>
-          복약 루틴을 함께 확인하고 알림도 받아보실 수 있어요.
-        </SmallText>
-      </TextContainer>
+        <TextContainer>
+          <LargeText fontSizeMode={fontSizeMode}>
+            추가할 관리 대상의 인증번호를 입력해주세요.
+          </LargeText>
+          <SmallText fontSizeMode={fontSizeMode}>
+            복약 루틴을 함께 확인하고 알림도 받아보실 수 있어요.
+          </SmallText>
+        </TextContainer>
 
-      <InputContainer>
-        <InputWithDelete
-          placeholder="인증번호 입력"
-          value={authCode}
-          onChangeText={setAuthCode}
-        />
-      </InputContainer>
+        <InputContainer>
+          <InputWithDelete
+            placeholder="인증번호 입력"
+            value={authCode}
+            onChangeText={setAuthCode}
+          />
+        </InputContainer>
 
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          paddingLeft: 20,
-          paddingRight: 20,
-          paddingBottom: 30,
-          alignItems: 'center',
-        }}>
-        <Button title='확인' onPress={handleRegister}/>
-    </View>
-    </Container>
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingBottom: 30,
+            alignItems: 'center',
+          }}>
+          <Button title='확인' onPress={handleRegister}/>
+      </View>
+      </Container>
+    </TouchableWithoutFeedback>
   );
 };
 

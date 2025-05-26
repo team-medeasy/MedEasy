@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, TouchableOpacity, Platform} from 'react-native';
+import {View, TouchableOpacity, Platform, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import styled from 'styled-components/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {themes} from './../../styles';
@@ -172,92 +172,94 @@ const SearchMedicineScreen = ({navigation, route}) => {
   };
 
   return (
-    <Container>
-      <HeaderContainer style={{ paddingTop: Platform.OS === 'ios' ? insets.top : insets.top + 10 }}>
-        <ChevronAndSearchContainer>
-          <ChevronIconButton
-            style={{padding: 12}}
-            onPress={() => navigation.goBack()}>
-            <HeaderIcons.chevron
-              height={17}
-              width={17}
-              style={{color: themes.light.textColor.textPrimary}}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <Container>
+        <HeaderContainer style={{ paddingTop: Platform.OS === 'ios' ? insets.top : insets.top + 10 }}>
+          <ChevronAndSearchContainer>
+            <ChevronIconButton
+              style={{padding: 12}}
+              onPress={() => navigation.goBack()}>
+              <HeaderIcons.chevron
+                height={17}
+                width={17}
+                style={{color: themes.light.textColor.textPrimary}}
+              />
+            </ChevronIconButton>
+            <SearchBar
+              searchQuery={searchQuery || ''}
+              setSearchQuery={setSearchQuery}
+              onSearch={() => handleSearch(searchQuery)}
+              placeholder={'약 이름, 증상을 입력하세요'}
             />
-          </ChevronIconButton>
-          <SearchBar
-            searchQuery={searchQuery || ''}
-            setSearchQuery={setSearchQuery}
-            onSearch={() => handleSearch(searchQuery)}
-            placeholder={'약 이름, 증상을 입력하세요'}
-          />
-        </ChevronAndSearchContainer>
-      </HeaderContainer>
+          </ChevronAndSearchContainer>
+        </HeaderContainer>
 
-      <SearchesContainer>
-        <View>
-          <SearchSectionHeader>
-            <SearchTitle fontSizeMode={fontSizeMode || 'default'}>최근 검색어</SearchTitle>
-            <TouchableOpacity style={{padding: 12}} onPress={handleClearAll}>
-              <ClearAllText fontSizeMode={fontSizeMode || 'default'}>전체 삭제</ClearAllText>
-            </TouchableOpacity>
-          </SearchSectionHeader>
-          {recentSearches && recentSearches.length > 0 ? (
-            <RecentSearchListContainer
-              horizontal
-              showsHorizontalScrollIndicator={false}>
-              {recentSearches.map((item, index) => (
-                <RecentSearchItemButton
-                  key={`recent-${index}-${item}`}
-                  onPress={() => handleRecentSearchClick(item)}>
-                  <RecentSearchItemText fontSizeMode={fontSizeMode || 'default'}>{item || ''}</RecentSearchItemText>
-                  <DeleteIconButton
-                    style={{padding: 8}}
-                    onPress={e => {
-                      e.stopPropagation();
-                      handleDeleteSearch(item);
-                    }}>
-                    <OtherIcons.delete
-                      height={10}
-                      width={10}
-                      style={{color: themes.light.textColor.Primary50}}
-                    />
-                  </DeleteIconButton>
-                </RecentSearchItemButton>
+        <SearchesContainer>
+          <View>
+            <SearchSectionHeader>
+              <SearchTitle fontSizeMode={fontSizeMode || 'default'}>최근 검색어</SearchTitle>
+              <TouchableOpacity style={{padding: 12}} onPress={handleClearAll}>
+                <ClearAllText fontSizeMode={fontSizeMode || 'default'}>전체 삭제</ClearAllText>
+              </TouchableOpacity>
+            </SearchSectionHeader>
+            {recentSearches && recentSearches.length > 0 ? (
+              <RecentSearchListContainer
+                horizontal
+                showsHorizontalScrollIndicator={false}>
+                {recentSearches.map((item, index) => (
+                  <RecentSearchItemButton
+                    key={`recent-${index}-${item}`}
+                    onPress={() => handleRecentSearchClick(item)}>
+                    <RecentSearchItemText fontSizeMode={fontSizeMode || 'default'}>{item || ''}</RecentSearchItemText>
+                    <DeleteIconButton
+                      style={{padding: 8}}
+                      onPress={e => {
+                        e.stopPropagation();
+                        handleDeleteSearch(item);
+                      }}>
+                      <OtherIcons.delete
+                        height={10}
+                        width={10}
+                        style={{color: themes.light.textColor.Primary50}}
+                      />
+                    </DeleteIconButton>
+                  </RecentSearchItemButton>
+                ))}
+              </RecentSearchListContainer>
+            ) : (
+              <NoRecentSearchesText fontSizeMode={fontSizeMode || 'default'}>검색 기록이 없습니다.</NoRecentSearchesText>
+            )}
+          </View>
+
+          <View>
+            <SearchSectionHeader>
+              <SearchTitle fontSizeMode={fontSizeMode || 'default'}>인기 검색어</SearchTitle>
+            </SearchSectionHeader>
+            <PopularSearchListContainer>
+              {popularSearches && popularSearches.map((item, index) => (
+                <PopularSearchItemButton
+                  key={`popular-${index}-${item.rank}`}
+                  onPress={() => handlePopularSearchClick(item.term)}>
+                  <RankingText fontSizeMode={fontSizeMode || 'default'}>{item.rank || ''}</RankingText>
+                  <PopularSearchText fontSizeMode={fontSizeMode || 'default'}>{item.term || ''}</PopularSearchText>
+                  <IconContainer>
+                    {getRankChangeIcon(item.rankChange)}
+                  </IconContainer>
+                </PopularSearchItemButton>
               ))}
-            </RecentSearchListContainer>
-          ) : (
-            <NoRecentSearchesText fontSizeMode={fontSizeMode || 'default'}>검색 기록이 없습니다.</NoRecentSearchesText>
-          )}
-        </View>
+            </PopularSearchListContainer>
+          </View>
 
-        <View>
-          <SearchSectionHeader>
-            <SearchTitle fontSizeMode={fontSizeMode || 'default'}>인기 검색어</SearchTitle>
-          </SearchSectionHeader>
-          <PopularSearchListContainer>
-            {popularSearches && popularSearches.map((item, index) => (
-              <PopularSearchItemButton
-                key={`popular-${index}-${item.rank}`}
-                onPress={() => handlePopularSearchClick(item.term)}>
-                <RankingText fontSizeMode={fontSizeMode || 'default'}>{item.rank || ''}</RankingText>
-                <PopularSearchText fontSizeMode={fontSizeMode || 'default'}>{item.term || ''}</PopularSearchText>
-                <IconContainer>
-                  {getRankChangeIcon(item.rankChange)}
-                </IconContainer>
-              </PopularSearchItemButton>
-            ))}
-          </PopularSearchListContainer>
-        </View>
-
-        <View
-          style={{
-            alignSelf: 'flex-end',
-            marginTop: 10,
-          }}>
-          <UpdateDateText fontSizeMode={fontSizeMode || 'default'}>업데이트 {currentDate || ''}</UpdateDateText>
-        </View>
-      </SearchesContainer>
-    </Container>
+          <View
+            style={{
+              alignSelf: 'flex-end',
+              marginTop: 10,
+            }}>
+            <UpdateDateText fontSizeMode={fontSizeMode || 'default'}>업데이트 {currentDate || ''}</UpdateDateText>
+          </View>
+        </SearchesContainer>
+      </Container>
+    </TouchableWithoutFeedback>
   );
 };
 
