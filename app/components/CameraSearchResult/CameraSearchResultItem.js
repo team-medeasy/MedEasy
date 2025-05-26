@@ -61,7 +61,7 @@ export const CameraSearchResultItem = ({item, onPress}) => {
           <Button
             title="이 약이 맞아요"
             fontSize="15"
-            height="40"
+            height="50"
             style={{marginTop: 12}}
             onPress={() => onPress({
               ...item,

@@ -86,7 +86,7 @@ export const getDayOfWeek = dateString => {
 
 export const DEFAULT_BOT_OPTIONS = [
   '약 검색',
-  '루틴 등록',
+  '복약 일정 등록',
   '처방전 촬영',
   '의약품 촬영',
   '오늘 복용 일정 확인',

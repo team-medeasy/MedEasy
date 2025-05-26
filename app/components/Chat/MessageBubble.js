@@ -156,7 +156,7 @@ const BotMessageBubble = styled.View`
   background-color: 'rgba(255, 255, 255, 0.1)';
   padding: 10px 14px;
   border-radius: 2px 12px 12px 12px;
-  max-width: 65%;
+  max-width: 90%;
   margin-top: 10px;
 `;
 
