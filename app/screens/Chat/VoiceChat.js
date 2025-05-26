@@ -269,15 +269,6 @@ export default function VoiceChat() {
               console.log('[AUDIO] 오디오 재생 완료 후 상태 변경');
               setAudioPlaybackInProgress(false);
 
-              if (chatMode !== 'voice') {
-                setChatMode('voice');
-              }
-
-              if (isTyping) {
-                console.log('[AUDIO] isTyping 강제 false 처리');
-                forceStopTyping();
-              }
-
               if (chatMode === 'voice') {
                 console.log('[AUDIO] 음성 인식 자동 재시작을 위한 상태 설정');
 
@@ -777,41 +768,35 @@ export default function VoiceChat() {
     isTyping,
   ]);
 
-  // 초기 메시지 표시 (웹소켓으로부터 받은 메시지가 있으면 사용, 없으면 기본 메시지)
+  const [hasShownInitialMessage, setHasShownInitialMessage] = useState(false);
+
   useEffect(() => {
-    fetchUserInfo();
-    if (!showInfoModal && messages.length === 0) {
-      console.log('[INIT] 모달 닫힘 이후 초기 메시지 출력');
+    if (
+      !showInfoModal &&
+      !hasShownInitialMessage &&
+      messages.length === 0 &&
+      initialWelcomeMessage &&
+      initialWelcomeAudio // 음성도 준비돼야 출력
+    ) {
+      console.log('[INIT] 초기 메시지 + 음성 출력');
 
-      if (initialWelcomeMessage) {
-        addMessage(
-          initialWelcomeMessage.text,
-          'bot',
-          initialWelcomeMessage.options || DEFAULT_BOT_OPTIONS,
-          false,
-          true,
-        );
+      addMessage(
+        initialWelcomeMessage.text,
+        'bot',
+        initialWelcomeMessage.options || DEFAULT_BOT_OPTIONS,
+        false,
+        true,
+      );
 
-        if (initialWelcomeAudio) {
-          playAudioWithCompletion(initialWelcomeAudio);
-        }
-      } else {
-        // 메시지가 아직 도착하지 않았을 경우 fallback 메시지
-        addMessage(
-          `${userName || '사용자'}님, 안녕하세요☺️\n어떤 도움이 필요하신가요?`,
-          'bot',
-          DEFAULT_BOT_OPTIONS,
-          false,
-          true,
-        );
-      }
+      playAudioWithCompletion(initialWelcomeAudio);
+      setHasShownInitialMessage(true); // 한 번만 실행되도록 플래그 설정
     }
   }, [
     showInfoModal,
+    hasShownInitialMessage,
     initialWelcomeMessage,
     initialWelcomeAudio,
     messages.length,
-    userName,
   ]);
 
   // 새 메시지가 추가될 때마다 스크롤 맨 아래로 이동
