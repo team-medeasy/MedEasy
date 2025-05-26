@@ -140,40 +140,58 @@ export const appleLogin = async () => {
 };
 
 /**
- * 애플 로그인 사용자 탈퇴 함수
+ * 애플 로그인 사용자 탈퇴 함수 (재인증 후 탈퇴)
  */
 export const appleDeleteAccount = async () => {
   try {
-    // 애플 SDK로 새로운 인증 코드 요청 
+    // 1. 애플 SDK로 재인증 수행
     const appleAuthResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [],  // 기본적인 승인만 필요
     });
 
-    // authorization_code를 가져옴
-    const { authorizationCode } = appleAuthResponse;
+    const { authorizationCode, identityToken } = appleAuthResponse;
+    console.log('애플 재인증 성공');
 
-    if (!authorizationCode) {
-      throw new Error('애플 인증 코드를 얻지 못했습니다.');
+    if (!authorizationCode || !identityToken) {
+      throw new Error('애플 인증 정보를 얻지 못했습니다.');
     }
 
-    // auth.js의 deleteAppleAccount 호출하도록 변경
-    const { deleteAppleAccount } = require('../auth');
-    const result = await deleteAppleAccount(authorizationCode);
+    // 2. 재인증된 정보로 새로운 토큰 발급받기
+    const loginResponse = await api.post('/open-api/auth/apple', {
+      identity_token: identityToken,
+      authorization_code: authorizationCode,
+      first_name: null,  // 재로그인시에는 null
+      last_name: null,   // 재로그인시에는 null
+      fcm_token: null    // 필요시 현재 FCM 토큰 전달
+    });
 
-    console.log('애플 계정 탈퇴 성공:', result);
-    return result;
+    const newTokens = loginResponse.data.body;
+    console.log('새로운 토큰 발급 성공');
 
+    // 3. 새로운 리프레시 토큰으로 계정 탈퇴
+    const deleteResponse = await api.delete('/user/apple/delete', {
+      data: {
+        refresh_token: newTokens.refresh_token
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${newTokens.access_token}`
+      }
+    });
+    console.log('애플 계정 탈퇴 성공:', deleteResponse.data);
+    return deleteResponse.data;
   } catch (error) {
     console.error('애플 계정 탈퇴 실패:', error);
 
-    // 사용자 친화적인 에러 메시지 추가
+    // 사용자 친화적인 에러 메시지
     if (error.code === 'ERR_CANCELED') {
       error.userMessage = '애플 인증이 취소되었습니다.';
+    } else if (error.response?.status === 401) {
+      error.userMessage = '인증에 실패했습니다. 다시 시도해주세요.';
     } else {
       error.userMessage = '애플 계정 탈퇴에 실패했습니다: ' + (error.message || '알 수 없는 오류');
     }
-
     throw error;
   }
 };

@@ -222,7 +222,7 @@ export const deleteEmailAccount = async () => {
 };
 
 // 애플 계정 탈퇴
-export const deleteAppleAccount = async (authorizationCode) => {
+export const deleteAppleAccount = async () => {
   try {
     // 리프레시 토큰 가져오기
     const refreshTokenValue = await getRefreshToken();
@@ -233,8 +233,7 @@ export const deleteAppleAccount = async (authorizationCode) => {
 
     // 애플 회원 탈퇴 API 호출
     const response = await api.post('/user/apple/delete', {
-      refresh_token: refreshTokenValue,
-      authorization_code: authorizationCode || null,
+      refresh_token: refreshTokenValue
     }, {
       headers: {
         'Content-Type': 'application/json',
