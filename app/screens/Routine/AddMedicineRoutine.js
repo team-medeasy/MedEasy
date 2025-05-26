@@ -1,6 +1,12 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components/native';
-import { Platform, Keyboard, View, Text, ActivityIndicator } from 'react-native';
+import { 
+  TouchableWithoutFeedback,
+  Keyboard,
+  View,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 import { themes } from './../../styles';
 import {
   ModalHeader,
@@ -226,26 +232,28 @@ const AddMedicineRoutine = ({navigation}) => {
   };
 
   return (
-    <Container>
-      <ModalHeader>루틴 추가</ModalHeader>
-      <HeaderContainer>
-        <LogoAndSearchContainer>
-          <LogoIconContainer>
-            <LogoIcons.logo width={14} height={22} style={{ color: themes.light.pointColor.Primary }} />
-          </LogoIconContainer>
-          <SearchBar
-            searchQuery={searchQuery}
-            setSearchQuery={handleSearchChange}
-            onSearch={handleSearch}
-            placeholder={"복용 중인 약을 입력하세요"}
-          />
-        </LogoAndSearchContainer>
-      </HeaderContainer>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <Container>
+        <ModalHeader>루틴 추가</ModalHeader>
+        <HeaderContainer>
+          <LogoAndSearchContainer>
+            <LogoIconContainer>
+              <LogoIcons.logo width={14} height={22} style={{ color: themes.light.pointColor.Primary }} />
+            </LogoIconContainer>
+            <SearchBar
+              searchQuery={searchQuery}
+              setSearchQuery={handleSearchChange}
+              onSearch={handleSearch}
+              placeholder={"복용 중인 약을 입력하세요"}
+            />
+          </LogoAndSearchContainer>
+        </HeaderContainer>
 
-      <SearchResultContainer>
-        {renderContent()}
-      </SearchResultContainer>
-    </Container>
+        <SearchResultContainer>
+          {renderContent()}
+        </SearchResultContainer>
+      </Container>
+    </TouchableWithoutFeedback>
   );
 };
 

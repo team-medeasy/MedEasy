@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import { 
+  Alert,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import Dialog from 'react-native-dialog';
@@ -231,84 +238,87 @@ const Profile = () => {
   };
 
   return (
-    <Container>
-      <Header>프로필 설정</Header>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <Container>
+        <Header>프로필 설정</Header>
 
-      <Section>
-        <Title fontSizeMode={fontSizeMode}>이름</Title>
-        <View style={{
-          flexDirection: 'row',
-          gap: 15,
-        }}>
-          <View style={{ flex: 1 }}>
-            <InputWithDelete
-              value={userName}
-              onChangeText={text => setUserName(text)}
-              keyboardType="default"
-              placeholder="이름을 입력하세요"
-            />
+        <Section>
+          <Title fontSizeMode={fontSizeMode}>이름</Title>
+          <View style={{
+            flexDirection: 'row',
+            gap: 15,
+            alignItems: 'center',
+          }}>
+            <View style={{ flex: 1 }}>
+              <InputWithDelete
+                value={userName}
+                onChangeText={text => setUserName(text)}
+                keyboardType="default"
+                placeholder="이름을 입력하세요"
+              />
+            </View>
+            <TestBtn onPress={handleUpdateUserName}>
+              <BtnTitle fontSizeMode={fontSizeMode}>변경하기</BtnTitle>
+            </TestBtn>
           </View>
-          <TestBtn onPress={handleUpdateUserName}>
-            <BtnTitle fontSizeMode={fontSizeMode}>변경하기</BtnTitle>
-          </TestBtn>
-        </View>
-      </Section>
+        </Section>
 
-      <Section>
-        <Title fontSizeMode={fontSizeMode}>이메일</Title>
-        <ReadOnlyInput text={userEmail} />
-      </Section>
+        <Section>
+          <Title fontSizeMode={fontSizeMode}>이메일</Title>
+          <ReadOnlyInput text={userEmail} />
+        </Section>
 
-      <LoginMethodSection>
-        <Title fontSizeMode={fontSizeMode}>로그인 방식</Title>
-        <LoginMethodText fontSizeMode={fontSizeMode}>
-          {authType === AUTH_TYPES.EMAIL ? '이메일 계정' :
-            authType === AUTH_TYPES.APPLE ? 'Apple 계정' :
-              authType === AUTH_TYPES.KAKAO ? '카카오 계정' : '알 수 없음'}
-        </LoginMethodText>
-      </LoginMethodSection>
+        <Section>
+          <Title fontSizeMode={fontSizeMode}>로그인 방식</Title>
+          <LoginMethodText fontSizeMode={fontSizeMode}>
+            {authType === AUTH_TYPES.EMAIL ? '이메일 계정' :
+              authType === AUTH_TYPES.APPLE ? 'Apple 계정' :
+                authType === AUTH_TYPES.KAKAO ? '카카오 계정' : '알 수 없음'}
+          </LoginMethodText>
+        </Section>
 
-      <ButtonContainer>
-        <IconTextButton
-          onPress={handleLogout}
-          icon={
-            <SettingsIcons.logout
-              width={16}
-              height={16}
-              color={themes.light.textColor.buttonText}
-            />
-          }
-          title="로그아웃"
-        />
-        <IconTextButton
-          onPress={() => {
-            setPassword('');
-            setDialogVisible(true);
-          }}
-          icon={
-            <SettingsIcons.trashcan
-              width={16}
-              height={16}
-              color={themes.light.textColor.buttonText}
-            />
-          }
-          title="계정 삭제"
-          bgColor={themes.light.textColor.Primary30}
-        />
-      </ButtonContainer>
+        <ButtonContainer>
+          <IconTextButton
+            onPress={handleLogout}
+            icon={
+              <SettingsIcons.logout
+                width={16}
+                height={16}
+                color={themes.light.textColor.buttonText}
+              />
+            }
+            title="로그아웃"
+          />
+          <IconTextButton
+            onPress={() => {
+              setPassword('');
+              setDialogVisible(true);
+            }}
+            icon={
+              <SettingsIcons.trashcan
+                width={16}
+                height={16}
+                color={themes.light.textColor.buttonText}
+              />
+            }
+            title="계정 삭제"
+            bgColor={themes.light.textColor.Primary30}
+          />
+        </ButtonContainer>
 
-      <Dialog.Container visible={isDialogVisible}>
-        <Dialog.Title>계정 삭제</Dialog.Title>
-        {renderDialogContent()}
-        {loading && (
-          <View style={{ alignItems: 'center', marginVertical: 8 }}>
-            <ActivityIndicator size="small" color={themes.light.textColor.Primary30} />
-          </View>
-        )}
-        <Dialog.Button label="취소" onPress={() => setDialogVisible(false)} />
-        <Dialog.Button label="삭제" onPress={performAccountDelete} disabled={loading} />
-      </Dialog.Container>
-    </Container>
+        <Dialog.Container visible={isDialogVisible}>
+          <Dialog.Title>계정 삭제</Dialog.Title>
+          {renderDialogContent()}
+          {loading && (
+            <View style={{ alignItems: 'center', marginVertical: 8 }}>
+              <ActivityIndicator size="small" color={themes.light.textColor.Primary30} />
+            </View>
+          )}
+          <Dialog.Button label="취소" onPress={() => setDialogVisible(false)} />
+          <Dialog.Button label="삭제" onPress={performAccountDelete} disabled={loading} />
+        </Dialog.Container>
+      </Container>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -320,10 +330,6 @@ const Container = styled.View`
 const Section = styled.View`
   padding: 20px;
   gap: 15px;
-`;
-
-const LoginMethodSection = styled(Section)`
-  padding-top: 0;
 `;
 
 const LoginMethodText = styled.Text`
