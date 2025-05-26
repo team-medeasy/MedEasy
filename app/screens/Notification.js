@@ -20,6 +20,7 @@ import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
 } from '../api/notification';
+import { getCareList } from '../api/userCare';
 import EmptyState from '../components/EmptyState';
 const {medicine: MediIcon, hospital: HospitalIcon} = RoutineIcons;
 
@@ -54,6 +55,7 @@ const Notification = ({route, navigation}) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMoreData, setHasMoreData] = useState(true);
+  const [careList, setCareList] = useState([]); // 관리 대상 목록 상태 추가
   const PAGE_SIZE = 10;
   const isMounted = useRef(true); // 컴포넌트 마운트 상태 추적
 
@@ -71,6 +73,23 @@ const Notification = ({route, navigation}) => {
       }
     };
   }, [route.params]);
+
+  // 관리 대상 목록 가져오기
+  const fetchCareList = async () => {
+    try {
+      const response = await getCareList();
+      const careListData = response.data.body;
+      console.log("관리 대상 목록: ", careListData);
+      setCareList(careListData);
+    } catch (error) {
+      console.error('관리 대상 목록 불러오기 실패:', error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 관리 대상 목록 가져오기
+  useEffect(() => {
+    fetchCareList();
+  }, []);
 
   const fetchNotifications = async (page = 0, refresh = false) => {
     if (loading) return;
@@ -188,13 +207,47 @@ const Notification = ({route, navigation}) => {
     try {
       console.log('📖 읽으려는 알림: ', item);
       await markNotificationAsRead(item.notification_id); // ✅ 알림 읽음 처리
+      
+      // routine_user_id가 있는 경우에만 체크
       if (item.routine_user_id) {
-        navigation.navigate('CareRoutine', {
-          userId: item.routine_user_id,
-          paramDate: item.routine_date,
-          userName: item.title.split('님')[0],
-        });
+        // 관리 대상 목록에서 해당 user_id 찾기
+        const targetUser = careList.find(user => user.user_id === item.routine_user_id);
+        
+        if (targetUser) {
+          if (targetUser.tag === '내 계정') {
+            // 내 계정인 경우 - 루틴 탭으로 이동
+            resetNavigate('NavigationBar', {
+              screen: 'TabNavigator',
+              params: {
+                screen: '루틴',
+                params: {
+                  selectedDate: item.routine_date,
+                },
+              },
+            });
+          } else {
+            // 피보호자인 경우 - CareRoutine으로 이동
+            navigation.navigate('CareRoutine', {
+              userId: item.routine_user_id,
+              paramDate: item.routine_date,
+              userName: targetUser.name, // split 대신 실제 name 사용
+            });
+          }
+        } else {
+          console.warn('해당 user_id를 관리 대상 목록에서 찾을 수 없습니다:', item.routine_user_id);
+          // 기본적으로 루틴 탭으로 이동
+          resetNavigate('NavigationBar', {
+            screen: 'TabNavigator',
+            params: {
+              screen: '루틴',
+              params: {
+                selectedDate: item.routine_date,
+              },
+            },
+          });
+        }
       } else {
+        // routine_user_id가 없는 경우 - 루틴 탭으로 이동
         resetNavigate('NavigationBar', {
           screen: 'TabNavigator',
           params: {
