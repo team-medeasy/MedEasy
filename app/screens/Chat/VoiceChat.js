@@ -179,8 +179,30 @@ export default function VoiceChat() {
     useCallback(() => {
       console.log('[CHAT] 화면 포커스 얻음');
 
+          console.log('[CHAT] 현재 route.params:', JSON.stringify(route.params, null, 2));
+
+
       // 화면으로 돌아왔을 때 네비게이션 플래그 해제
       setIsNavigatingAway(false);
+
+      // 🆕 루틴 등록에서 약 선택 후 돌아온 경우 처리
+      const { selectedMedicineName, fromRoutineRegistration, timestamp } = route.params || {};
+      
+      if (fromRoutineRegistration && selectedMedicineName && timestamp) {
+        console.log('[CHAT] 루틴 등록에서 선택된 약:', selectedMedicineName);
+        
+        // 파라미터 즉시 초기화 (중복 실행 방지)
+        navigation.setParams({
+          selectedMedicineName: null,
+          fromRoutineRegistration: null,
+          timestamp: null,
+        });
+
+        // 약간의 딜레이 후 자동으로 메시지 전송
+        setTimeout(() => {
+          handleSelectedMedicineFromRoutine(selectedMedicineName);
+        }, 300);
+      }
 
       // 백 버튼 핸들러 (안드로이드)
       const backHandler = BackHandler.addEventListener(
@@ -203,7 +225,7 @@ export default function VoiceChat() {
         Voice.cancel().catch(() => {});
         stopPulseAnimation();
       };
-    }, []),
+    }, [route.params]),
   );
 
   // 상태 메시지 관리
@@ -1054,6 +1076,74 @@ export default function VoiceChat() {
         null,
       );
       setAudioPlaybackInProgress(false); // 오류 발생 시 재생 상태 초기화
+    }
+  };
+
+  // 루틴 등록에서 선택된 약 이름 처리 함수
+  const handleSelectedMedicineFromRoutine = async (medicineName) => {
+    try {
+      console.log('[CHAT] 선택된 약으로 루틴 등록 메시지 전송:', medicineName);
+      
+      // 현재 진행 중인 음성 인식이나 오디오 정리
+      Voice.cancel().catch(() => {});
+      cleanupAudio();
+      stopPulseAnimation();
+      
+      // 사용자 메시지 추가 (선택된 약 이름으로)
+      const userMessage = `${medicineName}로 루틴을 등록하고 싶어요`;
+      addMessage(userMessage, 'user');
+
+      // 봇 타이핑 메시지 시작
+      const typingMsgId = startTypingMessage();
+
+      try {
+        // 서버에 메시지 전송
+        const response = await sendMessage(userMessage);
+        const {text: responseText, filePath, action, data} = response;
+
+        // 응답 메시지 업데이트
+        finishTypingMessage(typingMsgId, responseText, DEFAULT_BOT_OPTIONS);
+
+        console.log('[CHAT] 서버 응답 처리 완료, 오디오 재생 준비');
+
+        // 음성 재생
+        if (filePath) {
+          playAudioWithCompletion(filePath);
+        } else {
+          // 음성 파일이 없는 경우
+          setAudioPlaybackInProgress(true);
+          setTimeout(() => {
+            console.log('[CHAT] 음성 파일 없음 - 재생 완료 처리');
+            setAudioPlaybackInProgress(false);
+            if (chatMode === 'voice') {
+              setTimeout(() => {
+                console.log('[CHAT] 음성 인식 자동 재시작 트리거');
+                setStatus('idle');
+              }, 500);
+            }
+          }, 1000);
+        }
+
+        // 액션 처리
+        if (action) {
+          handleClientAction(action, navigation, {data, voiceControls});
+        }
+
+      } catch (error) {
+        console.error('[CHAT] 선택된 약 메시지 전송 오류:', error);
+        finishTypingMessage(
+          typingMsgId,
+          '죄송합니다. 응답을 받아오는 데 실패했습니다.',
+          null,
+        );
+        // 오류 시에도 타이핑 상태 확실히 해제
+        forceStopTyping();
+        setAudioPlaybackInProgress(false);
+      }
+
+    } catch (error) {
+      console.error('[CHAT] 선택된 약 처리 전체 오류:', error);
+      addMessage('죄송합니다. 루틴 등록 중 오류가 발생했습니다.', 'bot');
     }
   };
 

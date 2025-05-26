@@ -115,6 +115,25 @@ export const handleClientAction = (action, navigation, options = {}) => {
       });
       break;
 
+    case 'REGISTER_ROUTINE_SEARCH_MEDICINE':
+      // 루틴 등록 시 약 검색 결과 검토
+      console.log('[ActionHandler] 루틴 등록 시 약 검색 결과 검토');
+      if (!data || data.length === 0) {
+        console.warn('[ActionHandler] 알약 데이터 없음');
+        return;
+      }
+
+      // 음성 인식 중지
+      stopVoiceRecognition(voiceControls);
+
+      // 알약 검색 결과를 담아서 검토 화면으로 이동
+      navigation.navigate('CameraSearchResults', {
+        pillsData: data,
+        fromVoiceChat: true,
+        isRoutineRegistration: true,
+      });
+      break;
+
     default:
       console.log('[ActionHandler] 처리되지 않은 액션:', action);
       break;
