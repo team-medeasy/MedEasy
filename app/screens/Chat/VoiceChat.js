@@ -269,6 +269,15 @@ export default function VoiceChat() {
               console.log('[AUDIO] 오디오 재생 완료 후 상태 변경');
               setAudioPlaybackInProgress(false);
 
+              if (chatMode !== 'voice') {
+                setChatMode('voice');
+              }
+
+              if (isTyping) {
+                console.log('[AUDIO] isTyping 강제 false 처리');
+                forceStopTyping();
+              }
+
               if (chatMode === 'voice') {
                 console.log('[AUDIO] 음성 인식 자동 재시작을 위한 상태 설정');
 
