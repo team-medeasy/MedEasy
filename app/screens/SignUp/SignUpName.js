@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
-import {ProgressBar, BackAndNextButtons} from './../../components';
+import {ProgressBar, BackAndNextButtons, InputWithDelete} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
@@ -60,7 +60,7 @@ const TextInput = styled.TextInput`
 const SignUpNameScreen = ({navigation}) => {
   const {signUpData, updateSignUpData} = useSignUp();
   const [name, setName] = useState(signUpData.name || '');
-  const progress = '25%';
+  const progress = '33.3%';
   const secondInput = React.useRef();
 
   const handleNext = () => {
@@ -97,13 +97,11 @@ const SignUpNameScreen = ({navigation}) => {
         </Container1>
         <Container2>
           <InputContainer marginRight="5px">
-            <TextInput
+            <InputWithDelete
               placeholder="이름"
-              placeholderTextColor={themes.light.textColor.placeholder}
               value={name}
               onChangeText={setName}
-              returnKeyType="done"
-              onSubmitEditing={Keyboard.dismiss}
+              autoCapitalize="words"
             />
           </InputContainer>
         </Container2>
