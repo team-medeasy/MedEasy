@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import Voice from '@react-native-voice/voice';
-import { PermissionsAndroid, Platform } from 'react-native';
+import { PermissionsAndroid, Platform, Linking, Alert } from 'react-native';
 
 export default function useVoiceRecognition() {
   const [status, setStatus] = useState('idle');
@@ -22,7 +22,33 @@ export default function useVoiceRecognition() {
   const lastSpeechTime = useRef(null);
   const hasReceivedSpeech = useRef(false);
 
-  // 권한 요청 함수
+  // 권한 거부 시 설정 화면으로 이동하는 함수
+  const openAppSettings = () => {
+    Alert.alert(
+      '마이크/음성 인식 권한 필요',
+      Platform.OS === 'ios' 
+        ? 'AI 채팅을 사용하려면 설정에서 마이크 및 음성 인식 권한을 허용해주세요.\n\n설정 > 앱 > 메디지 > 마이크 및 음성 인식 활성화'
+        : 'AI 채팅을 사용하려면 설정에서 마이크 및 음성 인식 권한을 허용해주세요.\n\n설정 > 앱 > 메디지 > 권한 > 마이크 및 음성 인식 활성화',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '설정으로 이동',
+          onPress: () => {
+            if (Platform.OS === 'ios') {
+              Linking.openURL('app-settings:');
+            } else {
+              Linking.openSettings();
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  // 권한 요청 함수 - 개선된 버전
   const requestMicPermission = async () => {
     try {
       if (Platform.OS === 'android') {
@@ -41,7 +67,18 @@ export default function useVoiceRecognition() {
         setHasPermission(permissionGranted);
 
         if (!permissionGranted) {
-          setStatusMessage('마이크 권한이 필요합니다');
+          if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+            // 다시 묻지 않음을 선택한 경우
+            setStatusMessage('설정에서 마이크 권한을 허용해주세요');
+            setTimeout(() => {
+              openAppSettings();
+            }, 1000);
+          } else {
+            // 단순 거부한 경우
+            setStatusMessage('마이크 권한이 필요합니다');
+          }
+        } else {
+          setStatusMessage('준비 완료');
         }
 
         console.log('[VOICE] 안드로이드 권한 상태:', permissionGranted);
@@ -49,6 +86,7 @@ export default function useVoiceRecognition() {
       } else {
         // iOS는 자동으로 권한 요청
         setHasPermission(true);
+        setStatusMessage('준비 완료');
         return true;
       }
     } catch (err) {
@@ -111,8 +149,34 @@ export default function useVoiceRecognition() {
 
     } catch (error) {
       console.error('[VOICE] 음성 인식 초기화 오류:', error);
-      reset('시작 오류');
+      
+      // 권한 관련 오류 처리
+      if (error.message && error.message.includes('permission')) {
+        handlePermissionError(error);
+      } else {
+        reset('시작 오류');
+      }
       throw error;
+    }
+  };
+
+  // 권한 오류 처리 함수 추가
+  const handlePermissionError = (error) => {
+    console.log('[VOICE] 권한 오류 처리:', error.message);
+    
+    setHasPermission(false);
+    setVoiceActive(false);
+    setStatus('idle');
+    
+    if (error.message.includes('denied') || error.message.includes('permission')) {
+      setStatusMessage('마이크 권한이 거부되었습니다');
+      
+      // 1초 후 설정 화면으로 이동 안내
+      setTimeout(() => {
+        openAppSettings();
+      }, 1000);
+    } else {
+      setStatusMessage('음성 인식 권한 오류');
     }
   };
 
@@ -222,6 +286,15 @@ export default function useVoiceRecognition() {
   const handleSpeechError = (error) => {
     console.error('[VOICE] 음성 인식 오류:', error);
 
+    // 권한 관련 오류 처리 추가
+    if (error.error?.message?.includes('denied') || 
+        error.error?.message?.includes('permission') ||
+        error.error?.message?.includes('User denied access')) {
+      console.log('[VOICE] 권한 거부 오류 감지');
+      handlePermissionError(error.error);
+      return;
+    }
+
     // 네트워크 오류인 경우
     if (error.error?.message?.includes('network')) {
       setStatusMessage('네트워크 오류');
@@ -313,6 +386,13 @@ export default function useVoiceRecognition() {
     lastSpeechTime.current = null;
   };
 
+  // 권한 재확인 함수 추가
+  const recheckPermission = async () => {
+    console.log('[VOICE] 권한 재확인 시작');
+    const granted = await requestMicPermission();
+    return granted;
+  };
+
   // 훅 초기화 로직
   useEffect(() => {
     requestMicPermission();
@@ -366,6 +446,8 @@ export default function useVoiceRecognition() {
     reset,
     setVoiceActive,
     setStatus,
-    setStatusMessage
+    setStatusMessage,
+    recheckPermission,
+    openAppSettings,   // 설정 화면 열기 함수 추가
   };
 }
