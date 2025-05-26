@@ -97,6 +97,7 @@ const Notification = ({route, navigation}) => {
           formatted_time: formatDate(item.sent_at),
           is_read: item.is_read,
           routine_date: routineDate,
+          routine_user_id: item.routine_user_id,
           type: 'medicine', // 모두
         };
       });
@@ -187,15 +188,23 @@ const Notification = ({route, navigation}) => {
     try {
       console.log('📖 읽으려는 알림: ', item);
       await markNotificationAsRead(item.notification_id); // ✅ 알림 읽음 처리
-      resetNavigate('NavigationBar', {
-        screen: 'TabNavigator',
-        params: {
-          screen: '루틴',
+      if (item.routine_user_id) {
+        navigation.navigate('CareRoutine', {
+          userId: item.routine_user_id,
+          paramDate: item.routine_date,
+          userName: item.title.split('님')[0],
+        });
+      } else {
+        resetNavigate('NavigationBar', {
+          screen: 'TabNavigator',
           params: {
-            selectedDate: item.routine_date,
+            screen: '루틴',
+            params: {
+              selectedDate: item.routine_date,
+            },
           },
-        },
-      });
+        });
+      }
     } catch (error) {
       console.error('알림 읽음 처리 실패:', error);
     }
