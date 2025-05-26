@@ -2,7 +2,12 @@ import React, {useState} from 'react';
 import {SafeAreaView, Text, Keyboard, TouchableWithoutFeedback, View, TouchableOpacity} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
-import {ProgressBar, BackAndNextButtons} from './../../components';
+import {
+  ProgressBar,
+  BackAndNextButtons,
+  InputWithDelete,
+  ReadOnlyInput,
+} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
 import FontSizes from '../../../assets/fonts/fontSizes';
 
@@ -67,7 +72,7 @@ const SignUpEmailScreen = ({navigation, route}) => {
   const {signUpData, updateSignUpData} = useSignUp();
   const [email, setEmail] = useState(signUpData.email || '');
   const[emailError, setEmailError] = useState('');
-  const progress = '50%';
+  const progress = '66.6%';
 
   const validateEmail = text => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -127,17 +132,16 @@ const SignUpEmailScreen = ({navigation, route}) => {
           </Text>
         </Container1>
         <Container2>
-          <InputContainer marginBottom="5px">
-            <TextInput
+          <InputContainer>
+            <InputWithDelete
               placeholder="example@hansung.kr"
-              placeholderTextColor={themes.light.textColor.placeholder}
               value={email}
               onChangeText={handleEmailChange}
-              returnKeyType="done"
-              onBlur={handleEmailBlur}
-              onSubmitEditing={Keyboard.dismiss}
               keyboardType="email-address"
               autoCapitalize="none"
+              onBlur={handleEmailBlur}
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
               autoComplete="off"
               autoCorrect={false}
               spellCheck={false}
@@ -145,8 +149,8 @@ const SignUpEmailScreen = ({navigation, route}) => {
             />
             {emailError ? <ErrorText>{emailError}</ErrorText> : null}
           </InputContainer>
-          <InputContainer marginTop="15px">
-            <TxtLabel>{signUpData.name}</TxtLabel>
+          <InputContainer marginTop="10px">
+            <ReadOnlyInput text={signUpData.name}/>
           </InputContainer>
         </Container2>
         <BtnContainer>

@@ -1,11 +1,15 @@
 import React, {useState} from 'react';
-import {SafeAreaView, Text, TouchableWithoutFeedback, Keyboard, View, TouchableOpacity} from 'react-native';
+import {SafeAreaView, Text, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import styled from 'styled-components/native';
 import {themes, fonts} from './../../styles';
-import {ProgressBar, BackAndNextButtons} from './../../components';
+import {
+  ProgressBar,
+  BackAndNextButtons,
+  InputWithDelete,
+  ReadOnlyInput
+} from './../../components';
 import {useSignUp} from '../../api/context/SignUpContext';
-import FontSizes from '../../../assets/fonts/fontSizes';
-import { handleSignUp } from '../../api/services/authService';
+import {handleSignUp} from '../../api/services/authService';
 
 const Container = styled(SafeAreaView)`
   flex: 1;
@@ -30,16 +34,6 @@ const InputContainer = styled.View`
   margin-bottom: ${props => props.marginBottom || '0px'};
 `;
 
-const PasswordContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  height: 60px;
-  border-radius: 10px;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  padding-right: 10px;
-  overflow: hidden;
-`;
-
 const BtnContainer = styled.View`
   position: absolute;
   bottom: 0;
@@ -51,33 +45,9 @@ const BtnContainer = styled.View`
   align-items: center;
 `;
 
-const TextInput = styled.TextInput`
-  height: 60px;
-  border-radius: 10px;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  padding: 20px;
-  font-size: ${FontSizes.body.default};
-`;
-
-const TxtLabel = styled.Text`
-  height: 60px;
-  border-radius: 10px;
-  background-color: ${themes.light.boxColor.inputPrimary};
-  padding: 20px;
-  font-size: ${FontSizes.body.default};
-`;
-
-// show or hide password
-const ShowHideButton = styled.Text`
-  color: ${themes.light.textColor.placeholder};
-  font-size: 14px;
-  padding: 5px 10px;
-`;
-
 const SignUpPasswordScreen = ({navigation}) => {
   const {signUpData, updateSignUpData} = useSignUp();
   const [password, setPassword] = useState(signUpData.password || '');
-  const [showPassword, setShowPassword] = useState(false);
   const progress = '75%';
 
   const handleNext = async () => {
@@ -97,7 +67,6 @@ const SignUpPasswordScreen = ({navigation}) => {
       alert('회원가입에 실패했습니다. 다시 시도해주세요.');
     }
   };
-  
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -123,36 +92,23 @@ const SignUpPasswordScreen = ({navigation}) => {
         </Container1>
         <Container2>
           <InputContainer marginBottom="5px">
-            <PasswordContainer>
-              <TextInput
-                style={{
-                  flex: 1, 
-                  paddingRight: 0,
-                  backgroundColor: 'transparent',
-                  borderRadius: 0
-                }}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="비밀번호 입력"
-                placeholderTextColor={themes.light.textColor.placeholder}
-                secureTextEntry={!showPassword}
-                returnKeyType="done"
-                onSubmitEditing={Keyboard.dismiss}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <ShowHideButton style={{
-                  color: themes.light.textColor.placeholder
-                }}>
-                  {showPassword ? '숨기기' : '보기'}
-                </ShowHideButton>
-              </TouchableOpacity>
-            </PasswordContainer>
+            <InputWithDelete
+              value={password}
+              onChangeText={setPassword}
+              placeholder="비밀번호 입력"
+              secureTextEntry={true}
+              showPasswordToggle={true}  // 이 prop이 제대로 전달되는지 확인
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
+              textContentType="newPassword"
+              autoComplete="password-new"
+            />
           </InputContainer>
           <InputContainer marginTop="5px" marginBottom="5px">
-            <TxtLabel>{signUpData.email}</TxtLabel>
+            <ReadOnlyInput text={signUpData.email}/>
           </InputContainer>
           <InputContainer marginTop="5px">
-            <TxtLabel>{signUpData.name}</TxtLabel>
+            <ReadOnlyInput text={signUpData.name}/>
           </InputContainer>
         </Container2>
         <BtnContainer>
