@@ -8,7 +8,7 @@ export const updateUserName = name =>
 
 export const getUser = () => api.get('/user');
 
-export const deleteUser = (password) => api.post('/user', { password });
+export const deleteUser = (refreshToken) => api.post('/user', { refresh_token: refreshToken });
 
 export const getUserUsageDays = () => api.get('/user/usage-days');
 
