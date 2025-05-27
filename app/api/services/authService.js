@@ -28,6 +28,8 @@ export const handleLogin = async credentials => {
     if (accessToken) {
       await setAccessToken(accessToken);
       setAuthToken(accessToken);
+      await setRefreshToken(refreshToken);
+      console.log('[handleLogin] 저장된 refreshToken:', refreshToken);
 
       // 토큰 만료 시간 저장
       if (accessTokenExpiredAt) {
@@ -70,6 +72,7 @@ export const handleLogin = async credentials => {
 
     if (refreshToken) {
       await setRefreshToken(refreshToken);
+      console.log('[handleLogin] 저장된 refreshToken:', refreshToken);
     } else {
       console.warn('REFRESH_TOKEN is undefined. Removing key from storage.');
       await removeRefreshToken();
