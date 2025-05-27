@@ -4,8 +4,16 @@ import { updateNotificationAgreement as apiUpdateNotificationAgreement } from '.
 const ACCESS_TOKEN_KEY = 'ACCESS_TOKEN';
 const REFRESH_TOKEN_KEY = 'REFRESH_TOKEN';
 const USER_INFO_KEY = 'user_info';
-const FCM_TOKEN_KEY ='FCM_TOKEN'; // FCM 토큰 키
-const NOTIFICATION_AGREED_KEY = 'NOTIFICATION_AGREED'; // 알림 동의 상태 키
+const FCM_TOKEN_KEY = 'FCM_TOKEN';
+const NOTIFICATION_AGREED_KEY = 'NOTIFICATION_AGREED';
+const AUTH_TYPE_KEY = 'AUTH_TYPE'; // 로그인 방식 저장 키 추가
+
+// 인증 타입 상수 정의
+export const AUTH_TYPES = {
+  EMAIL: 'email',
+  APPLE: 'apple',
+  KAKAO: 'kakao'
+};
 
 // AccessToken 저장
 export const setAccessToken = async token => {
@@ -121,7 +129,7 @@ export const updateNotificationAgreement = async (agreed) => {
   try {
     // API 인터페이스를 통해 알림 설정 업데이트
     await apiUpdateNotificationAgreement(agreed);
-    
+
     // API 호출 성공 후 로컬 저장소 업데이트
     return await setNotificationAgreed(agreed);
   } catch (e) {
@@ -159,10 +167,49 @@ export const removeUserInfo = async () => {
   }
 };
 
+// 로그인 방식 저장
+export const setAuthType = async (authType) => {
+  try {
+    if (Object.values(AUTH_TYPES).includes(authType)) {
+      await AsyncStorage.setItem(AUTH_TYPE_KEY, authType);
+      console.log(`로그인 방식 저장: ${authType}`);
+    } else {
+      console.error('알 수 없는 로그인 방식:', authType);
+    }
+  } catch (error) {
+    console.error('로그인 방식 저장 실패:', error);
+  }
+};
+
+// 로그인 방식 가져오기
+export const getAuthType = async () => {
+  try {
+    return await AsyncStorage.getItem(AUTH_TYPE_KEY) || null;
+  } catch (error) {
+    console.error('로그인 방식 가져오기 실패:', error);
+    return null;
+  }
+};
+
+// 로그인 방식 삭제
+export const removeAuthType = async () => {
+  try {
+    await AsyncStorage.removeItem(AUTH_TYPE_KEY);
+  } catch (error) {
+    console.error('로그인 방식 삭제 실패:', error);
+  }
+};
+
 // 로그아웃 시 모든 인증 데이터 삭제
 export const clearAuthData = async () => {
   try {
-    await AsyncStorage.multiRemove([ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_INFO_KEY]);
+    await AsyncStorage.multiRemove([
+      ACCESS_TOKEN_KEY,
+      REFRESH_TOKEN_KEY,
+      USER_INFO_KEY,
+      AUTH_TYPE_KEY,
+      'ACCESS_TOKEN_EXPIRES_AT'
+    ]);
   } catch (error) {
     console.error('인증 데이터 삭제 실패', error);
   }

@@ -92,10 +92,13 @@ const MessageBubble = ({ item, onOptionPress }) => {
 
         {/* 초기 메시지이거나 명시적으로 옵션이 있는 경우에만 옵션 표시 */}
         {(item.options && item.isInitialMessage) ? (
-          <View style={{ flex: 1 }}>
-            <BotMessageBubble>
-              <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
-            </BotMessageBubble>
+          <BotMessageWithOptionsContainer>
+            <BotMessageBubbleRow>
+              <BotMessageBubble>
+                <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
+              </BotMessageBubble>
+              <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
+            </BotMessageBubbleRow>
 
             <OptionWrap>
               {item.options.map((option, index) => (
@@ -104,18 +107,19 @@ const MessageBubble = ({ item, onOptionPress }) => {
                 </OptionBubble>
               ))}
             </OptionWrap>
-          </View>
+          </BotMessageWithOptionsContainer>
         ) : (
-          <BotMessageBubble>
-            {item.isTyping ? (
-              <TypingAnimation />
-            ) : (
-              <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
-            )}
-          </BotMessageBubble>
+          <BotMessageBubbleWrapper>
+            <BotMessageBubble>
+              {item.isTyping ? (
+                <TypingAnimation />
+              ) : (
+                <BotText fontSizeMode={fontSizeMode}>{item.text}</BotText>
+              )}
+            </BotMessageBubble>
+            <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
+          </BotMessageBubbleWrapper>
         )}
-
-        <MessageTime fontSizeMode={fontSizeMode}>{item.time}</MessageTime>
       </BotMessageContainer>
     );
   } else {
@@ -152,12 +156,30 @@ const RobotIconContainer = styled.View`
   justify-content: center;
 `;
 
+// 옵션이 있는 봇 메시지의 컨테이너 - 최대 너비 제한 추가
+const BotMessageWithOptionsContainer = styled.View`
+  max-width: 65%;
+  margin-top: 10px;
+`;
+
+// 일반 봇 메시지 래퍼
+const BotMessageBubbleWrapper = styled.View`
+  margin-top: 10px;
+  max-width: 65%;
+  flex-direction: row;
+  align-items: flex-end;
+`;
+
+// 옵션이 있는 메시지에서 버블과 시간을 묶는 래퍼
+const BotMessageBubbleRow = styled.View`
+  flex-direction: row;
+  align-items: flex-end;
+`;
+
 const BotMessageBubble = styled.View`
   background-color: 'rgba(255, 255, 255, 0.1)';
   padding: 10px 14px;
   border-radius: 2px 12px 12px 12px;
-  max-width: 65%;
-  margin-top: 10px;
 `;
 
 const BotText = styled.Text`

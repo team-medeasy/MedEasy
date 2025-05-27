@@ -1,12 +1,12 @@
 import RNFS from 'react-native-fs';
-import { getAccessToken } from './storage';
+import {getAccessToken} from './storage';
 
 // WebSocket 연결 상태 상수 정의
 const WebSocketStates = {
   CONNECTING: 0,
   OPEN: 1,
   CLOSING: 2,
-  CLOSED: 3
+  CLOSED: 3,
 };
 
 class WebSocketManager {
@@ -71,7 +71,9 @@ class WebSocketManager {
         this.socket = new global.WebSocket(socketUrl);
       } catch (wsError) {
         console.error('[WebSocketManager] WebSocket 생성 오류:', wsError);
-        throw new Error('WebSocket 연결을 생성할 수 없습니다: ' + wsError.message);
+        throw new Error(
+          'WebSocket 연결을 생성할 수 없습니다: ' + wsError.message,
+        );
       }
 
       this.socket.onopen = () => {
@@ -91,10 +93,13 @@ class WebSocketManager {
       };
 
       // 메시지 핸들러 설정
-      this.socket.onmessage = (event) => {
+      this.socket.onmessage = event => {
         try {
           const response = JSON.parse(event.data);
-          console.log('[WebSocketManager] 메시지 수신:', JSON.stringify(response).substring(0, 300));
+          console.log(
+            '[WebSocketManager] 메시지 수신:',
+            JSON.stringify(response).substring(0, 300),
+          );
 
           // 마지막 수신 메시지 저장
           this.lastReceivedMessage = response;
@@ -107,18 +112,46 @@ class WebSocketManager {
               console.log('[WebSocketManager] 초기 메시지 콜백 실행');
               this.initialMessageCallback(response);
             } else {
-              console.warn('[WebSocketManager] 초기 메시지 콜백이 설정되지 않음');
+              console.warn(
+                '[WebSocketManager] 초기 메시지 콜백이 설정되지 않음',
+              );
             }
 
             this.receivedInitialMessage = true;
             return;
           }
 
+          // 액션 핸들러 실행 플래그
+          let actionHandlerExecuted = false;
+
           // 2. Client Action 핸들러 실행
-          if (response.client_action && this.dataHandlers[response.client_action]) {
-            console.log(`[WebSocketManager] 액션 핸들러 실행: ${response.client_action}`);
-            // data와 함께 전체 메시지도 전달
+          if (
+            response.client_action &&
+            this.dataHandlers[response.client_action]
+          ) {
+            console.log(
+              `[WebSocketManager] 액션 핸들러 실행: ${response.client_action}`,
+            );
+
+            // 액션 핸들러 실행 - data와 함께 전체 메시지도 전달
             this.dataHandlers[response.client_action](response.data, response);
+            actionHandlerExecuted = true;
+
+            // 특정 액션들은 자체적으로 메시지 처리를 하므로 pendingCallback 스킵
+            const selfHandlingActions = [
+              'REVIEW_PRESCRIPTION_REGISTER_RESPONSE',
+              'REVIEW_PILLS_PHOTO_SEARCH_RESPONSE',
+            ];
+
+            if (selfHandlingActions.includes(response.client_action)) {
+              console.log(
+                `[WebSocketManager] ${response.client_action} - 자체 메시지 처리, pendingCallback 스킵`,
+              );
+              if (this.pendingCallback) {
+                this.pendingCallback = null;
+              }
+              return;
+            }
           }
 
           // 3. 대기 중인 콜백이 있으면 실행
@@ -126,29 +159,67 @@ class WebSocketManager {
             console.log('[WebSocketManager] 대기 중인 콜백으로 메시지 전달');
             this.pendingCallback(response);
             this.pendingCallback = null;
-          } else {
-            console.log('[WebSocketManager] 처리할 콜백 없음, 메시지 무시:',
-              (response.text_message || '').substring(0, 50));
+            return;
+          }
+
+          // 4. 일반 메시지 처리 (액션 핸들러도 없고 pendingCallback도 없는 경우)
+          if (
+            !actionHandlerExecuted &&
+            !response.client_action &&
+            response.text_message
+          ) {
+            console.log('[WebSocketManager] 일반 메시지 수신 처리');
+
+            if (this.dataHandlers['DEFAULT_MESSAGE']) {
+              this.dataHandlers['DEFAULT_MESSAGE'](response.data, response);
+            } else {
+              console.warn(
+                '[WebSocketManager] DEFAULT_MESSAGE 핸들러가 설정되지 않음',
+              );
+            }
+          } else if (!actionHandlerExecuted) {
+            // 마지막 백업 처리
+            if (response.text_message && this.dataHandlers['DEFAULT_MESSAGE']) {
+              console.log(
+                '[WebSocketManager] fallback: DEFAULT_MESSAGE 핸들러 실행',
+              );
+              this.dataHandlers['DEFAULT_MESSAGE'](response.data, response);
+            } else {
+              console.log(
+                '[WebSocketManager] 처리할 핸들러 없음, 메시지 무시:',
+                (response.text_message || '').substring(0, 50),
+              );
+            }
           }
         } catch (err) {
           console.error('[WebSocketManager] 메시지 처리 중 오류:', err);
         }
       };
 
-      this.socket.onerror = (error) => {
+      this.socket.onerror = error => {
         console.error('[WebSocketManager] 오류 발생:', error);
         this.isConnected = false;
       };
 
-      this.socket.onclose = (event) => {
-        console.log(`[WebSocketManager] 연결 종료: 코드=${event.code}, 이유=${event.reason}`);
+      this.socket.onclose = event => {
+        console.log(
+          `[WebSocketManager] 연결 종료: 코드=${event.code}, 이유=${event.reason}`,
+        );
         this.isConnected = false;
 
         // 수동 종료가 아니고, 최대 재연결 시도 횟수보다 적게 시도한 경우 재연결
-        if (!this.manualDisconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
+        if (
+          !this.manualDisconnect &&
+          this.reconnectAttempts < this.maxReconnectAttempts
+        ) {
           this.reconnectAttempts++;
-          const delay = Math.min(this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts - 1), 60000);
-          console.log(`[WebSocketManager] ${delay}ms 후 재연결 시도 ${this.reconnectAttempts}/${this.maxReconnectAttempts}...`);
+          const delay = Math.min(
+            this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts - 1),
+            60000,
+          );
+          console.log(
+            `[WebSocketManager] ${delay}ms 후 재연결 시도 ${this.reconnectAttempts}/${this.maxReconnectAttempts}...`,
+          );
 
           // 예전 타이머 제거하고 새로운 타이머 설정
           if (this.reconnectTimer) {
@@ -157,7 +228,9 @@ class WebSocketManager {
 
           this.reconnectTimer = setTimeout(() => this.connect(), delay);
         } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-          console.error('[WebSocketManager] 최대 재연결 시도 횟수 초과. 재연결 중단.');
+          console.error(
+            '[WebSocketManager] 최대 재연결 시도 횟수 초과. 재연결 중단.',
+          );
           // 보류 중인 모든 콜백에 오류 통지
           this.rejectAllPendingRequests(new Error('서버 연결이 끊어졌습니다.'));
         }
@@ -178,7 +251,7 @@ class WebSocketManager {
         text_message: '서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.',
         audio_base64: null,
         client_action: null,
-        data: null
+        data: null,
       });
       this.pendingCallback = null;
     }
@@ -187,7 +260,7 @@ class WebSocketManager {
   // 대기 중인 메시지 큐 처리
   processMessageQueue() {
     while (this.messageQueue.length > 0) {
-      const { payload, resolve, reject } = this.messageQueue.shift();
+      const {payload, resolve, reject} = this.messageQueue.shift();
       try {
         this.sendMessageInternal(payload);
       } catch (error) {
@@ -245,7 +318,9 @@ class WebSocketManager {
    */
   sendMessageInternal(payload) {
     if (!this.isConnected || !this.socket) {
-      console.warn('[WebSocketManager] 연결되지 않은 상태에서 메시지 전송 시도');
+      console.warn(
+        '[WebSocketManager] 연결되지 않은 상태에서 메시지 전송 시도',
+      );
       return false;
     }
 
@@ -273,7 +348,7 @@ class WebSocketManager {
     return new Promise(async (resolve, reject) => {
       try {
         // 콜백 저장 (단일)
-        this.pendingCallback = async (response) => {
+        this.pendingCallback = async response => {
           try {
             const {
               result_code,
@@ -338,7 +413,7 @@ class WebSocketManager {
         const sent = this.sendMessageInternal(payload);
         if (!sent) {
           // 메시지 큐에 추가 (콜백과 함께)
-          this.messageQueue.push({ payload, resolve, reject });
+          this.messageQueue.push({payload, resolve, reject});
         }
       } catch (error) {
         console.error('[WebSocketManager] 메시지 전송 실패:', error);
@@ -352,14 +427,22 @@ class WebSocketManager {
    * 복약 루틴 음성 요청 전용
    */
   async getRoutineVoice() {
-    return this.sendMessage('오늘 복약 루틴 조회', 'GET_ROUTINE_LIST_TODAY', null);
+    return this.sendMessage(
+      '오늘 복약 루틴 조회',
+      'GET_ROUTINE_LIST_TODAY',
+      null,
+    );
   }
 
   /**
    * 처방전 등록 요청
    */
   async registerPrescription() {
-    return this.sendMessage('처방전 복용 일정 등록', 'PRESCRIPTION_ROUTINE_REGISTER_REQUEST', null);
+    return this.sendMessage(
+      '처방전 복용 일정 등록',
+      'PRESCRIPTION_ROUTINE_REGISTER_REQUEST',
+      null,
+    );
   }
 
   /**
@@ -367,7 +450,11 @@ class WebSocketManager {
    * @param {string} base64Image - Base64로 인코딩된 이미지 데이터
    */
   async uploadPrescriptionPhoto(base64Image) {
-    return this.sendMessage('처방전 사진 업로드', 'UPLOAD_PRESCRIPTION_PHOTO', base64Image);
+    return this.sendMessage(
+      '처방전 사진 업로드',
+      'UPLOAD_PRESCRIPTION_PHOTO',
+      base64Image,
+    );
   }
 
   /**
@@ -390,7 +477,11 @@ class WebSocketManager {
    * @param {string} base64Image - Base64로 인코딩된 이미지 데이터
    */
   async uploadPillsPhoto(base64Image) {
-    return this.sendMessage('알약 사진 업로드', 'UPLOAD_PILLS_PHOTO', base64Image);
+    return this.sendMessage(
+      '알약 사진 업로드',
+      'UPLOAD_PILLS_PHOTO',
+      base64Image,
+    );
   }
 
   /**
@@ -411,13 +502,19 @@ class WebSocketManager {
       const expireTime = 24 * 60 * 60 * 1000; // 24시간
 
       for (const file of files) {
-        if (file.name.startsWith('voice_response_') && file.name.endsWith('.mp3')) {
+        if (
+          file.name.startsWith('voice_response_') &&
+          file.name.endsWith('.mp3')
+        ) {
           const timestamp = Number(
-            file.name.replace('voice_response_', '').replace('.mp3', '')
+            file.name.replace('voice_response_', '').replace('.mp3', ''),
           );
           if (now - timestamp > expireTime) {
             await RNFS.unlink(file.path);
-            console.log('[WebSocketManager] 오래된 임시 오디오 파일 삭제:', file.name);
+            console.log(
+              '[WebSocketManager] 오래된 임시 오디오 파일 삭제:',
+              file.name,
+            );
           }
         }
       }
@@ -440,7 +537,11 @@ class WebSocketManager {
       this.reconnectTimer = null;
     }
 
-    if (this.socket && (this.isConnected || this.socket.readyState === WebSocketStates.CONNECTING)) {
+    if (
+      this.socket &&
+      (this.isConnected ||
+        this.socket.readyState === WebSocketStates.CONNECTING)
+    ) {
       console.log('[WebSocketManager] 웹소켓 연결 종료');
       this.socket.close();
       this.isConnected = false;
@@ -458,7 +559,7 @@ class WebSocketManager {
       receivedInitialMessage: this.receivedInitialMessage,
       hasPendingCallback: !!this.pendingCallback,
       registeredActions: Object.keys(this.dataHandlers),
-      queuedMessages: this.messageQueue.length
+      queuedMessages: this.messageQueue.length,
     };
   }
 }

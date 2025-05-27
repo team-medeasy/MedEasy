@@ -54,7 +54,8 @@ const CalendarWidget = ({ onDateChange, markedDates = {} }) => {
         return acc;
       }, {});
 
-      setRoutineMarkedDates(prev => ({ ...prev, ...markedRoutineDates }));
+      // 이전 상태를 병합하지 않고 현재 월의 데이터만 사용
+      setRoutineMarkedDates(markedRoutineDates);
     } catch (e) {
       console.error('루틴 데이터 가져오기 실패:', e);
     }
@@ -78,6 +79,9 @@ const CalendarWidget = ({ onDateChange, markedDates = {} }) => {
   useFocusEffect(
     React.useCallback(() => {
       fetchMonthlyRoutine(currentMonth);
+      return () => {
+        // 포커스가 해제될 때 추가 작업 (필요한 경우)
+      };
     }, [currentMonth])
   );
 
@@ -98,6 +102,8 @@ const CalendarWidget = ({ onDateChange, markedDates = {} }) => {
   const handleMonthChange = (month) => {
     const newMonth = dayjs(`${month.year}-${month.month}-01`);
     setCurrentMonth(newMonth);
+    // 월이 변경될 때마다 해당 월의 루틴 데이터를 새로 가져옴
+    fetchMonthlyRoutine(newMonth);
   };
 
   // 날짜 셀 커스텀 컴포넌트
@@ -140,7 +146,9 @@ const CalendarWidget = ({ onDateChange, markedDates = {} }) => {
     );
   }, (prev, next) => 
     // React.memo 최적화를 위한 비교: 날짜와 표시 정보가 같으면 리렌더링 방지
-    prev.date.dateString === next.date.dateString && prev.marking === next.marking
+    prev.date.dateString === next.date.dateString && 
+    prev.marking === next.marking && 
+    prev.state === next.state
   );
 
   return (

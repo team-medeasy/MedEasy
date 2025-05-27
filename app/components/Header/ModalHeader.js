@@ -21,7 +21,7 @@ const ModalHeader = ({
   return (     
     <HeaderContainer>       
       <BackAndTitleContainer>         
-        <TouchableOpacity onPress={handleBackPress}>           
+        <TouchableOpacity onPress={handleBackPress} style={{padding: 15}}>           
           <HeaderIcons.chevron             
             width={17}             
             height={17}             
@@ -35,7 +35,7 @@ const ModalHeader = ({
           {children}
         </Title>         
         {showDelete ? (
-          <TouchableOpacity onPress={onDeletePress}>
+          <TouchableOpacity onPress={onDeletePress} style={{padding: 15}}>
             <HeaderIcons.trash
               width={17}
               height={17}
@@ -52,7 +52,7 @@ const ModalHeader = ({
 
 const HeaderContainer = styled.View`   
   justify-content: flex-end;   
-  padding: 15px 0px;   
+  //padding: 15px 0px;   
   background-color: ${themes.light.bgColor.bgPrimary};   
   border-bottom-width: 1px;   
   border-bottom-color: ${themes.light.borderColor.borderPrimary}; 
@@ -60,7 +60,7 @@ const HeaderContainer = styled.View`
 
 const BackAndTitleContainer = styled.View`   
   flex-direction: row;   
-  padding: 0 15px;   
+  //padding: 0 15px;   
   align-items: center; 
 `;  
 

@@ -1,35 +1,133 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
+import {Alert, BackHandler} from 'react-native';
 import styled from 'styled-components/native';
-import {View, ActivityIndicator, Text, Alert} from 'react-native';
+import {useFocusEffect, CommonActions} from '@react-navigation/native';
 import {themes} from './../../styles';
 import {
-  Header,
-  CameraSearchResultsList,
-  NoSearchResults,
+ Header,
+ CameraSearchResultsList,
+ NoSearchResults,
 } from '../../components';
 import {searchPillByImage} from '../../api/pillSearch';
 import {getMedicineDetailByItemSeq} from '../../api/search';
 import {CameraSearchPlaceholder} from '../../components/CameraSearchResult/CameraSearchPlaceholder';
 
 const CameraSearchResultsScreen = ({route, navigation}) => {
-  const {photoUri, timestamp} = route.params || {};
+  // 파라미터 추출
+  const {photoUri, timestamp, pillsData, fromVoiceChat, isRoutineRegistration} = route.params || {};
   const isMounted = useRef(true);
   const apiCallStarted = useRef(false);
+  
+  // 🆕 선택된 약 이름을 저장할 ref
+  const selectedMedicineRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
   const [error, setError] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
-  // 검색 결과 항목 클릭 처리
-  const handleSearchResultPress = item => {
+  // 🆕 안전한 뒤로가기 처리 함수
+  const handleGoBack = useCallback(() => {
+    try {
+      // 루틴 등록 모드에서 약이 선택된 경우
+      if (isRoutineRegistration && selectedMedicineRef.current) {
+        console.log('[CameraResults] 선택된 약과 함께 뒤로가기:', selectedMedicineRef.current);
+        
+        // 🆕 navigation state 확인
+        const state = navigation.getState();
+        console.log('[CameraResults] navigation state routes:', state.routes.map(r => ({ name: r.name, key: r.key })));
+        
+        // VoiceChat route 찾기
+        const voiceChatRoute = state.routes.find(route => route.name === 'VoiceChat');
+        
+        if (voiceChatRoute) {
+          console.log('[CameraResults] VoiceChat route 찾음, key:', voiceChatRoute.key);
+          
+          // dispatch로 확실하게 파라미터 설정
+          navigation.dispatch({
+            ...CommonActions.setParams({
+              selectedMedicineName: selectedMedicineRef.current,
+              fromRoutineRegistration: true,
+              timestamp: Date.now()
+            }),
+            source: voiceChatRoute.key,
+          });
+          
+          console.log('[CameraResults] CommonActions.setParams 실행 완료');
+        } else {
+          console.warn('[CameraResults] VoiceChat route를 찾을 수 없음');
+          
+          // 대안: 모든 route에 파라미터 설정 시도
+          state.routes.forEach(route => {
+            if (route.name === 'VoiceChat') {
+              console.log('[CameraResults] 대안 방법으로 VoiceChat에 파라미터 설정 시도');
+              navigation.dispatch({
+                ...CommonActions.setParams({
+                  selectedMedicineName: selectedMedicineRef.current,
+                  fromRoutineRegistration: true,
+                  timestamp: Date.now()
+                }),
+                source: route.key,
+              });
+            }
+          });
+        }
+      }
+
+      // 뒤로가기 처리
+      if (navigation.canGoBack()) {
+        console.log('[CameraResults] 일반 뒤로가기 실행');
+        navigation.goBack();
+      } else {
+        console.log('[CameraResults] 뒤로갈 화면 없음, 홈으로 이동');
+        navigation.navigate('TabNavigator');
+      }
+    } catch (error) {
+      console.error('[CameraResults] 뒤로가기 처리 중 오류:', error);
+      navigation.navigate('TabNavigator');
+    }
+  }, [navigation, isRoutineRegistration]);
+
+  // 🆕 안드로이드 뒤로가기 버튼 처리
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        () => {
+          handleGoBack();
+          return true; // 기본 뒤로가기 동작 방지
+        }
+      );
+
+      return () => subscription.remove();
+    }, [handleGoBack])
+  );
+
+  // 검색 결과 항목 클릭 처리 - 수정됨
+  const handleSearchResultPress = (item) => {
     console.log('[CameraResults] 검색 결과 항목 클릭:', item.uniqueKey);
+    
+    // 🆕 루틴 등록 모드인 경우
+    if (isRoutineRegistration) {
+      console.log('[CameraResults] 루틴 등록 모드 - 약 이름 선택:', item.item_name);
+      
+      // 선택된 약 이름을 ref에 저장
+      selectedMedicineRef.current = item.item_name;
+      
+      // 뒤로가기 실행
+      handleGoBack();
+      return;
+    }
+    
+    // 기존 동작 (약품 상세 화면으로 이동)
     navigation.navigate('MedicineDetail', {item});
   };
 
   // 컴포넌트 마운트/언마운트 처리
   useEffect(() => {
     console.log('[CameraResults] 컴포넌트 마운트');
+    console.log('[CameraResults] fromVoiceChat 여부:', fromVoiceChat);
+    console.log('[CameraResults] isRoutineRegistration 여부:', isRoutineRegistration);
 
     // 언마운트 시 정리
     return () => {
@@ -47,16 +145,93 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
     return unsubscribe;
   }, [navigation]);
 
-  // API 호출 처리
+  // VoiceChat에서 전달된 데이터 처리
   useEffect(() => {
-    // API 호출이 이미 시작되었는지 확인
-    if (apiCallStarted.current) {
-      console.log('[CameraResults] API 호출이 이미 진행 중입니다');
+    const fetchMappedResultsWithDetail = async () => {
+      console.log('[CameraResults] 음성챗에서 전달된 데이터 처리 시작');
+
+      try {
+        const mappedResults = await Promise.all(
+          pillsData.map(async pill => {
+            try {
+              const detail = await getMedicineDetailByItemSeq(pill.item_seq);
+              const medicineId = detail?.body?.id || pill.item_seq;
+
+              return {
+                uniqueKey: `${pill.item_seq}`,
+                id: medicineId,
+                item_image: pill.image_url || pill.item_image || '',
+                entp_name: pill.entp_name || '정보 없음',
+                etc_otc_name: '전문/일반 정보 없음',
+                class_name: pill.class_name || '정보 없음',
+                item_name: pill.item_name || '정보 없음',
+                chart: pill.chart || '정보 없음',
+                drug_shape: pill.drug_shape || '',
+                color_classes: Array.isArray(pill.color_classes)
+                  ? pill.color_classes.join(', ')
+                  : pill.color_classes || '',
+                print_front: pill.print_front || '',
+                print_back: pill.print_back || '',
+                leng_long: '',
+                leng_short: '',
+                thick: '',
+                original_id: pill.item_seq,
+                indications: Array.isArray(pill.indications)
+                  ? pill.indications.join('\n')
+                  : pill.indications || '',
+                dosage: Array.isArray(pill.dosage)
+                  ? pill.dosage.join('\n')
+                  : pill.dosage || '',
+                storage_method: '',
+                precautions: Array.isArray(pill.precautions)
+                  ? pill.precautions.join('\n')
+                  : pill.precautions || '',
+                side_effects: Array.isArray(pill.side_effects)
+                  ? pill.side_effects.join('\n')
+                  : pill.side_effects || '',
+              };
+            } catch (err) {
+              console.warn(
+                '[CameraResults] 상세 정보 조회 실패:',
+                pill.item_seq,
+                err,
+              );
+              return {
+                uniqueKey: `${pill.item_seq}`,
+                id: pill.item_seq, // fallback
+                item_image: pill.image_url || pill.item_image || '',
+                entp_name: pill.entp_name || '정보 없음',
+                item_name: pill.item_name || '정보 없음',
+              };
+            }
+          }),
+        );
+
+        console.log(
+          '[CameraResults] 음성챗 데이터 매핑 완료, 항목 수:',
+          mappedResults.length,
+        );
+        setSearchResults(mappedResults);
+        setInitialDataLoaded(true);
+        setLoading(false);
+      } catch (err) {
+        console.error('[CameraResults] pillsData 처리 중 오류:', err);
+        setError(true);
+        setLoading(false);
+      }
+    };
+
+    if (fromVoiceChat && pillsData && pillsData.length > 0) {
+      fetchMappedResultsWithDetail();
+      return; // VoiceChat 처리 끝났으면 아래 실행하지 않도록 종료
+    }
+
+    // 기존 API 호출 로직은 fromVoiceChat이 아닐 때만 실행
+    if (fromVoiceChat || apiCallStarted.current) {
       return;
     }
 
-    console.log('[CameraResults] photoUri 확인:', !!photoUri);
-
+    // API 호출 처리 (기존 코드)
     if (!photoUri) {
       console.error('[CameraResults] 사진 URI가 없음');
       setLoading(false);
@@ -195,16 +370,14 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
     // API 호출 즉시 시작
     console.log('[CameraResults] API 호출 함수 시작');
     fetchSearchResults();
-  }, [photoUri, timestamp]);
+  }, [photoUri, timestamp, pillsData, fromVoiceChat]);
 
   return (
     <Container>
       <Header
-        onBackPress={() => {
-          console.log('[CameraResults] 뒤로가기 버튼 클릭');
-          navigation.goBack();
-        }}>
-        약 검색 결과
+        onBackPress={handleGoBack} // 🆕 헤더 뒤로가기도 통일
+      >
+        {isRoutineRegistration ? '루틴 등록할 약 선택' : '약 검색 결과'}
       </Header>
 
       <SearchResultContainer>
@@ -220,6 +393,7 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
             searchResults={searchResults}
             handleSearchResultPress={handleSearchResultPress}
             onEndReachedThreshold={0.5}
+            isRoutineRegistration={isRoutineRegistration} // prop 전달
           />
         )}
       </SearchResultContainer>
@@ -228,14 +402,14 @@ const CameraSearchResultsScreen = ({route, navigation}) => {
 };
 
 const Container = styled.View`
-  flex: 1;
-  background-color: ${themes.light.bgColor.bgPrimary};
+ flex: 1;
+ background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
 const SearchResultContainer = styled.View`
-  flex: 1;
-  margin-top: 16px;
-  background-color: ${themes.light.bgColor.bgPrimary};
+ flex: 1;
+ margin-top: 16px;
+ background-color: ${themes.light.bgColor.bgPrimary};
 `;
 
 export default CameraSearchResultsScreen;

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, {useEffect, useRef, useState, useCallback, useMemo} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -18,19 +18,19 @@ import {
   useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
-import { useNavigation, useIsFocused, useRoute } from '@react-navigation/native';
-import { cropCenterArea } from '../../services/cameraService';
+import {useNavigation, useIsFocused, useRoute} from '@react-navigation/native';
+import {cropCenterArea} from '../../services/cameraService';
 import styled from 'styled-components/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Svg, { Rect, Mask, Defs } from 'react-native-svg';
-import { CameraIcons, HeaderIcons } from '../../../assets/icons';
-import { themes } from '../../styles';
+import Svg, {Rect, Mask, Defs} from 'react-native-svg';
+import {CameraIcons, HeaderIcons} from '../../../assets/icons';
+import {themes} from '../../styles';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import { useFontSize } from '../../../assets/fonts/FontSizeContext';
-import { launchImageLibrary } from 'react-native-image-picker';
+import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 // --- Constants ---
-const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
+const {width: windowWidth, height: windowHeight} = Dimensions.get('window');
 const PREVIEW_SIZE = windowWidth - 60; // 양쪽 30px 여백 제외
 const BORDER_RADIUS = 24;
 const OVERLAY_OPACITY = 0.6;
@@ -49,11 +49,11 @@ const CameraSearchScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const isFocused = useIsFocused();
-  const { hasPermission, requestPermission } = useCameraPermission();
-  const { fontSizeMode } = useFontSize();
+  const {hasPermission, requestPermission} = useCameraPermission();
+  const {fontSizeMode} = useFontSize();
 
   // --- 화면 전환 관련 파라미터 ---
-  const { actionType, sourceScreen } = route.params || {};
+  const {actionType, sourceScreen} = route.params || {};
 
   // --- State ---
   const [activeIndex, setActiveIndex] = useState(0);
@@ -86,7 +86,14 @@ const CameraSearchScreen = () => {
     // Camera 화면이 포커스될 때 파라미터 확인
     const unsubscribe = navigation.addListener('focus', () => {
       // route.params에서 처리 완료 플래그 및 이미지 URI 확인
-      const { processingComplete, finalPhotoUri, isPrescription, actionType, sourceScreen, timestamp } = route.params || {};
+      const {
+        processingComplete,
+        finalPhotoUri,
+        isPrescription,
+        actionType,
+        sourceScreen,
+        timestamp,
+      } = route.params || {};
 
       // 이미지 처리가 완료되었다면 VoiceChat으로 돌아가기
       if (processingComplete && finalPhotoUri && sourceScreen === 'VoiceChat') {
@@ -99,22 +106,24 @@ const CameraSearchScreen = () => {
           isPrescription: undefined,
           actionType: undefined,
           sourceScreen: undefined,
-          timestamp: undefined
+          timestamp: undefined,
         });
 
         // 수정된 부분: VoiceChat으로 직접 이동하는 방식 사용
         navigation.reset({
-          index: 0,  // 첫 번째 화면을 활성화 (이제 VoiceChat만 있음)
-          routes: [{
-            name: 'VoiceChat',
-            params: {
-              photoUri: finalPhotoUri,
-              isPrescription: isPrescription,
-              actionType: actionType,
-              timestamp: timestamp || Date.now(),
-              photoProcessed: true
-            }
-          }]
+          index: 0, // 첫 번째 화면을 활성화 (이제 VoiceChat만 있음)
+          routes: [
+            {
+              name: 'VoiceChat',
+              params: {
+                photoUri: finalPhotoUri,
+                isPrescription: isPrescription,
+                actionType: actionType,
+                timestamp: timestamp || Date.now(),
+                photoProcessed: true,
+              },
+            },
+          ],
         });
       }
     });
@@ -145,10 +154,13 @@ const CameraSearchScreen = () => {
 
   // 백 버튼 핸들러 (Android)
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      handleGoBack();
-      return true; // 기본 뒤로가기 동작 방지
-    });
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        handleGoBack();
+        return true; // 기본 뒤로가기 동작 방지
+      },
+    );
 
     return () => backHandler.remove();
   }, []);
@@ -203,7 +215,7 @@ const CameraSearchScreen = () => {
         '카메라 권한 필요',
         '사진 검색을 위해 카메라 권한이 필요합니다. 설정에서 권한을 활성화해 주세요.',
         [
-          { text: '취소', onPress: () => navigation.goBack(), style: 'cancel' },
+          {text: '취소', onPress: () => navigation.goBack(), style: 'cancel'},
           {
             text: '설정으로 이동',
             onPress: () => {
@@ -229,21 +241,13 @@ const CameraSearchScreen = () => {
 
   const handleGoBack = useCallback(() => {
     if (isMounted.current) {
-      setIsCameraActive(false); // 먼저 비활성화 (카메라 해제)
+      setIsCameraActive(false); // 먼저 비활성화
     }
 
-    // 네비게이션 이동은 약간 delay
     setTimeout(() => {
-      if (sourceScreen === 'VoiceChat') {
-        // VoiceChat에서 왔다면 다시 VoiceChat으로 이동
-        console.log('[Camera] VoiceChat으로 돌아갑니다');
-        navigation.navigate('VoiceChat');
-      } else {
-        // 일반적인 경우 뒤로 이동
-        navigation.goBack();
-      }
+      navigation.goBack();
     }, 50);
-  }, [navigation, sourceScreen]);
+  }, [navigation]);
 
   const toggleFlash = useCallback(() => {
     setFlash(prev => (prev === 'off' ? 'on' : 'off'));
@@ -319,7 +323,7 @@ const CameraSearchScreen = () => {
                 photoUri: result.assets[0].uri,
                 isPrescription: isPrescriptionNow,
                 actionType: actionType, // 액션 타입 전달
-                sourceScreen: sourceScreen // 소스 화면 전달
+                sourceScreen: sourceScreen, // 소스 화면 전달
               });
             }
           });
@@ -393,7 +397,7 @@ const CameraSearchScreen = () => {
                 photoUri: croppedUri,
                 isPrescription: isPrescriptionMode,
                 actionType: actionType, // 액션 타입 전달
-                sourceScreen: sourceScreen // 소스 화면 전달
+                sourceScreen: sourceScreen, // 소스 화면 전달
               });
             }
           });
@@ -425,7 +429,7 @@ const CameraSearchScreen = () => {
     navigation,
     checkAndRequestCameraPermission,
     actionType,
-    sourceScreen
+    sourceScreen,
   ]);
 
   const animateFocusIndicator = useCallback(() => {
@@ -462,7 +466,7 @@ const CameraSearchScreen = () => {
       }
 
       try {
-        const { locationX, locationY } = event.nativeEvent;
+        const {locationX, locationY} = event.nativeEvent;
         const point = {
           x: Math.round(locationX),
           y: Math.round(locationY),
@@ -483,14 +487,14 @@ const CameraSearchScreen = () => {
 
   const onCameraLayout = useCallback(
     event => {
-      const { width: layoutWidth, height: layoutHeight } =
+      const {width: layoutWidth, height: layoutHeight} =
         event.nativeEvent.layout;
       if (
         layoutWidth !== cameraLayout.width ||
         layoutHeight !== cameraLayout.height
       ) {
         console.log('Camera layout updated:', layoutWidth, layoutHeight);
-        setCameraLayout({ width: layoutWidth, height: layoutHeight });
+        setCameraLayout({width: layoutWidth, height: layoutHeight});
       }
     },
     [cameraLayout.width, cameraLayout.height],
@@ -552,20 +556,20 @@ const CameraSearchScreen = () => {
         <HeaderTopRow>
           <HeaderButtonWrapper
             onPress={handleGoBack}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
             disabled={isProcessing}>
             <HeaderButton>
               <HeaderIcons.chevron
                 width={20}
                 height={20}
-                style={{ color: themes.light.textColor.buttonText }}
+                style={{color: themes.light.textColor.buttonText}}
               />
             </HeaderButton>
           </HeaderButtonWrapper>
           <Title fontSizeMode={fontSizeMode}>사진으로 검색하기</Title>
           <HeaderButtonWrapper
             onPress={toggleFlash}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
             disabled={isProcessing}>
             <HeaderButton
               style={{
@@ -591,7 +595,7 @@ const CameraSearchScreen = () => {
         <HeaderBottomRow>
           <ToggleContainer>
             <Animated.View
-              style={[styles.toggleBackground, { transform: [{ translateX }] }]}
+              style={[styles.toggleBackground, {transform: [{translateX}]}]}
             />
             <ToggleOption
               onPress={() => handleToggle(0)}
@@ -599,8 +603,7 @@ const CameraSearchScreen = () => {
               <ToggleButton>
                 <ToggleText
                   isActive={activeIndex === 0}
-                  fontSizeMode={fontSizeMode}
-                >
+                  fontSizeMode={fontSizeMode}>
                   알약 촬영
                 </ToggleText>
               </ToggleButton>
@@ -611,8 +614,7 @@ const CameraSearchScreen = () => {
               <ToggleButton>
                 <ToggleText
                   isActive={activeIndex === 1}
-                  fontSizeMode={fontSizeMode}
-                >
+                  fontSizeMode={fontSizeMode}>
                   처방전 촬영
                 </ToggleText>
               </ToggleButton>
@@ -661,7 +663,7 @@ const CameraSearchScreen = () => {
               left: focusPoint.x - FOCUS_INDICATOR_SIZE / 2,
               top: focusPoint.y - FOCUS_INDICATOR_SIZE / 2,
               opacity: focusIndicatorOpacity,
-              transform: [{ scale: focusIndicatorScale }],
+              transform: [{scale: focusIndicatorScale}],
             },
           ]}
           pointerEvents="none"
@@ -714,17 +716,19 @@ const CameraSearchScreen = () => {
         {/* Hint (Pill mode only) */}
         {!isPrescriptionMode && (
           <Animated.View
-            style={{ opacity: activeIndex === 0 ? 1 : 0, marginBottom: 25 }}>
+            style={{opacity: activeIndex === 0 ? 1 : 0, marginBottom: 25}}>
             <Hint>
               <HintIconWrapper>
                 <CameraIcons.tip
                   width={20}
                   height={20}
-                  style={{ color: themes.light.textColor.buttonText }}
+                  style={{color: themes.light.textColor.buttonText}}
                 />
               </HintIconWrapper>
               <HintTextWrapper>
-                <HintTitle fontSizeMode={fontSizeMode}>인식률을 높이려면?</HintTitle>
+                <HintTitle fontSizeMode={fontSizeMode}>
+                  인식률을 높이려면?
+                </HintTitle>
                 <HintText fontSizeMode={fontSizeMode}>
                   문자가 적힌 면이 위로 가도록 밝은 곳에서 촬영해주세요.
                 </HintText>
@@ -745,7 +749,7 @@ const CameraSearchScreen = () => {
           <CaptureButton
             onPress={handleCapture}
             disabled={isProcessing}
-            style={isProcessing ? { opacity: 0.7 } : {}}>
+            style={isProcessing ? {opacity: 0.7} : {}}>
             <CaptureButtonInner />
           </CaptureButton>
           <ButtonItem
@@ -863,7 +867,7 @@ const HeaderButton = styled.View`
 
 const Title = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({ fontSizeMode }) => FontSizes.heading[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.heading[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
 `;
 
@@ -894,9 +898,9 @@ const ToggleButton = styled.View``;
 
 const ToggleText = styled.Text`
   font-family: 'Pretendard-SemiBold';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
-  color: ${({ isActive }) => (isActive ? 'black' : 'rgba(255, 255, 255, 0.8)')};
-  font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
+  color: ${({isActive}) => (isActive ? 'black' : 'rgba(255, 255, 255, 0.8)')};
+  font-weight: ${({isActive}) => (isActive ? 'bold' : 'normal')};
 `;
 
 const LoadingContainer = styled.View`
@@ -946,14 +950,14 @@ const HintTextWrapper = styled.View`
 
 const HintTitle = styled.Text`
   font-family: 'Pretendard-Bold';
-  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText};
   margin-bottom: 4px;
 `;
 
 const HintText = styled.Text`
   font-family: 'Pretendard-Regular';
-  font-size: ${({ fontSizeMode }) => FontSizes.caption[fontSizeMode]}px;
+  font-size: ${({fontSizeMode}) => FontSizes.caption[fontSizeMode]}px;
   color: ${themes.light.textColor.buttonText70};
   line-height: 16px;
 `;

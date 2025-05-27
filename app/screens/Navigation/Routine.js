@@ -43,6 +43,8 @@ const Routine = ({route}) => {
   const [medicineRoutines, setMedicineRoutines] = useState([]);
   // 날짜별 routine_medicine_id를 저장
   const [routineMedicineMap, setRoutineMedicineMap] = useState({});
+  // 원본 루틴 데이터
+  const [routineRawData, setRoutineRawData] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -235,6 +237,7 @@ const Routine = ({route}) => {
 
           const response = await getRoutineByDate(startDate, endDate);
           const routineData = response.data.body;
+          setRoutineRawData(routineData);
           console.log('루틴 데이터 응답:', routineData);
 
           const processedRoutines = processRoutineData(routineData);
@@ -341,39 +344,30 @@ const Routine = ({route}) => {
   const getAllRoutinesByTime = () => {
     const todayMedicineItems = [];
     const dateKey = selectedDate.fullDate.format('YYYY-MM-DD');
+    // ★ 수정: 원본 루틴 데이터(routineRawData)에서 직접 시간대별로 medicines 추출
+    const dayRoutine = routineRawData.find(day => day.take_date === dateKey);
 
-    Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
-      const medicinesForTime = medicineRoutines.filter(medicine => {
-        const dayMatch = medicine.day_of_weeks.includes(
-          selectedDate.fullDate.day() === 0 ? 7 : selectedDate.fullDate.day(),
+    if (dayRoutine) {
+      Object.entries(timeMapping).forEach(([timeKey, timeInfo]) => {
+        const scheduleForTime = (dayRoutine.user_schedule_dtos || []).find(
+          schedule => getTimeTypeFromScheduleName(schedule.name) === timeKey
         );
-        const timeMatch = medicine.types.includes(timeKey);
-
-        if (!dayMatch || !timeMatch) {
-          return false;
+        if (scheduleForTime && scheduleForTime.routine_dtos.length > 0) {
+          todayMedicineItems.push({
+            id: `medicine-${timeKey}`,
+            label: timeInfo.label,
+            time: timeInfo.time,
+            sortValue: timeInfo.sortValue,
+            type: 'medicine',
+            timeKey,
+            medicines: scheduleForTime.routine_dtos, // ★ nickname 등 시간대별 정상 반영
+          });
         }
-
-        const routineExist =
-          routineMedicineMap[dateKey]?.[timeKey]?.[medicine.medicine_id];
-
-        return Boolean(routineExist);
       });
+    }
 
-      if (medicinesForTime.length > 0) {
-        todayMedicineItems.push({
-          id: `medicine-${timeKey}`,
-          label: timeInfo.label,
-          time: timeInfo.time,
-          sortValue: timeInfo.sortValue,
-          type: 'medicine',
-          timeKey,
-          medicines: medicinesForTime,
-        });
-      }
-    });
+    return todayMedicineItems.sort((a, b) => a.sortValue - b.sortValue);
 
-    // 모든 아이템 합치고 시간순 정렬
-    return [...todayMedicineItems].sort((a, b) => a.sortValue - b.sortValue);
   };
 
   const allRoutines = getAllRoutinesByTime();

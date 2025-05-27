@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import {useRef, useState} from 'react';
 import Sound from 'react-native-sound';
+import RNFS from 'react-native-fs';
 
 export default function useAudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -18,7 +19,7 @@ export default function useAudioPlayer() {
     Sound.setCategory('Playback');
 
     // 새 사운드 생성
-    const sound = new Sound(filePath, '', (error) => {
+    const sound = new Sound(filePath, '', error => {
       if (error) {
         console.error('오디오 로드 실패:', error);
         // 오류 시 콜백 호출
@@ -31,7 +32,7 @@ export default function useAudioPlayer() {
 
       // 재생 시작
       setIsPlaying(true);
-      sound.play((success) => {
+      sound.play(success => {
         setIsPlaying(false);
 
         if (success) {
@@ -62,17 +63,43 @@ export default function useAudioPlayer() {
 
   // 오디오 정리 함수
   const cleanupAudio = () => {
-    if (currentSound.current) {
-      currentSound.current.stop();
-      currentSound.current.release();
-      currentSound.current = null;
+    return new Promise(resolve => {
+      if (currentSound.current) {
+        currentSound.current.stop(() => {
+          setIsPlaying(false);
+          console.log('[AUDIO] 재생 강제 종료 완료');
+          resolve(); // 여기서 비로소 종료 완료
+        });
+      } else {
+        setIsPlaying(false);
+        resolve(); // 재생 중이 아니어도 즉시 resolve
+      }
+    });
+  };
+
+  // 오디오 파일 존재 여부 확인 후 재생 (추가)
+  const playAudioWithCompletion = async (filePath, fallbackCallback = null) => {
+    if (!filePath) {
+      console.warn('[AUDIO] 경로 없음: 오디오 재생 불가');
+      if (fallbackCallback) fallbackCallback();
+      return;
     }
-    setIsPlaying(false);
+
+    const exists = await RNFS.exists(filePath);
+    if (!exists) {
+      console.warn('[AUDIO] 파일이 존재하지 않음:', filePath);
+      if (fallbackCallback) fallbackCallback();
+      return;
+    }
+
+    // 정상 경로일 경우 재생
+    playAudioFile(filePath, fallbackCallback);
   };
 
   return {
     isPlaying,
     playAudioFile,
-    cleanupAudio
+    cleanupAudio,
+    playAudioWithCompletion,
   };
 }

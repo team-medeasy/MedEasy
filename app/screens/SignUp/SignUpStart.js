@@ -1,14 +1,28 @@
 import React from 'react';
-import {SafeAreaView, TouchableOpacity, Text, View} from 'react-native';
+import {
+  SafeAreaView,
+  TouchableOpacity,
+  Text,
+  View,
+  Platform,
+} from 'react-native';
 import styled from 'styled-components/native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {IconTextButton} from '../../components';
 import {themes, fonts} from './../../styles';
 import {OtherIcons, Images} from './../../../assets/icons';
 const {kakao: KakaoIcon} = OtherIcons;
 
-// kakaologin
-import { handleKakaoLogin } from '../../api/services/authService';
+// 로그인 서비스 import
+import {
+  handleKakaoLogin,
+  handleAppleLogin,
+} from '../../api/services/authService'; // handleAppleLogin 추가
+
+// 애플 로그인 (iOS 전용)
+import {
+  appleAuth,
+  AppleButton,
+} from '@invertase/react-native-apple-authentication';
 
 import FontSizes from '../../../assets/fonts/fontSizes';
 
@@ -32,6 +46,12 @@ const ButtonContainer = styled.View`
   align-items: center;
   padding: 0 20px;
   gap: 12px;
+`;
+
+const AppleButtonStyled = styled(AppleButton)`
+  width: 100%;
+  height: 50px;
+  margin-bottom: 12px;
 `;
 
 const EmailBtn = styled(TouchableOpacity)`
@@ -63,6 +83,15 @@ const SignUpStartScreen = ({navigation}) => {
     }
   };
 
+  // 애플 로그인 처리 함수
+  const onAppleLogin = async () => {
+    try {
+      await handleAppleLogin(navigation);
+    } catch (error) {
+      console.error('애플 로그인 화면 처리 오류:', error);
+    }
+  };
+
   return (
     <Container>
       <TitleContainer>
@@ -79,6 +108,19 @@ const SignUpStartScreen = ({navigation}) => {
       </ImageContainer>
 
       <ButtonContainer>
+        {Platform.OS === 'ios' && (
+          <IconTextButton
+            onPress={onAppleLogin}
+            icon={
+              <OtherIcons.Apple
+                height={18}
+                width={18}
+                style={{color: themes.light.textColor.buttonText}}
+              />
+            }
+            title="Apple로 시작하기"
+          />
+        )}
         <IconTextButton
           onPress={onKakaoLogin}
           icon={
@@ -89,17 +131,6 @@ const SignUpStartScreen = ({navigation}) => {
             />
           }
           title="카카오톡으로 시작하기"
-        />
-        <IconTextButton
-          onPress={() => console.log('Google 로그인')}
-          icon={
-            <FontAwesome
-              name="google"
-              size={20}
-              color={themes.light.textColor.buttonText}
-            />
-          }
-          title="Google로 시작하기"
         />
 
         <SignUpContainer>
