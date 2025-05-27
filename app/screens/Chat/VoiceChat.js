@@ -1216,7 +1216,7 @@ export default function VoiceChat() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : null} // 안드로이드에서는 null로 설정
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+        keyboardVerticalOffset={0}>
         <Header
           hideBorder="true"
           transparentBg="true"
