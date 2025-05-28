@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState, useCallback} from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -6,6 +6,7 @@ import {
   View,
   AppState,
   BackHandler,
+  Keyboard, // Keyboard API 추가
 } from 'react-native';
 import Voice from '@react-native-voice/voice';
 import styled from 'styled-components/native';
@@ -17,17 +18,17 @@ import {
 } from '@react-navigation/native';
 import RNFS from 'react-native-fs';
 
-import {themes} from '../../styles';
-import {useFontSize} from '../../../assets/fonts/FontSizeContext';
-import {Header} from '../../components';
+import { themes } from '../../styles';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
+import { Header } from '../../components';
 import ChatInfoModal from '../../components/Chat/ChatInfoModal';
 import MessageBubble from '../../components/Chat/MessageBubble';
 import MessageInput from '../../components/Chat/MessageInput';
 import VoiceInputUI from '../../components/Chat/VoiceInputUI';
 
-import {getUser} from '../../api/user';
-import {handleClientAction} from '../../utils/chatActionHandler';
-import {DEFAULT_BOT_OPTIONS} from '../../../assets/data/utils';
+import { getUser } from '../../api/user';
+import { handleClientAction } from '../../utils/chatActionHandler';
+import { DEFAULT_BOT_OPTIONS } from '../../../assets/data/utils';
 
 // 커스텀 훅 불러오기
 import useVoiceRecognition from '../../hooks/useVoiceRecognition';
@@ -37,11 +38,15 @@ import usePulseAnimation from '../../hooks/usePulseAnimation';
 import useWebSocketChat from '../../hooks/useWebSocketChat';
 
 export default function VoiceChat() {
-  const {fontSizeMode} = useFontSize();
+  const { fontSizeMode } = useFontSize();
   const navigation = useNavigation();
   const route = useRoute();
   const flatListRef = useRef(null);
   const appStateRef = useRef(AppState.currentState);
+
+  // 키보드 상태 관리 추가
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   // 커스텀 훅 사용
   const {
@@ -57,7 +62,7 @@ export default function VoiceChat() {
     setStatusMessage,
   } = useVoiceRecognition();
 
-  const {playAudioFile, cleanupAudio, isPlaying} = useAudioPlayer();
+  const { playAudioFile, cleanupAudio, isPlaying } = useAudioPlayer();
 
   const {
     messages,
@@ -71,7 +76,7 @@ export default function VoiceChat() {
     clearVoiceRecognizingMessages,
   } = useChatMessages();
 
-  const {scaleAnim, startPulseAnimation, stopPulseAnimation} =
+  const { scaleAnim, startPulseAnimation, stopPulseAnimation } =
     usePulseAnimation();
 
   const {
@@ -101,6 +106,37 @@ export default function VoiceChat() {
   const [isNavigatingAway, setIsNavigatingAway] = useState(false);
   const [isImageAnalysisInProgress, setIsImageAnalysisInProgress] =
     useState(false);
+
+  // 키보드 이벤트 리스너 설정
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        setKeyboardVisible(true);
+        setKeyboardHeight(e.endCoordinates.height);
+
+        // 키보드가 표시되면 즉시 스크롤을 아래로 이동
+        if (flatListRef.current && messages.length > 0) {
+          setTimeout(() => {
+            flatListRef.current.scrollToEnd({ animated: true });
+          }, 100);
+        }
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, [messages.length]);
 
   // 웰컴 오디오 저장 함수
   const saveWelcomeAudio = async (base64Audio, audioFormat = 'mp3') => {
@@ -163,7 +199,7 @@ export default function VoiceChat() {
         console.log('[CHAT] 앱이 백그라운드로 전환됨');
         // 앱이 포그라운드에서 백그라운드로 갈 때
         cleanupAudio(); // 오디오 재생 중지
-        Voice.cancel().catch(() => {}); // 음성 인식 중지
+        Voice.cancel().catch(() => { }); // 음성 인식 중지
       }
 
       appStateRef.current = nextAppState;
@@ -179,18 +215,17 @@ export default function VoiceChat() {
     useCallback(() => {
       console.log('[CHAT] 화면 포커스 얻음');
 
-          console.log('[CHAT] 현재 route.params:', JSON.stringify(route.params, null, 2));
-
+      console.log('[CHAT] 현재 route.params:', JSON.stringify(route.params, null, 2));
 
       // 화면으로 돌아왔을 때 네비게이션 플래그 해제
       setIsNavigatingAway(false);
 
       // 🆕 루틴 등록에서 약 선택 후 돌아온 경우 처리
       const { selectedMedicineName, fromRoutineRegistration, timestamp } = route.params || {};
-      
+
       if (fromRoutineRegistration && selectedMedicineName && timestamp) {
         console.log('[CHAT] 루틴 등록에서 선택된 약:', selectedMedicineName);
-        
+
         // 파라미터 즉시 초기화 (중복 실행 방지)
         navigation.setParams({
           selectedMedicineName: null,
@@ -210,7 +245,7 @@ export default function VoiceChat() {
         () => {
           // 오디오 및 음성 인식 정리
           cleanupAudio();
-          Voice.cancel().catch(() => {});
+          Voice.cancel().catch(() => { });
           stopPulseAnimation();
           return false; // 기본 뒤로가기 동작 허용
         },
@@ -222,7 +257,7 @@ export default function VoiceChat() {
 
         // 화면 이탈 시 정리
         cleanupAudio();
-        Voice.cancel().catch(() => {});
+        Voice.cancel().catch(() => { });
         stopPulseAnimation();
       };
     }, [route.params]),
@@ -385,7 +420,7 @@ export default function VoiceChat() {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       // route.params에서 사진 URI 및 기타 데이터 확인
-      const {photoUri, isPrescription, actionType, timestamp, photoProcessed} =
+      const { photoUri, isPrescription, actionType, timestamp, photoProcessed } =
         route.params || {};
 
       // photoProcessed 플래그가 있는 경우에만 처리
@@ -402,7 +437,7 @@ export default function VoiceChat() {
         console.log('[CHAT] 이미지 분석 상태 설정됨 - 음성 인식 차단');
 
         // 현재 진행 중인 음성 인식 강제 중지
-        Voice.cancel().catch(() => {});
+        Voice.cancel().catch(() => { });
         cleanupAudio();
         stopPulseAnimation();
         reset('이미지 분석 중...');
@@ -420,7 +455,7 @@ export default function VoiceChat() {
         // 스크롤 처리
         setTimeout(() => {
           if (flatListRef.current) {
-            flatListRef.current.scrollToEnd({animated: true});
+            flatListRef.current.scrollToEnd({ animated: true });
           }
         }, 50);
 
@@ -499,7 +534,7 @@ export default function VoiceChat() {
       }
 
       // 4. 응답 처리
-      const {text, filePath, action, data} = response;
+      const { text, filePath, action, data } = response;
 
       // 5. 최소 대기 시간 설정
       const responseTime = Date.now() - startTime;
@@ -513,7 +548,7 @@ export default function VoiceChat() {
       // 스크롤 처리
       setTimeout(() => {
         if (flatListRef.current) {
-          flatListRef.current.scrollToEnd({animated: true});
+          flatListRef.current.scrollToEnd({ animated: true });
         }
       }, 50);
 
@@ -532,7 +567,7 @@ export default function VoiceChat() {
         // 액션 처리를 지연시켜서 음성 재생이 완료된 후 실행
         setTimeout(
           () => {
-            handleClientAction(action, navigation, {data, voiceControls});
+            handleClientAction(action, navigation, { data, voiceControls });
           },
           filePath ? 5000 : 1000,
         ); // 음성이 있으면 5초, 없으면 1초 후
@@ -584,9 +619,8 @@ export default function VoiceChat() {
             const handleAudio = async () => {
               try {
                 const timestamp = Date.now();
-                const filePath = `${
-                  RNFS.CachesDirectoryPath
-                }/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
+                const filePath = `${RNFS.CachesDirectoryPath
+                  }/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
                 await RNFS.writeFile(filePath, message.audio_base64, 'base64');
                 playAudioWithCompletion(filePath);
               } catch (error) {
@@ -635,9 +669,8 @@ export default function VoiceChat() {
             const handleAudio = async () => {
               try {
                 const timestamp = Date.now();
-                const filePath = `${
-                  RNFS.CachesDirectoryPath
-                }/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
+                const filePath = `${RNFS.CachesDirectoryPath
+                  }/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
                 await RNFS.writeFile(filePath, message.audio_base64, 'base64');
                 console.log('[CHAT] 알약 분석 결과 음성 재생 시작 (자체 처리)');
                 playAudioWithCompletion(filePath);
@@ -668,9 +701,8 @@ export default function VoiceChat() {
           const handleAudio = async () => {
             try {
               const timestamp = Date.now();
-              const filePath = `${
-                RNFS.CachesDirectoryPath
-              }/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
+              const filePath = `${RNFS.CachesDirectoryPath
+                }/voice_response_${timestamp}.${message.audio_format || 'mp3'}`;
               await RNFS.writeFile(filePath, message.audio_base64, 'base64');
               playAudioWithCompletion(filePath);
             } catch (error) {
@@ -714,7 +746,7 @@ export default function VoiceChat() {
   // 사용자 정보 가져오기
   const fetchUserInfo = async () => {
     try {
-      const {data} = await getUser();
+      const { data } = await getUser();
       const name = data?.body?.name || '사용자';
       setUserName(name);
     } catch (error) {
@@ -825,7 +857,7 @@ export default function VoiceChat() {
   useEffect(() => {
     if (messages.length > 0 && flatListRef.current) {
       setTimeout(() => {
-        flatListRef.current.scrollToEnd({animated: true});
+        flatListRef.current.scrollToEnd({ animated: true });
       }, 100);
     }
   }, [messages]);
@@ -900,7 +932,7 @@ export default function VoiceChat() {
 
       // 메시지 전송 및 응답 처리
       const response = await sendMessage(text);
-      const {text: responseText, filePath, action, data} = response;
+      const { text: responseText, filePath, action, data } = response;
 
       // 응답 메시지 업데이트 - 즉시 타이핑 상태 해제
       finishTypingMessage(typingMsgId, responseText, DEFAULT_BOT_OPTIONS);
@@ -937,7 +969,7 @@ export default function VoiceChat() {
 
       // 액션 처리
       if (action) {
-        handleClientAction(action, navigation, {data, voiceControls});
+        handleClientAction(action, navigation, { data, voiceControls });
       }
 
       // 상태 초기화
@@ -975,7 +1007,7 @@ export default function VoiceChat() {
     try {
       // 메시지 전송 및 응답 처리
       const response = await sendMessage(userMessage);
-      const {text: responseText, filePath, action, data} = response;
+      const { text: responseText, filePath, action, data } = response;
 
       // 타이핑 메시지를 실제 메시지로 교체
       finishTypingMessage(typingMsgId, responseText, DEFAULT_BOT_OPTIONS);
@@ -987,7 +1019,7 @@ export default function VoiceChat() {
 
       // 액션 처리
       if (action) {
-        handleClientAction(action, navigation, {data, voiceControls});
+        handleClientAction(action, navigation, { data, voiceControls });
       }
     } catch (error) {
       console.error('[VOICE] 메시지 전송 오류:', error);
@@ -1002,7 +1034,7 @@ export default function VoiceChat() {
 
   // 채팅 모드 전환 (텍스트 <-> 음성)
   const toggleChatMode = () => {
-    Voice.cancel().catch(() => {});
+    Voice.cancel().catch(() => { });
     stopPulseAnimation();
 
     if (chatMode === 'text') {
@@ -1049,7 +1081,7 @@ export default function VoiceChat() {
         response = await sendMessage(option);
       }
 
-      const {text, filePath, action, data} = response;
+      const { text, filePath, action, data } = response;
       finishTypingMessage(typingMsgId, text, DEFAULT_BOT_OPTIONS);
 
       // 음성 재생 (수정된 함수 사용)
@@ -1064,7 +1096,7 @@ export default function VoiceChat() {
       }
 
       if (action) {
-        handleClientAction(action, navigation, {data, voiceControls});
+        handleClientAction(action, navigation, { data, voiceControls });
       }
 
       reset();
@@ -1083,12 +1115,12 @@ export default function VoiceChat() {
   const handleSelectedMedicineFromRoutine = async (medicineName) => {
     try {
       console.log('[CHAT] 선택된 약으로 루틴 등록 메시지 전송:', medicineName);
-      
+
       // 현재 진행 중인 음성 인식이나 오디오 정리
-      Voice.cancel().catch(() => {});
+      Voice.cancel().catch(() => { });
       cleanupAudio();
       stopPulseAnimation();
-      
+
       // 사용자 메시지 추가 (선택된 약 이름으로)
       const userMessage = `${medicineName}로 루틴을 등록하고 싶어요`;
       addMessage(userMessage, 'user');
@@ -1099,7 +1131,7 @@ export default function VoiceChat() {
       try {
         // 서버에 메시지 전송
         const response = await sendMessage(userMessage);
-        const {text: responseText, filePath, action, data} = response;
+        const { text: responseText, filePath, action, data } = response;
 
         // 응답 메시지 업데이트
         finishTypingMessage(typingMsgId, responseText, DEFAULT_BOT_OPTIONS);
@@ -1126,7 +1158,7 @@ export default function VoiceChat() {
 
         // 액션 처리
         if (action) {
-          handleClientAction(action, navigation, {data, voiceControls});
+          handleClientAction(action, navigation, { data, voiceControls });
         }
 
       } catch (error) {
@@ -1156,7 +1188,7 @@ export default function VoiceChat() {
   };
 
   // 메시지 렌더링 함수
-  const renderMessage = ({item}) => {
+  const renderMessage = ({ item }) => {
     return <MessageBubble item={item} onOptionPress={handleBotOptionPress} />;
   };
 
@@ -1164,46 +1196,27 @@ export default function VoiceChat() {
   const VOICE_UI_HEIGHT = 180; // 음성 UI의 대략적인 높이 (조정 필요)
   const SCROLL_PADDING = 20; // 추가 여백
 
-  // FlatList 참조 생성 및 사용자 정의 스크롤 함수
-  const scrollToBottom = (animated = true) => {
-    if (flatListRef.current && messages.length > 0) {
-      // 음성 모드일 때는 마이크 UI 높이를 고려해 더 위로 스크롤
-      if (chatMode === 'voice') {
-        flatListRef.current.scrollToOffset({
-          offset: 999999, // 충분히 큰 값으로 먼저 스크롤
-          animated: false,
-        });
-
-        // 짧은 지연 후 정확한 위치로 조정 (레이아웃 계산을 위해)
-        setTimeout(() => {
-          flatListRef.current.scrollToOffset({
-            offset: 999999 - VOICE_UI_HEIGHT - SCROLL_PADDING,
-            animated,
-          });
-        }, 50);
-      } else {
-        // 일반 텍스트 모드일 때는 완전히 아래로 스크롤
-        flatListRef.current.scrollToEnd({animated});
-      }
+  // 패딩 계산 함수 수정
+  const calculateBottomPadding = () => {
+    if (chatMode === 'voice') {
+      return VOICE_UI_HEIGHT + SCROLL_PADDING;
     }
+
+    // 안드로이드에서만 키보드 표시 시 추가 패딩 적용
+    // iOS는 KeyboardAvoidingView가 처리하므로 기본 패딩만 사용
+    if (Platform.OS === 'android' && keyboardVisible) {
+      return 40; // 안드로이드에서 키보드 표시 시 더 큰 패딩
+    }
+
+    return 16; // 기본 패딩
   };
-
-  // 메시지 추가, 처리 완료, 채팅 모드 변경 시 스크롤 재조정
-  useEffect(() => {
-    // 메시지가 추가되거나 타이핑이 완료되었을 때 스크롤
-    if (messages.length > 0) {
-      // 약간의 지연으로 레이아웃이 업데이트된 후 스크롤
-      setTimeout(() => {
-        scrollToBottom(true);
-      }, 100);
-    }
-  }, [messages, chatMode, isTyping]);
 
   return (
     <Container>
       <KeyboardAvoidingView
-        style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : null} // 안드로이드에서는 null로 설정
+        keyboardVerticalOffset={0}>
         <Header
           hideBorder="true"
           transparentBg="true"
@@ -1223,15 +1236,18 @@ export default function VoiceChat() {
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={{
             padding: 16,
-            paddingBottom:
-              chatMode === 'voice' ? VOICE_UI_HEIGHT + SCROLL_PADDING : 16,
+            paddingBottom: calculateBottomPadding(), // 동적 패딩 계산 함수 사용
           }}
           showsVerticalScrollIndicator={false}
           onContentSizeChange={() => {
-            scrollToBottom(true);
+            if (flatListRef.current) {
+              flatListRef.current.scrollToEnd({ animated: true });
+            }
           }}
           onLayout={() => {
-            scrollToBottom(false);
+            if (flatListRef.current) {
+              flatListRef.current.scrollToEnd({ animated: false });
+            }
           }}
         />
 
@@ -1243,7 +1259,7 @@ export default function VoiceChat() {
             scaleAnim={scaleAnim}
             fontSizeMode={fontSizeMode}
             onSwitchToTextMode={() => {
-              Voice.cancel().catch(() => {});
+              Voice.cancel().catch(() => { });
               stopPulseAnimation();
               clearVoiceRecognizingMessages();
               setStatus('idle');
@@ -1265,7 +1281,7 @@ export default function VoiceChat() {
           />
         )}
       </KeyboardAvoidingView>
-      <View style={{width: '100%', height: 20}} />
+      <View style={{ width: '100%', height: Platform.OS === 'android' ? 0 : 20 }} />
     </Container>
   );
 }
@@ -1273,8 +1289,8 @@ export default function VoiceChat() {
 // 스타일 정의
 const Container = styled(LinearGradient).attrs({
   colors: [themes.light.pointColor.PrimaryDark, '#000000'],
-  start: {x: 0, y: 0},
-  end: {x: 0, y: 1},
+  start: { x: 0, y: 0 },
+  end: { x: 0, y: 1 },
 })`
   flex: 1;
 `;

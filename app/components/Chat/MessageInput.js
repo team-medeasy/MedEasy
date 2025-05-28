@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components/native';
-import {TextInput, TouchableOpacity, View} from 'react-native';
-import {themes} from '../../styles';
-import {ChatIcons} from '../../../assets/icons';
+import { TextInput, TouchableOpacity, Platform, View } from 'react-native';
+import { themes } from '../../styles';
+import { ChatIcons } from '../../../assets/icons';
 import FontSizes from '../../../assets/fonts/fontSizes';
-import {useFontSize} from '../../../assets/fonts/FontSizeContext';
+import { useFontSize } from '../../../assets/fonts/FontSizeContext';
 
-const {voice: VoiceIcon, mike: MikeIcon, send: SendIcon} = ChatIcons;
+const { voice: VoiceIcon, mike: MikeIcon, send: SendIcon } = ChatIcons;
 
 const MessageInput = ({
   inputText,
@@ -15,7 +15,8 @@ const MessageInput = ({
   toggleVoiceMode,
   onVoicePress,
 }) => {
-  const {fontSizeMode} = useFontSize();
+  const { fontSizeMode } = useFontSize();
+  const isIOS = Platform.OS === 'ios';
 
   return (
     <InputContainer>
@@ -32,26 +33,30 @@ const MessageInput = ({
           <SendIcon
             width={18}
             height={18}
-            style={{color: 'rgba(255, 255, 255, 0.6)'}}
+            style={{ color: 'rgba(255, 255, 255, 0.6)' }}
           />
         </SendButton>
       </TextInputContainer>
-      <VoiceIconContainer
-        onPress={() => {
-          if (onVoicePress) onVoicePress(); // isTyping false 등
-          toggleVoiceMode(); // 기존 음성 모드 전환
-        }}>
-        <VoiceIcon
-          width={44}
-          height={44}
-          style={{color: 'rgba(255, 255, 255, 0.6)'}}
-        />
-      </VoiceIconContainer>
+
+      {/* iOS에서만 음성 버튼 표시 */}
+      {isIOS && (
+        <VoiceIconContainer
+          onPress={() => {
+            if (onVoicePress) onVoicePress(); // isTyping false 등
+            toggleVoiceMode(); // 기존 음성 모드 전환
+          }}>
+          <VoiceIcon
+            width={44}
+            height={44}
+            style={{ color: 'rgba(255, 255, 255, 0.6)' }}
+          />
+        </VoiceIconContainer>
+      )}
     </InputContainer>
   );
 };
 
-// 스타일 정의
+// 스타일 정의는 같음
 const InputContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
@@ -92,7 +97,7 @@ const Input = styled(TextInput)`
   flex: 1;
   padding-left: 15px;
   padding-right: 10px;
-  font-size: ${({fontSizeMode}) => FontSizes.body[fontSizeMode]};
+  font-size: ${({ fontSizeMode }) => FontSizes.body[fontSizeMode]};
   max-height: 100px;
   font-family: 'Pretendard-semiBold';
   padding-top: 5px;
