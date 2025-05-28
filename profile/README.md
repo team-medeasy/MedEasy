@@ -29,7 +29,7 @@ TestFlight를 통해 설치하고 복약 관리 기능을 먼저 경험해보세
 <div align="center">
 
 [![TestFlight](https://img.shields.io/badge/TestFlight-0A84FF?style=for-the-badge&logo=apple&logoColor=white)](https://testflight.apple.com/join/Ra98ySDU)  
-[![TestFlight QR](docs/testflight_qr.png)](https://testflight.apple.com/join/Ra98ySDU)
+[![TestFlight QR](docs/testflight.png)](https://testflight.apple.com/join/Ra98ySDU)
 
 </div>
 
