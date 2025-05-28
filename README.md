@@ -6,8 +6,6 @@
     
 [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/medeasy.dev)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:team.medeasy@gmail.com)
-[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store)
-[![App Store](https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com)
 [![Website](https://img.shields.io/badge/Homepage-000000?style=for-the-badge&logo=homeadvisor&logoColor=white)](https://medeasy.dev)
 
 </div>
@@ -20,6 +18,20 @@
 > 복약 누락 시 **보호자에게 실시간 알림**을 보내고, **보호자 계정과의 연동**을 통해 피보호자의 복약 상태를 원격으로 모니터링할 수 있다.
 > 
 > 또한 95% 이상의 정확도로 **알약 이미지 검색**이 가능해 약에 대한 정보가 부족하거나 시각적 구분이 어려운 사용자도 의약품 정보를 쉽게 확인할 수 있다.
+
+---
+
+## 📱 지금 메디지를 먼저 사용해보세요
+
+정식 출시 전 메디지를 iPhone에서 미리 체험할 수 있어요.  
+TestFlight를 통해 설치하고 복약 관리 기능을 먼저 경험해보세요.
+
+<div align="center">
+
+[![TestFlight](https://img.shields.io/badge/TestFlight-0A84FF?style=for-the-badge&logo=apple&logoColor=white)](https://testflight.apple.com/join/Ra98ySDU)  
+[![TestFlight QR](docs/testflight.png)](https://testflight.apple.com/join/Ra98ySDU)
+
+</div>
 
 ---
 
