@@ -7,6 +7,7 @@
 [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/medeasy.dev)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:team.medeasy@gmail.com)
 [![Website](https://img.shields.io/badge/Homepage-000000?style=for-the-badge&logo=homeadvisor&logoColor=white)](https://medeasy.dev)
+[![Youtube](https://img.shields.io/badge/YouTube-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/zXe52k8U_ac)
 
 </div>
 
