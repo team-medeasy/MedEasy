@@ -1,9 +1,9 @@
 # 💊 메디지(MedEasy) - 디지털 소외 계층을 위한 대화형 복약 어플리케이션
 ![Cover](docs/cover.png)
 
-
 <div align="center">
-    
+
+![Award](https://img.shields.io/badge/2025-한성대학교%20캡스톤디자인%20모바일부문%20장려상-brightgreen?style=for-the-badge&logo=trophy) <br>
 [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/medeasy.dev)
 [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:team.medeasy@gmail.com)
 [![Website](https://img.shields.io/badge/Homepage-000000?style=for-the-badge&logo=homeadvisor&logoColor=white)](https://medeasy.dev)
