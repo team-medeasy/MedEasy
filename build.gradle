@@ -82,3 +82,23 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// NCP Source Build용 빌드 태스크 (테스트 제외)
+tasks.register('buildForNcp') {
+	group = 'build'
+	description = 'Build for NCP Source Build without requiring environment variables'
+	dependsOn 'clean', 'assemble'
+	
+	doFirst {
+		// build 프로파일로 설정
+		System.setProperty('spring.profiles.active', 'build')
+	}
+}
+
+// bootJar 태스크 설정
+bootJar {
+	// 기본 프로파일이 없을 때 build 프로파일 사용
+	if (!System.getProperty('spring.profiles.active')) {
+		systemProperties 'spring.profiles.active': 'build'
+	}
+}
