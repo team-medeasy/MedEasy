@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medeasy-mcp-server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medeasy-mcp-server-app
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+
+  template:
+    metadata:
+      labels:
+        app: medeasy-mcp-server-app
+    spec:
+      imagePullSecrets:
+        - name: ncp-container-registry-secret
+      containers:
+        - name: medeasy-mcp-server-container
+          image: medesay-registry.kr.ncr.ntruss.com/medeasy-mcp-server:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: medeasy-mcp-server-secret

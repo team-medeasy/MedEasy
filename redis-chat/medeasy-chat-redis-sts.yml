@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: medeasy-chat-redis-sts
+
+spec:
+  serviceName: medeasy-chat-redis-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medeasy-chat-redis
+  template:
+    metadata:
+      labels:
+        app: medeasy-chat-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.0.10
+          ports:
+            - containerPort: 6379
+              name: redis
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: medeasy-chat-redis-secret
+                  key: redis-password
+
+            - name: REDISCLI_AUTH  # redis-cli가 자동으로 사용
+              valueFrom:
+                secretKeyRef:
+                  name: medeasy-chat-redis-secret
+                  key: redis-password
+
+          command:
+            - /bin/sh
+            - -c
+            - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+          volumeMounts:
+            - name: chat-redis-data
+              mountPath: /data
+            - name: medeasy-chat-redis-configmap
+              mountPath: /usr/local/etc/redis/redis.conf
+              subPath: medeasy-chat-redis.conf
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: medeasy-chat-redis-configmap
+          configMap:
+            name: medeasy-chat-redis-configmap
+        - name: chat-redis-data
+          persistentVolumeClaim:
+            claimName: chat-redis-data-pvc

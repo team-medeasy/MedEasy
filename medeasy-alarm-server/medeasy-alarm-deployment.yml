@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: medeasy-alarm-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medeasy-alarm-app
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+
+  template:
+    metadata:
+      labels:
+        app: medeasy-alarm-app
+
+    spec:
+      imagePullSecrets:
+        - name: ncp-container-registry-secret
+      containers:
+        - name: medeasy-alarm-container
+          image: medesay-registry.kr.ncr.ntruss.com/medeasy-alarm:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: medeasy-main-secret
+
+          volumeMounts:
+            - mountPath: /app/logs
+              name: alarm-log-volume
+
+            - mountPath: /secrets/firebase
+              name: firebase-secret
+              readOnly: true
+
+      volumes:
+        - name: alarm-log-volume
+          hostPath:
+            path: /home/ubuntu/alarm-logs
+            type: DirectoryOrCreate
+
+        - name: firebase-secret
+          secret:
+            secretName: medeasy-fcm-secret
