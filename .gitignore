@@ -1,3 +1,5 @@
+setenv.bat
+setenv.ps1
 docker-compose.yml
 
 .DS_Store
