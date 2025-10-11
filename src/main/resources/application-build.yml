@@ -1,0 +1,87 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 4MB
+      max-request-size: 4MB
+  data:
+    elasticsearch:
+      repositories:
+        enabled: false  # 빌드시 ES 연결 비활성화
+      url: localhost:9200
+      host: localhost
+      port: 9200
+      password: dummy
+
+    redis:
+      host: localhost
+      port: 6379
+
+  datasource:
+    url: jdbc:h2:mem:testdb  # 빌드용 인메모리 DB
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 인메모리 DB용 설정
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        default_schema: public
+        jdbc.batch_size: 30
+        order_inserts: true
+        order_updates: true
+        show_sql: false  # 빌드시 로그 최소화
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dummy@gmail.com
+    password: dummy
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+springdoc:
+  swagger-ui:
+    path: /api/swagger
+
+token:
+  secret:
+    key: dummySecretKeyForBuildOnlyNotForProduction123456789
+  access-token:
+    plus-hour: 24
+  refresh-token:
+    plus-hour: 168
+
+redis:
+  jwt:
+    host: localhost
+    port: 6379
+    password: dummy
+  alarm:
+    host: localhost
+    port: 6379
+    password: dummy
+
+ocr:
+  api:
+    url: http://dummy-ocr-api.com
+  secret: dummy-secret
+
+gemini:
+  api:
+    key: dummy-gemini-key
+    url: https://dummy-gemini-api.com
+
+kakao:
+  api:
+    user-info-uri: https://dummy-kakao-api.com
+
+tts:
+  output-dir: /tmp/tts
+
+apple:
+  client-id: dummy.client.id
+  team-id: DUMMY123
+  key-id: DUMMY456
+  private-key-path: /tmp/dummy-key.p8

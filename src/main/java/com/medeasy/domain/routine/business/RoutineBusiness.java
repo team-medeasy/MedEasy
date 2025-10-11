@@ -258,6 +258,7 @@ public class RoutineBusiness {
         }
 
         if (allTaken) {
+            log.info("알약 복용 체크 이벤트 저장");
             routineEventService.publishRoutineCheckEvent(userId, targetRoutine.getUserSchedule().getName());
         }
 
