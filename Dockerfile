@@ -3,11 +3,6 @@ FROM gradle:8.5-jdk21 AS builder
 
 RUN echo "🔍 Before Checking JAVA_HOME: $JAVA_HOME" && ls -al $JAVA_HOME || echo "not found" && which java || echo "java missing"
 
-# ncp source build 환경변수 사용
-ARG JAVA_HOME_OVERRIDE=/usr/lib/jvm/jdk-21.0.1
-ENV JAVA_HOME=${JAVA_HOME_OVERRIDE}
-ENV PATH=$JAVA_HOME/bin:$PATH
-
 RUN echo "🔍 After Checking JAVA_HOME: $JAVA_HOME" && ls -al $JAVA_HOME || echo "not found" && which java || echo "java missing"
 
 WORKDIR /app
