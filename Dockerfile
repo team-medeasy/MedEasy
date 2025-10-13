@@ -4,7 +4,7 @@ FROM gradle:8.5-jdk21 AS builder
 RUN echo "🔍 Before Checking JAVA_HOME: $JAVA_HOME" && ls -al $JAVA_HOME || echo "not found" && which java || echo "java missing"
 
 # ncp source build 환경변수 덮어쓰기
-ARG JAVA_HOME=/opt/java/openjdk
+ARG JAVA_HOME=/usr/lib/jvm/jdk-21.0.1
 ENV JAVA_HOME=${JAVA_HOME}
 ENV PATH=$JAVA_HOME/bin:$PATH
 
