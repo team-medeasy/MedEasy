@@ -1,6 +1,11 @@
 # ======== 1단계: Build Stage ========
 FROM gradle:8.5-jdk21 AS builder
 
+# ncp source build 환경변수 덮어쓰기
+ARG JAVA_HOME=/opt/java/openjdk
+ENV JAVA_HOME=${JAVA_HOME}
+ENV PATH=$JAVA_HOME/bin:$PATH
+
 WORKDIR /app
 
 COPY . .
