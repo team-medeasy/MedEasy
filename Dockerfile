@@ -3,6 +3,13 @@ FROM gradle:8.5-jdk21 AS builder
 
 RUN echo "🔍 Before Checking JAVA_HOME: $JAVA_HOME" && ls -al $JAVA_HOME || echo "not found" && which java || echo "java missing"
 
+RUN unset JAVA_HOME && \
+    export JAVA_HOME=/opt/java/openjdk && \
+    export PATH=$JAVA_HOME/bin:$PATH && \
+    echo "JAVA_HOME=$JAVA_HOME" && \
+    ls -al $JAVA_HOME/bin && \
+    which java && java -version
+
 RUN echo "🔍 After Checking JAVA_HOME: $JAVA_HOME" && ls -al $JAVA_HOME || echo "not found" && which java || echo "java missing"
 
 WORKDIR /app
