@@ -8,7 +8,7 @@ COPY . .
 # 캐시를 활용한 build 속도 최적화
 RUN ./gradlew clean build -x test
 
- ======== 2단계: Run Stage ========
+# ======== 2단계: Run Stage ========
 FROM eclipse-temurin:21-jre as runtime
 
 WORKDIR /app
