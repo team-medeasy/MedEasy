@@ -5,14 +5,15 @@ WORKDIR /app
 
 COPY . .
 
-# 디버그용: 자바 경로 확인
-RUN java --version || echo "java not found"
-RUN which java || echo "which java failed"
-RUN ls -R /usr/lib/jvm || echo "no jvm dir"
-RUN ls -R /opt/java || echo "no /opt/java dir"
+# gradlew 실행 권한 부여 (중요)
+RUN chmod +x gradlew
 
-# 메모리 제한 방지를 위해 Gradle 데몬 비활성화
-RUN ./gradlew --no-daemon clean build -x test
+# JAVA_HOME은 올바르지만 PATH가 무시될 수 있으므로 직접 export
+RUN export JAVA_HOME=/opt/java/openjdk && \
+    export PATH=$JAVA_HOME/bin:$PATH && \
+    echo "JAVA_HOME=$JAVA_HOME" && \
+    java --version && \
+    ./gradlew --no-daemon clean build -x test
 
 # ======== 2단계: Run Stage ========
 FROM eclipse-temurin:21-jre as runtime
