@@ -5,6 +5,9 @@ WORKDIR /app
 
 COPY . .
 
+ENV JAVA_HOME=/usr/local/openjdk-21
+ENV PATH=$JAVA_HOME/bin:$PATH
+
 # 캐시를 활용한 build 속도 최적화
 RUN ./gradlew clean build -x test
 
