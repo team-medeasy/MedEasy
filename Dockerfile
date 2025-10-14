@@ -5,9 +5,12 @@ WORKDIR /app
 
 COPY . .
 
-RUN export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java)))) && \
-    echo "JAVA_HOME set to $JAVA_HOME" && \
-    ./gradlew clean build -x test
+# JAVA_HOME을 명시적으로 설정 (gradle 공식 이미지 경로)
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# 메모리 제한 방지를 위해 Gradle 데몬 비활성화
+RUN ./gradlew --no-daemon clean build -x test
 
 # ======== 2단계: Run Stage ========
 FROM eclipse-temurin:21-jre as runtime
