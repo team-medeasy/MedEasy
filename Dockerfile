@@ -5,9 +5,11 @@ WORKDIR /app
 
 COPY . .
 
-# JAVA_HOME을 명시적으로 설정 (gradle 공식 이미지 경로)
-ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH=$JAVA_HOME/bin:$PATH
+# 디버그용: 자바 경로 확인
+RUN java --version || echo "java not found"
+RUN which java || echo "which java failed"
+RUN ls -R /usr/lib/jvm || echo "no jvm dir"
+RUN ls -R /opt/java || echo "no /opt/java dir"
 
 # 메모리 제한 방지를 위해 Gradle 데몬 비활성화
 RUN ./gradlew --no-daemon clean build -x test
