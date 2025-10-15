@@ -7,7 +7,7 @@ ENV TZ=Asia/Seoul
 
 COPY . .
 
-RUN apt-get update && apt-get install -y findutils
+RUN RUN yum install -y findutils
 
 RUN chmod +x gradlew && ./gradlew clean build -x test -Dspring.profiles.active=build
 
