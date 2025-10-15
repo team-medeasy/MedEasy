@@ -4,8 +4,8 @@ FROM python:3.11-slim AS builder
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --upgrade pip \
- && pip install --prefix=/install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip --progress-bar=off \
+ && pip install --prefix=/install --no-cache-dir --progress-bar=off -r requirements.txt
 
 # ====== 2단계: 런타임 환경 ======
 FROM python:3.11-slim
