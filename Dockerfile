@@ -7,14 +7,11 @@ ENV TZ=Asia/Seoul
 
 COPY . .
 
-RUN RUN yum install -y findutils
+RUN yum install -y findutils
 
 RUN chmod +x gradlew && ./gradlew clean build -x test -Dspring.profiles.active=build
 
 RUN cp /app/build/libs/*SNAPSHOT.jar app.jar
-
-# 빌드 결과 JAR 복사
-COPY build/libs/*SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
