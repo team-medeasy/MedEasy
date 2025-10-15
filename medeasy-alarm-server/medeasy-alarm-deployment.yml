@@ -26,7 +26,7 @@ spec:
         - name: ncp-container-registry-secret
       containers:
         - name: medeasy-alarm-container
-          image: medesay-registry.kr.ncr.ntruss.com/medeasy-alarm:latest
+          image: medeasy-registry.kr.ncr.ntruss.com/medeasy-alarm:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
