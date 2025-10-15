@@ -27,6 +27,7 @@ spec:
       containers:
         - name: medeasy-main-container
           image: medeasy-registry.kr.ncr.ntruss.com/medeasy-main:latest
+          command: ["java", "-jar", "/app/app.jar"]
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

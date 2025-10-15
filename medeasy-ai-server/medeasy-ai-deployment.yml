@@ -24,6 +24,7 @@ spec:
       containers:
         - name: medeasy-ai-container
           image: medeasy-registry.kr.ncr.ntruss.com/medeasy-ai:latest
+          command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
