@@ -1,17 +1,18 @@
-FROM openjdk:21
+FROM gradle:8.5-jdk21 AS builder
 
 WORKDIR /app
 
-# 한국 시간대 설정
-ENV TZ=Asia/Seoul
-
 COPY . .
-
-RUN yum install -y findutils
 
 RUN chmod +x gradlew && ./gradlew clean build -x test -Dspring.profiles.active=build
 
-RUN cp /app/build/libs/*SNAPSHOT.jar app.jar
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/*SNAPSHOT.jar app.jar
+
+ENV TZ=Asia/Seoul
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
