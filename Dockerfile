@@ -4,9 +4,11 @@ WORKDIR /app
 
 COPY . .
 
+RUN pwd
+
 RUN ls -al
 
-RUN ls -al /build/libs
+RUN ls -al build/libs
 
 COPY build/libs/medeasy-*SNAPSHOT.jar app.jar
 
