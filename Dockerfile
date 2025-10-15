@@ -1,15 +1,15 @@
-FROM openjdk:21 as runtime
+FROM openjdk:21
 
 WORKDIR /app
 
 # 한국 시간대 설정
 ENV TZ=Asia/Seoul
 
-RUN ls -al
-RUN pwd
+COPY . .
 
-RUN ls -al /app/
-RUN ls -al /build/
+RUN chmod +x gradlew && ./gradlew clean build -x test -Dspring.profiles.active=build
+
+RUN cp /app/build/libs/*SNAPSHOT.jar app.jar
 
 # 빌드 결과 JAR 복사
 COPY build/libs/*SNAPSHOT.jar app.jar
