@@ -13,11 +13,13 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Node.js와 npm 설치 추가
-RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
-    apt-get update && apt-get install -y curl \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
+RUN rm -f /etc/apt/apt.conf.d/docker-clean \
+     && apt-get update \
+     && apt-get install -y --no-install-recommends curl \
+     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+     && apt-get install -y --no-install-recommends nodejs \
+     && apt-get clean \
+     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /install /usr/local
 
