@@ -1,16 +1,14 @@
-FROM gradle:8.5-jdk21 AS builder
+FROM openjdk:21
 
 WORKDIR /app
 
 COPY . .
 
-RUN chmod +x gradlew && ./gradlew clean build -x test -Dspring.profiles.active=build
+RUN ls -al
 
-FROM eclipse-temurin:21-jre
+RUN ls -al /build/libs
 
-WORKDIR /app
-
-COPY --from=builder /app/build/libs/*SNAPSHOT.jar app.jar
+COPY build/libs/medeasy-*SNAPSHOT.jar app.jar
 
 ENV TZ=Asia/Seoul
 
