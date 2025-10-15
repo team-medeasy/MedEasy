@@ -6,7 +6,7 @@ WORKDIR /app
 ENV TZ=Asia/Seoul
 
 # 빌드 결과 JAR 복사
-COPY build/libs/medeasy-*SNAPSHOT.jar app.jar
+COPY build/libs/*SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
