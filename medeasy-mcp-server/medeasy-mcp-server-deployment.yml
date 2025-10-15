@@ -23,7 +23,7 @@ spec:
         - name: ncp-container-registry-secret
       containers:
         - name: medeasy-mcp-server-container
-          image: medesay-registry.kr.ncr.ntruss.com/medeasy-mcp-server:latest
+          image: medeasy-registry.kr.ncr.ntruss.com/medeasy-mcp-server:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
