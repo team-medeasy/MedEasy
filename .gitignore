@@ -1,5 +1,6 @@
 /script
 .idea
+/secret
 
 gemini_config.json
 .env
