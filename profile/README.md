@@ -154,7 +154,7 @@ erDiagram
 
 | Profile | Name | Role | Contact |
 |----------------------|------|------|----------|
-| <img src="https://github.com/HONGMOEJI.png" width="50" height="50"> | 👑 홍영준 | Backend Developer | Email: moejihong@gmail.com<br>GitHub: [@HONGMOEJI](https://github.com/HONGMOEJI) |
+| <img src="https://github.com/HONGMOEJI.png" width="50" height="50"> | 👑 홍영준 | Backend Developer | Email: 00_1205@naver.com<br>GitHub: [@HONGMOEJI](https://github.com/HONGMOEJI) |
 | <img src="https://github.com/jiwonp7747.png" width="50" height="50"> | 박지원 | Backend Developer | Email: angry9908@gmail.com<br>GitHub: [@jiwonp7747](https://github.com/jiwonp7747) |
 | <img src="https://github.com/hyynjju.png" width="50" height="50"> | 조현주 | UX/UI / Frontend Developer | Email: hyynjju@gmail.com<br>GitHub: [@hyynjju](https://github.com/hyynjju) |
 | <img src="https://github.com/kimgazii.png" width="50" height="50"> | 김가영 | Frontend Developer | Email: gy0424ya@gmail.com <br>GitHub: [@kimgazii](https://github.com/kimgazii) |
