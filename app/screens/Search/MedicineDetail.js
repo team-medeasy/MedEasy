@@ -629,29 +629,17 @@ const styles = StyleSheet.create({
 const Usage = ({label, value = '', borderBottomWidth = 1, fontSizeMode}) => {
   const [expanded, setExpanded] = useState(false);
   const [shouldShowToggle, setShouldShowToggle] = useState(false);
-  const textRef = useRef(null);
+  const [measured, setMeasured] = useState(false);
 
-  // 컴포넌트 마운트 후 텍스트 길이 예상 계산
-  useEffect(() => {
-    // 텍스트 길이로 토글 버튼 표시 여부 결정
-    // 평균적으로 한 줄에 표시되는 글자 수를 고려하여 계산
-    const averageCharsPerLine = 30; // 화면 크기와 폰트에 따라 조정 필요
-    const estimatedLines = Math.ceil(value.length / averageCharsPerLine);
-    setShouldShowToggle(estimatedLines > 5);
-
-    // 실제 레이아웃 측정 시도 (iOS에서는 더 정확하게 작동)
-    if (Platform.OS === 'ios') {
-      setTimeout(() => {
-        if (textRef.current) {
-          textRef.current.measure((x, y, width, height) => {
-            const lineHeight = 26; // 라인 높이
-            const estimatedLinesFromHeight = Math.floor(height / lineHeight);
-            setShouldShowToggle(estimatedLinesFromHeight > 5);
-          });
-        }
-      }, 100);
+  // onTextLayout으로 실제 텍스트가 잘렸는지 확인
+  const handleTextLayout = (e) => {
+    if (!measured) {
+      const {lines} = e.nativeEvent;
+      // 실제 렌더링된 줄 수가 5줄을 초과하면 토글 버튼 표시
+      setShouldShowToggle(lines.length > 5);
+      setMeasured(true);
     }
-  }, [value]);
+  };
 
   return (
     <View
@@ -688,8 +676,8 @@ const Usage = ({label, value = '', borderBottomWidth = 1, fontSizeMode}) => {
 
       {/* 실제 표시되는 텍스트 */}
       <Text
-        ref={textRef}
-        numberOfLines={expanded ? undefined : 5}
+        numberOfLines={measured && !expanded ? 5 : undefined}
+        onTextLayout={handleTextLayout}
         style={{
           color: themes.light.textColor.Primary70,
           fontFamily: 'Pretendard-Medium',
