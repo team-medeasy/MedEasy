@@ -82,7 +82,7 @@ export const handleLogin = async credentials => {
   } catch (error) {
     console.error('로그인 실패:', error.response?.data || error.message);
 
-    if (error.response?.status === 401) {
+    if (error.response?.status === 400 || error.response?.status === 401) {
       alert('이메일 또는 비밀번호가 잘못되었습니다.');
     } else if (error.response?.status === 404) {
       alert('사용자를 찾을 수 없습니다.');

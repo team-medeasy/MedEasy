@@ -58,9 +58,13 @@ const PhotoPreviewScreen = () => {
     }
   }, [navigation]);
 
-  // 안드로이드 뒤로가기 버튼 처리
+  // 안드로이드 뒤로가기 버튼 처리 및 네비게이션 상태 리셋
   useFocusEffect(
     useCallback(() => {
+      // 화면에 다시 포커스가 돌아왔을 때 네비게이션 상태 리셋
+      console.log('[PhotoPreview] 화면 포커스, 네비게이션 상태 리셋');
+      setIsNavigating(false);
+
       const subscription = BackHandler.addEventListener(
         'hardwareBackPress',
         () => {
