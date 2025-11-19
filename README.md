@@ -32,7 +32,7 @@
 - **식약처 공공데이터 + 이미지 인식 + OCR**로 약 정보·병용금기·노인주의 정보를 신뢰성 있게 제공
 - **보호자 연동 + 푸시 알림**으로 고령자의 복약 누락·중복 복용 위험을 줄이고 돌봄 피로를 완화
 
-## 지금 메디지를 먼저 사용해보세요 (Try Now)
+## 지금 메디지를 먼저 사용해보세요
 
 정식 출시 전 iPhone에서 메디지를 미리 체험할 수 있습니다.  
 TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직접 경험해 보세요.
@@ -281,21 +281,21 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 
 ### 서비스 확장성 (Service Expansion)
 
-#### 01. AI 에이전트의 사용자 커스텀 기능 강화 (User Customization)
+#### 01. AI 에이전트의 사용자 커스텀 기능 강화
 - **현재 방식**: 단순히 대화를 저장하여 대화의 흐름을 유지하는 데 집중
 - **개선 방향**: 일정 주기로 대화 로그를 분석하여, 사용자 개인의 복약 패턴을 분석해 개인에게 맞는 AI 서비스를 제공
 
-#### 02. 알약 촬영 의약품 안전 검색 모드 추가 (Safe Search Mode)
+#### 02. 알약 촬영 의약품 안전 검색 모드 추가
 - **현재 방식**: 알약 사진 퀄리티에 따라 잘못된 결과 및 클릭 확인이 존재
 - **개선 방향**: 사용자가 이전에 복용, 검색, 조회하였던 의약품에 가중치를 주어 검색 결과 제공
 
 ### 시스템 확장성 (System Expansion)
 
-#### 03. AI 기능 특화 로드밸런싱 (AI Load Balancing)
+#### 03. AI 기능 특화 로드밸런싱
 - **현재 방식**: 요청을 균등하게 분배하는 일반 로드밸런싱 방식 사용
 - **개선 방향**: AI 작업 복잡도를 예측, 부하에 따라 균등하게 요청을 분배 → 컴퓨팅 자원 효율화
 
-#### 04. 관찰가능성 도입 (Observability)
+#### 04. 관찰가능성 도입
 - **현재 방식**: 서비스별로 로그 관리, 장애 발생 시 디버깅
 - **개선 방향**: 서비스의 로그, 트레이스, 메트릭 데이터에 식별자를 추가하고 연관하여 저장
 
@@ -303,8 +303,8 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 
 | Profile | Name | Role | Contact |
 |----------------------|------|------|----------|
-| <img src="[https://github.com/HONGMOEJI.png](https://github.com/HONGMOEJI.png)" width="50" height="50"> | 👑 홍영준 | Backend Developer | Email: moejihong@gmail.com<br>GitHub: [@HONGMOEJI](https://github.com/HONGMOEJI) |
-| <img src="https://github.com/jiwonp7747.png" width="50" height="50"> | 박지원 | Backend Developer | Email: angry9908@gmail.com<br>GitHub: [@jiwonp7747](https://github.com/jiwonp7747) |
-| <img src="[https://github.com/hyynjju.png](https://github.com/hyynjju.png)" width="50" height="50"> | 조현주 | UX/UI / Frontend Developer | Email: hyynjju@gmail.com<br>GitHub: [@hyynjju](https://github.com/hyynjju) |
-| <img src="[https://github.com/kimgazii.png](https://github.com/kimgazii.png)" width="50" height="50"> | 김가영 | Frontend Developer | Email: gy0424ya@gmail.com <br>GitHub: [@kimgazii](https://github.com/kimgazii) |
-| <img src="[https://github.com/hs-2171117-yeyoungyang.png](https://github.com/hs-2171117-yeyoungyang.png)" width="50" height="50"> | 양예영 | Frontend Developer | Email: yangyeyoung13@gmail.com<br>GitHub: [@hs-2171117-yeyoungyang](https://github.com/hs-2171117-yeyoungyang) |
+| <img src="https://github.com/jiwonp7747.png" width="50" height="50"> | 👑 박지원 | Backend Developer | Email: angry9908@gmail.com<br>GitHub: [@jiwonp7747](https://github.com/jiwonp7747) |
+| <img src="https://github.com/HONGMOEJI.png" width="50" height="50"> | 홍영준 | Backend Developer | Email: moejihong@gmail.com<br>GitHub: [@HONGMOEJI](https://github.com/HONGMOEJI) |
+| <img src="https://github.com/hyynjju.png" width="50" height="50"> | 조현주 | UX/UI / Frontend Developer | Email: hyynjju@gmail.com<br>GitHub: [@hyynjju](https://github.com/hyynjju) |
+| <img src="https://github.com/kimgazii.png" width="50" height="50"> | 김가영 | Frontend Developer | Email: gy0424ya@gmail.com <br>GitHub: [@kimgazii](https://github.com/kimgazii) |
+| <img src="https://github.com/hs-2171117-yeyoungyang.png" width="50" height="50"> | 양예영 | Frontend Developer | Email: yangyeyoung13@gmail.com<br>GitHub: [@hs-2171117-yeyoungyang](https://github.com/hs-2171117-yeyoungyang) |
