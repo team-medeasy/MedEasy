@@ -46,6 +46,9 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 
 ## 1. 문제 (Issues)
 
+![Background](docs/background.png)
+![User Research](docs/user_research.png)
+
 ### I. 고령자의 디지털 역량 한계
 
 - 복약 관리 앱은 많지만, 실제로 **고령층의 복약 관리 앱 사용률은 2.5% 미만**입니다.
