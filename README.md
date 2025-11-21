@@ -1,6 +1,6 @@
 <div align="center">
 
- ![Award](https://img.shields.io/badge/2025-제9회_개방형_클라우드_플랫폼(K--PaaS)_활용_공모전_특별상-darkgreen?style=for-the-badge&logo=trophy)
+ ![Award](https://img.shields.io/badge/2025-제9회_개방형_클라우드_플랫폼(K--PaaS)_활용_공모전_특별상(한국클라우드산업협회장상)-darkgreen?style=for-the-badge&logo=trophy)
  ![Award](https://img.shields.io/badge/2025-한성대학교%20캡스톤디자인%20모바일부문%20장려상-blue?style=for-the-badge&logo=trophy)
  
 </div>
