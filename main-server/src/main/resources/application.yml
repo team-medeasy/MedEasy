@@ -1,0 +1,93 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 4MB
+      max-request-size: 4MB
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+      url: ${ES_HOST}:${ES_PORT}
+      host: ${ES_HOST}
+      port: ${ES_PORT}
+      password: ${ES_PASSWORD}
+
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: public
+        jdbc.batch_size: 30
+        order_inserts: true
+        order_updates: true
+        show_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USERNAME}
+    password: ${GMAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+#        generate_statistics: true # 배치 실행 횟수
+#logging:
+#  level:
+#    org.hibernate.engine.jdbc.batch.internal: DEBUG
+#    org.hibernate.engine.jdbc.spi.SqlStatementLogger: DEBUG
+#    org.hibernate.type.descriptor.sql: TRACE  # 선택 사항
+
+springdoc:
+  swagger-ui:
+    path: /api/swagger
+token:
+  secret:
+    key: ${TOKEN_SECRET_KEY}
+  access-token:
+    plus-hour: ${ACCESS_TOKEN_HOUR}
+  refresh-token:
+    plus-hour: ${REFRESH_TOKEN_HOUR}
+
+redis:
+  jwt:
+    host: ${REDIS_JWT_HOST}
+    port: ${REDIS_JWT_PORT}
+    password: ${REDIS_JWT_PASSWORD}
+
+  alarm:
+    host: ${REDIS_ALARM_HOST}
+    port: ${REDIS_ALARM_PORT}
+    password: ${REDIS_ALARM_PASSWORD}
+
+ocr:
+  api:
+    url: ${OCR_API_URL}
+  secret: ${OCR_SECRET}
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}
+    url: ${GEMINI_API_URL}
+
+kakao:
+  api:
+    user-info-uri: ${KAKAO_USER_INFO_URI}
+
+tts:
+  output-dir: ${TTS_OUTPUT_DIR}
+
+apple:
+  client-id: ${APPLE_CLIENT_ID}
+  team-id: ${APPLE_TEAM_ID}
+  key-id : ${APPLE_KEY_ID}
+  private-key-path: ${APPLE_SECRET_KEY_PATH}
