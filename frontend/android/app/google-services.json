@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "570714556248",
+    "project_id": "medeasy-64a51",
+    "storage_bucket": "medeasy-64a51.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570714556248:android:3cbf80d9ab7d600d7d872d",
+        "android_client_info": {
+          "package_name": "dev.medeasy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF1tNdPcRGdaOIM0gztuiun-6Gk1h_VV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
