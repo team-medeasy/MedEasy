@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: medeasy-ai-service
+
+spec:
+  type: NodePort
+  selector:
+    app: medeasy-ai-app
+  ports:
+    - port: 8000
+      protocol: TCP
+      targetPort: 8000
+      nodePort: 30001

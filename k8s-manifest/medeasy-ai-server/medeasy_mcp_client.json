@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "fastapi-mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "http://medeasy-mcp-server-service:8000/mcp",
+        "8080",
+        "--allow-http"
+      ]
+    }
+  }
+}

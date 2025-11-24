@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: medeasy-main-deployment
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: medeasy-main-app
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+
+  template:
+    metadata:
+      labels:
+        app: medeasy-main-app
+
+    spec:
+      imagePullSecrets:
+        - name: ncp-container-registry-secret
+      containers:
+        - name: medeasy-main-container
+          image: medeasy-registry.kr.ncr.ntruss.com/medeasy-main:latest
+          command: ["java", "-jar", "/app/app.jar"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: medeasy-main-secret
+
+          volumeMounts:
+            - mountPath: /app/logs
+              name: spring-log-volume
+
+            - name: gcp-credentials
+              mountPath: /var/secrets/gcp
+              readOnly: true
+
+            - name: apple-secret-key
+              mountPath: /var/secrets/apple
+              readOnly: true
+
+      volumes:
+        - name: spring-log-volume
+          hostPath:
+            path: /home/ubuntu/spring-logs
+            type: DirectoryOrCreate
+
+        - name: gcp-credentials
+          secret:
+            secretName: gcp-credentials
+
+        - name: apple-secret-key
+          secret:
+            secretName: medeasy-apple-secret

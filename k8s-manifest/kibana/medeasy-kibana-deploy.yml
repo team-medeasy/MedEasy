@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medeasy-kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medeasy-kibana
+  template:
+    metadata:
+      labels:
+        app: medeasy-kibana
+    spec:
+      containers:
+        - name: kibana
+          image: docker.elastic.co/kibana/kibana:8.5.0
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: "http://medeasy-es:9200"
+            - name: ELASTICSEARCH_USERNAME
+              value: "elastic"
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: es-secret
+                  key: KIBANA_PASSWORD
+            - name: SERVER_NAME
+              value: "medeasy-kibana"
+            - name: SERVER_HOST
+              value: "0.0.0.0"
+            - name: XPACK_SECURITY_ENABLED
+              value: "true"
+            - name: XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY
+              value: "something_at_least_32_characters_long"
+          ports:
+            - containerPort: 5601
+              name: http
+          resources:
+            limits:
+              memory: 384Mi      # 더 줄여도 됨
+              cpu: 300m
+            requests:
+              memory: 192Mi      # 최소 요청량
+              cpu: 200m
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 5601
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 5601
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3

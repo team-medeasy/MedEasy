@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: chat-redis-data-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /root/chat-redis/data
+  storageClassName: chat-redis-storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chat-redis-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: chat-redis-storage
+  volumeName: chat-redis-data-pv

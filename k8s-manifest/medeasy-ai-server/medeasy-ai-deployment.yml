@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medeasy-ai-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medeasy-ai-app
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+
+  template:
+    metadata:
+      labels:
+        app: medeasy-ai-app
+    spec:
+      imagePullSecrets:
+        - name: ncp-container-registry-secret
+      containers:
+        - name: medeasy-ai-container
+          image: medeasy-registry.kr.ncr.ntruss.com/medeasy-ai:latest
+          command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: medeasy-ai-secret
+
+          volumeMounts:
+            - mountPath: /app/mcp_client_config
+              name: medeasy-mcp-client-config
+
+            - name: gcp-credentials
+              mountPath: /var/secrets/gcp
+              readOnly: true
+
+      volumes:
+        - name: medeasy-mcp-client-config
+          configMap:
+            name: medeasy-mcp-client-config
+
+        - name: gcp-credentials
+          secret:
+            secretName: gcp-credentials
