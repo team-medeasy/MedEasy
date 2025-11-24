@@ -7,7 +7,7 @@
 
 # 메디지(MedEasy) - 디지털 소외 계층을 위한 대화형 AI 복약 관리 비서
 
-![Cover](docs/cover.png)
+![Cover](.github/profile/docs/cover.png)
 
 <div align="center">
 
@@ -40,14 +40,14 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 <div align="center">
 
 [![TestFlight](https://img.shields.io/badge/TestFlight-0A84FF?style=for-the-badge&logo=apple&logoColor=white)](https://testflight.apple.com/join/Ra98ySDU)  
-[![TestFlight QR](docs/testflight.png)](https://testflight.apple.com/join/Ra98ySDU)
+[![TestFlight QR](.github/profile/docs/testflight.png)](https://testflight.apple.com/join/Ra98ySDU)
 
 </div>
 
 ## 1. 문제 (Issues)
 
-![Background](docs/background.png)
-![User Research](docs/user_research.png)
+![Background](.github/profile/docs/background.png)
+![User Research](.github/profile/docs/user_research.png)
 
 ### I. 고령자의 디지털 역량 한계
 
@@ -69,7 +69,7 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 
 ## 2. 시장 조사
 유사 서비스를 조사하고 메디지만의 목표를 설정했습니다.
-![Market Research](docs/market_research.png)
+![Market Research](.github/profile/docs/market_research.png)
 
 ### I. 경쟁 서비스
 > 대부분의 기존 앱은 **텍스트 기반 검색** 또는 **직접 입력 방식**에 의존하고 있어<br>
@@ -79,7 +79,7 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 메디지가 목표로 하는 포지션은 **대화만으로 약 검색·복약 관리가 가능한 서비스**입니다.
 
 ## 3. 솔루션 & 핵심 가치 (Solutions & Values)
-![Solutions](docs/solutions.png)
+![Solutions](.github/profile/docs/solutions.png)
 
 ### Solution 1. 음성 중심 복약 관리 (Conversational UX)
 
@@ -131,17 +131,17 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 | **NFC 태깅 복약 체크** | 전용 NFC 카드를 태깅하면 앱 진입 및 약 선택 없이 바로 복약 기록이 처리됩니다. |
 
 
-![Features 1](docs/feature_01.png)
-![Features 2](docs/feature_02.png)
-![Features 3](docs/feature_03.png)
-![Features 4](docs/feature_04.png)
-![Features 5](docs/feature_05.png)
+![Features 1](.github/profile/docs/feature_01.png)
+![Features 2](.github/profile/docs/feature_02.png)
+![Features 3](.github/profile/docs/feature_03.png)
+![Features 4](.github/profile/docs/feature_04.png)
+![Features 5](.github/profile/docs/feature_05.png)
 
 
 ## 5. AI 에이전트 성능 최적화 (AI Performance)
 
 메디지 팀은 **AI 에이전트 성능과 응답 속도**를 핵심 지표로 두고 고도화했습니다.
-![AI Performance](docs/ai_performance.png)
+![AI Performance](.github/profile/docs/ai_performance.png)
 
 ### I. 응답 지연 시간 개선
 
@@ -199,7 +199,7 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 
 ## 7. 시스템 아키텍처 (Architecture)
 
-![System Architecture](docs/architecture.jpg)
+![System Architecture](.github/profile/docs/architecture.jpg)
 
 ### I. Cloud Native MSA on Ncloud Kubernetes Service
 
@@ -269,7 +269,7 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 
 
 ## 10. 기대 효과 (Outcomes)
-![Outcomes](docs/outcomes.png)
+![Outcomes](.github/profile/docs/outcomes.png)
 
 | 번호 | 내용 |
 |------|------|
@@ -280,7 +280,7 @@ TestFlight를 통해 설치하고 음성 기반 복약 관리 플로우를 직�
 | **05** | 가족 또는 간병인의 실시간 복약 현황 확인으로<br>**돌봄 효율 향상** |
 
 ## 11. 확장성 (Impact)
-![Impact](docs/impact.png)
+![Impact](.github/profile/docs/impact.png)
 
 ### 서비스 확장성 (Service Expansion)
 
