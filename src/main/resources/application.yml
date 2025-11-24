@@ -1,0 +1,59 @@
+
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: public
+        jdbc.batch_size: 30
+        order_inserts: true
+        order_updates: true
+        show_sql: true
+#        generate_statistics: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USERNAME}
+    password: ${GMAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+springdoc:
+  swagger-ui:
+    path: /api/swagger
+
+token:
+  secret:
+    key: ${TOKEN_SECRET_KEY}
+  access-token:
+    plus-hour: ${ACCESS_TOKEN_HOUR}
+  refresh-token:
+    plus-hour: ${REFRESH_TOKEN_HOUR}
+
+redis:
+  jwt:
+    host: ${REDIS_JWT_HOST}
+    port: ${REDIS_JWT_PORT}
+    password: ${REDIS_JWT_PASSWORD}
+
+  alarm:
+    host: ${REDIS_ALARM_HOST}
+    port: ${REDIS_ALARM_PORT}
+    password: ${REDIS_ALARM_PASSWORD}
+
+firebase:
+  account:
+    url: ${FIREBASE_ACCOUNT_URL}
+server:
+  port: 8081
