@@ -1,0 +1,16 @@
+/script
+.idea
+/secret
+
+gemini_config.json
+.env
+
+__pycache__/
+*.pyc
+*.pyo
+
+.DS_Store
+
+logs
+mcp_client_config/medeasy_mcp_client.json
+citric-replica*

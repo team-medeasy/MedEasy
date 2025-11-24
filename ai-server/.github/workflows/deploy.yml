@@ -1,0 +1,50 @@
+# .github/workflows/deploy.yml
+name: Deploy to GCP
+
+on:
+#  push:
+#    branches:
+#      - prod
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Copy code to GCP instance
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          source: "."
+          target: "/home/${{ secrets.GCP_USERNAME }}/medeasy"
+
+      - name: SSH into GCP and configure environment
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.GCP_USERNAME }}/medeasy
+
+            # .env 파일 생성 (docker 디렉토리 안에 생성)
+            echo "ELASTIC_USER=${{ secrets.ELASTIC_USER }}" > .env
+            echo "ELASTIC_PASSWORD=${{ secrets.ELASTIC_PASSWORD }}" >> .env
+            echo "ELASTICSEARCH_HOST=${{ secrets.ELASTICSEARCH_HOST }}" >> .env
+            echo "ELASTICSEARCH_PORT=${{ secrets.ELASTICSEARCH_PORT }}" >> .env
+            echo "KIBANA_USER=${{ secrets.KIBANA_USER }}" >> .env
+            echo "KIBANA_PASSWORD=${{ secrets.KIBANA_PASSWORD }}" >> .env
+            echo "GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }}" >> .env
+            echo "GOOGLE_APPLICATION_CREDENTIALS=/gemini_config.json" >> .env
+
+            # Google 인증 JSON 복원
+            echo "${{ secrets.GOOGLE_CONFIG_JSON_BASE64 }}" | base64 --decode > gemini_config.json
+
+            echo "[INFO] 전체 서비스 재빌드 및 재시작"
+            docker-compose -f docker/docker-compose.yml --env-file .env up -d --build
